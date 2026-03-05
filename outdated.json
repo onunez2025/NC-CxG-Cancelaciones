@@ -1,0 +1,93 @@
+{
+  "@eslint/js": {
+    "current": "9.39.2",
+    "wanted": "9.39.3",
+    "latest": "10.0.1",
+    "dependent": "EBM",
+    "location": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint\\js"
+  },
+  "@types/node": {
+    "current": "24.10.12",
+    "wanted": "24.10.13",
+    "latest": "25.3.0",
+    "dependent": "EBM",
+    "location": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\node"
+  },
+  "@types/react": {
+    "current": "19.2.13",
+    "wanted": "19.2.14",
+    "latest": "19.2.14",
+    "dependent": "EBM",
+    "location": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\react"
+  },
+  "eslint": {
+    "current": "9.39.2",
+    "wanted": "9.39.3",
+    "latest": "10.0.2",
+    "dependent": "EBM",
+    "location": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\eslint"
+  },
+  "eslint-plugin-react-refresh": {
+    "current": "0.4.26",
+    "wanted": "0.4.26",
+    "latest": "0.5.2",
+    "dependent": "EBM",
+    "location": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\eslint-plugin-react-refresh"
+  },
+  "globals": {
+    "current": "16.5.0",
+    "wanted": "16.5.0",
+    "latest": "17.3.0",
+    "dependent": "EBM",
+    "location": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\globals"
+  },
+  "i18next": {
+    "current": "25.8.4",
+    "wanted": "25.8.13",
+    "latest": "25.8.13",
+    "dependent": "EBM",
+    "location": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\i18next"
+  },
+  "i18next-browser-languagedetector": {
+    "current": "8.2.0",
+    "wanted": "8.2.1",
+    "latest": "8.2.1",
+    "dependent": "EBM",
+    "location": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\i18next-browser-languagedetector"
+  },
+  "lucide-react": {
+    "current": "0.563.0",
+    "wanted": "0.563.0",
+    "latest": "0.575.0",
+    "dependent": "EBM",
+    "location": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lucide-react"
+  },
+  "react-router-dom": {
+    "current": "7.13.0",
+    "wanted": "7.13.1",
+    "latest": "7.13.1",
+    "dependent": "EBM",
+    "location": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\react-router-dom"
+  },
+  "tailwind-merge": {
+    "current": "3.4.0",
+    "wanted": "3.5.0",
+    "latest": "3.5.0",
+    "dependent": "EBM",
+    "location": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\tailwind-merge"
+  },
+  "tailwindcss": {
+    "current": "3.4.19",
+    "wanted": "3.4.19",
+    "latest": "4.2.1",
+    "dependent": "EBM",
+    "location": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\tailwindcss"
+  },
+  "typescript-eslint": {
+    "current": "8.55.0",
+    "wanted": "8.56.1",
+    "latest": "8.56.1",
+    "dependent": "EBM",
+    "location": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\typescript-eslint"
+  }
+}

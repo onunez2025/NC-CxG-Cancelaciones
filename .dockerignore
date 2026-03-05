@@ -1,0 +1,13 @@
+node_modules
+dist
+dist-ssr
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+.vscode
+.idea
+*.log
+sap_samples
+ecosystem.config.cjs

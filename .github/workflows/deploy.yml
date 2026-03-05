@@ -1,0 +1,38 @@
+name: Deploy to Hostinger VPS
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            # Ajusta esta ruta a donde tengas el proyecto EBM clonado en el VPS
+            cd /ruta/a/tu/proyecto/EBM 
+            
+            echo "Descargando ultimos cambios..."
+            git reset --hard
+            git pull origin main
+            
+            echo "Instalando dependencias..."
+            npm install
+            
+            echo "Compilando Frontend..."
+            npm run build
+            
+            echo "Reiniciando PM2 Backend Server..."
+            # Asume que pm2 esta instalado globalmente (npm install -g pm2)
+            pm2 reload ecosystem.config.cjs --update-env || pm2 start ecosystem.config.cjs
+            
+            echo "Despliegue Finalizado."

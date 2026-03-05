@@ -1,0 +1,3427 @@
+{
+  "@alloc/quick-lru@5.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/quick-lru",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@alloc\\quick-lru",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@alloc\\quick-lru\\license"
+  },
+  "@azure-rest/core-client@2.5.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Azure/azure-sdk-for-js",
+    "publisher": "Microsoft Corporation",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure-rest\\core-client",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure-rest\\core-client\\LICENSE"
+  },
+  "@azure/abort-controller@2.1.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Azure/azure-sdk-for-js",
+    "publisher": "Microsoft Corporation",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\abort-controller",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\abort-controller\\LICENSE"
+  },
+  "@azure/core-auth@1.10.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Azure/azure-sdk-for-js",
+    "publisher": "Microsoft Corporation",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\core-auth",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\core-auth\\LICENSE"
+  },
+  "@azure/core-client@1.10.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Azure/azure-sdk-for-js",
+    "publisher": "Microsoft Corporation",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\core-client",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\core-client\\LICENSE"
+  },
+  "@azure/core-http-compat@2.3.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Azure/azure-sdk-for-js",
+    "publisher": "Microsoft Corporation",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\core-http-compat",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\core-http-compat\\LICENSE"
+  },
+  "@azure/core-lro@2.7.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Azure/azure-sdk-for-js",
+    "publisher": "Microsoft Corporation",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\core-lro",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\core-lro\\LICENSE"
+  },
+  "@azure/core-paging@1.6.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Azure/azure-sdk-for-js",
+    "publisher": "Microsoft Corporation",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\core-paging",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\core-paging\\LICENSE"
+  },
+  "@azure/core-rest-pipeline@1.22.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Azure/azure-sdk-for-js",
+    "publisher": "Microsoft Corporation",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\core-rest-pipeline",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\core-rest-pipeline\\LICENSE"
+  },
+  "@azure/core-tracing@1.3.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Azure/azure-sdk-for-js",
+    "publisher": "Microsoft Corporation",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\core-tracing",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\core-tracing\\LICENSE"
+  },
+  "@azure/core-util@1.13.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Azure/azure-sdk-for-js",
+    "publisher": "Microsoft Corporation",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\core-util",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\core-util\\LICENSE"
+  },
+  "@azure/identity@4.13.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Azure/azure-sdk-for-js",
+    "publisher": "Microsoft Corporation",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\identity",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\identity\\LICENSE"
+  },
+  "@azure/keyvault-common@2.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Azure/azure-sdk-for-js",
+    "publisher": "Microsoft Corporation",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\keyvault-common",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\keyvault-common\\LICENSE"
+  },
+  "@azure/keyvault-keys@4.10.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Azure/azure-sdk-for-js",
+    "publisher": "Microsoft Corporation",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\keyvault-keys",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\keyvault-keys\\LICENSE"
+  },
+  "@azure/logger@1.3.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Azure/azure-sdk-for-js",
+    "publisher": "Microsoft Corporation",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\logger",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\logger\\LICENSE"
+  },
+  "@azure/msal-browser@4.28.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/AzureAD/microsoft-authentication-library-for-js",
+    "publisher": "Microsoft",
+    "email": "nugetaad@microsoft.com",
+    "url": "https://www.microsoft.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\msal-browser",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\msal-browser\\LICENSE"
+  },
+  "@azure/msal-common@15.14.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/AzureAD/microsoft-authentication-library-for-js",
+    "publisher": "Microsoft",
+    "email": "nugetaad@microsoft.com",
+    "url": "https://www.microsoft.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\msal-common",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\msal-common\\LICENSE"
+  },
+  "@azure/msal-node@3.8.7": {
+    "licenses": "MIT",
+    "repository": "https://github.com/AzureAD/microsoft-authentication-library-for-js",
+    "publisher": "Microsoft",
+    "email": "nugetaad@microsoft.com",
+    "url": "https://www.microsoft.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\msal-node",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\msal-node\\LICENSE"
+  },
+  "@babel/code-frame@7.29.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\code-frame",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\code-frame\\LICENSE"
+  },
+  "@babel/compat-data@7.29.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\compat-data",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\compat-data\\LICENSE"
+  },
+  "@babel/core@7.29.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\core",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\core\\LICENSE"
+  },
+  "@babel/generator@7.29.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\generator",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\generator\\LICENSE"
+  },
+  "@babel/helper-compilation-targets@7.28.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\helper-compilation-targets",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\helper-compilation-targets\\LICENSE"
+  },
+  "@babel/helper-globals@7.28.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\helper-globals",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\helper-globals\\LICENSE"
+  },
+  "@babel/helper-module-imports@7.28.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\helper-module-imports",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\helper-module-imports\\LICENSE"
+  },
+  "@babel/helper-module-transforms@7.28.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\helper-module-transforms",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\helper-module-transforms\\LICENSE"
+  },
+  "@babel/helper-plugin-utils@7.28.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\helper-plugin-utils",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\helper-plugin-utils\\LICENSE"
+  },
+  "@babel/helper-string-parser@7.27.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\helper-string-parser",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\helper-string-parser\\LICENSE"
+  },
+  "@babel/helper-validator-identifier@7.28.5": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\helper-validator-identifier",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\helper-validator-identifier\\LICENSE"
+  },
+  "@babel/helper-validator-option@7.27.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\helper-validator-option",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\helper-validator-option\\LICENSE"
+  },
+  "@babel/helpers@7.28.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\helpers",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\helpers\\LICENSE"
+  },
+  "@babel/parser@7.29.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\parser",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\parser\\LICENSE"
+  },
+  "@babel/plugin-transform-react-jsx-self@7.27.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\plugin-transform-react-jsx-self",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\plugin-transform-react-jsx-self\\LICENSE"
+  },
+  "@babel/plugin-transform-react-jsx-source@7.27.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\plugin-transform-react-jsx-source",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\plugin-transform-react-jsx-source\\LICENSE"
+  },
+  "@babel/runtime@7.28.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\runtime",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\runtime\\LICENSE"
+  },
+  "@babel/template@7.28.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\template",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\template\\LICENSE"
+  },
+  "@babel/traverse@7.29.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\traverse",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\traverse\\LICENSE"
+  },
+  "@babel/types@7.29.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/babel/babel",
+    "publisher": "The Babel Team",
+    "url": "https://babel.dev/team",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\types",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@babel\\types\\LICENSE"
+  },
+  "@esbuild/win32-x64@0.27.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/evanw/esbuild",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@esbuild\\win32-x64",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@esbuild\\win32-x64\\README.md"
+  },
+  "@eslint-community/eslint-utils@4.9.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/eslint-community/eslint-utils",
+    "publisher": "Toru Nagashima",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint-community\\eslint-utils",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint-community\\eslint-utils\\LICENSE"
+  },
+  "@eslint-community/regexpp@4.12.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/eslint-community/regexpp",
+    "publisher": "Toru Nagashima",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint-community\\regexpp",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint-community\\regexpp\\LICENSE"
+  },
+  "@eslint/config-array@0.21.1": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/eslint/rewrite",
+    "publisher": "Nicholas C. Zakas",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint\\config-array",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint\\config-array\\LICENSE"
+  },
+  "@eslint/config-helpers@0.4.2": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/eslint/rewrite",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint\\config-helpers",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint\\config-helpers\\LICENSE"
+  },
+  "@eslint/core@0.17.0": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/eslint/rewrite",
+    "publisher": "Nicholas C. Zakas",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint\\core",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint\\core\\LICENSE"
+  },
+  "@eslint/eslintrc@3.3.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/eslint/eslintrc",
+    "publisher": "Nicholas C. Zakas",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint\\eslintrc",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint\\eslintrc\\LICENSE"
+  },
+  "@eslint/js@9.39.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/eslint/eslint",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint\\js",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint\\js\\LICENSE"
+  },
+  "@eslint/object-schema@2.1.7": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/eslint/rewrite",
+    "publisher": "Nicholas C. Zakas",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint\\object-schema",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint\\object-schema\\LICENSE"
+  },
+  "@eslint/plugin-kit@0.4.1": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/eslint/rewrite",
+    "publisher": "Nicholas C. Zakas",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint\\plugin-kit",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint\\plugin-kit\\LICENSE"
+  },
+  "@humanfs/core@0.19.1": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/humanwhocodes/humanfs",
+    "publisher": "Nicholas C. Zakas",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@humanfs\\core",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@humanfs\\core\\LICENSE"
+  },
+  "@humanfs/node@0.16.7": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/humanwhocodes/humanfs",
+    "publisher": "Nicholas C. Zakas",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@humanfs\\node",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@humanfs\\node\\LICENSE"
+  },
+  "@humanwhocodes/module-importer@1.0.1": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/humanwhocodes/module-importer",
+    "publisher": "Nicholas C. Zaks",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@humanwhocodes\\module-importer",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@humanwhocodes\\module-importer\\LICENSE"
+  },
+  "@humanwhocodes/retry@0.4.3": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/humanwhocodes/retry",
+    "publisher": "Nicholas C. Zaks",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@humanwhocodes\\retry",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@humanwhocodes\\retry\\LICENSE"
+  },
+  "@jridgewell/gen-mapping@0.3.13": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jridgewell/sourcemaps",
+    "publisher": "Justin Ridgewell",
+    "email": "justin@ridgewell.name",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@jridgewell\\gen-mapping",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@jridgewell\\gen-mapping\\LICENSE"
+  },
+  "@jridgewell/remapping@2.3.5": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jridgewell/sourcemaps",
+    "publisher": "Justin Ridgewell",
+    "email": "justin@ridgewell.name",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@jridgewell\\remapping",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@jridgewell\\remapping\\LICENSE"
+  },
+  "@jridgewell/resolve-uri@3.1.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jridgewell/resolve-uri",
+    "publisher": "Justin Ridgewell",
+    "email": "justin@ridgewell.name",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@jridgewell\\resolve-uri",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@jridgewell\\resolve-uri\\LICENSE"
+  },
+  "@jridgewell/sourcemap-codec@1.5.5": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jridgewell/sourcemaps",
+    "publisher": "Justin Ridgewell",
+    "email": "justin@ridgewell.name",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@jridgewell\\sourcemap-codec",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@jridgewell\\sourcemap-codec\\LICENSE"
+  },
+  "@jridgewell/trace-mapping@0.3.31": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jridgewell/sourcemaps",
+    "publisher": "Justin Ridgewell",
+    "email": "justin@ridgewell.name",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@jridgewell\\trace-mapping",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@jridgewell\\trace-mapping\\LICENSE"
+  },
+  "@js-joda/core@5.7.0": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/js-joda/js-joda",
+    "publisher": "pithu",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@js-joda\\core",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@js-joda\\core\\LICENSE"
+  },
+  "@nodelib/fs.scandir@2.1.5": {
+    "licenses": "MIT",
+    "repository": "https://github.com/nodelib/nodelib/tree/master/packages/fs/fs.scandir",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@nodelib\\fs.scandir",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@nodelib\\fs.scandir\\LICENSE"
+  },
+  "@nodelib/fs.stat@2.0.5": {
+    "licenses": "MIT",
+    "repository": "https://github.com/nodelib/nodelib/tree/master/packages/fs/fs.stat",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@nodelib\\fs.stat",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@nodelib\\fs.stat\\LICENSE"
+  },
+  "@nodelib/fs.walk@1.2.8": {
+    "licenses": "MIT",
+    "repository": "https://github.com/nodelib/nodelib/tree/master/packages/fs/fs.walk",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@nodelib\\fs.walk",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@nodelib\\fs.walk\\LICENSE"
+  },
+  "@reduxjs/toolkit@2.11.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/reduxjs/redux-toolkit",
+    "publisher": "Mark Erikson",
+    "email": "mark@isquaredsoftware.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@reduxjs\\toolkit",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@reduxjs\\toolkit\\LICENSE"
+  },
+  "@rolldown/pluginutils@1.0.0-rc.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/rolldown/rolldown",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@rolldown\\pluginutils",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@rolldown\\pluginutils\\LICENSE"
+  },
+  "@rollup/rollup-win32-x64-gnu@4.57.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/rollup/rollup",
+    "publisher": "Lukas Taegert-Atkinson",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@rollup\\rollup-win32-x64-gnu",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@rollup\\rollup-win32-x64-gnu\\README.md"
+  },
+  "@rollup/rollup-win32-x64-msvc@4.57.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/rollup/rollup",
+    "publisher": "Lukas Taegert-Atkinson",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@rollup\\rollup-win32-x64-msvc",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@rollup\\rollup-win32-x64-msvc\\README.md"
+  },
+  "@standard-schema/spec@1.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/standard-schema/standard-schema",
+    "publisher": "Colin McDonnell",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@standard-schema\\spec",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@standard-schema\\spec\\LICENSE"
+  },
+  "@standard-schema/utils@0.3.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/standard-schema/standard-schema",
+    "publisher": "Fabian Hiller",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@standard-schema\\utils",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@standard-schema\\utils\\LICENSE"
+  },
+  "@tediousjs/connection-string@0.6.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/tediousjs/connection-string",
+    "publisher": "Dan Hensby",
+    "email": "git@hens.by",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@tediousjs\\connection-string",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@tediousjs\\connection-string\\LICENSE"
+  },
+  "@types/babel__core@7.20.5": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\babel__core",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\babel__core\\LICENSE"
+  },
+  "@types/babel__generator@7.27.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\babel__generator",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\babel__generator\\LICENSE"
+  },
+  "@types/babel__template@7.4.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\babel__template",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\babel__template\\LICENSE"
+  },
+  "@types/babel__traverse@7.28.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\babel__traverse",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\babel__traverse\\LICENSE"
+  },
+  "@types/bcrypt@6.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\bcrypt",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\bcrypt\\LICENSE"
+  },
+  "@types/body-parser@1.19.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\body-parser",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\body-parser\\LICENSE"
+  },
+  "@types/connect@3.4.38": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\connect",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\connect\\LICENSE"
+  },
+  "@types/cors@2.8.19": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\cors",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\cors\\LICENSE"
+  },
+  "@types/d3-array@3.2.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\d3-array",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\d3-array\\LICENSE"
+  },
+  "@types/d3-color@3.1.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\d3-color",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\d3-color\\LICENSE"
+  },
+  "@types/d3-ease@3.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\d3-ease",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\d3-ease\\LICENSE"
+  },
+  "@types/d3-interpolate@3.0.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\d3-interpolate",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\d3-interpolate\\LICENSE"
+  },
+  "@types/d3-path@3.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\d3-path",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\d3-path\\LICENSE"
+  },
+  "@types/d3-scale@4.0.9": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\d3-scale",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\d3-scale\\LICENSE"
+  },
+  "@types/d3-shape@3.1.8": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\d3-shape",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\d3-shape\\LICENSE"
+  },
+  "@types/d3-time@3.0.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\d3-time",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\d3-time\\LICENSE"
+  },
+  "@types/d3-timer@3.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\d3-timer",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\d3-timer\\LICENSE"
+  },
+  "@types/estree@1.0.8": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\estree",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\estree\\LICENSE"
+  },
+  "@types/express-serve-static-core@5.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\express-serve-static-core",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\express-serve-static-core\\LICENSE"
+  },
+  "@types/express@5.0.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\express",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\express\\LICENSE"
+  },
+  "@types/http-errors@2.0.5": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\http-errors",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\http-errors\\LICENSE"
+  },
+  "@types/json-schema@7.0.15": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\json-schema",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\json-schema\\LICENSE"
+  },
+  "@types/jsonwebtoken@9.0.10": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\jsonwebtoken",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\jsonwebtoken\\LICENSE"
+  },
+  "@types/ms@2.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\ms",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\ms\\LICENSE"
+  },
+  "@types/node@24.10.12": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\node",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\node\\LICENSE"
+  },
+  "@types/qs@6.14.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\qs",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\qs\\LICENSE"
+  },
+  "@types/range-parser@1.2.7": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\range-parser",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\range-parser\\LICENSE"
+  },
+  "@types/react-dom@19.2.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\react-dom",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\react-dom\\LICENSE"
+  },
+  "@types/react@19.2.13": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\react",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\react\\LICENSE"
+  },
+  "@types/readable-stream@4.0.23": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\readable-stream",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\readable-stream\\LICENSE"
+  },
+  "@types/send@1.2.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\send",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\send\\LICENSE"
+  },
+  "@types/serve-static@2.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\serve-static",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\serve-static\\LICENSE"
+  },
+  "@types/use-sync-external-store@0.0.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\use-sync-external-store",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\use-sync-external-store\\LICENSE"
+  },
+  "@types/uuid@10.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\uuid",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@types\\uuid\\LICENSE"
+  },
+  "@typescript-eslint/eslint-plugin@8.55.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/typescript-eslint/typescript-eslint",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\eslint-plugin",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\eslint-plugin\\LICENSE"
+  },
+  "@typescript-eslint/parser@8.55.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/typescript-eslint/typescript-eslint",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\parser",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\parser\\LICENSE"
+  },
+  "@typescript-eslint/project-service@8.55.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/typescript-eslint/typescript-eslint",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\project-service",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\project-service\\LICENSE"
+  },
+  "@typescript-eslint/scope-manager@8.55.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/typescript-eslint/typescript-eslint",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\scope-manager",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\scope-manager\\LICENSE"
+  },
+  "@typescript-eslint/tsconfig-utils@8.55.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/typescript-eslint/typescript-eslint",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\tsconfig-utils",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\tsconfig-utils\\LICENSE"
+  },
+  "@typescript-eslint/type-utils@8.55.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/typescript-eslint/typescript-eslint",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\type-utils",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\type-utils\\LICENSE"
+  },
+  "@typescript-eslint/types@8.55.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/typescript-eslint/typescript-eslint",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\types",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\types\\LICENSE"
+  },
+  "@typescript-eslint/typescript-estree@8.55.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/typescript-eslint/typescript-eslint",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\typescript-estree",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\typescript-estree\\LICENSE"
+  },
+  "@typescript-eslint/utils@8.55.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/typescript-eslint/typescript-eslint",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\utils",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\utils\\LICENSE"
+  },
+  "@typescript-eslint/visitor-keys@8.55.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/typescript-eslint/typescript-eslint",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\visitor-keys",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\visitor-keys\\LICENSE"
+  },
+  "@typespec/ts-http-runtime@0.3.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Azure/azure-sdk-for-js",
+    "publisher": "Microsoft Corporation",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typespec\\ts-http-runtime",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typespec\\ts-http-runtime\\LICENSE"
+  },
+  "@vitejs/plugin-react@5.1.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/vitejs/vite-plugin-react",
+    "publisher": "Evan You",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@vitejs\\plugin-react",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@vitejs\\plugin-react\\LICENSE"
+  },
+  "abort-controller@3.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/mysticatea/abort-controller",
+    "publisher": "Toru Nagashima",
+    "url": "https://github.com/mysticatea",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\abort-controller",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\abort-controller\\LICENSE"
+  },
+  "accepts@2.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jshttp/accepts",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\accepts",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\accepts\\LICENSE"
+  },
+  "acorn-jsx@5.3.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/acornjs/acorn-jsx",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\acorn-jsx",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\acorn-jsx\\LICENSE"
+  },
+  "acorn@8.15.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/acornjs/acorn",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\acorn",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\acorn\\LICENSE"
+  },
+  "adler-32@1.3.1": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/SheetJS/js-adler32",
+    "publisher": "sheetjs",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\adler-32",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\adler-32\\LICENSE"
+  },
+  "agent-base@7.1.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/TooTallNate/proxy-agents",
+    "publisher": "Nathan Rajlich",
+    "email": "nathan@tootallnate.net",
+    "url": "http://n8.io/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\agent-base",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\agent-base\\LICENSE"
+  },
+  "ajv@6.12.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/ajv-validator/ajv",
+    "publisher": "Evgeny Poberezkin",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ajv",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ajv\\LICENSE"
+  },
+  "ansi-styles@4.3.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/chalk/ansi-styles",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ansi-styles",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ansi-styles\\license"
+  },
+  "any-promise@1.3.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/kevinbeaty/any-promise",
+    "publisher": "Kevin Beaty",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\any-promise",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\any-promise\\LICENSE"
+  },
+  "anymatch@3.1.3": {
+    "licenses": "ISC",
+    "repository": "https://github.com/micromatch/anymatch",
+    "publisher": "Elan Shanker",
+    "url": "https://github.com/es128",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\anymatch",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\anymatch\\LICENSE"
+  },
+  "arg@5.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/vercel/arg",
+    "publisher": "Josh Junon",
+    "email": "junon@wavetilt.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\arg",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\arg\\LICENSE.md"
+  },
+  "argparse@2.0.1": {
+    "licenses": "Python-2.0",
+    "repository": "https://github.com/nodeca/argparse",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\argparse",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\argparse\\LICENSE"
+  },
+  "autoprefixer@10.4.24": {
+    "licenses": "MIT",
+    "repository": "https://github.com/postcss/autoprefixer",
+    "publisher": "Andrey Sitnik",
+    "email": "andrey@sitnik.ru",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\autoprefixer",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\autoprefixer\\LICENSE"
+  },
+  "balanced-match@1.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/juliangruber/balanced-match",
+    "publisher": "Julian Gruber",
+    "email": "mail@juliangruber.com",
+    "url": "http://juliangruber.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\balanced-match",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\balanced-match\\LICENSE.md"
+  },
+  "base64-js@1.5.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/beatgammit/base64-js",
+    "publisher": "T. Jameson Little",
+    "email": "t.jameson.little@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\base64-js",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\base64-js\\LICENSE"
+  },
+  "baseline-browser-mapping@2.9.19": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/web-platform-dx/baseline-browser-mapping",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\baseline-browser-mapping",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\baseline-browser-mapping\\LICENSE.txt"
+  },
+  "bcrypt@6.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/kelektiv/node.bcrypt.js",
+    "publisher": "Nick Campbell",
+    "url": "https://github.com/ncb000gt",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\bcrypt",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\bcrypt\\LICENSE"
+  },
+  "binary-extensions@2.3.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/binary-extensions",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\binary-extensions",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\binary-extensions\\license"
+  },
+  "bl@6.1.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/rvagg/bl",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\bl",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\bl\\LICENSE.md"
+  },
+  "body-parser@2.2.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/expressjs/body-parser",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\body-parser",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\body-parser\\LICENSE"
+  },
+  "brace-expansion@1.1.12": {
+    "licenses": "MIT",
+    "repository": "https://github.com/juliangruber/brace-expansion",
+    "publisher": "Julian Gruber",
+    "email": "mail@juliangruber.com",
+    "url": "http://juliangruber.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\brace-expansion",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\brace-expansion\\LICENSE"
+  },
+  "brace-expansion@2.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/juliangruber/brace-expansion",
+    "publisher": "Julian Gruber",
+    "email": "mail@juliangruber.com",
+    "url": "http://juliangruber.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\typescript-estree\\node_modules\\brace-expansion",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\typescript-estree\\node_modules\\brace-expansion\\LICENSE"
+  },
+  "braces@3.0.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/micromatch/braces",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\braces",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\braces\\LICENSE"
+  },
+  "browserslist@4.28.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/browserslist/browserslist",
+    "publisher": "Andrey Sitnik",
+    "email": "andrey@sitnik.ru",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\browserslist",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\browserslist\\LICENSE"
+  },
+  "buffer-equal-constant-time@1.0.1": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/goinstant/buffer-equal-constant-time",
+    "publisher": "GoInstant Inc., a salesforce.com company",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\buffer-equal-constant-time",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\buffer-equal-constant-time\\LICENSE.txt"
+  },
+  "buffer@6.0.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/feross/buffer",
+    "publisher": "Feross Aboukhadijeh",
+    "email": "feross@feross.org",
+    "url": "https://feross.org",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\buffer",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\buffer\\LICENSE"
+  },
+  "bundle-name@4.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/bundle-name",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\bundle-name",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\bundle-name\\license"
+  },
+  "bytes@3.1.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/visionmedia/bytes.js",
+    "publisher": "TJ Holowaychuk",
+    "email": "tj@vision-media.ca",
+    "url": "http://tjholowaychuk.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\bytes",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\bytes\\LICENSE"
+  },
+  "call-bind-apply-helpers@1.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/ljharb/call-bind-apply-helpers",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\call-bind-apply-helpers",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\call-bind-apply-helpers\\LICENSE"
+  },
+  "call-bound@1.0.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/ljharb/call-bound",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\call-bound",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\call-bound\\LICENSE"
+  },
+  "callsites@3.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/callsites",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\callsites",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\callsites\\license"
+  },
+  "camelcase-css@2.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/stevenvachon/camelcase-css",
+    "publisher": "Steven Vachon",
+    "email": "contact@svachon.com",
+    "url": "https://www.svachon.com/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\camelcase-css",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\camelcase-css\\license"
+  },
+  "caniuse-lite@1.0.30001769": {
+    "licenses": "CC-BY-4.0",
+    "repository": "https://github.com/browserslist/caniuse-lite",
+    "publisher": "Ben Briggs",
+    "email": "beneb.info@gmail.com",
+    "url": "http://beneb.info",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\caniuse-lite",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\caniuse-lite\\LICENSE"
+  },
+  "cfb@1.2.2": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/SheetJS/js-cfb",
+    "publisher": "sheetjs",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\cfb",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\cfb\\LICENSE"
+  },
+  "chalk@4.1.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/chalk/chalk",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\chalk",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\chalk\\license"
+  },
+  "chokidar@3.6.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/paulmillr/chokidar",
+    "publisher": "Paul Miller",
+    "url": "https://paulmillr.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\chokidar",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\chokidar\\LICENSE"
+  },
+  "clsx@2.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lukeed/clsx",
+    "publisher": "Luke Edwards",
+    "email": "luke.edwards05@gmail.com",
+    "url": "https://lukeed.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\clsx",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\clsx\\license"
+  },
+  "codepage@1.15.0": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/SheetJS/js-codepage",
+    "publisher": "SheetJS",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\codepage",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\codepage\\LICENSE"
+  },
+  "color-convert@2.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Qix-/color-convert",
+    "publisher": "Heather Arthur",
+    "email": "fayearthur@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\color-convert",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\color-convert\\LICENSE"
+  },
+  "color-name@1.1.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/colorjs/color-name",
+    "publisher": "DY",
+    "email": "dfcreative@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\color-name",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\color-name\\LICENSE"
+  },
+  "commander@11.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/tj/commander.js",
+    "publisher": "TJ Holowaychuk",
+    "email": "tj@vision-media.ca",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\mssql\\node_modules\\commander",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\mssql\\node_modules\\commander\\LICENSE"
+  },
+  "commander@4.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/tj/commander.js",
+    "publisher": "TJ Holowaychuk",
+    "email": "tj@vision-media.ca",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\commander",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\commander\\LICENSE"
+  },
+  "concat-map@0.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/substack/node-concat-map",
+    "publisher": "James Halliday",
+    "email": "mail@substack.net",
+    "url": "http://substack.net",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\concat-map",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\concat-map\\LICENSE"
+  },
+  "content-disposition@1.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jshttp/content-disposition",
+    "publisher": "Douglas Christopher Wilson",
+    "email": "doug@somethingdoug.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\content-disposition",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\content-disposition\\LICENSE"
+  },
+  "content-type@1.0.5": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jshttp/content-type",
+    "publisher": "Douglas Christopher Wilson",
+    "email": "doug@somethingdoug.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\content-type",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\content-type\\LICENSE"
+  },
+  "convert-source-map@2.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/thlorenz/convert-source-map",
+    "publisher": "Thorsten Lorenz",
+    "email": "thlorenz@gmx.de",
+    "url": "http://thlorenz.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\convert-source-map",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\convert-source-map\\LICENSE"
+  },
+  "cookie-signature@1.2.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/visionmedia/node-cookie-signature",
+    "publisher": "TJ Holowaychuk",
+    "email": "tj@learnboost.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\cookie-signature",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\cookie-signature\\LICENSE"
+  },
+  "cookie@0.7.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jshttp/cookie",
+    "publisher": "Roman Shtylman",
+    "email": "shtylman@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\express\\node_modules\\cookie",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\express\\node_modules\\cookie\\LICENSE"
+  },
+  "cookie@1.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jshttp/cookie",
+    "publisher": "Roman Shtylman",
+    "email": "shtylman@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\cookie",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\cookie\\LICENSE"
+  },
+  "cors@2.8.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/expressjs/cors",
+    "publisher": "Troy Goode",
+    "email": "troygoode@gmail.com",
+    "url": "https://github.com/troygoode/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\cors",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\cors\\LICENSE"
+  },
+  "crc-32@1.2.2": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/SheetJS/js-crc32",
+    "publisher": "sheetjs",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\crc-32",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\crc-32\\LICENSE"
+  },
+  "cross-fetch@4.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lquixada/cross-fetch",
+    "publisher": "Leonardo Quixada",
+    "email": "lquixada@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\cross-fetch",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\cross-fetch\\LICENSE"
+  },
+  "cross-spawn@7.0.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/moxystudio/node-cross-spawn",
+    "publisher": "André Cruz",
+    "email": "andre@moxy.studio",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\cross-spawn",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\cross-spawn\\LICENSE"
+  },
+  "cssesc@3.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/mathiasbynens/cssesc",
+    "publisher": "Mathias Bynens",
+    "url": "https://mathiasbynens.be/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\cssesc",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\cssesc\\LICENSE-MIT.txt"
+  },
+  "csstype@3.2.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/frenic/csstype",
+    "publisher": "Fredrik Nicol",
+    "email": "fredrik.nicol@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\csstype",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\csstype\\LICENSE"
+  },
+  "d3-array@3.2.4": {
+    "licenses": "ISC",
+    "repository": "https://github.com/d3/d3-array",
+    "publisher": "Mike Bostock",
+    "url": "http://bost.ocks.org/mike",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-array",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-array\\LICENSE"
+  },
+  "d3-color@3.1.0": {
+    "licenses": "ISC",
+    "repository": "https://github.com/d3/d3-color",
+    "publisher": "Mike Bostock",
+    "url": "http://bost.ocks.org/mike",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-color",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-color\\LICENSE"
+  },
+  "d3-ease@3.0.1": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/d3/d3-ease",
+    "publisher": "Mike Bostock",
+    "url": "http://bost.ocks.org/mike",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-ease",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-ease\\LICENSE"
+  },
+  "d3-format@3.1.2": {
+    "licenses": "ISC",
+    "repository": "https://github.com/d3/d3-format",
+    "publisher": "Mike Bostock",
+    "url": "http://bost.ocks.org/mike",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-format",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-format\\LICENSE"
+  },
+  "d3-interpolate@3.0.1": {
+    "licenses": "ISC",
+    "repository": "https://github.com/d3/d3-interpolate",
+    "publisher": "Mike Bostock",
+    "url": "http://bost.ocks.org/mike",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-interpolate",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-interpolate\\LICENSE"
+  },
+  "d3-path@3.1.0": {
+    "licenses": "ISC",
+    "repository": "https://github.com/d3/d3-path",
+    "publisher": "Mike Bostock",
+    "url": "http://bost.ocks.org/mike",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-path",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-path\\LICENSE"
+  },
+  "d3-scale@4.0.2": {
+    "licenses": "ISC",
+    "repository": "https://github.com/d3/d3-scale",
+    "publisher": "Mike Bostock",
+    "url": "https://bost.ocks.org/mike",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-scale",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-scale\\LICENSE"
+  },
+  "d3-shape@3.2.0": {
+    "licenses": "ISC",
+    "repository": "https://github.com/d3/d3-shape",
+    "publisher": "Mike Bostock",
+    "url": "http://bost.ocks.org/mike",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-shape",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-shape\\LICENSE"
+  },
+  "d3-time-format@4.1.0": {
+    "licenses": "ISC",
+    "repository": "https://github.com/d3/d3-time-format",
+    "publisher": "Mike Bostock",
+    "url": "http://bost.ocks.org/mike",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-time-format",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-time-format\\LICENSE"
+  },
+  "d3-time@3.1.0": {
+    "licenses": "ISC",
+    "repository": "https://github.com/d3/d3-time",
+    "publisher": "Mike Bostock",
+    "url": "http://bost.ocks.org/mike",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-time",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-time\\LICENSE"
+  },
+  "d3-timer@3.0.1": {
+    "licenses": "ISC",
+    "repository": "https://github.com/d3/d3-timer",
+    "publisher": "Mike Bostock",
+    "url": "http://bost.ocks.org/mike",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-timer",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\d3-timer\\LICENSE"
+  },
+  "date-fns@4.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/date-fns/date-fns",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\date-fns",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\date-fns\\LICENSE.md"
+  },
+  "debug@4.4.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/debug-js/debug",
+    "publisher": "Josh Junon",
+    "url": "https://github.com/qix-",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\debug",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\debug\\LICENSE"
+  },
+  "decimal.js-light@2.5.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/MikeMcl/decimal.js-light",
+    "publisher": "Michael Mclaughlin",
+    "email": "M8ch88l@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\decimal.js-light",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\decimal.js-light\\LICENCE.md"
+  },
+  "deep-is@0.1.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/thlorenz/deep-is",
+    "publisher": "Thorsten Lorenz",
+    "email": "thlorenz@gmx.de",
+    "url": "http://thlorenz.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\deep-is",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\deep-is\\LICENSE"
+  },
+  "default-browser-id@5.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/default-browser-id",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\default-browser-id",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\default-browser-id\\license"
+  },
+  "default-browser@5.5.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/default-browser",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\default-browser",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\default-browser\\license"
+  },
+  "define-lazy-prop@3.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/define-lazy-prop",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\define-lazy-prop",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\define-lazy-prop\\license"
+  },
+  "depd@2.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/dougwilson/nodejs-depd",
+    "publisher": "Douglas Christopher Wilson",
+    "email": "doug@somethingdoug.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\depd",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\depd\\LICENSE"
+  },
+  "didyoumean@1.2.2": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/dcporter/didyoumean.js",
+    "publisher": "Dave Porter",
+    "email": "dcporter@gmail.com",
+    "url": "http://dcporter.net/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\didyoumean",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\didyoumean\\LICENSE"
+  },
+  "dlv@1.1.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/developit/dlv",
+    "publisher": "Jason Miller",
+    "email": "jason@developit.ca",
+    "url": "http://jasonformat.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\dlv",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\dlv\\README.md"
+  },
+  "dotenv@17.3.1": {
+    "licenses": "BSD-2-Clause",
+    "repository": "https://github.com/motdotla/dotenv",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\dotenv",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\dotenv\\LICENSE"
+  },
+  "dunder-proto@1.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/es-shims/dunder-proto",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\dunder-proto",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\dunder-proto\\LICENSE"
+  },
+  "ebm@0.0.0": {
+    "licenses": "UNLICENSED",
+    "private": true,
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\README.md"
+  },
+  "ecdsa-sig-formatter@1.0.11": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/Brightspace/node-ecdsa-sig-formatter",
+    "publisher": "D2L Corporation",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ecdsa-sig-formatter",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ecdsa-sig-formatter\\LICENSE"
+  },
+  "ee-first@1.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonathanong/ee-first",
+    "publisher": "Jonathan Ong",
+    "email": "me@jongleberry.com",
+    "url": "http://jongleberry.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ee-first",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ee-first\\LICENSE"
+  },
+  "electron-to-chromium@1.5.286": {
+    "licenses": "ISC",
+    "repository": "https://github.com/kilian/electron-to-chromium",
+    "publisher": "Kilian Valkhof",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\electron-to-chromium",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\electron-to-chromium\\LICENSE"
+  },
+  "encodeurl@2.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/pillarjs/encodeurl",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\encodeurl",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\encodeurl\\LICENSE"
+  },
+  "es-define-property@1.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/ljharb/es-define-property",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\es-define-property",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\es-define-property\\LICENSE"
+  },
+  "es-errors@1.3.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/ljharb/es-errors",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\es-errors",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\es-errors\\LICENSE"
+  },
+  "es-object-atoms@1.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/ljharb/es-object-atoms",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\es-object-atoms",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\es-object-atoms\\LICENSE"
+  },
+  "es-toolkit@1.44.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/toss/es-toolkit",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\es-toolkit",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\es-toolkit\\LICENSE"
+  },
+  "esbuild@0.27.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/evanw/esbuild",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\esbuild",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\esbuild\\LICENSE.md"
+  },
+  "escalade@3.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lukeed/escalade",
+    "publisher": "Luke Edwards",
+    "email": "luke.edwards05@gmail.com",
+    "url": "https://lukeed.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\escalade",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\escalade\\license"
+  },
+  "escape-html@1.0.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/component/escape-html",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\escape-html",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\escape-html\\LICENSE"
+  },
+  "escape-string-regexp@4.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/escape-string-regexp",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\escape-string-regexp",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\escape-string-regexp\\license"
+  },
+  "eslint-plugin-react-hooks@7.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/react",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\eslint-plugin-react-hooks",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\eslint-plugin-react-hooks\\LICENSE"
+  },
+  "eslint-plugin-react-refresh@0.4.26": {
+    "licenses": "MIT",
+    "repository": "https://github.com/ArnaudBarre/eslint-plugin-react-refresh",
+    "publisher": "Arnaud Barré",
+    "url": "https://github.com/ArnaudBarre",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\eslint-plugin-react-refresh",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\eslint-plugin-react-refresh\\LICENSE"
+  },
+  "eslint-scope@8.4.0": {
+    "licenses": "BSD-2-Clause",
+    "repository": "https://github.com/eslint/js",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\eslint-scope",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\eslint-scope\\LICENSE"
+  },
+  "eslint-visitor-keys@3.4.3": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/eslint/eslint-visitor-keys",
+    "publisher": "Toru Nagashima",
+    "url": "https://github.com/mysticatea",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint-community\\eslint-utils\\node_modules\\eslint-visitor-keys",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint-community\\eslint-utils\\node_modules\\eslint-visitor-keys\\LICENSE"
+  },
+  "eslint-visitor-keys@4.2.1": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/eslint/js",
+    "publisher": "Toru Nagashima",
+    "url": "https://github.com/mysticatea",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\eslint-visitor-keys",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\eslint-visitor-keys\\LICENSE"
+  },
+  "eslint@9.39.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/eslint/eslint",
+    "publisher": "Nicholas C. Zakas",
+    "email": "nicholas+npm@nczconsulting.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\eslint",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\eslint\\LICENSE"
+  },
+  "espree@10.4.0": {
+    "licenses": "BSD-2-Clause",
+    "repository": "https://github.com/eslint/js",
+    "publisher": "Nicholas C. Zakas",
+    "email": "nicholas+npm@nczconsulting.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\espree",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\espree\\LICENSE"
+  },
+  "esquery@1.7.0": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/estools/esquery",
+    "publisher": "Joel Feenstra",
+    "email": "jrfeenst+esquery@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\esquery",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\esquery\\license.txt"
+  },
+  "esrecurse@4.3.0": {
+    "licenses": "BSD-2-Clause",
+    "repository": "https://github.com/estools/esrecurse",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\esrecurse",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\esrecurse\\README.md"
+  },
+  "estraverse@5.3.0": {
+    "licenses": "BSD-2-Clause",
+    "repository": "https://github.com/estools/estraverse",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\estraverse",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\estraverse\\LICENSE.BSD"
+  },
+  "esutils@2.0.3": {
+    "licenses": "BSD-2-Clause",
+    "repository": "https://github.com/estools/esutils",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\esutils",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\esutils\\LICENSE.BSD"
+  },
+  "etag@1.8.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jshttp/etag",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\etag",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\etag\\LICENSE"
+  },
+  "event-target-shim@5.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/mysticatea/event-target-shim",
+    "publisher": "Toru Nagashima",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\event-target-shim",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\event-target-shim\\LICENSE"
+  },
+  "eventemitter3@5.0.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/primus/eventemitter3",
+    "publisher": "Arnout Kazemier",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\eventemitter3",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\eventemitter3\\LICENSE"
+  },
+  "events@3.3.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Gozala/events",
+    "publisher": "Irakli Gozalishvili",
+    "email": "rfobic@gmail.com",
+    "url": "http://jeditoolkit.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\events",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\events\\LICENSE"
+  },
+  "express@5.2.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/expressjs/express",
+    "publisher": "TJ Holowaychuk",
+    "email": "tj@vision-media.ca",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\express",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\express\\LICENSE"
+  },
+  "fast-deep-equal@3.1.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/epoberezkin/fast-deep-equal",
+    "publisher": "Evgeny Poberezkin",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\fast-deep-equal",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\fast-deep-equal\\LICENSE"
+  },
+  "fast-glob@3.3.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/mrmlnc/fast-glob",
+    "publisher": "Denis Malinochkin",
+    "url": "https://mrmlnc.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\fast-glob",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\fast-glob\\LICENSE"
+  },
+  "fast-json-stable-stringify@2.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/epoberezkin/fast-json-stable-stringify",
+    "publisher": "James Halliday",
+    "email": "mail@substack.net",
+    "url": "http://substack.net",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\fast-json-stable-stringify",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\fast-json-stable-stringify\\LICENSE"
+  },
+  "fast-levenshtein@2.0.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/hiddentao/fast-levenshtein",
+    "publisher": "Ramesh Nair",
+    "email": "ram@hiddentao.com",
+    "url": "http://www.hiddentao.com/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\fast-levenshtein",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\fast-levenshtein\\LICENSE.md"
+  },
+  "fastq@1.20.1": {
+    "licenses": "ISC",
+    "repository": "https://github.com/mcollina/fastq",
+    "publisher": "Matteo Collina",
+    "email": "hello@matteocollina.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\fastq",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\fastq\\LICENSE"
+  },
+  "fdir@6.5.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/thecodrr/fdir",
+    "publisher": "thecodrr",
+    "email": "thecodrr@protonmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\fdir",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\fdir\\LICENSE"
+  },
+  "file-entry-cache@8.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jaredwray/file-entry-cache",
+    "publisher": "Jared Wray",
+    "url": "https://jaredwray.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\file-entry-cache",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\file-entry-cache\\LICENSE"
+  },
+  "fill-range@7.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/fill-range",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\fill-range",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\fill-range\\LICENSE"
+  },
+  "finalhandler@2.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/pillarjs/finalhandler",
+    "publisher": "Douglas Christopher Wilson",
+    "email": "doug@somethingdoug.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\finalhandler",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\finalhandler\\LICENSE"
+  },
+  "find-up@5.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/find-up",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\find-up",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\find-up\\license"
+  },
+  "flat-cache@4.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jaredwray/flat-cache",
+    "publisher": "Jared Wray",
+    "url": "https://jaredwray.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\flat-cache",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\flat-cache\\LICENSE"
+  },
+  "flatted@3.3.3": {
+    "licenses": "ISC",
+    "repository": "https://github.com/WebReflection/flatted",
+    "publisher": "Andrea Giammarchi",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\flatted",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\flatted\\LICENSE"
+  },
+  "forwarded@0.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jshttp/forwarded",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\forwarded",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\forwarded\\LICENSE"
+  },
+  "frac@1.1.2": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/SheetJS/frac",
+    "publisher": "SheetJS",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\frac",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\frac\\LICENSE"
+  },
+  "fraction.js@5.3.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/rawify/Fraction.js",
+    "publisher": "Robert Eisele",
+    "email": "robert@raw.org",
+    "url": "https://raw.org/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\fraction.js",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\fraction.js\\LICENSE"
+  },
+  "fresh@2.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jshttp/fresh",
+    "publisher": "TJ Holowaychuk",
+    "email": "tj@vision-media.ca",
+    "url": "http://tjholowaychuk.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\fresh",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\fresh\\LICENSE"
+  },
+  "function-bind@1.1.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Raynos/function-bind",
+    "publisher": "Raynos",
+    "email": "raynos2@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\function-bind",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\function-bind\\LICENSE"
+  },
+  "gensync@1.0.0-beta.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/loganfsmyth/gensync",
+    "publisher": "Logan Smyth",
+    "email": "loganfsmyth@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\gensync",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\gensync\\LICENSE"
+  },
+  "get-intrinsic@1.3.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/ljharb/get-intrinsic",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\get-intrinsic",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\get-intrinsic\\LICENSE"
+  },
+  "get-proto@1.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/ljharb/get-proto",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\get-proto",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\get-proto\\LICENSE"
+  },
+  "glob-parent@5.1.2": {
+    "licenses": "ISC",
+    "repository": "https://github.com/gulpjs/glob-parent",
+    "publisher": "Gulp Team",
+    "email": "team@gulpjs.com",
+    "url": "https://gulpjs.com/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\chokidar\\node_modules\\glob-parent",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\chokidar\\node_modules\\glob-parent\\LICENSE"
+  },
+  "glob-parent@6.0.2": {
+    "licenses": "ISC",
+    "repository": "https://github.com/gulpjs/glob-parent",
+    "publisher": "Gulp Team",
+    "email": "team@gulpjs.com",
+    "url": "https://gulpjs.com/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\glob-parent",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\glob-parent\\LICENSE"
+  },
+  "globals@14.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/globals",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint\\eslintrc\\node_modules\\globals",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@eslint\\eslintrc\\node_modules\\globals\\license"
+  },
+  "globals@16.5.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/globals",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\globals",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\globals\\license"
+  },
+  "gopd@1.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/ljharb/gopd",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\gopd",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\gopd\\LICENSE"
+  },
+  "has-flag@4.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/has-flag",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\has-flag",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\has-flag\\license"
+  },
+  "has-symbols@1.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/inspect-js/has-symbols",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "url": "http://ljharb.codes",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\has-symbols",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\has-symbols\\LICENSE"
+  },
+  "hasown@2.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/inspect-js/hasOwn",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\hasown",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\hasown\\LICENSE"
+  },
+  "hermes-estree@0.25.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/hermes",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\hermes-estree",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\hermes-estree\\LICENSE"
+  },
+  "hermes-parser@0.25.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/hermes",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\hermes-parser",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\hermes-parser\\LICENSE"
+  },
+  "html-parse-stringify@3.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/henrikjoreteg/html-parse-stringify",
+    "publisher": "Henrik Joreteg",
+    "email": "henrik@joreteg.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\html-parse-stringify",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\html-parse-stringify\\README.md"
+  },
+  "http-errors@2.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jshttp/http-errors",
+    "publisher": "Jonathan Ong",
+    "email": "me@jongleberry.com",
+    "url": "http://jongleberry.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\http-errors",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\http-errors\\LICENSE"
+  },
+  "http-proxy-agent@7.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/TooTallNate/proxy-agents",
+    "publisher": "Nathan Rajlich",
+    "email": "nathan@tootallnate.net",
+    "url": "http://n8.io/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\http-proxy-agent",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\http-proxy-agent\\LICENSE"
+  },
+  "https-proxy-agent@7.0.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/TooTallNate/proxy-agents",
+    "publisher": "Nathan Rajlich",
+    "email": "nathan@tootallnate.net",
+    "url": "http://n8.io/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\https-proxy-agent",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\https-proxy-agent\\LICENSE"
+  },
+  "i18next-browser-languagedetector@8.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/i18next/i18next-browser-languageDetector",
+    "publisher": "Jan Mühlemann",
+    "email": "jan.muehlemann@gmail.com",
+    "url": "https://github.com/jamuhl",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\i18next-browser-languagedetector",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\i18next-browser-languagedetector\\LICENSE"
+  },
+  "i18next-http-backend@3.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/i18next/i18next-http-backend",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\i18next-http-backend",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\i18next-http-backend\\licence"
+  },
+  "i18next@25.8.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/i18next/i18next",
+    "publisher": "Jan Mühlemann",
+    "email": "jan.muehlemann@gmail.com",
+    "url": "https://github.com/jamuhl",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\i18next",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\i18next\\LICENSE"
+  },
+  "iconv-lite@0.7.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/pillarjs/iconv-lite",
+    "publisher": "Alexander Shtuchkin",
+    "email": "ashtuchkin@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\iconv-lite",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\iconv-lite\\LICENSE"
+  },
+  "ieee754@1.2.1": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/feross/ieee754",
+    "publisher": "Feross Aboukhadijeh",
+    "email": "feross@feross.org",
+    "url": "https://feross.org",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ieee754",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ieee754\\LICENSE"
+  },
+  "ignore@5.3.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/kaelzhang/node-ignore",
+    "publisher": "kael",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ignore",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ignore\\LICENSE-MIT"
+  },
+  "ignore@7.0.5": {
+    "licenses": "MIT",
+    "repository": "https://github.com/kaelzhang/node-ignore",
+    "publisher": "kael",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\eslint-plugin\\node_modules\\ignore",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\eslint-plugin\\node_modules\\ignore\\LICENSE-MIT"
+  },
+  "immer@10.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/immerjs/immer",
+    "publisher": "Michel Weststrate",
+    "email": "info@michel.codes",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\immer",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\immer\\LICENSE"
+  },
+  "immer@11.1.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/immerjs/immer",
+    "publisher": "Michel Weststrate",
+    "email": "info@michel.codes",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@reduxjs\\toolkit\\node_modules\\immer",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@reduxjs\\toolkit\\node_modules\\immer\\LICENSE"
+  },
+  "import-fresh@3.3.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/import-fresh",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\import-fresh",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\import-fresh\\license"
+  },
+  "imurmurhash@0.1.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jensyt/imurmurhash-js",
+    "publisher": "Jens Taylor",
+    "email": "jensyt@gmail.com",
+    "url": "https://github.com/homebrewing",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\imurmurhash",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\imurmurhash\\README.md"
+  },
+  "inherits@2.0.4": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/inherits",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\inherits",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\inherits\\LICENSE"
+  },
+  "internmap@2.0.3": {
+    "licenses": "ISC",
+    "repository": "https://github.com/mbostock/internmap",
+    "publisher": "Mike Bostock",
+    "url": "https://bost.ocks.org/mike",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\internmap",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\internmap\\LICENSE"
+  },
+  "ipaddr.js@1.9.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/whitequark/ipaddr.js",
+    "publisher": "whitequark",
+    "email": "whitequark@whitequark.org",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ipaddr.js",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ipaddr.js\\LICENSE"
+  },
+  "is-binary-path@2.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/is-binary-path",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\is-binary-path",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\is-binary-path\\license"
+  },
+  "is-core-module@2.16.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/inspect-js/is-core-module",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\is-core-module",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\is-core-module\\LICENSE"
+  },
+  "is-docker@3.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/is-docker",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\is-docker",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\is-docker\\license"
+  },
+  "is-extglob@2.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/is-extglob",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\is-extglob",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\is-extglob\\LICENSE"
+  },
+  "is-glob@4.0.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/micromatch/is-glob",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\is-glob",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\is-glob\\LICENSE"
+  },
+  "is-inside-container@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/is-inside-container",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\is-inside-container",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\is-inside-container\\license"
+  },
+  "is-number@7.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/is-number",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\is-number",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\is-number\\LICENSE"
+  },
+  "is-promise@4.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/then/is-promise",
+    "publisher": "ForbesLindesay",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\is-promise",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\is-promise\\LICENSE"
+  },
+  "is-wsl@3.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/is-wsl",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\is-wsl",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\is-wsl\\license"
+  },
+  "isexe@2.0.0": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/isexe",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\isexe",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\isexe\\LICENSE"
+  },
+  "jiti@1.21.7": {
+    "licenses": "MIT",
+    "repository": "https://github.com/unjs/jiti",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\jiti",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\jiti\\LICENSE"
+  },
+  "js-md4@0.3.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/emn178/js-md4",
+    "publisher": "Chen, Yi-Cyuan",
+    "email": "emn178@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\js-md4",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\js-md4\\LICENSE.txt"
+  },
+  "js-tokens@4.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lydell/js-tokens",
+    "publisher": "Simon Lydell",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\js-tokens",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\js-tokens\\LICENSE"
+  },
+  "js-yaml@4.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/nodeca/js-yaml",
+    "publisher": "Vladimir Zapparov",
+    "email": "dervus.grim@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\js-yaml",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\js-yaml\\LICENSE"
+  },
+  "jsesc@3.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/mathiasbynens/jsesc",
+    "publisher": "Mathias Bynens",
+    "url": "https://mathiasbynens.be/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\jsesc",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\jsesc\\LICENSE-MIT.txt"
+  },
+  "json-buffer@3.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/dominictarr/json-buffer",
+    "publisher": "Dominic Tarr",
+    "email": "dominic.tarr@gmail.com",
+    "url": "http://dominictarr.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\json-buffer",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\json-buffer\\LICENSE"
+  },
+  "json-schema-traverse@0.4.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/epoberezkin/json-schema-traverse",
+    "publisher": "Evgeny Poberezkin",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\json-schema-traverse",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\json-schema-traverse\\LICENSE"
+  },
+  "json-stable-stringify-without-jsonify@1.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/samn/json-stable-stringify",
+    "publisher": "James Halliday",
+    "email": "mail@substack.net",
+    "url": "http://substack.net",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\json-stable-stringify-without-jsonify",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\json-stable-stringify-without-jsonify\\LICENSE"
+  },
+  "json5@2.2.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/json5/json5",
+    "publisher": "Aseem Kishore",
+    "email": "aseem.kishore@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\json5",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\json5\\LICENSE.md"
+  },
+  "jsonwebtoken@9.0.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/auth0/node-jsonwebtoken",
+    "publisher": "auth0",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\jsonwebtoken",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\jsonwebtoken\\LICENSE"
+  },
+  "jwa@2.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/brianloveswords/node-jwa",
+    "publisher": "Brian J. Brennan",
+    "email": "brianloveswords@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\jwa",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\jwa\\LICENSE"
+  },
+  "jws@4.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/brianloveswords/node-jws",
+    "publisher": "Brian J Brennan",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\jws",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\jws\\LICENSE"
+  },
+  "keyv@4.5.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jaredwray/keyv",
+    "publisher": "Jared Wray",
+    "email": "me@jaredwray.com",
+    "url": "http://jaredwray.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\keyv",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\keyv\\README.md"
+  },
+  "levn@0.4.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/gkz/levn",
+    "publisher": "George Zahariev",
+    "email": "z@georgezahariev.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\levn",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\levn\\LICENSE"
+  },
+  "lilconfig@3.1.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/antonk52/lilconfig",
+    "publisher": "antonk52",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lilconfig",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lilconfig\\LICENSE"
+  },
+  "lines-and-columns@1.2.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/eventualbuddha/lines-and-columns",
+    "publisher": "Brian Donovan",
+    "email": "brian@donovans.cc",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lines-and-columns",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lines-and-columns\\LICENSE"
+  },
+  "locate-path@6.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/locate-path",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\locate-path",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\locate-path\\license"
+  },
+  "lodash.includes@4.3.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lodash/lodash",
+    "publisher": "John-David Dalton",
+    "email": "john.david.dalton@gmail.com",
+    "url": "http://allyoucanleet.com/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lodash.includes",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lodash.includes\\LICENSE"
+  },
+  "lodash.isboolean@3.0.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lodash/lodash",
+    "publisher": "John-David Dalton",
+    "email": "john.david.dalton@gmail.com",
+    "url": "http://allyoucanleet.com/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lodash.isboolean",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lodash.isboolean\\LICENSE"
+  },
+  "lodash.isinteger@4.0.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lodash/lodash",
+    "publisher": "John-David Dalton",
+    "email": "john.david.dalton@gmail.com",
+    "url": "http://allyoucanleet.com/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lodash.isinteger",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lodash.isinteger\\LICENSE"
+  },
+  "lodash.isnumber@3.0.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lodash/lodash",
+    "publisher": "John-David Dalton",
+    "email": "john.david.dalton@gmail.com",
+    "url": "http://allyoucanleet.com/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lodash.isnumber",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lodash.isnumber\\LICENSE"
+  },
+  "lodash.isplainobject@4.0.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lodash/lodash",
+    "publisher": "John-David Dalton",
+    "email": "john.david.dalton@gmail.com",
+    "url": "http://allyoucanleet.com/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lodash.isplainobject",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lodash.isplainobject\\LICENSE"
+  },
+  "lodash.isstring@4.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lodash/lodash",
+    "publisher": "John-David Dalton",
+    "email": "john.david.dalton@gmail.com",
+    "url": "http://allyoucanleet.com/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lodash.isstring",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lodash.isstring\\LICENSE"
+  },
+  "lodash.merge@4.6.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lodash/lodash",
+    "publisher": "John-David Dalton",
+    "email": "john.david.dalton@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lodash.merge",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lodash.merge\\LICENSE"
+  },
+  "lodash.once@4.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/lodash/lodash",
+    "publisher": "John-David Dalton",
+    "email": "john.david.dalton@gmail.com",
+    "url": "http://allyoucanleet.com/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lodash.once",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lodash.once\\LICENSE"
+  },
+  "lru-cache@5.1.1": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/node-lru-cache",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lru-cache",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lru-cache\\LICENSE"
+  },
+  "lucide-react@0.563.0": {
+    "licenses": "ISC",
+    "repository": "https://github.com/lucide-icons/lucide",
+    "publisher": "Eric Fennis",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lucide-react",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\lucide-react\\LICENSE"
+  },
+  "math-intrinsics@1.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/es-shims/math-intrinsics",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\math-intrinsics",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\math-intrinsics\\LICENSE"
+  },
+  "media-typer@1.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jshttp/media-typer",
+    "publisher": "Douglas Christopher Wilson",
+    "email": "doug@somethingdoug.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\media-typer",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\media-typer\\LICENSE"
+  },
+  "merge-descriptors@2.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/merge-descriptors",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\merge-descriptors",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\merge-descriptors\\license"
+  },
+  "merge2@1.4.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/teambition/merge2",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\merge2",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\merge2\\LICENSE"
+  },
+  "micromatch@4.0.8": {
+    "licenses": "MIT",
+    "repository": "https://github.com/micromatch/micromatch",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\micromatch",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\micromatch\\LICENSE"
+  },
+  "mime-db@1.54.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jshttp/mime-db",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\mime-db",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\mime-db\\LICENSE"
+  },
+  "mime-types@3.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jshttp/mime-types",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\mime-types",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\mime-types\\LICENSE"
+  },
+  "minimatch@3.1.2": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/minimatch",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\minimatch",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\minimatch\\LICENSE"
+  },
+  "minimatch@9.0.5": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/minimatch",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\typescript-estree\\node_modules\\minimatch",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@typescript-eslint\\typescript-estree\\node_modules\\minimatch\\LICENSE"
+  },
+  "ms@2.1.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/vercel/ms",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ms",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ms\\license.md"
+  },
+  "mssql@12.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/tediousjs/node-mssql",
+    "publisher": "Patrik Simek",
+    "url": "https://patriksimek.cz",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\mssql",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\mssql\\LICENSE.md"
+  },
+  "mz@2.7.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/normalize/mz",
+    "publisher": "Jonathan Ong",
+    "email": "me@jongleberry.com",
+    "url": "http://jongleberry.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\mz",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\mz\\LICENSE"
+  },
+  "nanoid@3.3.11": {
+    "licenses": "MIT",
+    "repository": "https://github.com/ai/nanoid",
+    "publisher": "Andrey Sitnik",
+    "email": "andrey@sitnik.ru",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\nanoid",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\nanoid\\LICENSE"
+  },
+  "native-duplexpair@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/tediousjs/native-duplexpair",
+    "publisher": "Anna Henningsen",
+    "email": "anna@addaleax.net",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\native-duplexpair",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\native-duplexpair\\LICENSE"
+  },
+  "natural-compare@1.4.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/litejs/natural-compare-lite",
+    "publisher": "Lauri Rooden",
+    "url": "https://github.com/litejs/natural-compare-lite",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\natural-compare",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\natural-compare\\README.md"
+  },
+  "negotiator@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jshttp/negotiator",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\negotiator",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\negotiator\\LICENSE"
+  },
+  "node-addon-api@8.5.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/nodejs/node-addon-api",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\node-addon-api",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\node-addon-api\\LICENSE.md"
+  },
+  "node-fetch@2.7.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/bitinn/node-fetch",
+    "publisher": "David Frank",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\node-fetch",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\node-fetch\\LICENSE.md"
+  },
+  "node-gyp-build@4.8.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/prebuild/node-gyp-build",
+    "publisher": "Mathias Buus",
+    "url": "@mafintosh",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\node-gyp-build",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\node-gyp-build\\LICENSE"
+  },
+  "node-releases@2.0.27": {
+    "licenses": "MIT",
+    "repository": "https://github.com/chicoxyzzy/node-releases",
+    "publisher": "Sergey Rubanov",
+    "email": "chi187@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\node-releases",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\node-releases\\LICENSE"
+  },
+  "normalize-path@3.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/normalize-path",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\normalize-path",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\normalize-path\\LICENSE"
+  },
+  "object-assign@4.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/object-assign",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\object-assign",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\object-assign\\license"
+  },
+  "object-hash@3.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/puleos/object-hash",
+    "publisher": "Scott Puleo",
+    "email": "puleos@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\object-hash",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\object-hash\\LICENSE"
+  },
+  "object-inspect@1.13.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/inspect-js/object-inspect",
+    "publisher": "James Halliday",
+    "email": "mail@substack.net",
+    "url": "http://substack.net",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\object-inspect",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\object-inspect\\LICENSE"
+  },
+  "on-finished@2.4.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jshttp/on-finished",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\on-finished",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\on-finished\\LICENSE"
+  },
+  "once@1.4.0": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/once",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\once",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\once\\LICENSE"
+  },
+  "open@10.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/open",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\open",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\open\\license"
+  },
+  "optionator@0.9.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/gkz/optionator",
+    "publisher": "George Zahariev",
+    "email": "z@georgezahariev.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\optionator",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\optionator\\LICENSE"
+  },
+  "p-limit@3.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/p-limit",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\p-limit",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\p-limit\\license"
+  },
+  "p-locate@5.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/p-locate",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\p-locate",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\p-locate\\license"
+  },
+  "parent-module@1.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/parent-module",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\parent-module",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\parent-module\\license"
+  },
+  "parseurl@1.3.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/pillarjs/parseurl",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\parseurl",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\parseurl\\LICENSE"
+  },
+  "path-exists@4.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/path-exists",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\path-exists",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\path-exists\\license"
+  },
+  "path-key@3.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/path-key",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\path-key",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\path-key\\license"
+  },
+  "path-parse@1.0.7": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jbgutierrez/path-parse",
+    "publisher": "Javier Blanco",
+    "email": "http://jbgutierrez.info",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\path-parse",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\path-parse\\LICENSE"
+  },
+  "path-to-regexp@8.3.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/pillarjs/path-to-regexp",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\path-to-regexp",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\path-to-regexp\\LICENSE"
+  },
+  "picocolors@1.1.1": {
+    "licenses": "ISC",
+    "repository": "https://github.com/alexeyraspopov/picocolors",
+    "publisher": "Alexey Raspopov",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\picocolors",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\picocolors\\LICENSE"
+  },
+  "picomatch@2.3.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/micromatch/picomatch",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\anymatch\\node_modules\\picomatch",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\anymatch\\node_modules\\picomatch\\LICENSE"
+  },
+  "picomatch@4.0.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/micromatch/picomatch",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\picomatch",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\picomatch\\LICENSE"
+  },
+  "pify@2.3.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/pify",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\pify",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\pify\\license"
+  },
+  "pirates@4.0.7": {
+    "licenses": "MIT",
+    "repository": "https://github.com/danez/pirates",
+    "publisher": "Ari Porad",
+    "email": "ari@ariporad.com",
+    "url": "http://ariporad.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\pirates",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\pirates\\LICENSE"
+  },
+  "postcss-import@15.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/postcss/postcss-import",
+    "publisher": "Maxime Thirouin",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\postcss-import",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\postcss-import\\LICENSE"
+  },
+  "postcss-js@4.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/postcss/postcss-js",
+    "publisher": "Andrey Sitnik",
+    "email": "andrey@sitnik.ru",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\postcss-js",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\postcss-js\\LICENSE"
+  },
+  "postcss-load-config@6.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/postcss/postcss-load-config",
+    "publisher": "Michael Ciniawky",
+    "email": "michael.ciniawsky@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\postcss-load-config",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\postcss-load-config\\LICENSE"
+  },
+  "postcss-nested@6.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/postcss/postcss-nested",
+    "publisher": "Andrey Sitnik",
+    "email": "andrey@sitnik.ru",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\postcss-nested",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\postcss-nested\\LICENSE"
+  },
+  "postcss-selector-parser@6.1.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/postcss/postcss-selector-parser",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\postcss-selector-parser",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\postcss-selector-parser\\LICENSE-MIT"
+  },
+  "postcss-value-parser@4.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/TrySound/postcss-value-parser",
+    "publisher": "Bogdan Chadkin",
+    "email": "trysound@yandex.ru",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\postcss-value-parser",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\postcss-value-parser\\LICENSE"
+  },
+  "postcss@8.5.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/postcss/postcss",
+    "publisher": "Andrey Sitnik",
+    "email": "andrey@sitnik.ru",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\postcss",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\postcss\\LICENSE"
+  },
+  "prelude-ls@1.2.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/gkz/prelude-ls",
+    "publisher": "George Zahariev",
+    "email": "z@georgezahariev.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\prelude-ls",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\prelude-ls\\LICENSE"
+  },
+  "process@0.11.10": {
+    "licenses": "MIT",
+    "repository": "https://github.com/shtylman/node-process",
+    "publisher": "Roman Shtylman",
+    "email": "shtylman@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\process",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\process\\LICENSE"
+  },
+  "proxy-addr@2.0.7": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jshttp/proxy-addr",
+    "publisher": "Douglas Christopher Wilson",
+    "email": "doug@somethingdoug.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\proxy-addr",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\proxy-addr\\LICENSE"
+  },
+  "punycode@2.3.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/mathiasbynens/punycode.js",
+    "publisher": "Mathias Bynens",
+    "url": "https://mathiasbynens.be/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\punycode",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\punycode\\LICENSE-MIT.txt"
+  },
+  "qs@6.15.0": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/ljharb/qs",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\qs",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\qs\\LICENSE.md"
+  },
+  "queue-microtask@1.2.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/feross/queue-microtask",
+    "publisher": "Feross Aboukhadijeh",
+    "email": "feross@feross.org",
+    "url": "https://feross.org",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\queue-microtask",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\queue-microtask\\LICENSE"
+  },
+  "range-parser@1.2.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jshttp/range-parser",
+    "publisher": "TJ Holowaychuk",
+    "email": "tj@vision-media.ca",
+    "url": "http://tjholowaychuk.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\range-parser",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\range-parser\\LICENSE"
+  },
+  "raw-body@3.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/stream-utils/raw-body",
+    "publisher": "Jonathan Ong",
+    "email": "me@jongleberry.com",
+    "url": "http://jongleberry.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\raw-body",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\raw-body\\LICENSE"
+  },
+  "react-dom@19.2.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/react",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\react-dom",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\react-dom\\LICENSE"
+  },
+  "react-i18next@16.5.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/i18next/react-i18next",
+    "publisher": "Jan Mühlemann",
+    "email": "jan.muehlemann@gmail.com",
+    "url": "https://github.com/jamuhl",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\react-i18next",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\react-i18next\\LICENSE"
+  },
+  "react-is@19.2.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/react",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\react-is",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\react-is\\LICENSE"
+  },
+  "react-redux@9.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/reduxjs/react-redux",
+    "publisher": "Dan Abramov",
+    "email": "dan.abramov@me.com",
+    "url": "https://github.com/gaearon",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\react-redux",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\react-redux\\LICENSE.md"
+  },
+  "react-refresh@0.18.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/react",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\react-refresh",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\react-refresh\\LICENSE"
+  },
+  "react-router-dom@7.13.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/remix-run/react-router",
+    "publisher": "Remix Software",
+    "email": "hello@remix.run",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\react-router-dom",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\react-router-dom\\LICENSE.md"
+  },
+  "react-router@7.13.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/remix-run/react-router",
+    "publisher": "Remix Software",
+    "email": "hello@remix.run",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\react-router",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\react-router\\LICENSE.md"
+  },
+  "react@19.2.4": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/react",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\react",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\react\\LICENSE"
+  },
+  "read-cache@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/TrySound/read-cache",
+    "publisher": "Bogdan Chadkin",
+    "email": "trysound@yandex.ru",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\read-cache",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\read-cache\\LICENSE"
+  },
+  "readable-stream@4.7.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/nodejs/readable-stream",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\readable-stream",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\readable-stream\\LICENSE"
+  },
+  "readdirp@3.6.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/paulmillr/readdirp",
+    "publisher": "Thorsten Lorenz",
+    "email": "thlorenz@gmx.de",
+    "url": "thlorenz.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\readdirp",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\readdirp\\LICENSE"
+  },
+  "recharts@3.7.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/recharts/recharts",
+    "publisher": "recharts group",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\recharts",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\recharts\\LICENSE"
+  },
+  "redux-thunk@3.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/reduxjs/redux-thunk",
+    "publisher": "Dan Abramov",
+    "email": "dan.abramov@me.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\redux-thunk",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\redux-thunk\\LICENSE.md"
+  },
+  "redux@5.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/reduxjs/redux",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\redux",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\redux\\LICENSE.md"
+  },
+  "reselect@5.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/reduxjs/reselect",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\reselect",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\reselect\\LICENSE"
+  },
+  "resolve-from@4.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/resolve-from",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\resolve-from",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\resolve-from\\license"
+  },
+  "resolve@1.22.11": {
+    "licenses": "MIT",
+    "repository": "https://github.com/browserify/resolve",
+    "publisher": "James Halliday",
+    "email": "mail@substack.net",
+    "url": "http://substack.net",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\resolve",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\resolve\\LICENSE"
+  },
+  "reusify@1.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/mcollina/reusify",
+    "publisher": "Matteo Collina",
+    "email": "hello@matteocollina.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\reusify",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\reusify\\LICENSE"
+  },
+  "rollup@4.57.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/rollup/rollup",
+    "publisher": "Rich Harris",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\rollup",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\rollup\\LICENSE.md"
+  },
+  "router@2.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/pillarjs/router",
+    "publisher": "Douglas Christopher Wilson",
+    "email": "doug@somethingdoug.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\router",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\router\\LICENSE"
+  },
+  "run-applescript@7.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/run-applescript",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\run-applescript",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\run-applescript\\license"
+  },
+  "run-parallel@1.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/feross/run-parallel",
+    "publisher": "Feross Aboukhadijeh",
+    "email": "feross@feross.org",
+    "url": "https://feross.org",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\run-parallel",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\run-parallel\\LICENSE"
+  },
+  "safe-buffer@5.2.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/feross/safe-buffer",
+    "publisher": "Feross Aboukhadijeh",
+    "email": "feross@feross.org",
+    "url": "https://feross.org",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\safe-buffer",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\safe-buffer\\LICENSE"
+  },
+  "safer-buffer@2.1.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/ChALkeR/safer-buffer",
+    "publisher": "Nikita Skovoroda",
+    "email": "chalkerx@gmail.com",
+    "url": "https://github.com/ChALkeR",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\safer-buffer",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\safer-buffer\\LICENSE"
+  },
+  "scheduler@0.27.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/react",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\scheduler",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\scheduler\\LICENSE"
+  },
+  "semver@6.3.1": {
+    "licenses": "ISC",
+    "repository": "https://github.com/npm/node-semver",
+    "publisher": "GitHub Inc.",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\semver",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\semver\\LICENSE"
+  },
+  "semver@7.7.4": {
+    "licenses": "ISC",
+    "repository": "https://github.com/npm/node-semver",
+    "publisher": "GitHub Inc.",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\jsonwebtoken\\node_modules\\semver",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\jsonwebtoken\\node_modules\\semver\\LICENSE"
+  },
+  "send@1.2.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/pillarjs/send",
+    "publisher": "TJ Holowaychuk",
+    "email": "tj@vision-media.ca",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\send",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\send\\LICENSE"
+  },
+  "serve-static@2.2.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/expressjs/serve-static",
+    "publisher": "Douglas Christopher Wilson",
+    "email": "doug@somethingdoug.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\serve-static",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\serve-static\\LICENSE"
+  },
+  "set-cookie-parser@2.7.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/nfriedly/set-cookie-parser",
+    "publisher": "Nathan Friedly",
+    "url": "http://nfriedly.com/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\set-cookie-parser",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\set-cookie-parser\\LICENSE"
+  },
+  "setprototypeof@1.2.0": {
+    "licenses": "ISC",
+    "repository": "https://github.com/wesleytodd/setprototypeof",
+    "publisher": "Wes Todd",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\setprototypeof",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\setprototypeof\\LICENSE"
+  },
+  "shebang-command@2.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/kevva/shebang-command",
+    "publisher": "Kevin Mårtensson",
+    "email": "kevinmartensson@gmail.com",
+    "url": "github.com/kevva",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\shebang-command",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\shebang-command\\license"
+  },
+  "shebang-regex@3.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/shebang-regex",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\shebang-regex",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\shebang-regex\\license"
+  },
+  "side-channel-list@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/ljharb/side-channel-list",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\side-channel-list",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\side-channel-list\\LICENSE"
+  },
+  "side-channel-map@1.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/ljharb/side-channel-map",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\side-channel-map",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\side-channel-map\\LICENSE"
+  },
+  "side-channel-weakmap@1.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/ljharb/side-channel-weakmap",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\side-channel-weakmap",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\side-channel-weakmap\\LICENSE"
+  },
+  "side-channel@1.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/ljharb/side-channel",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\side-channel",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\side-channel\\LICENSE"
+  },
+  "source-map-js@1.2.1": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/7rulnik/source-map-js",
+    "publisher": "Valentin 7rulnik Semirulnik",
+    "email": "v7rulnik@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\source-map-js",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\source-map-js\\LICENSE"
+  },
+  "sprintf-js@1.1.3": {
+    "licenses": "BSD-3-Clause",
+    "repository": "https://github.com/alexei/sprintf.js",
+    "publisher": "Alexandru Mărășteanu",
+    "email": "hello@alexei.ro",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\sprintf-js",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\sprintf-js\\LICENSE"
+  },
+  "ssf@0.11.2": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/SheetJS/ssf",
+    "publisher": "sheetjs",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ssf",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ssf\\LICENSE"
+  },
+  "statuses@2.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jshttp/statuses",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\statuses",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\statuses\\LICENSE"
+  },
+  "string_decoder@1.3.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/nodejs/string_decoder",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\string_decoder",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\string_decoder\\LICENSE"
+  },
+  "strip-json-comments@3.1.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/strip-json-comments",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\strip-json-comments",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\strip-json-comments\\license"
+  },
+  "sucrase@3.35.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/alangpierce/sucrase",
+    "publisher": "Alan Pierce",
+    "email": "alangpierce@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\sucrase",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\sucrase\\LICENSE"
+  },
+  "supports-color@7.2.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/chalk/supports-color",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\supports-color",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\supports-color\\license"
+  },
+  "supports-preserve-symlinks-flag@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/inspect-js/node-supports-preserve-symlinks-flag",
+    "publisher": "Jordan Harband",
+    "email": "ljharb@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\supports-preserve-symlinks-flag",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\supports-preserve-symlinks-flag\\LICENSE"
+  },
+  "tailwind-merge@3.4.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/dcastil/tailwind-merge",
+    "publisher": "Dany Castillo",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\tailwind-merge",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\tailwind-merge\\LICENSE.md"
+  },
+  "tailwindcss@3.4.19": {
+    "licenses": "MIT",
+    "repository": "https://github.com/tailwindlabs/tailwindcss.git#v3",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\tailwindcss",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\tailwindcss\\LICENSE"
+  },
+  "tarn@3.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/vincit/tarn.js",
+    "publisher": "Sami Koskimäki",
+    "email": "sami.koskimaki@vincit.com",
+    "url": "https://github.com/koskimas",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\tarn",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\tarn\\LICENSE"
+  },
+  "tedious@19.2.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/tediousjs/tedious",
+    "publisher": "Mike D Pilsbury",
+    "email": "mike.pilsbury@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\tedious",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\tedious\\LICENSE"
+  },
+  "thenify-all@1.6.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/thenables/thenify-all",
+    "publisher": "Jonathan Ong",
+    "email": "me@jongleberry.com",
+    "url": "http://jongleberry.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\thenify-all",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\thenify-all\\LICENSE"
+  },
+  "thenify@3.3.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/thenables/thenify",
+    "publisher": "Jonathan Ong",
+    "email": "me@jongleberry.com",
+    "url": "http://jongleberry.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\thenify",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\thenify\\LICENSE"
+  },
+  "tiny-invariant@1.3.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/alexreardon/tiny-invariant",
+    "publisher": "Alex Reardon",
+    "email": "alexreardon@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\tiny-invariant",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\tiny-invariant\\LICENSE"
+  },
+  "tinyglobby@0.2.15": {
+    "licenses": "MIT",
+    "repository": "https://github.com/SuperchupuDev/tinyglobby",
+    "publisher": "Superchupu",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\tinyglobby",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\tinyglobby\\LICENSE"
+  },
+  "to-regex-range@5.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/micromatch/to-regex-range",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\to-regex-range",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\to-regex-range\\LICENSE"
+  },
+  "toidentifier@1.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/component/toidentifier",
+    "publisher": "Douglas Christopher Wilson",
+    "email": "doug@somethingdoug.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\toidentifier",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\toidentifier\\LICENSE"
+  },
+  "tr46@0.0.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/Sebmaster/tr46.js",
+    "publisher": "Sebastian Mayr",
+    "email": "npm@smayr.name",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\tr46"
+  },
+  "ts-api-utils@2.4.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/JoshuaKGoldberg/ts-api-utils",
+    "publisher": "JoshuaKGoldberg",
+    "email": "npm@joshuakgoldberg.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ts-api-utils",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ts-api-utils\\LICENSE.md"
+  },
+  "ts-interface-checker@0.1.13": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/gristlabs/ts-interface-checker",
+    "publisher": "Dmitry S, Grist Labs",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ts-interface-checker",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\ts-interface-checker\\LICENSE"
+  },
+  "tslib@2.8.1": {
+    "licenses": "0BSD",
+    "repository": "https://github.com/Microsoft/tslib",
+    "publisher": "Microsoft Corp.",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\tslib",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\tslib\\LICENSE.txt"
+  },
+  "type-check@0.4.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/gkz/type-check",
+    "publisher": "George Zahariev",
+    "email": "z@georgezahariev.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\type-check",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\type-check\\LICENSE"
+  },
+  "type-is@2.0.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jshttp/type-is",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\type-is",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\type-is\\LICENSE"
+  },
+  "typescript-eslint@8.55.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/typescript-eslint/typescript-eslint",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\typescript-eslint",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\typescript-eslint\\LICENSE"
+  },
+  "typescript@5.9.3": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/microsoft/TypeScript",
+    "publisher": "Microsoft Corp.",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\typescript",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\typescript\\LICENSE.txt"
+  },
+  "undici-types@7.16.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/nodejs/undici",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\undici-types",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\undici-types\\LICENSE"
+  },
+  "unpipe@1.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/stream-utils/unpipe",
+    "publisher": "Douglas Christopher Wilson",
+    "email": "doug@somethingdoug.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\unpipe",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\unpipe\\LICENSE"
+  },
+  "update-browserslist-db@1.2.3": {
+    "licenses": "MIT",
+    "repository": "https://github.com/browserslist/update-db",
+    "publisher": "Andrey Sitnik",
+    "email": "andrey@sitnik.ru",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\update-browserslist-db",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\update-browserslist-db\\LICENSE"
+  },
+  "uri-js@4.4.1": {
+    "licenses": "BSD-2-Clause",
+    "repository": "https://github.com/garycourt/uri-js",
+    "publisher": "Gary Court",
+    "email": "gary.court@gmail.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\uri-js",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\uri-js\\LICENSE"
+  },
+  "use-sync-external-store@1.6.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/facebook/react",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\use-sync-external-store",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\use-sync-external-store\\LICENSE"
+  },
+  "util-deprecate@1.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/TooTallNate/util-deprecate",
+    "publisher": "Nathan Rajlich",
+    "email": "nathan@tootallnate.net",
+    "url": "http://n8.io/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\util-deprecate",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\util-deprecate\\LICENSE"
+  },
+  "uuid@13.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/uuidjs/uuid",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\uuid",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\uuid\\LICENSE.md"
+  },
+  "uuid@8.3.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/uuidjs/uuid",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\msal-node\\node_modules\\uuid",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\@azure\\msal-node\\node_modules\\uuid\\LICENSE.md"
+  },
+  "vary@1.1.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jshttp/vary",
+    "publisher": "Douglas Christopher Wilson",
+    "email": "doug@somethingdoug.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\vary",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\vary\\LICENSE"
+  },
+  "victory-vendor@37.3.6": {
+    "licenses": "MIT AND ISC",
+    "repository": "https://github.com/FormidableLabs/victory",
+    "publisher": "Formidable",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\victory-vendor",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\victory-vendor\\README.md"
+  },
+  "vite@7.3.1": {
+    "licenses": "MIT",
+    "repository": "https://github.com/vitejs/vite",
+    "publisher": "Evan You",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\vite",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\vite\\LICENSE.md"
+  },
+  "void-elements@3.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/pugjs/void-elements",
+    "publisher": "hemanth.hm",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\void-elements",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\void-elements\\LICENSE"
+  },
+  "webidl-conversions@3.0.1": {
+    "licenses": "BSD-2-Clause",
+    "repository": "https://github.com/jsdom/webidl-conversions",
+    "publisher": "Domenic Denicola",
+    "email": "d@domenic.me",
+    "url": "https://domenic.me/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\webidl-conversions",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\webidl-conversions\\LICENSE.md"
+  },
+  "whatwg-url@5.0.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jsdom/whatwg-url",
+    "publisher": "Sebastian Mayr",
+    "email": "github@smayr.name",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\whatwg-url",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\whatwg-url\\LICENSE.txt"
+  },
+  "which@2.0.2": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/node-which",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\which",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\which\\LICENSE"
+  },
+  "wmf@1.0.2": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/SheetJS/js-wmf",
+    "publisher": "sheetjs",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\wmf",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\wmf\\LICENSE"
+  },
+  "word-wrap@1.2.5": {
+    "licenses": "MIT",
+    "repository": "https://github.com/jonschlinkert/word-wrap",
+    "publisher": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\word-wrap",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\word-wrap\\LICENSE"
+  },
+  "word@0.3.0": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/SheetJS/js-word",
+    "publisher": "sheetjs",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\word",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\word\\LICENSE"
+  },
+  "wrappy@1.0.2": {
+    "licenses": "ISC",
+    "repository": "https://github.com/npm/wrappy",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\wrappy",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\wrappy\\LICENSE"
+  },
+  "wsl-utils@0.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/wsl-utils",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\wsl-utils",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\wsl-utils\\license"
+  },
+  "xlsx@0.18.5": {
+    "licenses": "Apache-2.0",
+    "repository": "https://github.com/SheetJS/sheetjs",
+    "publisher": "sheetjs",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\xlsx",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\xlsx\\LICENSE"
+  },
+  "yallist@3.1.1": {
+    "licenses": "ISC",
+    "repository": "https://github.com/isaacs/yallist",
+    "publisher": "Isaac Z. Schlueter",
+    "email": "i@izs.me",
+    "url": "http://blog.izs.me/",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\yallist",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\yallist\\LICENSE"
+  },
+  "yocto-queue@0.1.0": {
+    "licenses": "MIT",
+    "repository": "https://github.com/sindresorhus/yocto-queue",
+    "publisher": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "https://sindresorhus.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\yocto-queue",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\yocto-queue\\license"
+  },
+  "zod-validation-error@4.0.2": {
+    "licenses": "MIT",
+    "repository": "https://github.com/causaly/zod-validation-error",
+    "publisher": "Dimitrios C. Michalakos",
+    "email": "dimitris@jmike.gr",
+    "url": "https://github.com/jmike",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\zod-validation-error",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\zod-validation-error\\LICENSE"
+  },
+  "zod@4.3.6": {
+    "licenses": "MIT",
+    "repository": "https://github.com/colinhacks/zod",
+    "publisher": "Colin McDonnell",
+    "email": "zod@colinhacks.com",
+    "path": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\zod",
+    "licenseFile": "D:\\diego\\Documentos\\Antigravity\\EBM\\node_modules\\zod\\LICENSE"
+  }
+}
+

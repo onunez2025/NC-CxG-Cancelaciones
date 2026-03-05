@@ -1,0 +1,393 @@
+{
+    "common": {
+        "welcome": "Bienvenido",
+        "login": "Iniciar Sesión",
+        "logout": "Cerrar Sesión",
+        "loading": "Cargando...",
+        "error": "Error",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "edit": "Editar",
+        "search": "Buscar...",
+        "export": "Exportar",
+        "filters": "Filtros",
+        "actions": "Acciones",
+        "status": "Estado",
+        "user": "Usuario",
+        "role": "Rol",
+        "date": "Fecha",
+        "yes": "Sí",
+        "no": "No",
+        "view": "Ver",
+        "clear_filters": "Limpiar Filtros",
+        "pagination": "Mostrando {{start}} a {{end}} de {{total}} resultados",
+        "rows_per_page": "Filas por página",
+        "deleteConfirm": "¿Estás seguro de eliminar este elemento?",
+        "all": "Todos"
+    },
+    "nav": {
+        "dashboard": "Panel de Control",
+        "budget": "Presupuesto",
+        "solped": "Solicitudes",
+        "files": "Carga de Archivos",
+        "tracking": "Seguimiento",
+        "vendors": "Proveedores",
+        "config": "Configuración",
+        "budget_vs_real": "Ppto vs Real",
+        "light_mode": "Modo Claro",
+        "dark_mode": "Modo Oscuro",
+        "app_subtitle": "Gestor de Presupuesto Empresarial",
+        "role_admin": "Administrador"
+    },
+    "profile": {
+        "title": "Mi Perfil",
+        "subtitle": "Gestiona tu información personal y credenciales.",
+        "success": "Perfil actualizado correctamente",
+        "error": "Error al actualizar el perfil"
+    },
+    "auth": {
+        "subtitle": "Ingresa tus credenciales para continuar",
+        "username": "Usuario",
+        "password": "Contraseña",
+        "rememberMe": "Recordarme",
+        "forgotPassword": "¿Olvidaste tu contraseña?",
+        "loginButton": "Iniciar Sesión",
+        "errors": {
+            "invalid": "Credenciales inválidas",
+            "inactive": "Usuario inactivo. Contacte al administrador."
+        }
+    },
+    "dashboard": {
+        "budget": "Presupuesto 2026",
+        "executed": "Ejecutado (Real)",
+        "pendingSolped": "Pedidos Activos",
+        "withSolped": "con solicitud",
+        "committed": "Comprometido",
+        "poTotalValue": "Valor total de POs",
+        "realCost": "Gasto Real",
+        "bookedInKSB1": "Contabilizado en KSB1",
+        "processingPO": "OC en Proceso",
+        "recentActivity": "Últimos Pedidos",
+        "budgetVsExecuted": "Presupuesto vs Ejecutado",
+        "requestStatus": "Estado de Pedidos",
+        "spendingByCeco": "Gasto por Centro de Costo",
+        "topVendors": "Top Proveedores",
+        "fileStatus": "Estado de Archivos SAP",
+        "manage": "Gestionar",
+        "totalPaid": "Total Pagado",
+        "paidPOs": "POs pagadas",
+        "seeAll": "Ver todos",
+        "empty": {
+            "title": "Sin datos cargados",
+            "desc": "Para ver el panel de control, primero sube los 5 archivos SAP (ME2K, ME5K, KSB1, ME5A, FBL1N) desde la página de carga.",
+            "button": "Ir a Carga de Archivos",
+            "ceco": "Sin datos de centro de costo",
+            "vendors": "Sin datos de proveedores"
+        },
+        "status_labels": {
+            "solicitado": "Solicitado",
+            "pedido": "Pedido",
+            "recibido": "Recibido",
+            "facturado": "Facturado",
+            "pagado": "Pagado"
+        },
+        "file_status": {
+            "not_loaded": "No cargado"
+        },
+        "alert": {
+            "over_execution_title": "Sobre-ejecución detectada",
+            "over_execution_desc": "El gasto real ({{real}}) supera el valor comprometido ({{committed}})."
+        }
+    },
+    "solped": {
+        "title": "Solicitudes de Pedido",
+        "subtitle": "Solicitudes (ME5K/ME5A) con estado de vinculación a pedidos, gastos y facturas.",
+        "search_placeholder": "Buscar por SolPed, PO, descripción, proveedor...",
+        "filter_status": "Todos los estados",
+        "filter_ceco": "Todos los CeCos",
+        "kpi": {
+            "total": "Total",
+            "to_approve": "Por Aprobar",
+            "ready_for_po": "Listas p/Pedido",
+            "with_po": "Con Pedido",
+            "executed": "Ejecutados",
+            "billed": "Facturados",
+            "total_amount": "Valor Total"
+        },
+        "multiple_cecos": "Múltiples CeCos",
+        "table": {
+            "solped": "SOLPED",
+            "po": "PO",
+            "description": "DESCRIPCIÓN",
+            "ceco": "CECO",
+            "ceco_name": "NOMBRE CECO",
+            "currency": "MONEDA",
+            "value": "VALOR",
+            "status": "ESTADO"
+        },
+        "status": {
+            "pending_approval": "Pendiente Firma",
+            "released": "Liberada",
+            "with_po": "Con Pedido",
+            "executed": "Ejecutado",
+            "billed": "Facturado"
+        },
+        "empty_state": {
+            "title": "Sin solicitudes",
+            "desc": "No hay datos de ME5K o ME5A cargados. Ve a <strong>Carga de Archivos</strong> para subir los reportes."
+        },
+        "detail": {
+            "date": "Fecha",
+            "quantity": "Cantidad",
+            "gl_account": "Cuenta Mayor",
+            "vendor": "Proveedor",
+            "po_value": "Valor PO",
+            "real_expense": "Gasto Real (KSB1)",
+            "invoices": "Facturas (FBL1N)",
+            "invoices_count": "{{count}} facturas",
+            "release_date": "Fecha Liberación",
+            "items_title": "Posiciones ({{count}} ítems)",
+            "unit_price": "P. Unitario",
+            "traceability": "Trazabilidad"
+        },
+        "traceability": {
+            "solped": "SolPed",
+            "po": "Pedido",
+            "expense": "Gasto",
+            "invoice": "Factura"
+        },
+        "results_label": "{{count}} de {{total}} solicitudes"
+    },
+    "budget": {
+        "title": "Presupuesto",
+        "subtitle": "Gestión y planificación presupuestal anual.",
+        "total_budget": "Presupuesto Total",
+        "search_account": "Buscar cuenta...",
+        "new": "Nuevo",
+        "year": "Año",
+        "management": "Gerencia",
+        "empty_state": "No hay presupuestos registrados para esta selección.",
+        "table": {
+            "account": "Cuenta",
+            "jan": "Ene",
+            "feb": "Feb",
+            "mar": "Mar",
+            "apr": "Abr",
+            "may": "May",
+            "jun": "Jun",
+            "jul": "Jul",
+            "aug": "Ago",
+            "sep": "Sep",
+            "oct": "Oct",
+            "nov": "Nov",
+            "dec": "Dic",
+            "total": "Total"
+        },
+        "modal": {
+            "monthly_distribution": "Distribución Mensual",
+            "annual_total": "Total Anual"
+        }
+    },
+    "budget_vs_real": {
+        "title": "Presupuesto vs Real",
+        "subtitle": "Comparación entre presupuesto planificado y gasto real ejecutado (KSB1).",
+        "kpi": {
+            "budgeted": "PRESUPUESTADO",
+            "executed": "EJECUTADO (REAL)",
+            "over_execution": "SOBRE EJECUCIÓN",
+            "execution_percentage": "% EJECUCIÓN",
+            "po_committed": "PO Comprometido",
+            "available_balance": "Saldo Disponible"
+        },
+        "global_execution": "Ejecución Global",
+        "alert": {
+            "no_budget": "Gastos sin presupuesto asignado",
+            "no_budget_desc": "{{count}} elementos de costo tienen gasto real pero no tienen línea presupuestal.",
+            "over_execution": "Cuentas con sobre-ejecución (>110%)",
+            "executed_text": "ejecutado"
+        },
+        "empty_state": {
+            "title": "Sin datos de comparación",
+            "desc": "No hay presupuestos configurados o datos KSB1 cargados para esta gerencia y año."
+        },
+        "cost_element": "Elem. Costo {{code}}",
+        "table": {
+            "account": "CUENTA",
+            "budget": "PRESUPUESTO",
+            "real": "REAL",
+            "difference": "DIFERENCIA",
+            "execution": "EJECUCIÓN",
+            "no_budget": "Sin ppto",
+            "total": "TOTAL"
+        }
+    },
+    "tracking": {
+        "title": "Seguimiento de Pedidos (Tracking)",
+        "subtitle": "Vista unificada de Pedidos (ME2K), Entradas (ME2K) y Facturas (FBL1N).",
+        "search_placeholder": "Buscar por PO, Proveedor o Factura...",
+        "metrics": {
+            "pos": "Pedidos (POs)",
+            "with_solped": "con Solped",
+            "total_po_value": "Valor Total POs",
+            "committed": "Comprometido",
+            "real_expense": "Gasto Real (KSB1)",
+            "with_invoice": "con factura",
+            "total_paid": "Total Pagado",
+            "pos_paid": "POs pagadas"
+        },
+        "filters": {
+            "all_status": "Todos los estados",
+            "all_cecos": "Todos los CeCos"
+        },
+        "results_count": "Mostrando {{count}} de {{total}} pedidos",
+        "empty": {
+            "title": "Sin datos de cruce",
+            "desc": "No hay archivos SAP cargados o no se encontraron pedidos (ME2K). <br /> Ve a <strong>Carga de Archivos</strong> para subir los reportes."
+        },
+        "list": {
+            "no_vendor": "Sin proveedor",
+            "po_value": "Valor PO",
+            "real_ksb1": "Real (KSB1)",
+            "paid": "Pagado"
+        },
+        "detail": {
+            "solped_title": "Solicitud (ME5K)",
+            "solped_empty": "Sin solicitud vinculada",
+            "me5a_title": "Sol. General (ME5A)",
+            "me5a_empty": "Sin detalle ME5A",
+            "ksb1_title": "Gastos Reales (KSB1)",
+            "ksb1_empty": "Sin gastos reales registrados",
+            "fbl1n_title": "Facturas (FBL1N)",
+            "fbl1n_empty": "Sin facturas del proveedor",
+            "created_by": "Creado por",
+            "po_date": "Fecha PO",
+            "doc": "Doc.",
+            "paid_status": "Pagado",
+            "pending_status": "Pendiente",
+            "invoiced": "Facturado",
+            "records_suffix": "reg.",
+            "more_records": "+{{count}} registros más...",
+            "total": "Total"
+        },
+        "table": {
+            "po": "PEDIDO (PO)",
+            "provider": "PROVEEDOR",
+            "amount": "MONTO (ME2K)",
+            "status": "ESTADO ENTREGAS",
+            "invoice": "FACTURA (FBL1N)",
+            "guide": "GUÍA / REF",
+            "entry_date": "FECHA CONT.",
+            "desc": "DESCRIPCIÓN"
+        },
+        "status": {
+            "requested": "Solicitado",
+            "ordered": "Pedido",
+            "received": "Recibido",
+            "invoiced": "Facturado",
+            "complete": "Completo",
+            "partial": "Parcial",
+            "pending": "Pendiente",
+            "paid": "Pagado",
+            "pending_payment": "Pendiente Pago"
+        }
+    },
+    "vendors": {
+        "title": "Proveedores",
+        "subtitle": "Proveedores extraídos de ME2K con sus pedidos y facturas vinculadas.",
+        "search_placeholder": "Buscar por nombre o código de proveedor...",
+        "kpi": {
+            "vendors": "Proveedores",
+            "po_value": "Valor POs",
+            "invoiced": "Facturado",
+            "paid": "Pagado",
+            "pending": "Pendiente"
+        },
+        "sort": {
+            "amount": "Mayor monto",
+            "count": "Más pedidos",
+            "alpha": "Alfabético"
+        },
+        "count_label": "{{count}} proveedores",
+        "empty": {
+            "title": "Sin proveedores",
+            "desc": "No hay datos de ME2K cargados. Ve a <strong>Carga de Archivos</strong> para subir los reportes."
+        },
+        "card": {
+            "no_ceco": "Sin CeCo",
+            "pos": "POs",
+            "po_value": "Valor PO",
+            "invoices": "Facturas",
+            "paid": "Pagado"
+        },
+        "detail": {
+            "orders": "Pedidos",
+            "invoices": "Facturas",
+            "no_invoices": "Sin facturas registradas",
+            "more": "+{{count}} más...",
+            "total": "Total",
+            "paid_label": "Pagado",
+            "pending_label": "Pend",
+            "doc": "Doc.",
+            "paid_status": "Pagado",
+            "pending_status": "Pendiente"
+        }
+    },
+    "files": {
+        "title": "Carga Masiva SAP",
+        "subtitle": "Sube y cruza múltiples archivos SAP simultáneamente.",
+        "status": {
+            "title_ready": "Sincronización Completa",
+            "title_missing": "Faltan Archivos para Cruce",
+            "desc_ready": "Todos los reportes clave están cargados.",
+            "desc_missing": "Pendientes: {{missing}}",
+            "view_tracking": "Ver Seguimiento"
+        },
+        "dropzone": {
+            "label": "Selecciona o arrastra múltiples archivos",
+            "formats": "FBL1N, ME5K, ME2K, KSB1, ME5A"
+        },
+        "queue": {
+            "title": "Cola de Procesamiento ({{count}})",
+            "process_all": "Procesar Todo",
+            "unknown_type": "Tipo Desconocido"
+        },
+        "db": {
+            "title": "Estado de Almacenamiento",
+            "clear_all": "Limpiar Todo",
+            "records": "{{count}} reg.",
+            "records_loaded": "Cargado",
+            "missing": "Faltante",
+            "note_title": "NOTA DE FILTRADO",
+            "note_desc": "Los archivos se filtran automáticamente por **Centros de Costo activos**. Solo los registros correspondientes a tu área serán guardados para optimizar el espacio."
+        },
+        "modal": {
+            "title": "¿Limpiar base de datos?",
+            "desc": "Esta acción eliminará <span className=\"font-bold text-foreground\">todos</span> los reportes SAP cargados actualmente. Deberás volver a cargar los archivos para realizar el cruce.",
+            "cancel": "Cancelar",
+            "confirm": "Sí, Limpiar Todo"
+        },
+        "types": {
+            "FBL1N": {
+                "label": "FBL1N - Partidas Proveedores",
+                "desc": "Facturas, pagos y compensaciones."
+            },
+            "ME5K": {
+                "label": "ME5K - Solped por Imputación",
+                "desc": "Solicitudes imputadas a CeCos."
+            },
+            "ME2K": {
+                "label": "ME2K - Pedidos por Imputación",
+                "desc": "Órdenes imputadas a CeCos."
+            },
+            "KSB1": {
+                "label": "KSB1 - Partidas Reales CeCo",
+                "desc": "Detalle de gastos reales."
+            },
+            "ME5A": {
+                "label": "ME5A - Lista Solicitudes",
+                "desc": "Listado general de solicitudes."
+            }
+        }
+    }
+}

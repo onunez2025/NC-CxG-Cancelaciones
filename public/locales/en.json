@@ -1,0 +1,362 @@
+{
+    "common": {
+        "welcome": "Welcome",
+        "login": "Login",
+        "logout": "Logout",
+        "loading": "Loading...",
+        "error": "Error",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "search": "Search...",
+        "export": "Export",
+        "filters": "Filters",
+        "actions": "Actions",
+        "status": "Status",
+        "user": "User",
+        "role": "Role",
+        "date": "Date",
+        "yes": "Yes",
+        "no": "No",
+        "view": "View",
+        "clear_filters": "Clear Filters",
+        "pagination": "Showing {{start}} to {{end}} of {{total}} results",
+        "rows_per_page": "Rows per page",
+        "deleteConfirm": "Are you sure you want to delete this item?"
+    },
+    "nav": {
+        "dashboard": "Dashboard",
+        "budget": "Budget",
+        "solped": "Requisitions",
+        "files": "File Upload",
+        "tracking": "Tracking",
+        "vendors": "Vendors",
+        "config": "Settings",
+        "budget_vs_real": "Budget vs Real",
+        "light_mode": "Light Mode",
+        "dark_mode": "Dark Mode",
+        "app_subtitle": "Enterprise Budget Manager",
+        "role_admin": "Administrator"
+    },
+    "profile": {
+        "title": "My Profile",
+        "subtitle": "Manage your personal information and credentials.",
+        "success": "Profile updated successfully",
+        "error": "Error updating profile"
+    },
+    "auth": {
+        "subtitle": "Enter your credentials to continue",
+        "username": "Username",
+        "password": "Password",
+        "rememberMe": "Remember me",
+        "forgotPassword": "Forgot password?",
+        "loginButton": "Login",
+        "errors": {
+            "invalid": "Invalid credentials",
+            "inactive": "User inactive. Contact administrator."
+        }
+    },
+    "dashboard": {
+        "budget": "Budget 2026",
+        "executed": "Executed (Real)",
+        "pendingSolped": "Active Orders",
+        "withSolped": "with requisition",
+        "committed": "Committed",
+        "poTotalValue": "Total PO Value",
+        "realCost": "Real Cost",
+        "bookedInKSB1": "Booked in KSB1",
+        "processingPO": "Processing PO",
+        "recentActivity": "Recent POs",
+        "budgetVsExecuted": "Budget vs Executed",
+        "requestStatus": "Order Status",
+        "spendingByCeco": "Spending by Cost Center",
+        "topVendors": "Top Vendors",
+        "fileStatus": "SAP File Status",
+        "manage": "Manage",
+        "totalPaid": "Total Paid",
+        "paidPOs": "Paid POs",
+        "seeAll": "See All",
+        "empty": {
+            "title": "No Data Loaded",
+            "desc": "To view the dashboard, first upload the 5 SAP files (ME2K, ME5K, KSB1, ME5A, FBL1N) from the file upload page.",
+            "button": "Go to File Upload",
+            "ceco": "No cost center data",
+            "vendors": "No vendor data"
+        },
+        "status_labels": {
+            "solicitado": "Requested",
+            "pedido": "Ordered",
+            "recibido": "Received",
+            "facturado": "Invoiced",
+            "pagado": "Paid"
+        },
+        "file_status": {
+            "not_loaded": "Not Loaded"
+        },
+        "alert": {
+            "over_execution_title": "Over-execution Detected",
+            "over_execution_desc": "Real expense ({{real}}) exceeds committed value ({{committed}})."
+        }
+    },
+    "solped": {
+        "title": "Purchase Requisitions",
+        "subtitle": "Requisitions (ME5K/ME5A) linked to orders, expenses, and invoices.",
+        "search_placeholder": "Search by SolPed, PO, description, vendor...",
+        "filter_status": "All Statuses",
+        "filter_ceco": "All Cost Centers",
+        "kpi": {
+            "total": "Total",
+            "no_po": "No Order",
+            "with_po": "With Order",
+            "executed": "Executed",
+            "billed": "Billed",
+            "total_amount": "Total Amount"
+        },
+        "table": {
+            "solped": "SOLPED",
+            "po": "PO",
+            "description": "DESCRIPTION",
+            "ceco": "COST CENTER",
+            "value": "VALUE",
+            "status": "STATUS"
+        },
+        "status": {
+            "executed": "Executed",
+            "no_po": "No Order",
+            "billed": "Billed",
+            "with_po": "With Order"
+        }
+    },
+    "budget": {
+        "title": "Budget",
+        "subtitle": "Annual budget planning and management.",
+        "total_budget": "Total Budget",
+        "search_account": "Search account...",
+        "new": "New",
+        "year": "Year",
+        "management": "Management",
+        "empty_state": "No budgets registered for this selection.",
+        "table": {
+            "account": "Account",
+            "jan": "Jan",
+            "feb": "Feb",
+            "mar": "Mar",
+            "apr": "Apr",
+            "may": "May",
+            "jun": "Jun",
+            "jul": "Jul",
+            "aug": "Aug",
+            "sep": "Sep",
+            "oct": "Oct",
+            "nov": "Nov",
+            "dec": "Dec",
+            "total": "Total"
+        },
+        "modal": {
+            "monthly_distribution": "Monthly Distribution",
+            "annual_total": "Annual Total"
+        }
+    },
+    "budget_vs_real": {
+        "title": "Budget vs Real",
+        "subtitle": "Comparison between planned budget and actual executed cost (KSB1).",
+        "kpi": {
+            "budgeted": "BUDGETED",
+            "executed": "EXECUTED (REAL)",
+            "over_execution": "OVER EXECUTION",
+            "execution_percentage": "% EXECUTION",
+            "po_committed": "Committed PO",
+            "available_balance": "Available Balance"
+        },
+        "global_execution": "Global Execution",
+        "alert": {
+            "no_budget": "Expenses without assigned budget",
+            "no_budget_desc": "{{count}} cost elements have actual expenses but no budget line.",
+            "over_execution": "Over-executed Accounts (>110%)",
+            "executed_text": "executed"
+        },
+        "empty_state": {
+            "title": "No Comparison Data",
+            "desc": "No budgets configured or KSB1 data loaded for this management and year."
+        },
+        "cost_element": "Cost Elem. {{code}}",
+        "table": {
+            "account": "ACCOUNT",
+            "budget": "BUDGET",
+            "real": "REAL",
+            "difference": "DIFFERENCE",
+            "execution": "EXECUTION",
+            "no_budget": "No Budget",
+            "total": "TOTAL"
+        }
+    },
+    "tracking": {
+        "title": "Order Tracking",
+        "subtitle": "Unified view of Orders (ME2K), Receipts (ME2K), and Invoices (FBL1N).",
+        "search_placeholder": "Search by PO, Vendor or Invoice...",
+        "metrics": {
+            "pos": "Orders (POs)",
+            "with_solped": "with Solped",
+            "total_po_value": "Total PO Value",
+            "committed": "Committed",
+            "real_expense": "Real Expense (KSB1)",
+            "with_invoice": "with invoice",
+            "total_paid": "Total Paid",
+            "pos_paid": "Paid POs"
+        },
+        "filters": {
+            "all_status": "All Statuses",
+            "all_cecos": "All Cost Centers"
+        },
+        "results_count": "Showing {{count}} of {{total}} orders",
+        "empty": {
+            "title": "No Cross-Reference Data",
+            "desc": "No SAP files uploaded or no orders (ME2K) found. <br /> Go to <strong>File Upload</strong> to upload reports."
+        },
+        "list": {
+            "no_vendor": "No Vendor",
+            "po_value": "PO Value",
+            "real_ksb1": "Real (KSB1)",
+            "paid": "Paid"
+        },
+        "detail": {
+            "solped_title": "Requisition (ME5K)",
+            "solped_empty": "No linked requisition",
+            "me5a_title": "General Req. (ME5A)",
+            "me5a_empty": "No ME5A detail",
+            "ksb1_title": "Real Expenses (KSB1)",
+            "ksb1_empty": "No real expenses registered",
+            "fbl1n_title": "Invoices (FBL1N)",
+            "fbl1n_empty": "No vendor invoices",
+            "created_by": "Created by",
+            "po_date": "PO Date",
+            "doc": "Doc.",
+            "paid_status": "Paid",
+            "pending_status": "Pending",
+            "invoiced": "Invoiced",
+            "records_suffix": "recs.",
+            "more_records": "+{{count}} more records...",
+            "total": "Total"
+        },
+        "table": {
+            "po": "ORDER (PO)",
+            "provider": "VENDOR",
+            "amount": "AMOUNT (ME2K)",
+            "status": "DELIVERY STATUS",
+            "invoice": "INVOICE (FBL1N)",
+            "guide": "GUIDE / REF",
+            "entry_date": "ENTRY DATE",
+            "desc": "DESCRIPTION"
+        },
+        "status": {
+            "requested": "Requested",
+            "ordered": "Ordered",
+            "received": "Received",
+            "invoiced": "Invoiced",
+            "complete": "Complete",
+            "partial": "Partial",
+            "pending": "Pending",
+            "paid": "Paid",
+            "pending_payment": "Pending Payment"
+        }
+    },
+    "vendors": {
+        "title": "Vendors",
+        "subtitle": "Vendors extracted from ME2K with their linked orders and invoices.",
+        "search_placeholder": "Search by valid name or vendor code...",
+        "kpi": {
+            "vendors": "Vendors",
+            "po_value": "PO Value",
+            "invoiced": "Invoiced",
+            "paid": "Paid",
+            "pending": "Pending"
+        },
+        "sort": {
+            "amount": "Highest Amount",
+            "count": "Most Orders",
+            "alpha": "Alphabetical"
+        },
+        "count_label": "{{count}} vendors",
+        "empty": {
+            "title": "No Vendors",
+            "desc": "No ME2K data uploaded. Go to <strong>File Upload</strong> to upload reports."
+        },
+        "card": {
+            "no_ceco": "No Cost Center",
+            "pos": "POs",
+            "po_value": "PO Value",
+            "invoices": "Invoices",
+            "paid": "Paid"
+        },
+        "detail": {
+            "orders": "Orders",
+            "invoices": "Invoices",
+            "no_invoices": "No registered invoices",
+            "more": "+{{count}} more...",
+            "total": "Total",
+            "paid_label": "Paid",
+            "pending_label": "Pend",
+            "doc": "Doc.",
+            "paid_status": "Paid",
+            "pending_status": "Pending"
+        }
+    },
+    "files": {
+        "title": "SAP Mass Upload",
+        "subtitle": "Upload and cross-reference multiple SAP files simultaneously.",
+        "status": {
+            "title_ready": "Sync Complete",
+            "title_missing": "Missing Files for Cross-Ref",
+            "desc_ready": "All key reports are uploaded.",
+            "desc_missing": "Missing: {{missing}}",
+            "view_tracking": "View Tracking"
+        },
+        "dropzone": {
+            "label": "Select or drag multiple files",
+            "formats": "FBL1N, ME5K, ME2K, KSB1, ME5A"
+        },
+        "queue": {
+            "title": "Processing Queue ({{count}})",
+            "process_all": "Process All",
+            "unknown_type": "Unknown Type"
+        },
+        "db": {
+            "title": "Storage Status",
+            "clear_all": "Clean All",
+            "records": "{{count}} recs.",
+            "records_loaded": "Loaded",
+            "missing": "Missing",
+            "note_title": "FILTERING NOTE",
+            "note_desc": "Files are automatically filtered by **Active Cost Centers**. Only records corresponding to your area will be saved to optimize space."
+        },
+        "modal": {
+            "title": "Clear Database?",
+            "desc": "This action will delete <span className=\"font-bold text-foreground\">all</span> currently uploaded SAP reports. You will need to re-upload files to perform cross-referencing.",
+            "cancel": "Cancel",
+            "confirm": "Yes, Clear All"
+        },
+        "types": {
+            "FBL1N": {
+                "label": "FBL1N - Vendor Items",
+                "desc": "Invoices, payments and clearing."
+            },
+            "ME5K": {
+                "label": "ME5K - Requisitions by Acct",
+                "desc": "Requisitions assigned to Cost Centers."
+            },
+            "ME2K": {
+                "label": "ME2K - Orders by Acct",
+                "desc": "Orders assigned to Cost Centers."
+            },
+            "KSB1": {
+                "label": "KSB1 - Cost Centers: Actual",
+                "desc": "Detail of actual expenses."
+            },
+            "ME5A": {
+                "label": "ME5A - List Requisitions",
+                "desc": "General list of requisitions."
+            }
+        }
+    }
+}
