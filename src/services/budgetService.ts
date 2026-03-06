@@ -5,12 +5,16 @@ const API_URL = `${API_BASE_URL}/budgets`;
 
 export class BudgetService {
     static async getBudgets(year?: number, managementId?: string, costCenterId?: string): Promise<Budget[]> {
-        let url = new URL(API_URL);
-        if (year) url.searchParams.append('year', year.toString());
-        if (managementId) url.searchParams.append('management_id', managementId);
-        if (costCenterId) url.searchParams.append('cost_center_id', costCenterId);
+        let urlStr = API_URL;
+        const params = new URLSearchParams();
+        if (year) params.append('year', year.toString());
+        if (managementId) params.append('management_id', managementId);
+        if (costCenterId) params.append('cost_center_id', costCenterId);
 
-        const response = await apiClient(url.toString());
+        const qry = params.toString();
+        if (qry) urlStr += `?${qry}`;
+
+        const response = await apiClient(urlStr);
         if (!response.ok) throw new Error('Failed to fetch budgets');
         return response.json();
     }
