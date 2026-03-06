@@ -27,6 +27,10 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3001;
 
+// Trust the reverse proxy (EasyPanel uses Traefik/Caddy)
+// Required for express-rate-limit to read correct IP addresses from 'X-Forwarded-For' headers
+app.set('trust proxy', 1);
+
 // Middlewares
 // Security headers
 app.use(helmet({
