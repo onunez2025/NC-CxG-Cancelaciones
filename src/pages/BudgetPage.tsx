@@ -24,7 +24,7 @@ import { ConfirmDialog } from '../components/common/ConfirmDialog';
 
 export function BudgetPage() {
     const { t } = useTranslation();
-    const { user } = useAuth();
+    const { user, hasPermission } = useAuth();
 
     const months = [
         t('budget.table.jan'), t('budget.table.feb'), t('budget.table.mar'),
@@ -259,13 +259,15 @@ export function BudgetPage() {
                             ))}
                     </select>
 
-                    <button
-                        onClick={handleCreate}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium shadow-sm"
-                    >
-                        <Plus className="w-4 h-4" />
-                        {t('budget.new')}
-                    </button>
+                    {hasPermission('budget.create') && (
+                        <button
+                            onClick={handleCreate}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium shadow-sm"
+                        >
+                            <Plus className="w-4 h-4" />
+                            {t('budget.new')}
+                        </button>
+                    )}
 
                     {isAdministrador && (
                         <button
@@ -278,13 +280,15 @@ export function BudgetPage() {
                         </button>
                     )}
 
-                    <button
-                        onClick={() => setIsBulkModalOpen(true)}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90 transition-colors font-medium shadow-sm"
-                        title="Carga Masiva (Excel)"
-                    >
-                        <Upload className="w-4 h-4" />
-                    </button>
+                    {hasPermission('budget.create') && (
+                        <button
+                            onClick={() => setIsBulkModalOpen(true)}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90 transition-colors font-medium shadow-sm"
+                            title="Carga Masiva (Excel)"
+                        >
+                            <Upload className="w-4 h-4" />
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -473,7 +477,9 @@ export function BudgetPage() {
                                         <th key={idx} className="px-4 py-2 text-right whitespace-nowrap">{month.substring(0, 3)}</th>
                                     ))}
                                     <th className="px-4 py-2 text-right font-bold text-foreground">{t('budget.table.total')}</th>
-                                    <th className="px-4 py-2 text-right">{t('common.actions')}</th>
+                                    {hasPermission('budget.edit') && (
+                                        <th className="px-4 py-2 text-right">{t('common.actions')}</th>
+                                    )}
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border">
@@ -503,22 +509,24 @@ export function BudgetPage() {
                                                 <td className="px-4 py-2 text-right font-bold text-foreground tabular-nums">
                                                     {formatCurrency(budget.total)}
                                                 </td>
-                                                <td className="px-4 py-2 text-right">
-                                                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <button
-                                                            onClick={() => handleEdit(budget)}
-                                                            className="p-1 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded transition-colors"
-                                                        >
-                                                            <Edit2 className="w-3.5 h-3.5" />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDelete(budget.id)}
-                                                            className="p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-colors"
-                                                        >
-                                                            <Trash2 className="w-3.5 h-3.5" />
-                                                        </button>
-                                                    </div>
-                                                </td>
+                                                {hasPermission('budget.edit') && (
+                                                    <td className="px-4 py-2 text-right">
+                                                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <button
+                                                                onClick={() => handleEdit(budget)}
+                                                                className="p-1 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded transition-colors"
+                                                            >
+                                                                <Edit2 className="w-3.5 h-3.5" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDelete(budget.id)}
+                                                                className="p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-colors"
+                                                            >
+                                                                <Trash2 className="w-3.5 h-3.5" />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                )}
                                             </tr>
                                         );
                                     })
