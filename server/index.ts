@@ -115,9 +115,11 @@ app.get('/api/status', async (req: Request, res: Response) => {
 if (process.env.NODE_ENV === 'production') {
     const staticPath = path.join(__dirname, '../dist');
     app.use(express.static(staticPath));
-    app.get('*', (req, res) => {
+    app.use((req, res, next) => {
         if (!req.path.startsWith('/api')) {
             res.sendFile(path.join(staticPath, 'index.html'));
+        } else {
+            next();
         }
     });
 }
