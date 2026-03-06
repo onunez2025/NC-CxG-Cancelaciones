@@ -15,7 +15,7 @@ export function createSapMe2kTable() {
     table.columns.add('Description', sql.NVarChar(500), { nullable: true });
     table.columns.add('OrderValue', sql.Decimal(18, 2), { nullable: true });
     table.columns.add('NetPrice', sql.Decimal(18, 2), { nullable: true });
-    table.columns.add('Quantity', sql.Decimal(18, 2), { nullable: true });
+    table.columns.add('Quantity', sql.Decimal(18, 4), { nullable: true });
     table.columns.add('Currency', sql.NVarChar(10), { nullable: true });
     table.columns.add('ReleaseStatus', sql.NVarChar(50), { nullable: true });
     table.columns.add('ReleaseStrategy', sql.NVarChar(50), { nullable: true });
@@ -34,7 +34,7 @@ export function createSapMe5kTable() {
     table.columns.add('VendorName', sql.NVarChar(150), { nullable: true });
     table.columns.add('Description', sql.NVarChar(500), { nullable: true });
     table.columns.add('NetValue', sql.Decimal(18, 2), { nullable: true });
-    table.columns.add('Quantity', sql.Decimal(18, 2), { nullable: true });
+    table.columns.add('Quantity', sql.Decimal(18, 4), { nullable: true });
     table.columns.add('Currency', sql.NVarChar(10), { nullable: true });
     table.columns.add('RequestDate', sql.DateTime2, { nullable: true });
     table.columns.add('ReleaseDate', sql.DateTime2, { nullable: true });
@@ -52,7 +52,7 @@ export function createSapMe5aTable() {
     table.columns.add('Description', sql.NVarChar(500), { nullable: true });
     table.columns.add('TotalValue', sql.Decimal(18, 2), { nullable: true });
     table.columns.add('UnitPrice', sql.Decimal(18, 2), { nullable: true });
-    table.columns.add('Quantity', sql.Decimal(18, 2), { nullable: true });
+    table.columns.add('Quantity', sql.Decimal(18, 4), { nullable: true });
     table.columns.add('Currency', sql.NVarChar(10), { nullable: true });
     table.columns.add('VendorName', sql.NVarChar(150), { nullable: true });
     table.columns.add('CreatedBy', sql.NVarChar(150), { nullable: true });

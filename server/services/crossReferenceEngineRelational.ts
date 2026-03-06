@@ -230,16 +230,36 @@ export async function getRelationalSolpedData(): Promise<any[]> {
     const me5kResult = await pool.request().query(`SELECT PrNumber, PrItem, CostCenter, Description, Quantity, NetValue, Currency, RequestDate FROM EBM.SAP_ME5K WHERE PrNumber IS NOT NULL`);
 
     const itemsMap = new Map<string, SolpedItem[]>();
+
+    // Group by PrNumber + PrItem to find true totals for distributed positions
+    const positionTotals = new Map<string, { totalValue: number; originalQuantity: number }>();
+    me5kResult.recordset.forEach((r: any) => {
+        const key = `${r.PrNumber}_${r.PrItem}`;
+        if (!positionTotals.has(key)) {
+            positionTotals.set(key, { totalValue: 0, originalQuantity: Number(r.Quantity) || 0 });
+        }
+        positionTotals.get(key)!.totalValue += (Number(r.NetValue) || 0);
+    });
+
     me5kResult.recordset.forEach((r: any) => {
         if (!itemsMap.has(r.PrNumber)) itemsMap.set(r.PrNumber, []);
-        const qty = Number(r.Quantity) || 0;
+
+        const key = `${r.PrNumber}_${r.PrItem}`;
+        const totals = positionTotals.get(key)!;
         const val = Number(r.NetValue) || 0;
+
+        // The real unit price for the entire service position
+        const realUnitPrice = totals.originalQuantity > 0 ? (totals.totalValue / totals.originalQuantity) : 0;
+
+        // This specific row's proportional quantity based on its value share
+        const proportionalQuantity = totals.totalValue > 0 ? (val / totals.totalValue) * totals.originalQuantity : 0;
+
         itemsMap.get(r.PrNumber)!.push({
             position: String(r.PrItem || ''),
             description: r.Description || '',
             cost_center: r.CostCenter || '',
-            quantity: qty,
-            unit_price: qty > 0 ? (val / qty) : 0,
+            quantity: Number(proportionalQuantity.toFixed(4)),
+            unit_price: realUnitPrice,
             total_value: val
         });
     });
