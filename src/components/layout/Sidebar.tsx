@@ -36,9 +36,9 @@ export function Sidebar({ className }: { className?: string }) {
         { to: '/budget', icon: Wallet, label: t('nav.budget'), permission: 'budget.view' as const },
         { to: '/budget-vs-real', icon: BarChart3, label: 'Ppto vs Real', permission: 'budget.view' as const },
         { to: '/solped', icon: FileText, label: t('nav.solped'), permission: 'solped.view' as const },
-        { to: '/files', icon: UploadCloud, label: t('nav.files'), permission: 'files.view' as const },
         { to: '/tracking', icon: Activity, label: t('nav.tracking'), permission: 'tracking.view' as const },
         { to: '/vendors', icon: Users, label: t('nav.vendors'), permission: 'expenses.view' as const },
+        { to: '/files', icon: UploadCloud, label: t('nav.files'), permission: 'files.view' as const },
         { to: '/config', icon: Settings, label: t('nav.config'), permission: 'config.users' as const }, // Assuming config.users is minimum for config area
     ];
 
