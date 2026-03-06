@@ -227,6 +227,22 @@ export interface VendorSummary {
 export async function getRelationalSolpedData(): Promise<any[]> {
     const pool = await getDbConnection();
     const result = await pool.request().query(`SELECT * FROM EBM.vw_EBM_Solped`);
+    const me5kResult = await pool.request().query(`SELECT PrNumber, PrItem, CostCenter, Description, Quantity, NetValue, Currency, RequestDate FROM EBM.SAP_ME5K WHERE PrNumber IS NOT NULL`);
+
+    const itemsMap = new Map<string, SolpedItem[]>();
+    me5kResult.recordset.forEach((r: any) => {
+        if (!itemsMap.has(r.PrNumber)) itemsMap.set(r.PrNumber, []);
+        const qty = Number(r.Quantity) || 0;
+        const val = Number(r.NetValue) || 0;
+        itemsMap.get(r.PrNumber)!.push({
+            position: String(r.PrItem || ''),
+            description: r.Description || '',
+            cost_center: r.CostCenter || '',
+            quantity: qty,
+            unit_price: qty > 0 ? (val / qty) : 0,
+            total_value: val
+        });
+    });
 
     return result.recordset.map((row: any) => ({
         pr_number: row.PrNumber || '',
@@ -243,7 +259,7 @@ export async function getRelationalSolpedData(): Promise<any[]> {
         has_po: !!row.PoNumber,
         po_value: Number(row.PoValue) || 0,
         status: row.Status || 'solicitado', // from vw
-        items: [], // Expandable detail if needed
+        items: itemsMap.get(row.PrNumber) || [],
         has_ksb1: false, // Legacy fields
         real_expense: 0,
         has_fbl1n: false,
