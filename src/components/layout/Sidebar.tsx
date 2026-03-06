@@ -21,7 +21,7 @@ import { useAuth } from '../../hooks/useAuth';
 export function Sidebar({ className }: { className?: string }) {
     const { t, i18n } = useTranslation();
     const { theme, setTheme } = useTheme();
-    const { user, logout } = useAuth();
+    const { user, logout, hasPermission } = useAuth();
 
     const toggleTheme = () => {
         setTheme(theme === 'dark' ? 'light' : 'dark');
@@ -32,15 +32,19 @@ export function Sidebar({ className }: { className?: string }) {
     };
 
     const navItems = [
-        { to: '/dashboard', icon: LayoutDashboard, label: t('nav.dashboard') },
-        { to: '/budget', icon: Wallet, label: t('nav.budget') },
-        { to: '/budget-vs-real', icon: BarChart3, label: 'Ppto vs Real' },
-        { to: '/solped', icon: FileText, label: t('nav.solped') },
-        { to: '/files', icon: UploadCloud, label: t('nav.files') },
-        { to: '/tracking', icon: Activity, label: t('nav.tracking') },
-        { to: '/vendors', icon: Users, label: t('nav.vendors') },
-        { to: '/config', icon: Settings, label: t('nav.config') },
+        { to: '/dashboard', icon: LayoutDashboard, label: t('nav.dashboard') }, // All authenticated users can see dashboard
+        { to: '/budget', icon: Wallet, label: t('nav.budget'), permission: 'budget.view' as const },
+        { to: '/budget-vs-real', icon: BarChart3, label: 'Ppto vs Real', permission: 'budget.view' as const },
+        { to: '/solped', icon: FileText, label: t('nav.solped'), permission: 'solped.view' as const },
+        { to: '/files', icon: UploadCloud, label: t('nav.files'), permission: 'files.view' as const },
+        { to: '/tracking', icon: Activity, label: t('nav.tracking'), permission: 'tracking.view' as const },
+        { to: '/vendors', icon: Users, label: t('nav.vendors'), permission: 'expenses.view' as const },
+        { to: '/config', icon: Settings, label: t('nav.config'), permission: 'config.users' as const }, // Assuming config.users is minimum for config area
     ];
+
+    const filteredNavItems = navItems.filter(item =>
+        !item.permission || hasPermission(item.permission)
+    );
 
     return (
         <div className={cn(
@@ -79,16 +83,17 @@ export function Sidebar({ className }: { className?: string }) {
                     </div>
                     <div className="overflow-hidden">
                         <p className="text-sm font-medium truncate group-hover:text-primary transition-colors">
-                            {user?.username || 'Carlos Mendoza'}
+                            {user?.full_name || user?.username || 'Usuario EBM'}
                         </p>
-                        <p className="text-xs text-muted-foreground truncate">{t('nav.role_admin')}</p>
+                        <p className="text-xs text-muted-foreground truncate" title={user?.role_name || ''}>
+                            {user?.role_name || 'Sin Rol'}
+                        </p>
                     </div>
                 </NavLink>
             </div>
 
-            {/* Navigation */}
             <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-                {navItems.map((item) => (
+                {filteredNavItems.map((item) => (
                     <NavLink
                         key={item.to}
                         to={item.to}

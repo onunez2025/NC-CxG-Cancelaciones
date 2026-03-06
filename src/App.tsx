@@ -8,6 +8,7 @@ import { ForceChangePasswordPage } from './pages/ForceChangePasswordPage';
 import { UsersPage } from './pages/config/UsersPage';
 import { RolesPage } from './pages/config/RolesPage';
 import { ConfigLayout } from './pages/config/ConfigLayout';
+import { RequirePermission } from './components/common/RequirePermission';
 
 // Placeholder Pages
 import { DashboardPage } from './pages/DashboardPage';
@@ -82,23 +83,40 @@ function App() {
               <Route path="/dashboard" element={<DashboardPage />} />
 
               {/* Config Routes */}
-              <Route path="/config" element={<ConfigLayout />}>
-                <Route index element={<Navigate to="users" replace />} />
-                <Route path="users" element={<UsersPage />} />
-                <Route path="roles" element={<RolesPage />} />
-                <Route path="cecos" element={<CostCentersPage />} />
-                <Route path="accounts" element={<AccountsPage />} />
-                <Route path="managements" element={<ManagementsPage />} />
-                <Route path="exchange-rates" element={<ExchangeRatesPage />} />
+              <Route element={<RequirePermission permission="config.users" />}>
+                <Route path="/config" element={<ConfigLayout />}>
+                  <Route index element={<Navigate to="users" replace />} />
+                  <Route path="users" element={<UsersPage />} />
+                  <Route path="roles" element={<RolesPage />} />
+                  <Route path="cecos" element={<CostCentersPage />} />
+                  <Route path="accounts" element={<AccountsPage />} />
+                  <Route path="managements" element={<ManagementsPage />} />
+                  <Route path="exchange-rates" element={<ExchangeRatesPage />} />
+                </Route>
               </Route>
 
-              {/* Other routes placeholders */}
-              <Route path="/budget" element={<BudgetPage />} />
-              <Route path="/budget-vs-real" element={<BudgetVsRealPage />} />
-              <Route path="/solped" element={<SolpedPage />} />
-              <Route path="/files" element={<FileUploadPage />} />
-              <Route path="/tracking" element={<TrackingPage />} />
-              <Route path="/vendors" element={<VendorsPage />} />
+              {/* Other routes with RBAC */}
+              <Route element={<RequirePermission permission="budget.view" />}>
+                <Route path="/budget" element={<BudgetPage />} />
+                <Route path="/budget-vs-real" element={<BudgetVsRealPage />} />
+              </Route>
+
+              <Route element={<RequirePermission permission="solped.view" />}>
+                <Route path="/solped" element={<SolpedPage />} />
+              </Route>
+
+              <Route element={<RequirePermission permission="files.view" />}>
+                <Route path="/files" element={<FileUploadPage />} />
+              </Route>
+
+              <Route element={<RequirePermission permission="tracking.view" />}>
+                <Route path="/tracking" element={<TrackingPage />} />
+              </Route>
+
+              <Route element={<RequirePermission permission="expenses.view" />}>
+                <Route path="/vendors" element={<VendorsPage />} />
+              </Route>
+
               <Route path="/profile" element={<ProfilePage />} />
             </Route>
 
