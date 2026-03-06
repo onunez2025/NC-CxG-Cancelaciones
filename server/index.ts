@@ -113,7 +113,7 @@ app.get('/api/status', async (req: Request, res: Response) => {
 
 // Serve frontend in production (Docker image)
 if (process.env.NODE_ENV === 'production') {
-    const staticPath = path.join(__dirname, '../../dist');
+    const staticPath = path.join(__dirname, '../dist');
     app.use(express.static(staticPath));
     app.get('*', (req, res) => {
         if (!req.path.startsWith('/api')) {
