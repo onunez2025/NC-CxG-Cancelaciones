@@ -1,0 +1,27 @@
+[
+  {
+    "Grupo de compras": "G32",
+    "Solicitud de pedido": "4000016951",
+    "Pos.solicitud pedido": "10",
+    "Material": "12632",
+    "Texto breve": "Servicio de Inventario y Archivo en gral",
+    "Unidad de medida": "UN",
+    "Cantidad solicitada": 1,
+    "Fecha de solicitud": 46066,
+    "Modificado el": 46071,
+    "Entregas (de/a)": 46066,
+    "Fecha de liberación": 46066,
+    "Creado por": "JSALAZART",
+    "Moneda": "PEN",
+    "Precio de valoración": 5583.6,
+    "Valor total": 5583.6,
+    "Centro": "M310",
+    "Fecha de pedido": "",
+    "Pedido": "",
+    "Posición de pedido": "0",
+    "Cantidad pedida": 0,
+    "Cant.Dias de OC": "0",
+    "Nombre de proveedor": "",
+    "Proveedor deseado": ""
+  }
+]

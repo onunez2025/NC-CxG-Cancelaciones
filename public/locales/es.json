@@ -128,7 +128,7 @@
         },
         "status": {
             "pending_approval": "Pendiente Firma",
-            "released": "Liberada",
+            "released": "Lista p/Pedido",
             "with_po": "Con Pedido",
             "executed": "Ejecutado",
             "billed": "Facturado"

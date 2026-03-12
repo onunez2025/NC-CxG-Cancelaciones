@@ -71,27 +71,46 @@ async function setupSapViews() {
         // VISTA PARA SOLPEDS (vw_EBM_Solped)
         await pool.request().query(`
             CREATE OR ALTER VIEW EBM.vw_EBM_Solped AS
-            WITH me5_base AS (
-                SELECT PrNumber, PrItem, PoNumber, CostCenter, RequestDate, ReleaseDate, Currency, Description, NetValue AS TotalValue, Quantity, VendorName, GlAccount
-                FROM EBM.SAP_ME5K
-                UNION ALL
-                SELECT PrNumber, PrItem, PoNumber, CostCenter, RequestDate, ReleaseDate, Currency, Description, TotalValue, Quantity, VendorName, NULL AS GlAccount
-                FROM EBM.SAP_ME5A
-            ),
-            me5_grouped AS (
-                SELECT 
+            -- ME5K is the authoritative source for Solped data. 
+            -- ME5A is only used as a fallback for PrNumbers not found in ME5K.
+            WITH me5k_grouped AS (
+                SELECT
                     PrNumber,
-                    MAX(CostCenter) AS CostCenter,
-                    MIN(RequestDate) AS RequestDate,
-                    MAX(ReleaseDate) AS ReleaseDate,
-                    MAX(Currency) AS Currency,
-                    MAX(Description) AS Description,
-                    SUM(TotalValue) AS Value,
-                    SUM(Quantity) AS Quantity,
-                    MAX(VendorName) AS VendorName,
-                    MAX(GlAccount) AS GlAccount
-                FROM me5_base
+                    MAX(CostCenter)    AS CostCenter,
+                    MIN(RequestDate)   AS RequestDate,
+                    MAX(ReleaseDate)   AS ReleaseDate,
+                    MAX(Currency)      AS Currency,
+                    MAX(Description)   AS Description,
+                    SUM(NetValue)      AS Value,
+                    MAX(Quantity)      AS Quantity,
+                    MAX(VendorName)    AS VendorName,
+                    MAX(GlAccount)     AS GlAccount,
+                    'ME5K'             AS Source
+                FROM EBM.SAP_ME5K
                 GROUP BY PrNumber
+            ),
+            me5a_grouped AS (
+                SELECT
+                    PrNumber,
+                    MAX(CostCenter)    AS CostCenter,
+                    MIN(RequestDate)   AS RequestDate,
+                    MAX(ReleaseDate)   AS ReleaseDate,
+                    MAX(Currency)      AS Currency,
+                    MAX(Description)   AS Description,
+                    SUM(TotalValue)    AS Value,
+                    MAX(Quantity)      AS Quantity,
+                    MAX(VendorName)    AS VendorName,
+                    NULL               AS GlAccount,
+                    'ME5A'             AS Source
+                FROM EBM.SAP_ME5A
+                -- Only include rows whose PrNumber does NOT appear in ME5K
+                WHERE PrNumber NOT IN (SELECT DISTINCT PrNumber FROM EBM.SAP_ME5K WHERE PrNumber IS NOT NULL)
+                GROUP BY PrNumber
+            ),
+            combined AS (
+                SELECT * FROM me5k_grouped
+                UNION ALL
+                SELECT * FROM me5a_grouped
             ),
             me2k_po AS (
                 SELECT K.PrNumber, MAX(M.PoNumber) AS PoNumber, SUM(M.OrderValue) AS PoValue
@@ -99,7 +118,7 @@ async function setupSapViews() {
                 JOIN EBM.SAP_ME5K K ON M.PoNumber = K.PoNumber
                 GROUP BY K.PrNumber
             )
-            SELECT 
+            SELECT
                 S.PrNumber,
                 S.CostCenter,
                 S.Description,
@@ -113,7 +132,7 @@ async function setupSapViews() {
                 P.PoNumber,
                 P.PoValue,
                 CASE WHEN P.PoNumber IS NOT NULL THEN 'pedido' ELSE 'solicitado' END AS Status
-            FROM me5_grouped S
+            FROM combined S
             LEFT JOIN me2k_po P ON S.PrNumber = P.PrNumber
         `);
         console.log('Vista EBM.vw_EBM_Solped creada.');

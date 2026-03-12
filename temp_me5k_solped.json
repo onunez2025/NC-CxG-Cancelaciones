@@ -1,0 +1,30 @@
+[
+  {
+    "Centro de coste": "MT050002",
+    "Cuenta de mayor": "639991020",
+    "Tipo de imputación": "K",
+    "Solicitud de pedido": "4000016951",
+    "Material": "12632",
+    "Texto breve": "Servicio de Inventario y Archivo en gral",
+    "Cantidad solicitada": 0.745,
+    "Unidad de medida": "UN",
+    "Centro": "M310",
+    "Grupo de compras": "G32",
+    "Solicitante": "JSALAZAR",
+    "Reg.info de compras": "",
+    "Proveedor fijo": "",
+    "Nombre de proveedor": "",
+    "Proveedor deseado": "",
+    "Nombre del proveedor deseado": "",
+    "Fecha de solicitud": 46066,
+    "Moneda": "PEN",
+    "Pedido": "",
+    "Fecha de pedido": "",
+    "Centro de beneficio": "MT05",
+    "Ind.recuperación": "",
+    "Distribución (%)": 74.5,
+    "Valor neto de orden": 4158,
+    "Pos.solicitud pedido": "10",
+    "Fecha de liberación": 46066
+  }
+]
