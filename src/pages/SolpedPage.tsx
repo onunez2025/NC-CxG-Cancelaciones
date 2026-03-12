@@ -270,7 +270,7 @@ export function SolpedPage() {
                                                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
                                                                 <DetailItem label={t('solped.detail.date')} value={formatExcelDate(r.request_date)} />
                                                                 <DetailItem label={t('solped.detail.release_date')} value={formatExcelDate(r.release_date)} highlight={!!r.release_date} />
-                                                                <DetailItem label={t('solped.detail.quantity')} value={String(r.quantity)} />
+                                                                <DetailItem label={t('solped.detail.quantity')} value={`${(r.quantity * 100).toFixed(2)}%`} />
                                                                 <DetailItem label={t('solped.detail.gl_account')} value={r.gl_account || '—'} />
                                                                 <DetailItem label={t('solped.detail.vendor')} value={r.vendor_name || '—'} />
                                                                 <DetailItem label={t('solped.detail.po_value')} value={r.has_po ? formatCurrency(r.po_value, r.currency) : '—'} highlight={r.has_po} />
