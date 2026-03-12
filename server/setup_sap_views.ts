@@ -6,6 +6,30 @@ export async function setupSapViews() {
     const pool = await getDbConnection();
     console.log('--- Iniciando creación de Vistas SQL Relacionales ---');
 
+    // ── Migration: Ensure Quantity columns have DECIMAL(18,4) precision ──────
+    // This is idempotent: only runs ALTER if the column is still at scale <= 2
+    try {
+        const migrationCheck = await pool.request().query(`
+            SELECT TABLE_NAME, COLUMN_NAME, NUMERIC_SCALE
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_SCHEMA = 'EBM'
+              AND COLUMN_NAME = 'Quantity'
+              AND TABLE_NAME IN ('SAP_ME2K','SAP_ME5K','SAP_ME5A')
+              AND NUMERIC_SCALE < 4
+        `);
+        for (const col of migrationCheck.recordset) {
+            console.log(`[Migration] Upgrading EBM.${col.TABLE_NAME}.Quantity to DECIMAL(18,4)...`);
+            await pool.request().query(`ALTER TABLE EBM.${col.TABLE_NAME} ALTER COLUMN Quantity DECIMAL(18,4)`);
+            console.log(`[Migration] EBM.${col.TABLE_NAME}.Quantity upgraded.`);
+        }
+        if (migrationCheck.recordset.length === 0) {
+            console.log('[Migration] Quantity columns already at DECIMAL(18,4). No changes needed.');
+        }
+    } catch (migErr) {
+        console.error('[Migration] Failed to upgrade Quantity columns:', migErr);
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     try {
         // VISTA PARA TRACKING COMPLETO DE PEDIDOS
         // Cruza ME2K como pivote principal, enlazado con ME5K, KSB1 y FBL1N usando SUM()
