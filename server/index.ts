@@ -21,6 +21,7 @@ import budgetsRouter from './routes/budgets.js';
 import { sapRouter } from './routes/sap.js';
 import { crossReferenceRouter, prewarmCache } from './routes/crossReference.js';
 import { verifyToken } from './middleware/auth.js';
+import { setupSapViews } from './setup_sap_views.js';
 
 dotenv.config();
 
@@ -134,6 +135,11 @@ if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
 app.listen(port, () => {
     console.log(`Backend Server listening on port ${port} in ${process.env.NODE_ENV || 'development'} mode`);
     console.log(`Azure Status Check available at: http://localhost:${port}/api/status`);
+
+    // Ensure SQL Views are always up-to-date (CREATE OR ALTER — idempotent)
+    setupSapViews()
+        .then(() => console.log('[Views] SQL Views initialized/updated.'))
+        .catch(err => console.error('[Views] Failed to initialize SQL Views:', err));
 
     // Pre-warm the SAP cross-reference cache in background
     prewarmCache().catch(err => console.error('[Cache] Pre-warm error on startup:', err));

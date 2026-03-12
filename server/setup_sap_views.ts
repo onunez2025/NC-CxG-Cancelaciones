@@ -2,7 +2,7 @@ import { getDbConnection } from './db.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
-async function setupSapViews() {
+export async function setupSapViews() {
     const pool = await getDbConnection();
     console.log('--- Iniciando creación de Vistas SQL Relacionales ---');
 
@@ -170,12 +170,18 @@ async function setupSapViews() {
         console.log('Vista EBM.vw_EBM_Vendor creada.');
 
         console.log('✔ Todas las vistas SAP creadas correctamente.');
-        process.exit(0);
+        return;
 
     } catch (err) {
         console.error('Error creando vistas SAP:', err);
-        process.exit(1);
+        throw err;
     }
 }
 
-setupSapViews();
+// Only auto-run when called directly as a migration script
+// (not when imported by index.ts)
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+if (process.argv[1] === __filename.replace('.ts', '.js')) {
+    setupSapViews();
+}
