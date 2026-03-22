@@ -76,22 +76,17 @@ export function LoginPage() {
                     <h1 className="text-5xl font-bold mb-4 leading-tight">
                         Enterprise<br />Budget<br />Manager
                     </h1>
-                    <p className="text-slate-400 text-lg max-w-md">
-                        Control integral de presupuesto, solicitudes y proveedores para gerencias de alto rendimiento.
-                    </p>
-
-                    <div className="mt-12">
-                        <h3 className="text-2xl font-bold text-white tracking-tight">
-                            Gerencia Atención al Cliente - Grupo Sole
-                        </h3>
-                        <p className="text-slate-400 text-sm text-right mt-1">
-                            Rinnai Corporation
-                        </p>
+                    <div className="text-slate-400 text-lg max-w-md space-y-6">
+                        <p>Control integral de presupuesto, solicitudes y proveedores para gerencias de alto rendimiento.</p>
+                        <div className="flex flex-col w-fit">
+                            <span className="text-2xl font-bold text-slate-100 tracking-tight">Gerencia Atención al Cliente - Grupo Sole</span>
+                            <span className="text-sm font-medium text-slate-400 self-end mt-1">Rinnai Corporation</span>
+                        </div>
                     </div>
                 </div>
 
                 <div className="relative z-10 text-sm text-slate-500">
-                    © 2026 Enterprise Budget Manager. All rights reserved.
+                    © 2026 GAC - Grupo Sole. Todos los derechos reservados.
                 </div>
             </div>
 
