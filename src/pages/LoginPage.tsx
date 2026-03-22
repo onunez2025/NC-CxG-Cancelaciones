@@ -79,6 +79,15 @@ export function LoginPage() {
                     <p className="text-slate-400 text-lg max-w-md">
                         Control integral de presupuesto, solicitudes y proveedores para gerencias de alto rendimiento.
                     </p>
+
+                    <div className="mt-12">
+                        <h3 className="text-2xl font-bold text-white tracking-tight">
+                            Gerencia Atención al Cliente - Grupo Sole
+                        </h3>
+                        <p className="text-slate-400 text-sm text-right mt-1">
+                            Rinnai Corporation
+                        </p>
+                    </div>
                 </div>
 
                 <div className="relative z-10 text-sm text-slate-500">
