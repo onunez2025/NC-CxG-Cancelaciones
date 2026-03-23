@@ -6,7 +6,8 @@ import {
     Plus,
     Edit2,
     Trash2,
-    AlertCircle
+    AlertCircle,
+    Save
 } from 'lucide-react';
 import { ManagementsService } from '../../services/managementsService';
 import { UsersService } from '../../services/usersService';
@@ -154,120 +155,104 @@ export function UsersPage() {
 
     return (
         <div className="space-y-6">
-            {/* Page Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight">Gestión de Usuarios</h1>
-                    <p className="text-muted-foreground">Administra el acceso y roles de los usuarios del sistema.</p>
+            <div className="flex flex-col shadow-sm rounded-lg">
+                <div className="sticky top-0 z-30 p-6 border border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card rounded-t-lg before:content-[''] before:absolute before:bottom-full before:-translate-y-px before:-left-4 before:-right-4 before:h-12 before:bg-background before:pointer-events-none">
+                    <div>
+                        <h2 className="text-lg font-medium flex items-center gap-2 text-foreground">
+                            <Users className="w-5 h-5 text-primary" /> Gestión de Usuarios
+                        </h2>
+                        <p className="text-sm text-muted-foreground mt-1">Administra los usuarios con acceso al sistema EBM</p>
+                    </div>
+                    <button onClick={handleCreate} className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium shadow-sm shrink-0">
+                        <Plus className="w-4 h-4" /> Nuevo Usuario
+                    </button>
                 </div>
-                <button
-                    onClick={handleCreate}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium shadow-sm"
-                >
-                    <Plus className="w-4 h-4" />
-                    Nuevo Usuario
-                </button>
-            </div>
+                
+                <div className="p-6 space-y-6 bg-card border-x border-b border-border rounded-b-lg">
+                    <div className="relative max-w-md">
+                        <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={handleSearch}
+                            placeholder="Buscar por nombre, usuario o email..."
+                            className="w-full pl-9 pr-4 py-2 bg-background border border-input rounded-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-sm"
+                        />
+                    </div>
 
-            {/* Filters and Search */}
-            <div className="flex items-center gap-4 bg-card p-4 rounded-lg border border-border shadow-sm">
-                <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <input
-                        type="text"
-                        placeholder={t('common.search')}
-                        value={searchTerm}
-                        onChange={handleSearch}
-                        className="w-full pl-9 pr-4 py-2 bg-background border border-input rounded-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-sm"
-                    />
-                </div>
-                {/* Placeholder for more filters */}
-            </div>
-
-            {/* Users Table */}
-            <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-muted/50 text-muted-foreground font-medium border-b border-border">
-                            <tr>
-                                <th className="px-6 py-3">Usuario</th>
-                                <th className="px-6 py-3">Rol</th>
-                                <th className="px-6 py-3">Gerencia</th>
-                                <th className="px-6 py-3 text-center">Aplicaciones</th>
-                                <th className="px-6 py-3 text-center">Estado</th>
-                                <th className="px-6 py-3 text-right">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border">
-                            {filteredUsers.length > 0 ? (
-                                filteredUsers.map((user) => (
-                                    <tr key={user.id} className="hover:bg-muted/50 transition-colors">
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                                                    {user.username.substring(0, 2).toUpperCase()}
-                                                </div>
-                                                <div>
-                                                    <div className="font-medium text-foreground">{user.full_name || user.username}</div>
-                                                    <div className="text-xs text-muted-foreground">{user.username} • {user.email}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {getRoleBadge(user.role_id)}
-                                        </td>
-                                        <td className="px-6 py-4 text-muted-foreground">
-                                            {managements.find(m => m.id === user.management_id)?.name || user.management_id}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex flex-wrap justify-center gap-1">
-                                                {(user.apps || 'EBM').split(',').map(app => (
-                                                    <span key={app} className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/10 text-primary border border-primary/20">
-                                                        {app.trim()}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 text-center">
-                                            <span className={cn(
-                                                "px-2 py-0.5 rounded-full text-[10px] font-semibold border",
-                                                user.is_active 
-                                                    ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20"
-                                                    : "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20"
-                                            )}>
-                                                {user.is_active ? 'Activo' : 'Inactivo'}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <button
-                                                    onClick={() => handleEdit(user)}
-                                                    className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-md transition-colors"
-                                                    title="Editar"
-                                                >
-                                                    <Edit2 className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(user.id)}
-                                                    className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
-                                                    title="Eliminar"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        </td>
+                    <div className="bg-card rounded-lg border border-border overflow-hidden shadow-sm">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm text-left">
+                                <thead className="bg-muted/50 text-muted-foreground font-medium border-b border-border">
+                                    <tr>
+                                        <th className="px-6 py-3">Usuario</th>
+                                        <th className="px-6 py-3">Email</th>
+                                        <th className="px-6 py-3">Rol</th>
+                                        <th className="px-6 py-3">Aplicaciones</th>
+                                        <th className="px-6 py-3 text-right">Acciones</th>
                                     </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
-                                        <Users className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                                        <p>No se encontraron usuarios</p>
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                                </thead>
+                                <tbody className="divide-y divide-border">
+                                    {filteredUsers.length > 0 ? (
+                                        filteredUsers.map((user) => (
+                                            <tr key={user.id} className="hover:bg-muted/50 transition-colors">
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase">
+                                                            {user.username.substring(0, 2)}
+                                                        </div>
+                                                        <div>
+                                                            <div className="font-medium text-foreground">{user.full_name || user.username}</div>
+                                                            <div className="text-xs text-muted-foreground">@{user.username}</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-foreground">{user.email}</td>
+                                                <td className="px-6 py-4">
+                                                    <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
+                                                        {roles.find(r => r.id === user.role_id)?.name || user.role_id}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {(user.apps || 'EBM').split(',').map(app => (
+                                                            <span key={app} className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/5 text-primary border border-primary/10">
+                                                                {app.trim()}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <div className="flex items-center justify-end gap-2">
+                                                        <button
+                                                            onClick={() => handleEdit(user)}
+                                                            className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-md transition-colors"
+                                                            title="Editar"
+                                                        >
+                                                            <Edit2 className="w-4 h-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDelete(user.id)}
+                                                            className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors"
+                                                            title="Eliminar"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground font-medium italic opacity-60">
+                                                No se encontraron usuarios que coincidan con la búsqueda.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -284,84 +269,77 @@ export function UsersPage() {
                             {error}
                         </div>
                     )}
-                    <div className="grid grid-cols-1 gap-4">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">Nombre Completo</label>
-                            <input
-                                type="text"
-                                required
-                                value={formData.full_name}
-                                onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                                className="w-full px-3 py-2 bg-background border border-input rounded-md focus:ring-2 focus:ring-primary focus:border-primary outline-none"
-                                placeholder="Ej: Juan Pérez"
-                            />
-                        </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-foreground mb-1">Nombre Completo *</label>
+                        <input
+                            type="text"
+                            value={formData.full_name || ''}
+                            onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                            className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                        />
+                    </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">Usuario / ID de Inicio de sesión</label>
-                            <input
-                                type="text"
-                                required
-                                value={formData.username}
-                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                                className="w-full px-3 py-2 bg-background border border-input rounded-md focus:ring-2 focus:ring-primary focus:border-primary outline-none"
-                                placeholder="Ej: jperez"
-                            />
-                        </div>
+                    <div>
+                        <label className="block text-sm font-medium text-foreground mb-1">Usuario *</label>
+                        <input
+                            type="text"
+                            value={formData.username || ''}
+                            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                            className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                        />
+                    </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">Email</label>
-                            <input
-                                type="email"
-                                required
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                className="w-full px-3 py-2 bg-background border border-input rounded-md focus:ring-2 focus:ring-primary focus:border-primary outline-none"
-                                placeholder="juan@empresa.com"
-                            />
-                        </div>
+                    <div>
+                        <label className="block text-sm font-medium text-foreground mb-1">Email *</label>
+                        <input
+                            type="email"
+                            value={formData.email || ''}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                        />
+                    </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">
-                                Contraseña {editingUser && <span className="text-xs text-muted-foreground font-normal">(Dejar en blanco para mantener actual)</span>}
-                            </label>
-                            <input
-                                type="password"
-                                required={!editingUser}
-                                value={formData.password_hash || ''}
-                                onChange={(e) => setFormData({ ...formData, password_hash: e.target.value })}
-                                className="w-full px-3 py-2 bg-background border border-input rounded-md focus:ring-2 focus:ring-primary focus:border-primary outline-none"
-                                placeholder={editingUser ? "••••••••" : "Ingresa una contraseña segura"}
-                            />
-                        </div>
+                    <div>
+                        <label className="block text-sm font-medium text-foreground mb-1">
+                            {editingUser ? 'Nueva Contraseña (dejar vacío para no cambiar)' : 'Contraseña *'}
+                        </label>
+                        <input
+                            type="password"
+                            value={formData.password_hash || ''}
+                            onChange={(e) => setFormData({ ...formData, password_hash: e.target.value })}
+                            className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                            placeholder={editingUser ? "••••••••" : ""}
+                        />
+                    </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">Rol</label>
-                                <select
-                                    value={formData.role_id}
-                                    onChange={(e) => setFormData({ ...formData, role_id: e.target.value })}
-                                    className="w-full px-3 py-2 bg-background border border-input rounded-md focus:ring-2 focus:ring-primary focus:border-primary outline-none"
-                                >
-                                    {roles.map(role => (
-                                        <option key={role.id} value={role.id}>{role.name}</option>
-                                    ))}
-                                </select>
-                            </div>
+                    <div>
+                        <label className="block text-sm font-medium text-foreground mb-1">Rol *</label>
+                        <select
+                            value={formData.role_id || ''}
+                            onChange={(e) => setFormData({ ...formData, role_id: e.target.value })}
+                            className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            <option value="">Seleccionar rol</option>
+                            {roles.map(role => (
+                                <option key={role.id} value={role.id}>{role.name}</option>
+                            ))}
+                        </select>
+                    </div>
 
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">Gerencia</label>
-                                <select
-                                    value={formData.management_id}
-                                    onChange={(e) => setFormData({ ...formData, management_id: e.target.value })}
-                                    className="w-full px-3 py-2 bg-background border border-input rounded-md focus:ring-2 focus:ring-primary focus:border-primary outline-none"
-                                >
-                                    {managements.map(mgmt => (
-                                        <option key={mgmt.id} value={mgmt.id}>{mgmt.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
+                    <div>
+                        <label className="block text-sm font-medium text-foreground mb-1">Gerencia *</label>
+                        <select
+                            value={formData.management_id || ''}
+                            onChange={(e) => setFormData({ ...formData, management_id: e.target.value })}
+                            className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            <option value="">Seleccionar gerencia</option>
+                            {managements.map(mgmt => (
+                                <option key={mgmt.id} value={mgmt.id}>{mgmt.name}</option>
+                            ))}
+                        </select>
+                    </div>
 
                         <div className="col-span-full border-t border-border pt-4 mt-2">
                             <label className="block text-sm font-medium text-foreground mb-3">Acceso a Aplicaciones</label>
@@ -384,7 +362,7 @@ export function UsersPage() {
                                                 "w-4 h-4 rounded border flex items-center justify-center transition-colors",
                                                 isSelected ? "bg-primary border-primary text-white" : "border-input bg-background"
                                             )}>
-                                                {isSelected && <Users className="w-2.5 h-2.5" />}
+                                                {isSelected && <Save className="w-2.5 h-2.5" />}
                                             </div>
                                             {app.label}
                                         </button>
@@ -393,17 +371,19 @@ export function UsersPage() {
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-2 pt-2 col-span-full border-t border-border pt-4">
-                            <input
-                                type="checkbox"
-                                id="is_active"
-                                checked={formData.is_active}
-                                onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                                className="w-4 h-4 rounded border-input text-primary focus:ring-primary"
-                            />
-                            <label htmlFor="is_active" className="text-sm font-medium cursor-pointer">
-                                Usuario Activo
-                            </label>
+                        <div className="flex items-center gap-4 col-span-full border-t border-border pt-4">
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    id="is_active"
+                                    checked={formData.is_active ?? true}
+                                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                                    className="rounded border-input text-primary focus:ring-primary"
+                                />
+                                <label htmlFor="is_active" className="text-sm font-medium text-foreground">
+                                    Usuario activo
+                                </label>
+                            </div>
                         </div>
                     </div>
 
