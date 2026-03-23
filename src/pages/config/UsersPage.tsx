@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 import {
     Users,
     Search,
@@ -17,7 +17,7 @@ import { Modal } from '../../components/common/Modal';
 import { cn } from '../../utils/cn';
 
 export function UsersPage() {
-    const { t } = useTranslation();
+    // const { t } = useTranslation();
     const [users, setUsers] = useState<User[]>([]);
     const [managements, setManagements] = useState<Management[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
@@ -162,7 +162,7 @@ export function UsersPage() {
                         />
                     </div>
 
-                    <div className="bg-card rounded-lg border border-border overflow-hidden shadow-sm">
+                    <div className="bg-card rounded-lg border border-border overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm text-left">
                                 <thead className="bg-muted/50 text-muted-foreground font-medium border-b border-border">
@@ -181,7 +181,7 @@ export function UsersPage() {
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase">
-                                                            {user.username.substring(0, 2)}
+                                                            {user.username.substring(0, 2).toUpperCase()}
                                                         </div>
                                                         <div>
                                                             <div className="font-medium text-foreground">{user.full_name || user.username}</div>
@@ -192,7 +192,7 @@ export function UsersPage() {
                                                 <td className="px-6 py-4 text-foreground">{user.email}</td>
                                                 <td className="px-6 py-4">
                                                     <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
-                                                        {roles.find(r => r.id === user.role_id)?.name || user.role_id}
+                                                        {user.role_name || 'Sin Rol'}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4">
@@ -395,7 +395,7 @@ export function UsersPage() {
             >
                 <div className="space-y-4">
                     <p className="text-sm text-foreground">
-                        {t('common.deleteConfirm', { defaultValue: '¿Estás seguro de eliminar este usuario? Esta acción no se puede deshacer.' })}
+                        ¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer y el usuario perderá el acceso a todas las aplicaciones asociadas.
                     </p>
                     <div className="flex justify-end gap-3 pt-4">
                         <button

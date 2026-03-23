@@ -16,32 +16,33 @@ export function ConfigLayout() {
     ];
 
     return (
-        <div className="flex flex-col md:flex-row gap-6 h-[calc(100vh-theme(spacing.24))]">
+        <div className="grid grid-cols-1 lg:grid-cols-[14rem_1fr] gap-6 flex-1 min-h-0">
             {/* Secondary Sidebar */}
-            <aside className="w-full md:w-64 shrink-0">
-                <nav className="flex flex-col space-y-1">
+            <aside className="relative">
+                <div className="lg:sticky lg:top-0 z-30 lg:mb-8 bg-card rounded-lg border border-border shadow-sm p-3 space-y-1">
+                    <p className="text-xs font-semibold text-foreground uppercase tracking-wider px-3 py-2">Configuración</p>
                     {navItems.map((item) => (
                         <NavLink
                             key={item.to}
                             to={item.to}
                             className={({ isActive }) => cn(
-                                "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                                "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                                 isActive
-                                    ? "bg-primary/10 text-primary"
-                                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                                    ? "bg-primary/5 dark:bg-primary/10 text-primary"
+                                    : "text-foreground hover:bg-card hover:text-foreground"
                             )}
                         >
                             <item.icon className="w-4 h-4" />
                             {item.label}
                         </NavLink>
                     ))}
-                </nav>
+                </div>
             </aside>
 
             {/* Content Area */}
-            <main className="flex-1 overflow-y-auto pr-1">
+            <div className="flex-1 min-w-0">
                 <Outlet />
-            </main>
+            </div>
         </div>
     );
 }
