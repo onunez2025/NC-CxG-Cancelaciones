@@ -148,7 +148,7 @@ export function RolesPage() {
                                     </div>
                                 </div>
 
-                                <div className="flex flex-wrap gap-1.5">
+                                <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1 custom-scrollbar">
                                     {role.permissions.length === 0 ? (
                                         <span className="text-xs text-muted-foreground italic">Sin permisos asignados</span>
                                     ) : (
