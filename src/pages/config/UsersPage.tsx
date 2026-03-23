@@ -135,24 +135,6 @@ export function UsersPage() {
         }
     };
 
-    const getRoleBadge = (roleId: string) => {
-        const role = roles.find(r => r.id === roleId);
-        // Default colors mapping as a fallback since color is not strictly on Role
-        const roleColorMap: Record<string, string> = {
-            'admin': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-            'manager': 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
-            'analyst': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-            'viewer': 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
-        };
-        const colorClass = roleColorMap[roleId] || roleColorMap['viewer'];
-
-        return (
-            <span className={cn("px-2.5 py-0.5 rounded-full text-xs font-medium", colorClass)}>
-                {role?.name || roleId}
-            </span>
-        );
-    };
-
     return (
         <div className="space-y-6">
             <div className="flex flex-col shadow-sm rounded-lg">
