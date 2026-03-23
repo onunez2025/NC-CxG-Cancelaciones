@@ -6,8 +6,6 @@ import {
     Plus,
     Edit2,
     Trash2,
-    CheckCircle,
-    XCircle,
     AlertCircle
 } from 'lucide-react';
 import { ManagementsService } from '../../services/managementsService';
@@ -39,7 +37,8 @@ export function UsersPage() {
         is_active: true,
         language: 'es',
         theme: 'light',
-        password_hash: ''
+        password_hash: '',
+        apps: 'EBM'
     });
 
     useEffect(() => {
@@ -69,7 +68,6 @@ export function UsersPage() {
         user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
     const handleCreate = () => {
         setEditingUser(null);
         setError(null);
@@ -82,9 +80,19 @@ export function UsersPage() {
             is_active: true,
             language: 'es',
             theme: 'light',
-            password_hash: ''
+            password_hash: '',
+            apps: 'EBM'
         });
         setIsModalOpen(true);
+    };
+
+    const toggleApp = (appCode: string) => {
+        const currentApps = (formData.apps || '').split(',').map(a => a.trim()).filter(Boolean);
+        const updatedApps = currentApps.includes(appCode)
+            ? currentApps.filter(a => a !== appCode)
+            : [...currentApps, appCode];
+        
+        setFormData({ ...formData, apps: updatedApps.join(', ') });
     };
 
     const handleEdit = (user: User) => {
@@ -185,7 +193,8 @@ export function UsersPage() {
                                 <th className="px-6 py-3">Usuario</th>
                                 <th className="px-6 py-3">Rol</th>
                                 <th className="px-6 py-3">Gerencia</th>
-                                <th className="px-6 py-3">Estado</th>
+                                <th className="px-6 py-3 text-center">Aplicaciones</th>
+                                <th className="px-6 py-3 text-center">Estado</th>
                                 <th className="px-6 py-3 text-right">Acciones</th>
                             </tr>
                         </thead>
@@ -211,17 +220,23 @@ export function UsersPage() {
                                             {managements.find(m => m.id === user.management_id)?.name || user.management_id}
                                         </td>
                                         <td className="px-6 py-4">
-                                            {user.is_active ? (
-                                                <div className="flex items-center gap-1.5 text-green-600 dark:text-green-400 text-xs font-medium">
-                                                    <CheckCircle className="w-3.5 h-3.5" />
-                                                    Activo
-                                                </div>
-                                            ) : (
-                                                <div className="flex items-center gap-1.5 text-muted-foreground text-xs font-medium">
-                                                    <XCircle className="w-3.5 h-3.5" />
-                                                    Inactivo
-                                                </div>
-                                            )}
+                                            <div className="flex flex-wrap justify-center gap-1">
+                                                {(user.apps || 'EBM').split(',').map(app => (
+                                                    <span key={app} className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/10 text-primary border border-primary/20">
+                                                        {app.trim()}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-center">
+                                            <span className={cn(
+                                                "px-2 py-0.5 rounded-full text-[10px] font-semibold border",
+                                                user.is_active 
+                                                    ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20"
+                                                    : "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20"
+                                            )}>
+                                                {user.is_active ? 'Activo' : 'Inactivo'}
+                                            </span>
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
@@ -348,7 +363,37 @@ export function UsersPage() {
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-2 pt-2">
+                        <div className="col-span-full border-t border-border pt-4 mt-2">
+                            <label className="block text-sm font-medium text-foreground mb-3">Acceso a Aplicaciones</label>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                {[
+                                    { id: 'EBM', label: 'EBM (Principal)' },
+                                    { id: 'FSM', label: 'Gestor FSM' },
+                                    { id: 'TCtrl', label: 'Tablero Control' }
+                                ].map(app => {
+                                    const isSelected = (formData.apps || '').split(',').map(a => a.trim()).includes(app.id);
+                                    return (
+                                        <button key={app.id} type="button" onClick={() => toggleApp(app.id)}
+                                            className={cn(
+                                                "flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors border",
+                                                isSelected
+                                                    ? "bg-primary/5 border-primary/20 text-primary"
+                                                    : "bg-card border-border text-foreground hover:bg-muted"
+                                            )}>
+                                            <div className={cn(
+                                                "w-4 h-4 rounded border flex items-center justify-center transition-colors",
+                                                isSelected ? "bg-primary border-primary text-white" : "border-input bg-background"
+                                            )}>
+                                                {isSelected && <Users className="w-2.5 h-2.5" />}
+                                            </div>
+                                            {app.label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 pt-2 col-span-full border-t border-border pt-4">
                             <input
                                 type="checkbox"
                                 id="is_active"

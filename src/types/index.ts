@@ -17,6 +17,7 @@ export interface User {
     avatar_url?: string;
     permissions?: Permission[];
     requires_password_change?: boolean;
+    apps?: string;
 }
 
 export interface Role {

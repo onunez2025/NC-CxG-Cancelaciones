@@ -23,7 +23,8 @@ router.get('/', async (req: Request, res: Response) => {
                 u.CreatedAt as created_at,
                 u.Language as language,
                 u.Theme as theme,
-                u.AvatarUrl as avatar_url
+                u.AvatarUrl as avatar_url,
+                u.Apps as apps
             FROM EBM.Users u
             LEFT JOIN EBM.Roles r ON u.RoleId = r.Id
             LEFT JOIN EBM.Managements m ON u.ManagementId = m.Id
@@ -38,17 +39,54 @@ router.get('/', async (req: Request, res: Response) => {
 // POST new User
 router.post('/', async (req: Request, res: Response) => {
     try {
-        const { full_name, username, email, password_hash, role_id, management_id, language = 'es', theme = 'light' } = req.body;
+        const { full_name, username, email, password_hash, role_id, management_id, language = 'es', theme = 'light', apps } = req.body;
 
         if (!full_name || !username || !email || !role_id || !management_id) {
             return res.status(400).json({ error: 'Nombre completo, usuario, email, rol y gerencia son requeridos' });
         }
 
+        const pool = await getDbConnection();
+
+        // 1. Check if user already exists (by Username or Email)
+        const checkResult = await pool.request()
+            .input('username', username)
+            .input('email', email)
+            .query("SELECT Id, Apps FROM EBM.Users WHERE Username = @username OR Email = @email");
+
+        const appsToSave = Array.isArray(apps) ? apps.join(', ') : (apps || 'EBM');
+
+        if (checkResult.recordset.length > 0) {
+            // 2a. User EXISTS -> UPSERT (Update existing user)
+            const existingUser = checkResult.recordset[0];
+            const userId = existingUser.Id || existingUser.id;
+
+            await pool.request()
+                .input('id', userId)
+                .input('fullName', full_name)
+                .input('roleId', role_id)
+                .input('managementId', management_id)
+                .input('apps', appsToSave)
+                .query(`
+                    UPDATE EBM.Users 
+                    SET FullName = @fullName, RoleId = @roleId, ManagementId = @managementId, Apps = @apps, IsActive = 1
+                    WHERE Id = @id
+                `);
+
+            const updatedUserResult = await pool.request().input('id', userId).query(`
+                SELECT u.Id as id, u.FullName as full_name, u.Username as username, u.Email as email,
+                       u.RoleId as role_id, u.ManagementId as management_id,
+                       CAST(u.IsActive AS BIT) as is_active, u.CreatedAt as created_at,
+                       u.Language as language, u.Theme as theme, u.AvatarUrl as avatar_url, u.Apps as apps
+                FROM EBM.Users u WHERE u.Id = @id
+            `);
+            return res.status(200).json(updatedUserResult.recordset[0]);
+        }
+
+        // 2b. User DOES NOT exist -> New INSERT
         const passwordToHash = password_hash || crypto.randomBytes(6).toString('hex');
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(passwordToHash, salt);
 
-        const pool = await getDbConnection();
         const result = await pool.request()
             .input('fullName', full_name)
             .input('username', username)
@@ -59,24 +97,22 @@ router.post('/', async (req: Request, res: Response) => {
             .input('language', language)
             .input('theme', theme)
             .input('avatarUrl', req.body.avatar_url || null)
+            .input('apps', appsToSave)
             .query(`
-                INSERT INTO EBM.Users (FullName, Username, Email, PasswordHash, RoleId, ManagementId, Language, Theme, RequiresPasswordChange, AvatarUrl)
+                INSERT INTO EBM.Users (FullName, Username, Email, PasswordHash, RoleId, ManagementId, Language, Theme, RequiresPasswordChange, AvatarUrl, Apps)
                 OUTPUT 
                     INSERTED.Id as id, INSERTED.FullName as full_name, INSERTED.Username as username, INSERTED.Email as email,
                     INSERTED.RoleId as role_id, INSERTED.ManagementId as management_id,
                     CAST(INSERTED.IsActive AS BIT) as is_active, INSERTED.CreatedAt as created_at,
                     INSERTED.Language as language, INSERTED.Theme as theme,
                     CAST(INSERTED.RequiresPasswordChange AS BIT) as requires_password_change,
-                    INSERTED.AvatarUrl as avatar_url
-                VALUES (@fullName, @username, @email, @password, @roleId, @managementId, @language, @theme, 1, @avatarUrl)
+                    INSERTED.AvatarUrl as avatar_url, INSERTED.Apps as apps
+                VALUES (@fullName, @username, @email, @password, @roleId, @managementId, @language, @theme, 1, @avatarUrl, @apps)
             `);
 
         res.status(201).json(result.recordset[0]);
     } catch (error: any) {
-        console.error('Error creating user:', error);
-        if (error.number === 2601 || error.number === 2627) {
-            return res.status(400).json({ error: 'El nombre de usuario o correo electrónico ya están registrados.' });
-        }
+        console.error('Error in router.post(/):', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -85,7 +121,7 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
     try {
         const userId = req.params.id;
-        const { full_name, username, email, role_id, management_id, is_active, language, theme, password_hash, avatar_url } = req.body;
+        const { full_name, username, email, role_id, management_id, is_active, language, theme, password_hash, avatar_url, apps } = req.body;
 
         const pool = await getDbConnection();
 
@@ -94,12 +130,13 @@ router.put('/:id', async (req: Request, res: Response) => {
             SET FullName = @fullName,
                 Username = @username, 
                 Email = @email, 
-                RoleId = @roleId, 
+                RoleId = @role_id, 
                 ManagementId = @managementId, 
                 IsActive = @isActive,
                 Language = @language,
                 Theme = @theme,
-                AvatarUrl = @avatarUrl
+                AvatarUrl = @avatarUrl,
+                Apps = @apps
         `;
 
         const request = pool.request()
@@ -107,12 +144,13 @@ router.put('/:id', async (req: Request, res: Response) => {
             .input('fullName', full_name)
             .input('username', username)
             .input('email', email)
-            .input('roleId', role_id)
+            .input('role_id', role_id)
             .input('managementId', management_id)
             .input('isActive', is_active ? 1 : 0)
             .input('language', language)
             .input('theme', theme)
-            .input('avatarUrl', avatar_url || null);
+            .input('avatarUrl', avatar_url || null)
+            .input('apps', Array.isArray(apps) ? apps.join(', ') : (apps || 'EBM'));
 
         // Only update password if provided
         if (password_hash && password_hash.trim() !== '') {
