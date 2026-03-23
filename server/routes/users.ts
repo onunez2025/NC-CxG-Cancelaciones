@@ -66,9 +66,10 @@ router.post('/', async (req: Request, res: Response) => {
                 .input('roleId', role_id)
                 .input('managementId', management_id)
                 .input('apps', appsToSave)
+                .input('avatarUrl', req.body.avatar_url || null)
                 .query(`
                     UPDATE EBM.Users 
-                    SET FullName = @fullName, RoleId = @roleId, ManagementId = @managementId, Apps = @apps, IsActive = 1
+                    SET FullName = @fullName, RoleId = @roleId, ManagementId = @managementId, Apps = @apps, AvatarUrl = @avatarUrl, IsActive = 1
                     WHERE Id = @id
                 `);
 

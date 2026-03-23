@@ -75,10 +75,10 @@
     @apply bg-background text-foreground;
   }
 
-  /* Custom Scrollbar - S-Project Style */
+  /* Custom Scrollbar - EBM Style */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
   
   ::-webkit-scrollbar-track {
@@ -92,4 +92,29 @@
   .dark ::-webkit-scrollbar-thumb {
     @apply bg-muted-foreground/20 hover:bg-muted-foreground/40;
   }
+}
+
+/* Base animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes zoomIn95 {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-in {
+  animation-duration: 300ms;
+  animation-fill-mode: forwards;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fade-in {
+  animation-name: fadeIn;
+}
+
+.zoom-in-95 {
+  animation-name: zoomIn95;
 }
