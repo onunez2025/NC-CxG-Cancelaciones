@@ -49,7 +49,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                         <Menu className="w-6 h-6" />
                     </button>
                     <div className="flex items-center gap-2">
-                        <img src="/ebm-logo.png" alt="EBM Logo" className="w-6 h-6 object-contain" />
+                        <img src="/ebm-logo-.png" alt="EBM Logo" className="w-6 h-6 object-contain" />
                         <span className="font-semibold text-lg">EBM</span>
                     </div>
                 </header>

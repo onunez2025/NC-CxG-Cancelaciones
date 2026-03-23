@@ -69,7 +69,7 @@ export function LoginPage() {
                 <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="w-10 h-10 flex items-center justify-center">
-                            <img src="/ebm-logo.png" alt="EBM Logo" className="w-full h-full object-contain" />
+                            <img src="/ebm-logo-.png" alt="EBM Logo" className="w-full h-full object-contain" />
                         </div>
                         <span className="text-2xl font-bold tracking-tight">EBM</span>
                     </div>
