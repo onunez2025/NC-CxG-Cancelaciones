@@ -152,21 +152,14 @@ export function RolesPage() {
                                     {role.permissions.length === 0 ? (
                                         <span className="text-xs text-muted-foreground italic">Sin permisos asignados</span>
                                     ) : (
-                                        <>
-                                            {role.permissions.slice(0, 6).map(perm => {
-                                                const label = availablePermissions.find(p => p.id === perm)?.label || perm;
-                                                return (
-                                                    <span key={perm} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-secondary text-secondary-foreground border border-border">
-                                                        {label}
-                                                    </span>
-                                                );
-                                            })}
-                                            {role.permissions.length > 6 && (
-                                                <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted/50 text-muted-foreground border border-border">
-                                                    +{role.permissions.length - 6} más
+                                        role.permissions.map(perm => {
+                                            const label = availablePermissions.find(p => p.id === perm)?.label || perm;
+                                            return (
+                                                <span key={perm} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-secondary text-secondary-foreground border border-border">
+                                                    {label}
                                                 </span>
-                                            )}
-                                        </>
+                                            );
+                                        })
                                     )}
                                 </div>
                             </div>
