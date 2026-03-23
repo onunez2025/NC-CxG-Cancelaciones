@@ -196,7 +196,7 @@ export function ProfilePage() {
                                 <p className="text-sm text-primary font-medium">@{user.username}</p>
 
                                 {/* Role badge */}
-                                <div className="mt-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary dark:bg-primary/30 text-primary dark:text-primary text-xs font-bold border border-blue-100 dark:border-blue-800">
+                                <div className="mt-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 dark:bg-primary/30 text-primary dark:text-primary text-xs font-bold border border-blue-100 dark:border-blue-800">
                                     <Shield className="w-3.5 h-3.5" />
                                     {user.role_name || 'Sin rol'}
                                 </div>
@@ -209,7 +209,7 @@ export function ProfilePage() {
 
                             <div className="space-y-4">
                                 <div className="flex items-center gap-4 group">
-                                    <div className="w-10 h-10 rounded-md bg-primary dark:bg-primary/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:bg-primary transition-all">
+                                    <div className="w-10 h-10 rounded-md bg-primary/10 dark:bg-primary/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:bg-primary transition-all">
                                         <Mail className="w-5 h-5 text-primary dark:text-primary" />
                                     </div>
                                     <div className="overflow-hidden">
@@ -291,7 +291,7 @@ export function ProfilePage() {
                                     </div>
                                 </div>
 
-                                <div className="p-3 bg-primary dark:bg-primary/20 rounded-lg border border-blue-100 dark:border-blue-900/50">
+                                <div className="p-3 bg-primary/5 dark:bg-primary/20 rounded-lg border border-blue-100 dark:border-blue-900/50">
                                     <p className="text-[11px] text-primary dark:text-primary font-medium flex items-center gap-2">
                                         <AlertCircle className="w-3.5 h-3.5 inline" />
                                         Estos campos son de solo lectura. Si necesitas un cambio, contacta al administrador del sistema.
