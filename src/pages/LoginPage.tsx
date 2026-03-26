@@ -81,7 +81,7 @@ export function LoginPage() {
                         <div className="flex flex-col w-fit gap-2">
                             <span className="text-2xl font-bold text-slate-100 tracking-tight">Gerencia Atención al Cliente</span>
                             <img 
-                                src="/Logo - Grupo Sole - Transparente blanco.png" 
+                                src="/Logo - Grupo Sole - Transparente blanco-.png" 
                                 alt="Logo Grupo Sole" 
                                 className="h-auto max-w-[12rem] object-contain"
                             />
