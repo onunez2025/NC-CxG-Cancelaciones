@@ -79,7 +79,7 @@ export function LoginPage() {
                     <div className="text-slate-400 text-lg max-w-md space-y-6">
                         <p>Control integral de presupuesto, solicitudes y proveedores para gerencias de alto rendimiento.</p>
                         <div className="flex flex-col w-fit gap-2">
-                            <span className="text-2xl font-bold text-slate-100 tracking-tight">Gerencia Atención al Cliente</span>
+                            <span className="text-2xl font-bold text-slate-100 tracking-tight">Gerencia de Atención al Cliente</span>
                             <img 
                                 src="/Logo - Grupo Sole - Transparente blanco-.png" 
                                 alt="Logo Grupo Sole" 
