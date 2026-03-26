@@ -90,7 +90,7 @@ export function LoginPage() {
                 </div>
 
                 <div className="relative z-10 text-sm text-slate-500">
-                    © 2026 GAC - Grupo Sole. Todos los derechos reservados.
+                    © 2026 GAC - Grupo Sole. Rinnai Corporation. Todos los derechos reservados.
                 </div>
             </div>
 
