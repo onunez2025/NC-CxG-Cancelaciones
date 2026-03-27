@@ -329,7 +329,8 @@ export function UsersPage() {
                                 {[
                                     { id: 'EBM', label: 'EBM (Principal)' },
                                     { id: 'FSM', label: 'Gestor FSM' },
-                                    { id: 'TCtrl', label: 'Tablero Control' }
+                                    { id: 'TCtrl', label: 'Tablero Control' },
+                                    { id: 'Liq', label: 'Liquidaciones' }
                                 ].map(app => {
                                     const isSelected = (formData.apps || '').split(',').map(a => a.trim()).includes(app.id);
                                     return (
