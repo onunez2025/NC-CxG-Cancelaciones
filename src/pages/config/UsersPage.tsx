@@ -243,6 +243,7 @@ export function UsersPage() {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 title={editingUser ? 'Editar Usuario' : 'Nuevo Usuario'}
+                size="lg"
             >
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {error && (
