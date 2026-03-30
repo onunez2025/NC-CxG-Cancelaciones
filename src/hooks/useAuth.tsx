@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, createContext } from 'react';
+import { useState, useEffect, useContext, createContext, useCallback } from 'react';
 import type { User, Permission } from '../types';
 import { StorageService } from '../services/storageService';
 import { API_BASE_URL } from '../services/apiClient';
@@ -69,19 +69,54 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         validateSession();
     }, []);
 
-    const login = (newUser: User, token?: string) => {
+    const login = useCallback((newUser: User, token?: string) => {
         setUser(newUser);
         StorageService.setCurrentUser(newUser);
         if (token) {
             StorageService.setToken(token);
         }
-    };
+    }, []);
 
-    const logout = () => {
+    const logout = useCallback(() => {
         setUser(null);
         StorageService.remove('current_user');
         StorageService.remove('auth_token');
-    };
+    }, []);
+
+    // --- Inactivity Logout Logic (5 Minutes) ---
+    useEffect(() => {
+        if (!user) return;
+
+        let timeoutId: any;
+
+        const resetTimer = () => {
+            if (timeoutId) timeoutId = setTimeout(() => {
+                logout();
+            }, 5 * 60 * 1000); // 5 minutes
+        };
+
+        const activityEvents = ['mousemove', 'keydown', 'mousedown', 'touchstart', 'scroll'];
+        
+        const handleActivity = () => {
+            if (timeoutId) clearTimeout(timeoutId);
+            resetTimer();
+        };
+
+        activityEvents.forEach(event => {
+            window.addEventListener(event, handleActivity);
+        });
+
+        // Initialize the timer
+        resetTimer();
+
+        return () => {
+            if (timeoutId) clearTimeout(timeoutId);
+            activityEvents.forEach(event => {
+                window.removeEventListener(event, handleActivity);
+            });
+        };
+    }, [user, logout]);
+    // ------------------------------------------
 
     const hasPermission = (permission: Permission): boolean => {
         if (!user) return false;
