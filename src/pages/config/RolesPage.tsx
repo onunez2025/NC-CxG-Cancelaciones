@@ -3,14 +3,15 @@ import { Shield, Plus, Edit2, Trash2, Check } from 'lucide-react';
 import { RolesService } from '../../services/rolesService';
 import type { Role, Permission } from '../../types';
 import { Modal } from '../../components/common/Modal';
+import { useDialog } from '../../context/DialogContext';
 import { cn } from '../../utils/cn';
 
 export function RolesPage() {
+    const { confirm } = useDialog();
     const [roles, setRoles] = useState<Role[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingRole, setEditingRole] = useState<Role | null>(null);
     const [availablePermissions] = useState(RolesService.getAllPermissions());
-    const [roleToDelete, setRoleToDelete] = useState<string | null>(null);
 
     const [formData, setFormData] = useState<Omit<Role, 'id'>>({
         name: '',
@@ -49,18 +50,18 @@ export function RolesPage() {
     };
 
     const handleDelete = (id: string) => {
-        setRoleToDelete(id);
-    };
-
-    const confirmDelete = async () => {
-        if (!roleToDelete) return;
-        try {
-            await RolesService.deleteRole(roleToDelete);
-            await loadRoles();
-            setRoleToDelete(null);
-        } catch (error) {
-            console.error("Error deleting role:", error);
-        }
+        confirm({
+            title: 'Eliminar Rol',
+            message: '¿Estás seguro de que deseas eliminar este rol? Esta acción no se puede deshacer y afectará a todos los usuarios que tengan este rol asignado.',
+            onConfirm: async () => {
+                try {
+                    await RolesService.deleteRole(id);
+                    await loadRoles();
+                } catch (error) {
+                    console.error("Error deleting role:", error);
+                }
+            }
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -240,34 +241,6 @@ export function RolesPage() {
                         </button>
                     </div>
                 </form>
-            </Modal>
-
-            {/* Delete Confirmation Modal */}
-            <Modal
-                isOpen={!!roleToDelete}
-                onClose={() => setRoleToDelete(null)}
-                title="Eliminar Rol"
-                size="sm"
-            >
-                <div className="space-y-4">
-                    <p className="text-sm text-foreground">
-                        ¿Estás seguro de que deseas eliminar este rol? Esta acción no se puede deshacer y afectará a todos los usuarios que tengan este rol asignado.
-                    </p>
-                    <div className="flex justify-end gap-3 pt-4 border-t border-border">
-                        <button
-                            onClick={() => setRoleToDelete(null)}
-                            className="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-accent rounded-md transition-colors"
-                        >
-                            Cancelar
-                        </button>
-                        <button
-                            onClick={confirmDelete}
-                            className="px-4 py-2 text-sm font-medium text-white bg-destructive hover:bg-destructive/90 rounded-md shadow-sm transition-colors"
-                        >
-                            Eliminar Rol
-                        </button>
-                    </div>
-                </div>
             </Modal>
         </div>
     );

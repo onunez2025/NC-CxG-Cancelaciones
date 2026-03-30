@@ -14,10 +14,12 @@ import { UsersService } from '../../services/usersService';
 import { RolesService } from '../../services/rolesService';
 import type { User, Management, Role } from '../../types';
 import { Modal } from '../../components/common/Modal';
+import { useDialog } from '../../context/DialogContext';
 import { cn } from '../../utils/cn';
 
 export function UsersPage() {
     // const { t } = useTranslation();
+    const { confirm } = useDialog();
     const [users, setUsers] = useState<User[]>([]);
     const [managements, setManagements] = useState<Management[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
@@ -26,7 +28,6 @@ export function UsersPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<User | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const [userToDelete, setUserToDelete] = useState<string | null>(null);
 
     // Form state
     const [formData, setFormData] = useState<Partial<User>>({
@@ -104,18 +105,18 @@ export function UsersPage() {
     };
 
     const handleDelete = (id: string) => {
-        setUserToDelete(id);
-    };
-
-    const confirmDelete = async () => {
-        if (!userToDelete) return;
-        try {
-            await UsersService.deleteUser(userToDelete);
-            await loadData();
-            setUserToDelete(null);
-        } catch (error) {
-            console.error("Error deleting user:", error);
-        }
+        confirm({
+            title: 'Eliminar Usuario',
+            message: '¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer y el usuario perderá el acceso a todas las aplicaciones asociadas.',
+            onConfirm: async () => {
+                try {
+                    await UsersService.deleteUser(id);
+                    await loadData();
+                } catch (error) {
+                    console.error("Error deleting user:", error);
+                }
+            }
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -387,33 +388,6 @@ export function UsersPage() {
                         </button>
                     </div>
                 </form>
-            </Modal>
-
-            {/* Delete Confirmation Modal */}
-            <Modal
-                isOpen={!!userToDelete}
-                onClose={() => setUserToDelete(null)}
-                title="Eliminar Usuario"
-            >
-                <div className="space-y-4">
-                    <p className="text-sm text-foreground">
-                        ¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer y el usuario perderá el acceso a todas las aplicaciones asociadas.
-                    </p>
-                    <div className="flex justify-end gap-3 pt-4">
-                        <button
-                            onClick={() => setUserToDelete(null)}
-                            className="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-accent rounded-md transition-colors"
-                        >
-                            Cancelar
-                        </button>
-                        <button
-                            onClick={confirmDelete}
-                            className="px-4 py-2 text-sm font-medium text-destructive-foreground bg-destructive hover:bg-destructive/90 rounded-md shadow-sm transition-colors"
-                        >
-                            Eliminar
-                        </button>
-                    </div>
-                </div>
             </Modal>
         </div>
     );

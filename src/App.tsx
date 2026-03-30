@@ -3,6 +3,7 @@ import { ErrorBoundary } from './components/common/ErrorBoundary';
 // import { useTranslation } from 'react-i18next';
 import { MainLayout } from './components/layout/MainLayout';
 import { AuthProvider, useAuth } from './hooks/useAuth';
+import { DialogProvider } from './context/DialogContext';
 import { LoginPage } from './pages/LoginPage';
 import { ForceChangePasswordPage } from './pages/ForceChangePasswordPage';
 import { UsersPage } from './pages/config/UsersPage';
@@ -75,8 +76,9 @@ function App() {
     <ErrorBoundary>
       <Router>
         <AuthProvider>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
+          <DialogProvider>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
 
             <Route element={<ProtectedRoute />}>
               <Route path="/force-change-password" element={<ForceChangePasswordPage />} />
@@ -122,7 +124,8 @@ function App() {
             </Route>
 
             <Route path="*" element={<NotFound />} />
-          </Routes>
+            </Routes>
+          </DialogProvider>
         </AuthProvider>
       </Router>
     </ErrorBoundary>
