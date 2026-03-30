@@ -35,10 +35,11 @@ const ProtectedRoute = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 rounded-full border-4 border-primary border-t-transparent animate-spin" />
-          <p className="text-muted-foreground font-medium text-sm animate-pulse">Verificando sesión...</p>
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-6">
+          <img src="/ebm-logo-.png" alt="EBM Logo" className="w-16 h-16 object-contain animate-pulse" />
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-muted-foreground font-medium animate-pulse">Cargando EBM...</p>
         </div>
       </div>
     );
