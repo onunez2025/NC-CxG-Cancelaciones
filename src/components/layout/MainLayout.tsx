@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Sidebar } from './Sidebar';
+import { AppSwitcher } from './AppSwitcher';
 import { cn } from '../../utils/cn';
 
 interface MainLayoutProps {
@@ -40,17 +41,23 @@ export function MainLayout({ children }: MainLayoutProps) {
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-                {/* Mobile Header */}
-                <header className="flex items-center gap-4 px-4 py-3 border-b border-border bg-card lg:hidden sticky top-0 z-30">
-                    <button
-                        onClick={() => setSidebarOpen(true)}
-                        className="p-2 -ml-2 text-muted-foreground hover:bg-accent rounded-md"
-                    >
-                        <Menu className="w-6 h-6" />
-                    </button>
-                    <div className="flex items-center gap-2">
-                        <img src="/ebm-logo-.png" alt="EBM Logo" className="w-6 h-6 object-contain" />
-                        <span className="font-semibold text-lg">EBM</span>
+                {/* Global Header */}
+                <header className="flex items-center justify-between px-4 py-3 border-b border-border bg-card sticky top-0 z-30">
+                    <div className="flex items-center gap-4 lg:hidden">
+                        <button
+                            onClick={() => setSidebarOpen(true)}
+                            className="p-2 -ml-2 text-muted-foreground hover:bg-accent rounded-md"
+                        >
+                            <Menu className="w-6 h-6" />
+                        </button>
+                        <div className="flex items-center gap-2">
+                            <img src="/ebm-logo-.png" alt="EBM Logo" className="w-6 h-6 object-contain" />
+                            <span className="font-semibold text-lg">EBM</span>
+                        </div>
+                    </div>
+                    
+                    <div className="flex-1 flex justify-end">
+                        <AppSwitcher currentAppId="ebm" />
                     </div>
                 </header>
 
