@@ -54,8 +54,8 @@ export function Sidebar({ className }: { className?: string }) {
         )}>
             {/* Header / Logo */}
             <div className="p-6 flex items-center gap-3">
-                <div className="w-9 h-9 flex items-center justify-center shrink-0">
-                    <img src="/ebm-logo-.png" alt="EBM Logo" className="w-full h-full object-contain drop-shadow-sm" />
+                <div className="w-10 h-10 flex items-center justify-center shrink-0 overflow-hidden">
+                    <img src="/ebm-logo-.png" alt="EBM Logo" className="h-full w-full object-contain drop-shadow-sm" />
                 </div>
                 <div>
                     <h1 className="font-bold text-lg leading-none tracking-tight">EBM</h1>
