@@ -8,28 +8,16 @@ import {
     Activity,
     Users,
     BarChart3,
-    Settings,
     LogOut,
-    Moon,
-    Sun,
-    Globe
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
 
 export function Sidebar({ className }: { className?: string }) {
-    const { t, i18n } = useTranslation();
-    const { theme, setTheme } = useTheme();
-    const { user, logout, hasPermission } = useAuth();
-
-    const toggleTheme = () => {
-        setTheme(theme === 'dark' ? 'light' : 'dark');
-    };
-
-    const toggleLanguage = () => {
-        i18n.changeLanguage(i18n.language === 'es' ? 'en' : 'es');
-    };
+    const { t } = useTranslation();
+    const { theme } = useTheme();
+    const { logout, hasPermission } = useAuth();
 
     const navItems = [
         { to: '/dashboard', icon: LayoutDashboard, label: t('nav.dashboard') }, // All authenticated users can see dashboard
@@ -39,7 +27,7 @@ export function Sidebar({ className }: { className?: string }) {
         { to: '/tracking', icon: Activity, label: t('nav.tracking'), permission: 'tracking.view' as const },
         { to: '/vendors', icon: Users, label: t('nav.vendors'), permission: 'expenses.view' as const },
         { to: '/files', icon: UploadCloud, label: t('nav.files'), permission: 'files.view' as const },
-        { to: '/config', icon: Settings, label: t('nav.config'), permission: 'config.users' as const }, // Assuming config.users is minimum for config area
+        { to: '/files', icon: UploadCloud, label: t('nav.files'), permission: 'files.view' as const },
     ];
 
     const filteredNavItems = navItems.filter(item =>
@@ -63,34 +51,7 @@ export function Sidebar({ className }: { className?: string }) {
                 </div>
             </div>
 
-            {/* User Profile (Collapsed version) */}
-            <div className="px-4 py-2">
-                <NavLink
-                    to="/profile"
-                    className={({ isActive }) => cn(
-                        "flex items-center gap-3 p-3 rounded-lg transition-all group border border-transparent",
-                        isActive
-                            ? "bg-primary/10 border-primary/20 shadow-sm"
-                            : "bg-background/50 hover:bg-background hover:shadow-md cursor-pointer"
-                    )}
-                >
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold overflow-hidden shrink-0">
-                        {user?.avatar_url ? (
-                            <img src={user.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-                        ) : (
-                            user?.username?.substring(0, 2).toUpperCase() || 'CM'
-                        )}
-                    </div>
-                    <div className="overflow-hidden">
-                        <p className="text-sm font-medium truncate group-hover:text-primary transition-colors">
-                            {user?.full_name || user?.username || 'Usuario EBM'}
-                        </p>
-                        <p className="text-xs text-muted-foreground truncate" title={user?.role_name || ''}>
-                            {user?.role_name || 'Sin Rol'}
-                        </p>
-                    </div>
-                </NavLink>
-            </div>
+            {/* Navigation */}
 
             <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
                 {filteredNavItems.map((item) => (
@@ -112,22 +73,6 @@ export function Sidebar({ className }: { className?: string }) {
 
             {/* Footer / Theme Toggle / Logout */}
             <div className="p-4 border-t border-border space-y-2">
-                <button
-                    onClick={toggleTheme}
-                    className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
-                >
-                    {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                    {theme === 'dark' ? t('nav.light_mode') : t('nav.dark_mode')}
-                </button>
-
-                <button
-                    onClick={toggleLanguage}
-                    className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
-                >
-                    <Globe className="w-4 h-4" />
-                    {i18n.language === 'es' ? 'Español' : 'English'}
-                </button>
-
                 <button
                     onClick={logout}
                     className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 rounded-md transition-colors"
