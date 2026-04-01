@@ -41,8 +41,8 @@ export function AppSwitcher({ currentAppId }: AppSwitcherProps) {
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-[432px] bg-white dark:bg-[#0F172A]/95 backdrop-blur-md border border-slate-200 dark:border-slate-700/50 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-300">
-                    <div className="p-5 border-b border-slate-100 dark:border-slate-700/50 bg-slate-50/50 dark:bg-[#1E293B]/50">
+                <div className="absolute right-0 mt-2 w-[432px] bg-[#FFFFFF] dark:bg-[#111827] backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+                    <div className="p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/50">
                         <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight">Más aplicaciones</h3>
                     </div>
                     <div className="p-4 grid grid-cols-2 gap-4">
