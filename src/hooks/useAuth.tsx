@@ -90,7 +90,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         let timeoutId: any;
 
         const resetTimer = () => {
-            if (timeoutId) timeoutId = setTimeout(() => {
+            timeoutId = setTimeout(() => {
                 logout();
             }, 5 * 60 * 1000); // 5 minutes
         };
