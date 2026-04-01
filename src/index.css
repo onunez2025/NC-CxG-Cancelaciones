@@ -73,6 +73,11 @@
   }
   body {
     @apply bg-background text-foreground;
+    cursor: url('/ecosystem-logos/cursor.png'), auto !important;
+  }
+
+  a, button, [role="button"], input[type="button"], input[type="submit"] {
+    cursor: url('/ecosystem-logos/cursor.png'), pointer !important;
   }
 
   /* Custom Scrollbar - EBM Style */
