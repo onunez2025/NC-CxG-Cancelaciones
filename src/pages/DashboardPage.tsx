@@ -149,7 +149,7 @@ export function DashboardPage() {
                     </p>
                     <button
                         onClick={() => navigate('/files')}
-                        className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold text-sm hover:bg-primary/90 transition-colors shadow-sm inline-flex items-center gap-2"
+                        className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-bold text-sm hover:bg-primary/90 transition-colors shadow-sm inline-flex items-center gap-2"
                     >
                         <Upload className="w-4 h-4" />
                         {t('dashboard.empty.button')}
@@ -319,7 +319,7 @@ export function DashboardPage() {
                             </h3>
                             <button
                                 onClick={() => navigate('/tracking')}
-                                className="text-xs text-primary font-semibold hover:underline flex items-center gap-1"
+                                className="text-xs text-primary font-bold hover:underline flex items-center gap-1"
                             >
                                 {t('dashboard.seeAll')} <ArrowRight className="w-3 h-3" />
                             </button>
@@ -349,7 +349,7 @@ export function DashboardPage() {
                             </h3>
                             <button
                                 onClick={() => navigate('/files')}
-                                className="text-xs text-primary font-semibold hover:underline flex items-center gap-1"
+                                className="text-xs text-primary font-bold hover:underline flex items-center gap-1"
                             >
                                 {t('dashboard.manage')} <ArrowRight className="w-3 h-3" />
                             </button>

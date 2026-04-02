@@ -186,7 +186,7 @@ export function TrackingPage() {
             {transactions.length === 0 ? (
                 <div className="bg-card border rounded-lg p-12 text-center shrink-0">
                     <AlertTriangle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">{t('tracking.empty.title')}</h3>
+                    <h3 className="text-lg font-bold mb-2">{t('tracking.empty.title')}</h3>
                     <p className="text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: t('tracking.empty.desc') }} />
                 </div>
             ) : (
@@ -196,15 +196,15 @@ export function TrackingPage() {
                             <thead className="sticky top-0 z-10 bg-card shadow-sm ring-1 ring-border/50">
                                 <tr className="border-b bg-muted/30">
                                     <th className="w-8 py-3 px-2"></th>
-                                    <th className="py-3 px-4 font-semibold text-xs uppercase tracking-wider text-muted-foreground">PEDIDO</th>
-                                    <th className="py-3 px-4 font-semibold text-xs uppercase tracking-wider text-muted-foreground w-28 text-center">{t('tracking.table.status', { defaultValue: 'ESTADO' })}</th>
-                                    <th className="py-3 px-4 font-semibold text-xs uppercase tracking-wider text-muted-foreground hidden md:table-cell w-24">CECO</th>
-                                    <th className="py-3 px-4 font-semibold text-xs uppercase tracking-wider text-muted-foreground w-full">{t('tracking.table.vendor_desc', { defaultValue: 'PROVEEDOR / DESCR.' })}</th>
-                                    <th className="py-3 px-4 font-semibold text-xs uppercase tracking-wider text-muted-foreground text-center">MONEDA</th>
-                                    <th className="py-3 px-4 font-semibold text-xs uppercase tracking-wider text-muted-foreground text-right">{t('tracking.table.po_value', { defaultValue: 'VALOR PO' })}</th>
-                                    <th className="py-3 px-4 font-semibold text-xs uppercase tracking-wider text-muted-foreground text-right">{t('tracking.table.real', { defaultValue: 'REAL (KSB1)' })}</th>
-                                    <th className="py-3 px-4 font-semibold text-xs uppercase tracking-wider text-muted-foreground text-right" title="Incluye IGV (18%)">{t('tracking.table.paid', { defaultValue: 'PAGADO (Inc. IGV)' })}</th>
-                                    <th className="py-3 px-4 font-semibold text-xs uppercase tracking-wider text-muted-foreground text-center hidden lg:table-cell">TRAZABILIDAD</th>
+                                    <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground">PEDIDO</th>
+                                    <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground w-28 text-center">{t('tracking.table.status', { defaultValue: 'ESTADO' })}</th>
+                                    <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground hidden md:table-cell w-24">CECO</th>
+                                    <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground w-full">{t('tracking.table.vendor_desc', { defaultValue: 'PROVEEDOR / DESCR.' })}</th>
+                                    <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground text-center">MONEDA</th>
+                                    <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground text-right">{t('tracking.table.po_value', { defaultValue: 'VALOR PO' })}</th>
+                                    <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground text-right">{t('tracking.table.real', { defaultValue: 'REAL (KSB1)' })}</th>
+                                    <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground text-right" title="Incluye IGV (18%)">{t('tracking.table.paid', { defaultValue: 'PAGADO (Inc. IGV)' })}</th>
+                                    <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground text-center hidden lg:table-cell">TRAZABILIDAD</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y relative">
@@ -369,8 +369,8 @@ export function TrackingPage() {
                                                                         )}
                                                                         <div className="mt-2 text-xs border rounded-md overflow-hidden dark:border-slate-800">
                                                                             <div className="bg-muted/30 px-3 py-1.5 flex justify-between border-b dark:border-slate-800">
-                                                                                <span className="text-muted-foreground" title="Deducido (Total Facturado / 1.18)">Base Imponible: <span className="font-semibold text-foreground">{formatCurrency(netInvoiced)}</span></span>
-                                                                                <span className="text-muted-foreground">IGV (18%): <span className="font-semibold text-foreground">{formatCurrency(igvInvoiced)}</span></span>
+                                                                                <span className="text-muted-foreground" title="Deducido (Total Facturado / 1.18)">Base Imponible: <span className="font-bold text-foreground">{formatCurrency(netInvoiced)}</span></span>
+                                                                                <span className="text-muted-foreground">IGV (18%): <span className="font-bold text-foreground">{formatCurrency(igvInvoiced)}</span></span>
                                                                             </div>
                                                                             <div className="px-3 py-2 font-bold flex justify-between bg-card">
                                                                                 <span>Pagado Total: {formatCurrency(txn.total_paid)}</span>

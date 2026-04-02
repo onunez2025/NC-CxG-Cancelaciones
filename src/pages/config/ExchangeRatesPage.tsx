@@ -126,7 +126,7 @@ export function ExchangeRatesPage() {
             <div className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 p-4 rounded-lg flex items-start gap-3 max-w-3xl border border-blue-100 dark:border-blue-900/30">
                 <Calculator className="w-5 h-5 shrink-0 mt-0.5" />
                 <div className="text-sm space-y-1">
-                    <p className="font-semibold">¿Cómo funciona?</p>
+                    <p className="font-bold">¿Cómo funciona?</p>
                     <p>Estos valores se utilizan al calcular la ejecución del <strong>Presupuesto vs Real</strong>. Cualquier Solped, Orden de Compra o Gasto Real registrado en USD se convertirá a Soles (PEN) multiplicándolo por la tasa configurada en el mes correspondiente a su fecha.</p>
                 </div>
             </div>

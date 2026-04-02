@@ -319,7 +319,7 @@ export function BudgetPage() {
 
                             <div className="mt-3 flex items-center justify-between text-xs">
                                 <span className="text-muted-foreground font-medium">{currentMonthName}:</span>
-                                <span className="font-semibold text-foreground">{formatCurrency(managementMonthTotal)}</span>
+                                <span className="font-bold text-foreground">{formatCurrency(managementMonthTotal)}</span>
                             </div>
                         </div>
 
@@ -352,7 +352,7 @@ export function BudgetPage() {
                                         </div>
                                         <div className="flex justify-between items-center text-xs pt-2 border-t border-border/50">
                                             <span className="text-muted-foreground font-medium">{currentMonthName}</span>
-                                            <span className="font-semibold text-foreground">{formatCurrency(cecoMonthTotal)}</span>
+                                            <span className="font-bold text-foreground">{formatCurrency(cecoMonthTotal)}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -387,7 +387,7 @@ export function BudgetPage() {
                                                 <div className="h-8 w-px bg-border mx-2"></div>
                                                 <div>
                                                     <p className="text-xs text-muted-foreground mb-0.5">{currentMonthName} ({t('budget.table.total')})</p>
-                                                    <p className="text-xl font-semibold text-foreground">{formatCurrency(cecoMonthTotal)}</p>
+                                                    <p className="text-xl font-bold text-foreground">{formatCurrency(cecoMonthTotal)}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -552,11 +552,11 @@ export function BudgetPage() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg">
                         <div>
-                            <label className="text-xs font-semibold text-muted-foreground uppercase">{t('budget.year')}</label>
+                            <label className="text-xs font-bold text-muted-foreground uppercase">{t('budget.year')}</label>
                             <div className="font-medium">{selectedYear}</div>
                         </div>
                         <div>
-                            <label className="text-xs font-semibold text-muted-foreground uppercase">{t('budget.management')}</label>
+                            <label className="text-xs font-bold text-muted-foreground uppercase">{t('budget.management')}</label>
                             <div className="font-medium">{managements.find(m => m.id === selectedManagement)?.name}</div>
                         </div>
                     </div>

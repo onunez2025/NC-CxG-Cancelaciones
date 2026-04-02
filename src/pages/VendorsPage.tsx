@@ -131,7 +131,7 @@ export function VendorsPage() {
             {vendors.length === 0 ? (
                 <div className="bg-card border rounded-lg p-12 text-center">
                     <AlertTriangle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">{t('vendors.empty.title')}</h3>
+                    <h3 className="text-lg font-bold mb-2">{t('vendors.empty.title')}</h3>
                     <p className="text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: t('vendors.empty.desc') }} />
                 </div>
             ) : (
@@ -155,7 +155,7 @@ export function VendorsPage() {
 
                                     {/* Vendor Name */}
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-semibold truncate">{v.name}</p>
+                                        <p className="text-sm font-bold truncate">{v.name}</p>
                                         <p className="text-[10px] text-muted-foreground">
                                             {v.cost_centers.join(', ') || t('vendors.card.no_ceco')}
                                         </p>

@@ -39,7 +39,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md', className
                 className
             )}>
                 <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-                    <h2 className="text-lg font-semibold leading-none tracking-tight">{title}</h2>
+                    <h2 className="text-lg font-bold leading-none tracking-tight">{title}</h2>
                     <button
                         onClick={onClose}
                         className="rounded-sm opacity-70 transition-opacity hover:opacity-100 hover:bg-accent text-muted-foreground hover:text-foreground p-1"

@@ -188,7 +188,7 @@ export function FileUploadPage() {
                 <div className="flex items-center gap-3">
                     {isReady ? <CheckCircle className="w-6 h-6 text-green-600" /> : <AlertCircle className="w-6 h-6 text-orange-600" />}
                     <div>
-                        <h3 className="font-semibold text-sm">
+                        <h3 className="font-bold text-sm">
                             {isReady ? t('files.status.title_ready') : t('files.status.title_missing')}
                         </h3>
                         <p className="text-xs text-muted-foreground">
@@ -233,7 +233,7 @@ export function FileUploadPage() {
                     {fileQueue.length > 0 && (
                         <div className="bg-card rounded-lg border shadow-sm divide-y">
                             <div className="p-4 flex items-center justify-between bg-muted/30">
-                                <h3 className="font-semibold text-sm">{t('files.queue.title', { count: fileQueue.length })}</h3>
+                                <h3 className="font-bold text-sm">{t('files.queue.title', { count: fileQueue.length })}</h3>
                                 <button
                                     onClick={processAll}
                                     disabled={isProcessingAll || fileQueue.every(f => f.status === 'success')}
@@ -373,13 +373,13 @@ export function FileUploadPage() {
                             <div className="flex items-center gap-3 w-full pt-4">
                                 <button
                                     onClick={() => setShowConfirmClear(false)}
-                                    className="flex-1 px-4 py-2.5 bg-muted hover:bg-muted/80 text-muted-foreground font-semibold rounded-xl transition-all"
+                                    className="flex-1 px-4 py-2.5 bg-muted hover:bg-muted/80 text-muted-foreground font-bold rounded-xl transition-all"
                                 >
                                     {t('files.modal.cancel')}
                                 </button>
                                 <button
                                     onClick={handleClearAll}
-                                    className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl shadow-lg shadow-red-600/20 transition-all hover:-translate-y-0.5"
+                                    className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg shadow-red-600/20 transition-all hover:-translate-y-0.5"
                                 >
                                     {t('files.modal.confirm')}
                                 </button>

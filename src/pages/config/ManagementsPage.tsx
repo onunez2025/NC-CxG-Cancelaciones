@@ -100,7 +100,7 @@ export function ManagementsPage() {
                 </div>
                 <button
                     onClick={handleCreate}
-                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold text-sm flex items-center gap-2 hover:bg-primary/90 transition-colors shadow-sm"
+                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-bold text-sm flex items-center gap-2 hover:bg-primary/90 transition-colors shadow-sm"
                 >
                     <Plus className="w-4 h-4" />
                     Nueva Gerencia
@@ -124,9 +124,9 @@ export function ManagementsPage() {
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="border-b bg-muted/30">
-                            <th className="text-left py-3 px-4 font-semibold text-xs uppercase tracking-wider text-muted-foreground">Código</th>
-                            <th className="text-left py-3 px-4 font-semibold text-xs uppercase tracking-wider text-muted-foreground">Nombre</th>
-                            <th className="text-right py-3 px-4 font-semibold text-xs uppercase tracking-wider text-muted-foreground">Acciones</th>
+                            <th className="text-left py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground">Código</th>
+                            <th className="text-left py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground">Nombre</th>
+                            <th className="text-right py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground">Acciones</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y">
@@ -198,14 +198,14 @@ export function ManagementsPage() {
                         <button
                             type="button"
                             onClick={() => setIsModalOpen(false)}
-                            className="flex-1 px-4 py-2.5 bg-muted text-muted-foreground rounded-lg font-semibold text-sm hover:bg-muted/80 transition-colors flex items-center justify-center gap-2"
+                            className="flex-1 px-4 py-2.5 bg-muted text-muted-foreground rounded-lg font-bold text-sm hover:bg-muted/80 transition-colors flex items-center justify-center gap-2"
                         >
                             <X className="w-4 h-4" />
                             Cancelar
                         </button>
                         <button
                             type="submit"
-                            className="flex-1 px-4 py-2.5 bg-primary text-primary-foreground rounded-lg font-semibold text-sm hover:bg-primary/90 transition-colors shadow-sm"
+                            className="flex-1 px-4 py-2.5 bg-primary text-primary-foreground rounded-lg font-bold text-sm hover:bg-primary/90 transition-colors shadow-sm"
                         >
                             {editingMgmt ? 'Guardar Cambios' : 'Crear Gerencia'}
                         </button>

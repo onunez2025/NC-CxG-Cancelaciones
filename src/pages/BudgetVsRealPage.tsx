@@ -209,7 +209,7 @@ export function BudgetVsRealPage() {
                                             <TrendingUp className="w-3 h-3 text-muted-foreground" />
                                             <span className="text-muted-foreground">Ejecutado:</span>
                                         </div>
-                                        <span className="font-semibold">{formatCurrency(totals?.real || 0)}</span>
+                                        <span className="font-bold">{formatCurrency(totals?.real || 0)}</span>
                                     </div>
                                 </div>
 
@@ -267,7 +267,7 @@ export function BudgetVsRealPage() {
                                                                 <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
                                                                 Comprometido Pend.
                                                             </div>
-                                                            <p className="text-lg font-semibold text-indigo-700">{formatCurrency(totals?.committed || 0)}</p>
+                                                            <p className="text-lg font-bold text-indigo-700">{formatCurrency(totals?.committed || 0)}</p>
                                                         </div>
 
                                                         <div className="space-y-1">
@@ -275,7 +275,7 @@ export function BudgetVsRealPage() {
                                                                 <div className="w-2 h-2 rounded-full bg-purple-500"></div>
                                                                 Ordenado Pend.
                                                             </div>
-                                                            <p className="text-lg font-semibold text-purple-700">{formatCurrency(totals?.ordered || 0)}</p>
+                                                            <p className="text-lg font-bold text-purple-700">{formatCurrency(totals?.ordered || 0)}</p>
                                                         </div>
 
                                                         <div className="space-y-1">
@@ -283,7 +283,7 @@ export function BudgetVsRealPage() {
                                                                 <div className="w-2 h-2 rounded-full bg-amber-500"></div>
                                                                 Ejecutado (Real)
                                                             </div>
-                                                            <p className="text-lg font-semibold text-amber-700">{formatCurrency(totals?.real || 0)}</p>
+                                                            <p className="text-lg font-bold text-amber-700">{formatCurrency(totals?.real || 0)}</p>
                                                         </div>
 
                                                         <div className="h-10 w-px bg-border hidden sm:block"></div>
@@ -343,7 +343,7 @@ export function BudgetVsRealPage() {
                                 <thead className="bg-muted/90 text-muted-foreground font-medium border-b border-border sticky top-0 z-10 backdrop-blur-sm shadow-sm">
                                     <tr>
                                         <th className="px-4 py-2 w-1/3 min-w-[200px]">{t('budget_vs_real.table.account')}</th>
-                                        <th className="px-3 py-2 text-right text-primary font-semibold">{t('budget_vs_real.table.budget')}</th>
+                                        <th className="px-3 py-2 text-right text-primary font-bold">{t('budget_vs_real.table.budget')}</th>
                                         <th className="px-3 py-2 text-right text-indigo-600 font-medium whitespace-nowrap">Comprom. Pend.</th>
                                         <th className="px-3 py-2 text-right text-purple-600 font-medium whitespace-nowrap">Ord. Pend.</th>
                                         <th className="px-3 py-2 text-right text-amber-600 font-medium">{t('budget_vs_real.table.real')}</th>

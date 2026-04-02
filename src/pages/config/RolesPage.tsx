@@ -125,7 +125,7 @@ export function RolesPage() {
                                             <Shield className="w-5 h-5 text-primary" />
                                         </div>
                                         <div>
-                                            <h3 className="font-semibold text-foreground text-sm">{role.name}</h3>
+                                            <h3 className="font-bold text-foreground text-sm">{role.name}</h3>
                                             <p className="text-[11px] text-muted-foreground">{role.permissions.length} permisos asignados</p>
                                         </div>
                                     </div>
@@ -193,7 +193,7 @@ export function RolesPage() {
                         <div className="space-y-4">
                             {Object.entries(groupedPermissions).map(([group, permissions]) => (
                                 <div key={group}>
-                                    <p className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2">{group}</p>
+                                    <p className="text-xs font-bold text-foreground uppercase tracking-wider mb-2">{group}</p>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                         {permissions.map((perm) => {
                                             const isSelected = formData.permissions.includes(perm.id);

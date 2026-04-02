@@ -73,6 +73,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Lato', ui-sans-serif, system-ui, sans-serif;
     cursor: url('/cursor.png'), auto !important;
   }
 

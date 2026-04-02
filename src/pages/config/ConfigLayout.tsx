@@ -20,7 +20,7 @@ export function ConfigLayout() {
             {/* Secondary Sidebar */}
             <aside className="relative">
                 <div className="lg:sticky lg:top-0 z-30 lg:mb-8 bg-card rounded-lg border border-border shadow-sm p-3 space-y-1">
-                    <p className="text-xs font-semibold text-foreground uppercase tracking-wider px-3 py-2">Configuración</p>
+                    <p className="text-xs font-bold text-foreground uppercase tracking-wider px-3 py-2">Configuración</p>
                     {navItems.map((item) => (
                         <NavLink
                             key={item.to}

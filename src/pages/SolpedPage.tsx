@@ -216,7 +216,7 @@ export function SolpedPage() {
                 rows.length === 0 ? (
                     <div className="bg-card border rounded-lg p-12 text-center shrink-0">
                         <AlertTriangle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">{t('solped.empty_state.title')}</h3>
+                        <h3 className="text-lg font-bold mb-2">{t('solped.empty_state.title')}</h3>
                         <p className="text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: t('solped.empty_state.desc') }} />
                     </div>
                 ) : (
@@ -226,13 +226,13 @@ export function SolpedPage() {
                                 <thead className="sticky top-0 z-10 bg-card shadow-sm ring-1 ring-border/50">
                                     <tr className="border-b bg-muted/30">
                                         <th className="w-8 py-3 px-2"></th>
-                                        <th className="text-left py-3 px-3 font-semibold text-xs uppercase tracking-wider text-muted-foreground">{t('solped.table.solped')}</th>
-                                        <th className="text-left py-3 px-3 font-semibold text-xs uppercase tracking-wider text-muted-foreground">{t('solped.table.po')}</th>
-                                        <th className="text-left py-3 px-3 font-semibold text-xs uppercase tracking-wider text-muted-foreground hidden lg:table-cell">{t('solped.table.description')}</th>
-                                        <th className="text-left py-3 px-3 font-semibold text-xs uppercase tracking-wider text-muted-foreground hidden md:table-cell">{t('solped.table.ceco')}</th>
-                                        <th className="text-center py-3 px-3 font-semibold text-xs uppercase tracking-wider text-muted-foreground">{t('solped.table.currency', { defaultValue: 'MONEDA' })}</th>
-                                        <th className="text-right py-3 px-3 font-semibold text-xs uppercase tracking-wider text-muted-foreground">{t('solped.table.value')}</th>
-                                        <th className="text-center py-3 px-3 font-semibold text-xs uppercase tracking-wider text-muted-foreground">{t('solped.table.status')}</th>
+                                        <th className="text-left py-3 px-3 font-bold text-xs uppercase tracking-wider text-muted-foreground">{t('solped.table.solped')}</th>
+                                        <th className="text-left py-3 px-3 font-bold text-xs uppercase tracking-wider text-muted-foreground">{t('solped.table.po')}</th>
+                                        <th className="text-left py-3 px-3 font-bold text-xs uppercase tracking-wider text-muted-foreground hidden lg:table-cell">{t('solped.table.description')}</th>
+                                        <th className="text-left py-3 px-3 font-bold text-xs uppercase tracking-wider text-muted-foreground hidden md:table-cell">{t('solped.table.ceco')}</th>
+                                        <th className="text-center py-3 px-3 font-bold text-xs uppercase tracking-wider text-muted-foreground">{t('solped.table.currency', { defaultValue: 'MONEDA' })}</th>
+                                        <th className="text-right py-3 px-3 font-bold text-xs uppercase tracking-wider text-muted-foreground">{t('solped.table.value')}</th>
+                                        <th className="text-center py-3 px-3 font-bold text-xs uppercase tracking-wider text-muted-foreground">{t('solped.table.status')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y">
@@ -296,14 +296,14 @@ export function SolpedPage() {
                                                                     <table className="w-full text-xs">
                                                                         <thead>
                                                                             <tr className="border-b bg-muted/20">
-                                                                                <th className="text-left py-1.5 px-3 font-semibold text-[10px] uppercase text-muted-foreground">Pos</th>
-                                                                                <th className="text-left py-1.5 px-3 font-semibold text-[10px] uppercase text-muted-foreground">{t('solped.table.ceco')}</th>
-                                                                                <th className="text-left py-1.5 px-3 font-semibold text-[10px] uppercase text-muted-foreground">{t('solped.table.ceco_name') || 'Nombre CeCo'}</th>
-                                                                                <th className="text-left py-1.5 px-3 font-semibold text-[10px] uppercase text-muted-foreground">{t('solped.table.description')}</th>
-                                                                                <th className="text-center py-1.5 px-3 font-semibold text-[10px] uppercase text-muted-foreground">{t('solped.table.currency', { defaultValue: 'MONEDA' })}</th>
-                                                                                <th className="text-right py-1.5 px-3 font-semibold text-[10px] uppercase text-muted-foreground">{t('solped.detail.quantity')}</th>
-                                                                                <th className="text-right py-1.5 px-3 font-semibold text-[10px] uppercase text-muted-foreground">{t('solped.detail.unit_price')}</th>
-                                                                                <th className="text-right py-1.5 px-3 font-semibold text-[10px] uppercase text-muted-foreground">{t('solped.table.value')}</th>
+                                                                                <th className="text-left py-1.5 px-3 font-bold text-[10px] uppercase text-muted-foreground">Pos</th>
+                                                                                <th className="text-left py-1.5 px-3 font-bold text-[10px] uppercase text-muted-foreground">{t('solped.table.ceco')}</th>
+                                                                                <th className="text-left py-1.5 px-3 font-bold text-[10px] uppercase text-muted-foreground">{t('solped.table.ceco_name') || 'Nombre CeCo'}</th>
+                                                                                <th className="text-left py-1.5 px-3 font-bold text-[10px] uppercase text-muted-foreground">{t('solped.table.description')}</th>
+                                                                                <th className="text-center py-1.5 px-3 font-bold text-[10px] uppercase text-muted-foreground">{t('solped.table.currency', { defaultValue: 'MONEDA' })}</th>
+                                                                                <th className="text-right py-1.5 px-3 font-bold text-[10px] uppercase text-muted-foreground">{t('solped.detail.quantity')}</th>
+                                                                                <th className="text-right py-1.5 px-3 font-bold text-[10px] uppercase text-muted-foreground">{t('solped.detail.unit_price')}</th>
+                                                                                <th className="text-right py-1.5 px-3 font-bold text-[10px] uppercase text-muted-foreground">{t('solped.table.value')}</th>
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody className="divide-y">

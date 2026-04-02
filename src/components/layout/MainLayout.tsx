@@ -61,7 +61,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                         </button>
                         <div className="flex items-center gap-2">
                             <img src="/ebm-logo-.png" alt="EBM Logo" className="w-8 h-8 object-contain" />
-                            <span className="font-semibold text-lg hidden sm:inline-block">EBM</span>
+                            <span className="font-bold text-lg hidden sm:inline-block">EBM</span>
                         </div>
                     </div>
                     

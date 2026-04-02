@@ -214,7 +214,7 @@ export function ProfilePage() {
                                     </div>
                                     <div className="overflow-hidden">
                                         <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Email</p>
-                                        <p className="text-sm font-semibold truncate text-foreground">{user.email}</p>
+                                        <p className="text-sm font-bold truncate text-foreground">{user.email}</p>
                                     </div>
                                 </div>
 
@@ -224,7 +224,7 @@ export function ProfilePage() {
                                     </div>
                                     <div className="overflow-hidden">
                                         <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Gerencia</p>
-                                        <p className="text-sm font-semibold truncate text-foreground">{(user as any).management_name || user.management_id}</p>
+                                        <p className="text-sm font-bold truncate text-foreground">{(user as any).management_name || user.management_id}</p>
                                     </div>
                                 </div>
 
@@ -327,7 +327,7 @@ export function ProfilePage() {
                                                     value={formData.password}
                                                     onChange={handleChange}
                                                     placeholder="••••••••"
-                                                    className="block w-full pl-10 pr-3 py-2.5 bg-background border rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-semibold"
+                                                    className="block w-full pl-10 pr-3 py-2.5 bg-background border rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-bold"
                                                     minLength={4}
                                                 />
                                             </div>
@@ -348,7 +348,7 @@ export function ProfilePage() {
                                                     onChange={handleChange}
                                                     placeholder="••••••••"
                                                     className={cn(
-                                                        "block w-full pl-10 pr-3 py-2.5 bg-background border rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-semibold",
+                                                        "block w-full pl-10 pr-3 py-2.5 bg-background border rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-bold",
                                                         formData.confirmPassword && formData.password !== formData.confirmPassword && "border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50 dark:bg-red-900/10"
                                                     )}
                                                     minLength={4}
