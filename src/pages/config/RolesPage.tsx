@@ -150,17 +150,19 @@ export function RolesPage() {
                                 </div>
 
                                 <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1 custom-scrollbar">
-                                    {role.permissions.length === 0 ? (
+                                    {role.permissions.filter(p => availablePermissions.some(ap => ap.id === p)).length === 0 ? (
                                         <span className="text-xs text-muted-foreground italic">Sin permisos asignados</span>
                                     ) : (
-                                        role.permissions.map(perm => {
-                                            const label = availablePermissions.find(p => p.id === perm)?.label || perm;
-                                            return (
-                                                <span key={perm} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-secondary text-secondary-foreground border border-border">
-                                                    {label}
-                                                </span>
-                                            );
-                                        })
+                                        role.permissions
+                                            .filter(p => availablePermissions.some(ap => ap.id === p))
+                                            .map(perm => {
+                                                const label = availablePermissions.find(p => p.id === perm)?.label || perm;
+                                                return (
+                                                    <span key={perm} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-secondary text-secondary-foreground border border-border">
+                                                        {label}
+                                                    </span>
+                                                );
+                                            })
                                     )}
                                 </div>
                             </div>

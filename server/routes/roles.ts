@@ -16,6 +16,7 @@ router.get('/', async (req: Request, res: Response) => {
                 p.Permission as permission
             FROM EBM.Roles r
             LEFT JOIN EBM.RolePermissions p ON r.Id = p.RoleId
+            WHERE r.Apps LIKE '%EBM%'
         `);
 
         // Group permissions by role since SQL returns flat rows
@@ -57,9 +58,9 @@ router.post('/', async (req: Request, res: Response) => {
             const roleResult = await transaction.request()
                 .input('name', name)
                 .query(`
-                    INSERT INTO EBM.Roles (Name)
+                    INSERT INTO EBM.Roles (Name, Apps)
                     OUTPUT INSERTED.Id as id, INSERTED.Name as name
-                    VALUES (@name)
+                    VALUES (@name, 'EBM')
                 `);
 
             const newRole = roleResult.recordset[0];
@@ -107,10 +108,21 @@ router.put('/:id', async (req: Request, res: Response) => {
                 .input('name', name)
                 .query(`UPDATE EBM.Roles SET Name = @name WHERE Id = @id`);
 
-            // 2. Refresh permissions: Delete old, insert new
+            // 2. Refresh permissions: Delete ONLY EBM-related permissions, insert new
             await transaction.request()
                 .input('id', roleId)
-                .query(`DELETE FROM EBM.RolePermissions WHERE RoleId = @id`);
+                .query(`
+                    DELETE FROM EBM.RolePermissions 
+                    WHERE RoleId = @id 
+                    AND (
+                        Permission LIKE 'budget.%' OR 
+                        Permission LIKE 'solped.%' OR 
+                        Permission LIKE 'files.%' OR 
+                        Permission LIKE 'tracking.%' OR 
+                        Permission LIKE 'config.%' OR 
+                        Permission LIKE 'expenses.%'
+                    )
+                `);
 
             if (permissions && Array.isArray(permissions)) {
                 for (const perm of permissions) {
