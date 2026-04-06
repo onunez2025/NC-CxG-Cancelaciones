@@ -112,21 +112,11 @@ router.put('/:id', async (req: Request, res: Response) => {
                 .input('apps', apps || 'EBM')
                 .query(`UPDATE EBM.Roles SET Name = @name, Apps = @apps WHERE Id = @id`);
 
-            // 2. Refresh permissions: Delete ONLY EBM-related permissions, insert new
+            // 2. Refresh permissions: Delete ALL permissions for this role 
+            // We delete all because the frontend sends the complete set (union of all apps)
             await transaction.request()
                 .input('id', roleId)
-                .query(`
-                    DELETE FROM EBM.RolePermissions 
-                    WHERE RoleId = @id 
-                    AND (
-                        Permission LIKE 'budget.%' OR 
-                        Permission LIKE 'solped.%' OR 
-                        Permission LIKE 'files.%' OR 
-                        Permission LIKE 'tracking.%' OR 
-                        Permission LIKE 'config.%' OR 
-                        Permission LIKE 'expenses.%'
-                    )
-                `);
+                .query(`DELETE FROM EBM.RolePermissions WHERE RoleId = @id`);
 
             if (permissions && Array.isArray(permissions)) {
                 for (const perm of permissions) {
