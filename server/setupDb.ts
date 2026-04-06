@@ -49,8 +49,17 @@ IF NOT EXISTS (SELECT * FROM sys.tables WHERE object_id = OBJECT_ID('EBM.Roles')
 BEGIN
     CREATE TABLE EBM.Roles (
         Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
-        Name NVARCHAR(50) NOT NULL UNIQUE
+        Name NVARCHAR(50) NOT NULL UNIQUE,
+        Apps NVARCHAR(200) NOT NULL DEFAULT 'EBM'
     );
+END
+ELSE
+BEGIN
+    -- Ensure Apps column exists in existing table
+    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('EBM.Roles') AND name = 'Apps')
+    BEGIN
+        ALTER TABLE EBM.Roles ADD Apps NVARCHAR(200) NOT NULL DEFAULT 'EBM';
+    END
 END
 
 -- 6. Create Users

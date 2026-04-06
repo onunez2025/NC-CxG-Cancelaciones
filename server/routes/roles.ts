@@ -13,6 +13,7 @@ router.get('/', async (req: Request, res: Response) => {
             SELECT 
                 r.Id as id,
                 r.Name as name,
+                r.Apps as apps,
                 p.Permission as permission
             FROM EBM.Roles r
             LEFT JOIN EBM.RolePermissions p ON r.Id = p.RoleId
@@ -27,6 +28,7 @@ router.get('/', async (req: Request, res: Response) => {
                 rolesMap.set(row.id, {
                     id: row.id,
                     name: row.name,
+                    apps: row.apps,
                     permissions: []
                 });
             }
@@ -45,7 +47,7 @@ router.get('/', async (req: Request, res: Response) => {
 // POST new Role
 router.post('/', async (req: Request, res: Response) => {
     try {
-        const { name, permissions } = req.body;
+        const { name, permissions, apps } = req.body;
 
         if (!name) return res.status(400).json({ error: 'Role name is required' });
 
@@ -57,10 +59,11 @@ router.post('/', async (req: Request, res: Response) => {
             // 1. Insert Role
             const roleResult = await transaction.request()
                 .input('name', name)
+                .input('apps', apps || 'EBM')
                 .query(`
                     INSERT INTO EBM.Roles (Name, Apps)
-                    OUTPUT INSERTED.Id as id, INSERTED.Name as name
-                    VALUES (@name, 'EBM')
+                    OUTPUT INSERTED.Id as id, INSERTED.Name as name, INSERTED.Apps as apps
+                    VALUES (@name, @apps)
                 `);
 
             const newRole = roleResult.recordset[0];
@@ -95,18 +98,19 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
     try {
         const roleId = req.params.id;
-        const { name, permissions } = req.body;
+        const { name, permissions, apps } = req.body;
 
         const pool = await getDbConnection();
         const transaction = new sql.Transaction(pool);
         await transaction.begin();
 
         try {
-            // 1. Update Role Name
+            // 1. Update Role Name & Apps
             await transaction.request()
                 .input('id', roleId)
                 .input('name', name)
-                .query(`UPDATE EBM.Roles SET Name = @name WHERE Id = @id`);
+                .input('apps', apps || 'EBM')
+                .query(`UPDATE EBM.Roles SET Name = @name, Apps = @apps WHERE Id = @id`);
 
             // 2. Refresh permissions: Delete ONLY EBM-related permissions, insert new
             await transaction.request()
