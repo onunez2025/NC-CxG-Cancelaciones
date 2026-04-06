@@ -24,6 +24,7 @@ export interface Role {
     id: string;
     name: string;
     permissions: Permission[];
+    apps?: string;
 }
 
 export type Permission =
