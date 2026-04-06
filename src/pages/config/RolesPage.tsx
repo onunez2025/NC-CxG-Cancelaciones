@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Shield, Plus, Edit2, Trash2, Check, ChevronDown, Activity, Settings, CalendarDays, Users } from 'lucide-react';
+import { Shield, Plus, Edit2, Trash2, Check, ChevronDown, Activity, Settings, CalendarDays, Users, Save } from 'lucide-react';
 import { RolesService } from '../../services/rolesService';
 import type { Role, Permission } from '../../types';
 import { Modal } from '../../components/common/Modal';
@@ -15,17 +15,15 @@ export function RolesPage() {
 
     const [formData, setFormData] = useState<Omit<Role, 'id'>>({
         name: '',
-        permissions: []
+        permissions: [],
+        apps: 'EBM'
     });
 
     const permissionGroups = [...new Set(availablePermissions.map(p => p.group))];
-    const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+    const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
 
     const toggleGroup = (group: string) => {
-        setExpandedGroups(prev => ({
-            ...prev,
-            [group]: prev[group] === false ? true : false
-        }));
+        setExpandedGroup(prev => prev === group ? null : group);
     };
 
     const getGroupIcon = (groupName: string) => {
@@ -41,16 +39,6 @@ export function RolesPage() {
         loadRoles();
     }, []);
 
-    // Expand all groups by default when opening modal
-    useEffect(() => {
-        if (isModalOpen && permissionGroups.length > 0) {
-            const initial: Record<string, boolean> = {};
-            permissionGroups.forEach(g => {
-                initial[g] = true;
-            });
-            setExpandedGroups(initial);
-        }
-    }, [isModalOpen, permissionGroups.length]);
 
     const loadRoles = async () => {
         try {
@@ -65,8 +53,10 @@ export function RolesPage() {
         setEditingRole(null);
         setFormData({
             name: '',
-            permissions: []
+            permissions: [],
+            apps: 'EBM'
         });
+        setExpandedGroup(null);
         setIsModalOpen(true);
     };
 
@@ -74,8 +64,10 @@ export function RolesPage() {
         setEditingRole(role);
         setFormData({
             name: role.name,
-            permissions: role.permissions
+            permissions: role.permissions,
+            apps: role.apps || 'EBM'
         });
+        setExpandedGroup(null);
         setIsModalOpen(true);
     };
 
@@ -195,7 +187,7 @@ export function RolesPage() {
                 </div>
             </div>
 
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingRole ? 'Configuración de Rol' : 'Configuración de Rol'} size="xl">
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingRole ? 'Configuración de Rol' : 'Nuevo Rol'} size="xl">
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-6 py-2">
                         {/* Role Header Section - Compacted */}
@@ -224,6 +216,47 @@ export function RolesPage() {
                             </div>
                         </div>
 
+                        {/* Application Access Section */}
+                        <div className="space-y-3 pt-1">
+                            <h3 className="block text-sm font-bold text-foreground">Acceso a Aplicaciones</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                                {[
+                                    { id: 'EBM', label: 'EBM (Principal)' },
+                                    { id: 'FSM', label: 'Gestor FSM' },
+                                    { id: 'TCtrl', label: 'Tablero Control' },
+                                    { id: 'Liq', label: 'Liquidaciones' }
+                                ].map(app => {
+                                    const isSelected = (formData.apps || '').split(',').map(a => a.trim()).includes(app.id);
+                                    return (
+                                        <button 
+                                            key={app.id} 
+                                            type="button" 
+                                            onClick={() => {
+                                                const currentApps = (formData.apps || '').split(',').map((a: string) => a.trim()).filter(Boolean);
+                                                const updatedApps = currentApps.includes(app.id)
+                                                    ? currentApps.filter((a: string) => a !== app.id)
+                                                    : [...currentApps, app.id];
+                                                setFormData({ ...formData, apps: updatedApps.join(', ') });
+                                            }}
+                                            className={cn(
+                                                "flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors border",
+                                                isSelected
+                                                    ? "bg-primary/5 border-primary/30 text-primary"
+                                                    : "bg-background border-border text-foreground hover:bg-muted"
+                                            )}>
+                                            <div className={cn(
+                                                "w-4 h-4 rounded-md border flex items-center justify-center transition-colors shrink-0",
+                                                isSelected ? "bg-primary border-primary text-primary-foreground" : "border-input bg-background"
+                                            )}>
+                                                {isSelected && <Save className="w-2.5 h-2.5" />}
+                                            </div>
+                                            <span className="font-medium truncate">{app.label}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
                         {/* Permissions Section */}
                         <div className="space-y-4">
                             <div className="flex items-center gap-4">
@@ -236,7 +269,7 @@ export function RolesPage() {
 
                             <div className="grid grid-cols-1 gap-4">
                                 {permissionGroups.map(group => {
-                                    const isExpanded = expandedGroups[group] !== false;
+                                    const isExpanded = expandedGroup === group;
                                     return (
                                         <div key={group} className="border border-border/50 rounded-xl overflow-hidden bg-background">
                                             <button 
