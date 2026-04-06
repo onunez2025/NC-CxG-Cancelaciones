@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Shield, Plus, Edit2, Trash2, Check } from 'lucide-react';
+import { Shield, Plus, Edit2, Trash2, Check, ChevronDown, Activity, Settings, CalendarDays, Users } from 'lucide-react';
 import { RolesService } from '../../services/rolesService';
 import type { Role, Permission } from '../../types';
 import { Modal } from '../../components/common/Modal';
@@ -18,9 +18,39 @@ export function RolesPage() {
         permissions: []
     });
 
+    const permissionGroups = [...new Set(availablePermissions.map(p => p.group))];
+    const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+
+    const toggleGroup = (group: string) => {
+        setExpandedGroups(prev => ({
+            ...prev,
+            [group]: prev[group] === false ? true : false
+        }));
+    };
+
+    const getGroupIcon = (groupName: string) => {
+        const lower = groupName.toLowerCase();
+        if (lower.includes('control') || lower.includes('operati')) return <Activity className="w-4 h-4" />;
+        if (lower.includes('config')) return <Settings className="w-4 h-4" />;
+        if (lower.includes('reserva') || lower.includes('agenda') || lower.includes('ticket')) return <CalendarDays className="w-4 h-4" />;
+        if (lower.includes('empleado') || lower.includes('personal') || lower.includes('user') || lower.includes('usuario')) return <Users className="w-4 h-4" />;
+        return <Shield className="w-4 h-4" />;
+    };
+
     useEffect(() => {
         loadRoles();
     }, []);
+
+    // Expand all groups by default when opening modal
+    useEffect(() => {
+        if (isModalOpen && permissionGroups.length > 0) {
+            const initial: Record<string, boolean> = {};
+            permissionGroups.forEach(g => {
+                initial[g] = true;
+            });
+            setExpandedGroups(initial);
+        }
+    }, [isModalOpen, permissionGroups.length]);
 
     const loadRoles = async () => {
         try {
@@ -91,12 +121,6 @@ export function RolesPage() {
         });
     };
 
-    // Group permissions by category
-    const groupedPermissions = availablePermissions.reduce((acc, curr) => {
-        if (!acc[curr.group]) acc[curr.group] = [];
-        acc[curr.group].push(curr);
-        return acc;
-    }, {} as Record<string, typeof availablePermissions>);
 
     return (
         <div className="space-y-6">
@@ -171,59 +195,113 @@ export function RolesPage() {
                 </div>
             </div>
 
-            <Modal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                title={editingRole ? 'Editar Rol' : 'Nuevo Rol'}
-                size="lg"
-            >
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingRole ? 'Configuración de Rol' : 'Configuración de Rol'} size="xl">
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-foreground mb-1">Nombre del Rol *</label>
-                        <input
-                            type="text"
-                            required
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
-                            placeholder="Ej: Auditor"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-foreground mb-3">Permisos del Sistema</label>
-                        <div className="space-y-4">
-                            {Object.entries(groupedPermissions).map(([group, permissions]) => (
-                                <div key={group}>
-                                    <p className="text-xs font-bold text-foreground uppercase tracking-wider mb-2">{group}</p>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                        {permissions.map((perm) => {
-                                            const isSelected = formData.permissions.includes(perm.id);
-                                            return (
-                                                <button
-                                                    key={perm.id}
-                                                    type="button"
-                                                    onClick={() => togglePermission(perm.id)}
-                                                    className={cn(
-                                                        "flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors border",
-                                                        isSelected
-                                                            ? "bg-primary/5 border-primary/20 text-primary"
-                                                            : "bg-card border-border text-foreground hover:bg-muted"
-                                                    )}
-                                                >
-                                                    <div className={cn(
-                                                        "w-4 h-4 rounded flex items-center justify-center transition-colors",
-                                                        isSelected ? "bg-primary text-primary-foreground" : "border border-border"
-                                                    )}>
-                                                        {isSelected && <Check className="w-3 h-3" />}
-                                                    </div>
-                                                    {perm.label}
-                                                </button>
-                                            );
-                                        })}
+                    <div className="space-y-6 py-2">
+                        {/* Role Header Section - Compacted */}
+                        <div className="bg-muted/30 p-4 rounded-xl border border-border/50 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
+                                <Shield className="w-16 h-16 rotate-12" />
+                            </div>
+                            <div className="relative z-10 flex flex-col sm:flex-row sm:items-center gap-4">
+                                <div className="shrink-0 flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">
+                                    <Shield className="w-3.5 h-3.5 text-primary" />
+                                    Identificación:
+                                </div>
+                                <div className="relative flex-1">
+                                    <input 
+                                        type="text" 
+                                        required
+                                        value={formData.name || ''} 
+                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                        className="w-full h-10 pl-11 pr-4 bg-background border border-input rounded-lg text-sm font-bold placeholder:text-muted-foreground/50 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none" 
+                                        placeholder="Nombre descriptivo del Rol (Ej: Administrador, Operador)" 
+                                    />
+                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/60">
+                                        <Shield className="w-4 h-4" />
                                     </div>
                                 </div>
-                            ))}
+                            </div>
+                        </div>
+
+                        {/* Permissions Section */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-4">
+                                <h3 className="text-sm font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                                    Panel de Permisos
+                                </h3>
+                                <div className="h-px bg-border flex-1" />
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-4">
+                                {permissionGroups.map(group => {
+                                    const isExpanded = expandedGroups[group] !== false;
+                                    return (
+                                        <div key={group} className="border border-border/50 rounded-xl overflow-hidden bg-background">
+                                            <button 
+                                                type="button"
+                                                onClick={() => toggleGroup(group)}
+                                                className="w-full flex items-center justify-between p-3.5 group/header hover:bg-muted/30 transition-colors"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary border border-primary/20 group-hover/header:scale-105 transition-transform">
+                                                        {getGroupIcon(group)}
+                                                    </div>
+                                                    <p className="text-sm font-bold text-foreground tracking-tight">{group}</p>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="text-[10px] font-medium text-muted-foreground px-2 py-0.5 bg-muted rounded border border-border/50 uppercase tracking-wider">
+                                                        {availablePermissions.filter(p => p.group === group).length} Opciones
+                                                    </div>
+                                                    <ChevronDown className={cn(
+                                                        "w-4 h-4 text-muted-foreground transition-transform duration-300",
+                                                        !isExpanded && "-rotate-90"
+                                                    )} />
+                                                </div>
+                                            </button>
+
+                                            {isExpanded && (
+                                                <div className="p-4 pt-0 border-t border-border/50 bg-muted/5 transition-all">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-4">
+                                                        {availablePermissions.filter(p => p.group === group).map(perm => {
+                                                            const isSelected = formData.permissions.includes(perm.id);
+                                                            return (
+                                                                <button 
+                                                                    type="button"
+                                                                    key={perm.id} 
+                                                                    onClick={() => togglePermission(perm.id)}
+                                                                    className={cn(
+                                                                        "group relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs text-left transition-all border",
+                                                                        isSelected
+                                                                            ? 'bg-primary/5 border-primary/30 text-primary ring-1 ring-primary/10'
+                                                                            : 'bg-background border-border text-muted-foreground hover:border-primary/30 hover:bg-muted/30'
+                                                                    )}
+                                                                >
+                                                                    <div className={cn(
+                                                                        "w-4 h-4 rounded-md flex items-center justify-center transition-all shrink-0",
+                                                                        isSelected 
+                                                                            ? 'bg-primary text-primary-foreground' 
+                                                                            : 'bg-muted border border-border'
+                                                                    )}>
+                                                                        {isSelected && <Check className="w-3 h-3 stroke-[3px]" />}
+                                                                    </div>
+                                                                    <span className={cn(
+                                                                        "font-medium truncate",
+                                                                        isSelected ? 'text-primary' : 'group-hover:text-foreground'
+                                                                    )}>
+                                                                        {perm.label}
+                                                                    </span>
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
 
@@ -239,7 +317,7 @@ export function RolesPage() {
                             type="submit"
                             className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-md shadow-sm transition-colors"
                         >
-                            {editingRole ? 'Guardar Cambios' : 'Crear Rol'}
+                            Guardar
                         </button>
                     </div>
                 </form>
