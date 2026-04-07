@@ -77,7 +77,7 @@ export function UsersPage() {
     };
 
     const filteredUsers = users.filter(user =>
-        ((user.apps || 'EBM').split(',').map(a => a.trim()).includes('EBM')) &&
+        (user.apps || 'EBM').split(',').some(a => a.trim().toUpperCase() === 'EBM') &&
         (user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (user.full_name || '').toLowerCase().includes(searchTerm.toLowerCase()))
@@ -215,7 +215,7 @@ export function UsersPage() {
                                                     <td style={{ width: widths.apps }} className="px-6 py-4 truncate">
                                                         <div className="flex flex-wrap gap-1">
                                                             {(user.apps || 'EBM').split(',').map(app => (
-                                                                <span key={app} className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/5 text-primary border border-primary/10">
+                                                                <span key={app} className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/5 text-primary border border-primary/10 uppercase">
                                                                     {app.trim()}
                                                                 </span>
                                                             ))}

@@ -133,56 +133,62 @@ export function RolesPage() {
 
                 <div className="p-6 space-y-6 bg-card border-x border-b border-border rounded-b-lg">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {roles.map((role) => (
-                            <div key={role.id} className="bg-background rounded-lg border border-border shadow-sm p-5 hover:shadow-md transition-shadow">
-                                <div className="flex items-start justify-between mb-3">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                                            <Shield className="w-5 h-5 text-primary" />
+                        {roles
+                            .filter(role => (role.apps || 'EBM').split(',').some(a => a.trim().toUpperCase() === 'EBM'))
+                            .map((role) => (
+                                <div key={role.id} className="bg-background rounded-lg border border-border shadow-sm p-5 hover:shadow-md transition-shadow">
+                                    <div className="flex items-start justify-between mb-3">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                                                <Shield className="w-5 h-5 text-primary" />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-bold text-foreground text-sm">{role.name}</h3>
+                                                <p className="text-[11px] text-muted-foreground">{role.permissions.length} permisos asignados</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h3 className="font-bold text-foreground text-sm">{role.name}</h3>
-                                            <p className="text-[11px] text-muted-foreground">{role.permissions.length} permisos asignados</p>
+                                        <div className="flex gap-1">
+                                            <button
+                                                onClick={() => handleEdit(role)}
+                                                className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
+                                                title="Editar"
+                                            >
+                                                <Edit2 className="w-4 h-4" />
+                                            </button>
+                                            {role.id !== 'admin' && ( // Prevent deleting admin
+                                                <button
+                                                    onClick={() => handleDelete(role.id)}
+                                                    className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                                    title="Eliminar"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
-                                    <div className="flex gap-1">
-                                        <button
-                                            onClick={() => handleEdit(role)}
-                                            className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
-                                            title="Editar"
-                                        >
-                                            <Edit2 className="w-4 h-4" />
-                                        </button>
-                                        {role.id !== 'admin' && ( // Prevent deleting admin
-                                            <button
-                                                onClick={() => handleDelete(role.id)}
-                                                className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                                                title="Eliminar"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
+
+                                    <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1 custom-scrollbar">
+                                        {role.permissions.filter(p => availablePermissions.some(ap => ap.id === p)).length === 0 ? (
+                                            <span className="text-xs text-muted-foreground italic">Sin permisos asignados</span>
+                                        ) : (
+                                            role.permissions
+                                                .filter(p => availablePermissions.some(ap => ap.id === p))
+                                                .map(perm => {
+                                                    const label = availablePermissions.find(p => p.id === perm)?.label || perm;
+                                                    return (
+                                                        <span key={perm} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-secondary text-secondary-foreground border border-border">
+                                                            {label}
+                                                        </span>
+                                                    );
+                                                })
                                         )}
                                     </div>
                                 </div>
-
-                                <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1 custom-scrollbar">
-                                    {role.permissions.filter(p => availablePermissions.some(ap => ap.id === p)).length === 0 ? (
-                                        <span className="text-xs text-muted-foreground italic">Sin permisos asignados</span>
-                                    ) : (
-                                        role.permissions
-                                            .filter(p => availablePermissions.some(ap => ap.id === p))
-                                            .map(perm => {
-                                                const label = availablePermissions.find(p => p.id === perm)?.label || perm;
-                                                return (
-                                                    <span key={perm} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-secondary text-secondary-foreground border border-border">
-                                                        {label}
-                                                    </span>
-                                                );
-                                            })
-                                    )}
-                                </div>
-                            </div>
-                        ))}
+                            ))
+                        }
+                        {roles.filter(role => (role.apps || 'EBM').split(',').some(a => a.trim().toUpperCase() === 'EBM')).length === 0 && (
+                            <div className="col-span-full text-center py-12 text-muted-foreground font-medium italic opacity-60">No hay roles definidos para mostrar.</div>
+                        )}
                     </div>
                 </div>
             </div>
