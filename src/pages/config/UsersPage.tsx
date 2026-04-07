@@ -7,7 +7,9 @@ import {
     Edit2,
     Trash2,
     AlertCircle,
-    Save
+    Save,
+    ChevronUp,
+    ChevronDown
 } from 'lucide-react';
 import { ManagementsService } from '../../services/managementsService';
 import { UsersService } from '../../services/usersService';
@@ -29,6 +31,8 @@ export function UsersPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<User | null>(null);
+    const [sortBy, setSortBy] = useState<string>('username');
+    const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('ASC');
     const [error, setError] = useState<string | null>(null);
 
     // Resizing logic
@@ -76,12 +80,36 @@ export function UsersPage() {
         setSearchTerm(e.target.value);
     };
 
-    const filteredUsers = users.filter(user =>
-        (user.apps || 'EBM').split(',').some(a => a.trim().toUpperCase() === 'EBM') &&
-        (user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (user.full_name || '').toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    const handleSort = (column: string) => {
+        if (sortBy === column) {
+            setSortOrder(sortOrder === 'ASC' ? 'DESC' : 'ASC');
+        } else {
+            setSortBy(column);
+            setSortOrder('ASC');
+        }
+    };
+
+    const SortIcon = ({ column }: { column: string }) => {
+        if (sortBy !== column) return <ChevronUp className="w-3.5 h-3.5 opacity-20" />;
+        return sortOrder === 'ASC' 
+            ? <ChevronUp className="w-3.5 h-3.5 text-primary" /> 
+            : <ChevronDown className="w-3.5 h-3.5 text-primary" />;
+    };
+
+    const filteredUsers = users
+        .filter(user =>
+            (user.apps || 'EBM').split(',').some(a => a.trim().toUpperCase() === 'EBM') &&
+            (user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (user.full_name || '').toLowerCase().includes(searchTerm.toLowerCase()))
+        )
+        .sort((a, b) => {
+            const factor = sortOrder === 'ASC' ? 1 : -1;
+            if (sortBy === 'username') return (a.username || '').localeCompare(b.username || '') * factor;
+            if (sortBy === 'email') return (a.email || '').localeCompare(b.email || '') * factor;
+            if (sortBy === 'rol') return (a.role_name || '').localeCompare(b.role_name || '') * factor;
+            return 0;
+        });
 
     const handleCreate = () => {
         setEditingUser(null);
@@ -184,9 +212,24 @@ export function UsersPage() {
                                 <table className="w-full text-sm text-left table-fixed border-collapse">
                                     <thead className="sticky top-0 z-20 bg-muted/50 text-muted-foreground font-medium border-b border-border">
                                         <tr>
-                                            <ResizableHeader columnId="usuario" width={widths.usuario} onResizeStart={onResizeStart} className="px-6 py-3 bg-muted/50">Usuario</ResizableHeader>
-                                            <ResizableHeader columnId="email" width={widths.email} onResizeStart={onResizeStart} className="px-6 py-3 bg-muted/50">Email</ResizableHeader>
-                                            <ResizableHeader columnId="rol" width={widths.rol} onResizeStart={onResizeStart} className="px-6 py-3 bg-muted/50">Rol</ResizableHeader>
+                                            <ResizableHeader columnId="usuario" width={widths.usuario} onResizeStart={onResizeStart} className="px-6 py-3 group/header bg-muted/50">
+                                                <div className="flex items-center justify-between gap-1 w-full overflow-hidden">
+                                                    <span className="truncate pr-1 font-bold">Usuario</span>
+                                                    <button onClick={(e) => { e.stopPropagation(); handleSort('username'); }} className="p-1 hover:bg-primary/10 rounded-md transition-colors shrink-0"><SortIcon column="username" /></button>
+                                                </div>
+                                            </ResizableHeader>
+                                            <ResizableHeader columnId="email" width={widths.email} onResizeStart={onResizeStart} className="px-6 py-3 group/header bg-muted/50">
+                                                <div className="flex items-center justify-between gap-1 w-full overflow-hidden">
+                                                    <span className="truncate pr-1 font-bold">Email</span>
+                                                    <button onClick={(e) => { e.stopPropagation(); handleSort('email'); }} className="p-1 hover:bg-primary/10 rounded-md transition-colors shrink-0"><SortIcon column="email" /></button>
+                                                </div>
+                                            </ResizableHeader>
+                                            <ResizableHeader columnId="rol" width={widths.rol} onResizeStart={onResizeStart} className="px-6 py-3 group/header bg-muted/50">
+                                                <div className="flex items-center justify-between gap-1 w-full overflow-hidden">
+                                                    <span className="truncate pr-1 font-bold">Rol</span>
+                                                    <button onClick={(e) => { e.stopPropagation(); handleSort('rol'); }} className="p-1 hover:bg-primary/10 rounded-md transition-colors shrink-0"><SortIcon column="rol" /></button>
+                                                </div>
+                                            </ResizableHeader>
                                             <ResizableHeader columnId="apps" width={widths.apps} onResizeStart={onResizeStart} className="px-6 py-3 bg-muted/50">Aplicaciones</ResizableHeader>
                                             <th className="px-6 py-3 text-right w-24 bg-muted/50">Acciones</th>
                                         </tr>
