@@ -16,6 +16,8 @@ import type { User, Management, Role } from '../../types';
 import { Modal } from '../../components/common/Modal';
 import { useDialog } from '../../context/DialogContext';
 import { cn } from '../../utils/cn';
+import { useTableResizer } from '../../hooks/useTableResizer';
+import { ResizableHeader } from '../../components/common/ResizableHeader';
 
 export function UsersPage() {
     // const { t } = useTranslation();
@@ -28,6 +30,14 @@ export function UsersPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<User | null>(null);
     const [error, setError] = useState<string | null>(null);
+
+    // Resizing logic
+    const { widths, onResizeStart } = useTableResizer('ebm_users_column_widths', {
+        usuario: 250,
+        email: 200,
+        rol: 150,
+        apps: 200
+    });
 
     // Form state
     const [formData, setFormData] = useState<Partial<User>>({
@@ -67,9 +77,12 @@ export function UsersPage() {
     };
 
     const filteredUsers = users.filter(user =>
-        user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+        ((user.apps || 'EBM').split(',').map(a => a.trim()).includes('EBM')) &&
+        (user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (user.full_name || '').toLowerCase().includes(searchTerm.toLowerCase()))
     );
+
     const handleCreate = () => {
         setEditingUser(null);
         setError(null);
@@ -138,8 +151,8 @@ export function UsersPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col shadow-sm rounded-lg">
-                <div className="sticky top-0 z-30 p-6 border border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card rounded-t-lg before:content-[''] before:absolute before:bottom-full before:-translate-y-px before:-left-4 before:-right-4 before:h-12 before:bg-background before:pointer-events-none">
+            <div className="flex flex-col shadow-sm rounded-lg border border-border bg-card overflow-hidden h-[calc(100vh-140px)]">
+                <div className="p-6 border-b border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card shrink-0">
                     <div>
                         <h2 className="text-lg font-medium flex items-center gap-2 text-foreground">
                             <Users className="w-5 h-5 text-primary" /> Gestión de Usuarios
@@ -151,89 +164,93 @@ export function UsersPage() {
                     </button>
                 </div>
                 
-                <div className="p-6 space-y-6 bg-card border-x border-b border-border rounded-b-lg">
-                    <div className="relative max-w-md">
-                        <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
-                        <input
-                            type="text"
-                            value={searchTerm}
-                            onChange={handleSearch}
-                            placeholder="Buscar por nombre, usuario o email..."
-                            className="w-full pl-9 pr-4 py-2 bg-background border border-input rounded-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-sm"
-                        />
-                    </div>
+                <div className="flex-1 overflow-y-auto">
+                    <div className="p-6 space-y-6">
+                        <div className="sticky top-0 z-30 bg-card pb-4 -mt-2">
+                            <div className="relative max-w-md">
+                                <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
+                                <input
+                                    type="text"
+                                    value={searchTerm}
+                                    onChange={handleSearch}
+                                    placeholder="Buscar por nombre, usuario o email..."
+                                    className="w-full pl-9 pr-4 py-2 bg-background border border-input rounded-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-sm"
+                                />
+                            </div>
+                        </div>
 
-                    <div className="bg-card rounded-lg border border-border overflow-hidden">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-muted/50 text-muted-foreground font-medium border-b border-border">
-                                    <tr>
-                                        <th className="px-6 py-3">Usuario</th>
-                                        <th className="px-6 py-3">Email</th>
-                                        <th className="px-6 py-3">Rol</th>
-                                        <th className="px-6 py-3">Aplicaciones</th>
-                                        <th className="px-6 py-3 text-right">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-border">
-                                    {filteredUsers.length > 0 ? (
-                                        filteredUsers.map((user) => (
-                                            <tr key={user.id} className="hover:bg-muted/50 transition-colors">
-                                                <td className="px-6 py-4">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase">
-                                                            {user.username.substring(0, 2).toUpperCase()}
+                        <div className="bg-card rounded-lg border border-border overflow-hidden">
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-sm text-left table-fixed border-collapse">
+                                    <thead className="sticky top-0 z-20 bg-muted/50 text-muted-foreground font-medium border-b border-border">
+                                        <tr>
+                                            <ResizableHeader columnId="usuario" width={widths.usuario} onResizeStart={onResizeStart} className="px-6 py-3 bg-muted/50">Usuario</ResizableHeader>
+                                            <ResizableHeader columnId="email" width={widths.email} onResizeStart={onResizeStart} className="px-6 py-3 bg-muted/50">Email</ResizableHeader>
+                                            <ResizableHeader columnId="rol" width={widths.rol} onResizeStart={onResizeStart} className="px-6 py-3 bg-muted/50">Rol</ResizableHeader>
+                                            <ResizableHeader columnId="apps" width={widths.apps} onResizeStart={onResizeStart} className="px-6 py-3 bg-muted/50">Aplicaciones</ResizableHeader>
+                                            <th className="px-6 py-3 text-right w-24 bg-muted/50">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-border">
+                                        {filteredUsers.length > 0 ? (
+                                            filteredUsers.map((user) => (
+                                                <tr key={user.id} className="hover:bg-muted/50 transition-colors">
+                                                    <td style={{ width: widths.usuario }} className="px-6 py-4 truncate">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase shrink-0">
+                                                                {user.username.substring(0, 2).toUpperCase()}
+                                                            </div>
+                                                            <div className="truncate">
+                                                                <div className="font-medium text-foreground truncate">{user.full_name || user.username}</div>
+                                                                <div className="text-xs text-muted-foreground truncate">@{user.username}</div>
+                                                            </div>
                                                         </div>
-                                                        <div>
-                                                            <div className="font-medium text-foreground">{user.full_name || user.username}</div>
-                                                            <div className="text-xs text-muted-foreground">@{user.username}</div>
+                                                    </td>
+                                                    <td style={{ width: widths.email }} className="px-6 py-4 text-foreground truncate">{user.email}</td>
+                                                    <td style={{ width: widths.rol }} className="px-6 py-4 truncate">
+                                                        <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
+                                                            {user.role_name || 'Sin Rol'}
+                                                        </span>
+                                                    </td>
+                                                    <td style={{ width: widths.apps }} className="px-6 py-4 truncate">
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {(user.apps || 'EBM').split(',').map(app => (
+                                                                <span key={app} className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/5 text-primary border border-primary/10">
+                                                                    {app.trim()}
+                                                                </span>
+                                                            ))}
                                                         </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 text-foreground">{user.email}</td>
-                                                <td className="px-6 py-4">
-                                                    <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
-                                                        {user.role_name || 'Sin Rol'}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {(user.apps || 'EBM').split(',').map(app => (
-                                                            <span key={app} className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/5 text-primary border border-primary/10">
-                                                                {app.trim()}
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        <button
-                                                            onClick={() => handleEdit(user)}
-                                                            className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-md transition-colors"
-                                                            title="Editar"
-                                                        >
-                                                            <Edit2 className="w-4 h-4" />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDelete(user.id)}
-                                                            className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors"
-                                                            title="Eliminar"
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </button>
-                                                    </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-right">
+                                                        <div className="flex items-center justify-end gap-2">
+                                                            <button
+                                                                onClick={() => handleEdit(user)}
+                                                                className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-md transition-colors"
+                                                                title="Editar"
+                                                            >
+                                                                <Edit2 className="w-4 h-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDelete(user.id)}
+                                                                className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors"
+                                                                title="Eliminar"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground font-medium italic opacity-60">
+                                                    No se encontraron usuarios que coincidan con la búsqueda.
                                                 </td>
                                             </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground font-medium italic opacity-60">
-                                                No se encontraron usuarios que coincidan con la búsqueda.
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -253,77 +270,77 @@ export function UsersPage() {
                             {error}
                         </div>
                     )}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-foreground mb-1">Nombre Completo *</label>
-                        <input
-                            type="text"
-                            value={formData.full_name || ''}
-                            onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                            className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
-                        />
-                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-foreground mb-1">Nombre Completo *</label>
+                            <input
+                                type="text"
+                                value={formData.full_name || ''}
+                                onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                                className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                            />
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-foreground mb-1">Usuario *</label>
-                        <input
-                            type="text"
-                            value={formData.username || ''}
-                            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                            className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
-                        />
-                    </div>
+                        <div>
+                            <label className="block text-sm font-medium text-foreground mb-1">Usuario *</label>
+                            <input
+                                type="text"
+                                value={formData.username || ''}
+                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                                className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                            />
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-foreground mb-1">Email *</label>
-                        <input
-                            type="email"
-                            value={formData.email || ''}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
-                        />
-                    </div>
+                        <div>
+                            <label className="block text-sm font-medium text-foreground mb-1">Email *</label>
+                            <input
+                                type="email"
+                                value={formData.email || ''}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                            />
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-foreground mb-1">
-                            {editingUser ? 'Nueva Contraseña (dejar vacío para no cambiar)' : 'Contraseña *'}
-                        </label>
-                        <input
-                            type="password"
-                            value={formData.password_hash || ''}
-                            onChange={(e) => setFormData({ ...formData, password_hash: e.target.value })}
-                            className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
-                            placeholder={editingUser ? "••••••••" : ""}
-                        />
-                    </div>
+                        <div>
+                            <label className="block text-sm font-medium text-foreground mb-1">
+                                {editingUser ? 'Nueva Contraseña (dejar vacío para no cambiar)' : 'Contraseña *'}
+                            </label>
+                            <input
+                                type="password"
+                                value={formData.password_hash || ''}
+                                onChange={(e) => setFormData({ ...formData, password_hash: e.target.value })}
+                                className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                                placeholder={editingUser ? "••••••••" : ""}
+                            />
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-foreground mb-1">Rol *</label>
-                        <select
-                            value={formData.role_id || ''}
-                            onChange={(e) => setFormData({ ...formData, role_id: e.target.value })}
-                            className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                            <option value="">Seleccionar rol</option>
-                            {roles.map(role => (
-                                <option key={role.id} value={role.id}>{role.name}</option>
-                            ))}
-                        </select>
-                    </div>
+                        <div>
+                            <label className="block text-sm font-medium text-foreground mb-1">Rol *</label>
+                            <select
+                                value={formData.role_id || ''}
+                                onChange={(e) => setFormData({ ...formData, role_id: e.target.value })}
+                                className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                <option value="">Seleccionar rol</option>
+                                {roles.map(role => (
+                                    <option key={role.id} value={role.id}>{role.name}</option>
+                                ))}
+                            </select>
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-foreground mb-1">Gerencia *</label>
-                        <select
-                            value={formData.management_id || ''}
-                            onChange={(e) => setFormData({ ...formData, management_id: e.target.value })}
-                            className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                            <option value="">Seleccionar gerencia</option>
-                            {managements.map(mgmt => (
-                                <option key={mgmt.id} value={mgmt.id}>{mgmt.name}</option>
-                            ))}
-                        </select>
-                    </div>
+                        <div>
+                            <label className="block text-sm font-medium text-foreground mb-1">Gerencia *</label>
+                            <select
+                                value={formData.management_id || ''}
+                                onChange={(e) => setFormData({ ...formData, management_id: e.target.value })}
+                                className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                <option value="">Seleccionar gerencia</option>
+                                {managements.map(mgmt => (
+                                    <option key={mgmt.id} value={mgmt.id}>{mgmt.name}</option>
+                                ))}
+                            </select>
+                        </div>
 
                         <div className="col-span-full border-t border-border pt-4 mt-2">
                             <label className="block text-sm font-medium text-foreground mb-3">Acceso a Aplicaciones</label>
