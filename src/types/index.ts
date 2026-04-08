@@ -33,6 +33,7 @@ export type Permission =
     | 'files.upload' | 'files.view'
     | 'tracking.view' | 'tracking.export'
     | 'config.users' | 'config.roles' | 'config.cecos' | 'config.accounts' | 'config.managements' | 'config.exchange_rates'
+    | 'ebm.config.users' | 'ebm.config.roles' | 'ebm.config.sap' | 'ebm.config.audit'
     | 'expenses.map' | 'expenses.view';
 
 export interface Management {

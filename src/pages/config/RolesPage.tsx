@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Shield, Plus, Edit2, Trash2, Check, ChevronDown, Activity, Settings, CalendarDays, Users, Save } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
 import { RolesService } from '../../services/rolesService';
 import type { Role, Permission } from '../../types';
 import { Modal } from '../../components/common/Modal';
@@ -8,6 +9,7 @@ import { cn } from '../../utils/cn';
 
 export function RolesPage() {
     const { confirm } = useDialog();
+    const { hasPermission } = useAuth();
     const [roles, setRoles] = useState<Role[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingRole, setEditingRole] = useState<Role | null>(null);
@@ -122,13 +124,15 @@ export function RolesPage() {
                         <h2 className="text-lg font-medium flex items-center gap-2 text-foreground"><Shield className="w-5 h-5 text-primary" /> Gestión de Roles</h2>
                         <p className="text-sm text-muted-foreground mt-1">Define permisos y niveles de acceso para los usuarios</p>
                     </div>
-                    <button
-                        onClick={handleCreate}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium shadow-sm shrink-0"
-                    >
-                        <Plus className="w-4 h-4" />
-                        Nuevo Rol
-                    </button>
+                    {hasPermission('ebm.config.roles') && (
+                        <button
+                            onClick={handleCreate}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium shadow-sm shrink-0"
+                        >
+                            <Plus className="w-4 h-4" />
+                            Nuevo Rol
+                        </button>
+                    )}
                 </div>
 
                 <div className="p-6 space-y-6 bg-card border-x border-b border-border rounded-b-lg">
@@ -148,21 +152,25 @@ export function RolesPage() {
                                             </div>
                                         </div>
                                         <div className="flex gap-1">
-                                            <button
-                                                onClick={() => handleEdit(role)}
-                                                className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
-                                                title="Editar"
-                                            >
-                                                <Edit2 className="w-4 h-4" />
-                                            </button>
-                                            {role.id !== 'admin' && ( // Prevent deleting admin
-                                                <button
-                                                    onClick={() => handleDelete(role.id)}
-                                                    className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                                                    title="Eliminar"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
+                                            {hasPermission('ebm.config.roles') && (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleEdit(role)}
+                                                        className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
+                                                        title="Editar"
+                                                    >
+                                                        <Edit2 className="w-4 h-4" />
+                                                    </button>
+                                                    {role.id !== 'admin' && ( // Prevent deleting admin
+                                                        <button
+                                                            onClick={() => handleDelete(role.id)}
+                                                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                                            title="Eliminar"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    )}
+                                                </>
                                             )}
                                         </div>
                                     </div>

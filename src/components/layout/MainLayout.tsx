@@ -76,7 +76,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                         </button>
 
                         {/* Config (Gear Icon) */}
-                        {hasPermission('config.users') && (
+                        {hasPermission('ebm.config.users') && (
                             <NavLink 
                                 to="/config"
                                 className={({ isActive }) => cn(

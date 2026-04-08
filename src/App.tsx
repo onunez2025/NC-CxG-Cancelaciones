@@ -8,6 +8,7 @@ import { LoginPage } from './pages/LoginPage';
 import { ForceChangePasswordPage } from './pages/ForceChangePasswordPage';
 import { UsersPage } from './pages/config/UsersPage';
 import { RolesPage } from './pages/config/RolesPage';
+import AuditLogPage from './pages/config/AuditLogPage';
 import { ConfigLayout } from './pages/config/ConfigLayout';
 import { RequirePermission } from './components/common/RequirePermission';
 
@@ -86,11 +87,12 @@ function App() {
               <Route path="/dashboard" element={<DashboardPage />} />
 
               {/* Config Routes */}
-              <Route element={<RequirePermission permission="config.users" />}>
+              <Route element={<RequirePermission permission="ebm.config.users" />}>
                 <Route path="/config" element={<ConfigLayout />}>
                   <Route index element={<Navigate to="users" replace />} />
                   <Route path="users" element={<UsersPage />} />
                   <Route path="roles" element={<RolesPage />} />
+                  <Route path="audit" element={<AuditLogPage />} />
                   <Route path="cecos" element={<CostCentersPage />} />
                   <Route path="accounts" element={<AccountsPage />} />
                   <Route path="managements" element={<ManagementsPage />} />

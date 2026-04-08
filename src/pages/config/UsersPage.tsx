@@ -20,10 +20,12 @@ import { useDialog } from '../../context/DialogContext';
 import { cn } from '../../utils/cn';
 import { useTableResizer } from '../../hooks/useTableResizer';
 import { ResizableHeader } from '../../components/common/ResizableHeader';
+import { useAuth } from '../../hooks/useAuth';
 
 export function UsersPage() {
     // const { t } = useTranslation();
     const { confirm } = useDialog();
+    const { hasPermission } = useAuth();
     const [users, setUsers] = useState<User[]>([]);
     const [managements, setManagements] = useState<Management[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
@@ -187,9 +189,11 @@ export function UsersPage() {
                         </h2>
                         <p className="text-sm text-muted-foreground mt-1">Administra los usuarios con acceso al sistema EBM</p>
                     </div>
-                    <button onClick={handleCreate} className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium shadow-sm shrink-0">
-                        <Plus className="w-4 h-4" /> Nuevo Usuario
-                    </button>
+                    {hasPermission('ebm.config.users') && (
+                        <button onClick={handleCreate} className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium shadow-sm shrink-0">
+                            <Plus className="w-4 h-4" /> Nuevo Usuario
+                        </button>
+                    )}
                 </div>
                 
                 <div className="flex-1 overflow-y-auto">
@@ -266,20 +270,24 @@ export function UsersPage() {
                                                     </td>
                                                     <td className="px-6 py-4 text-right">
                                                         <div className="flex items-center justify-end gap-2">
-                                                            <button
-                                                                onClick={() => handleEdit(user)}
-                                                                className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-md transition-colors"
-                                                                title="Editar"
-                                                            >
-                                                                <Edit2 className="w-4 h-4" />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleDelete(user.id)}
-                                                                className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors"
-                                                                title="Eliminar"
-                                                            >
-                                                                <Trash2 className="w-4 h-4" />
-                                                            </button>
+                                                            {hasPermission('ebm.config.users') && (
+                                                                <>
+                                                                    <button
+                                                                        onClick={() => handleEdit(user)}
+                                                                        className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-md transition-colors"
+                                                                        title="Editar"
+                                                                    >
+                                                                        <Edit2 className="w-4 h-4" />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleDelete(user.id)}
+                                                                        className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors"
+                                                                        title="Eliminar"
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </button>
+                                                                </>
+                                                            )}
                                                         </div>
                                                     </td>
                                                 </tr>

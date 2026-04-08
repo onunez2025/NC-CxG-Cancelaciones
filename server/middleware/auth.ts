@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { getDbConnection } from '../db.js';
 
 const isProduction = process.env.NODE_ENV === 'production';
 const JWT_SECRET = process.env.JWT_SECRET || (isProduction ? 'FAIL' : 'fallback_development_secret_do_not_use');
@@ -36,4 +37,50 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
     } catch (err) {
         return res.status(401).json({ error: 'Invalid or expired token.' });
     }
+};
+
+export const verifyPermission = (permission: string) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
+        const user = req.user;
+        if (!user) {
+            return res.status(401).json({ error: 'Authentication required' });
+        }
+
+        // Admin check
+        const roleName = (user.role_name || '').trim().toLowerCase();
+        if (roleName === 'administrador') {
+            return next();
+        }
+
+        const permissions = user.permissions || [];
+        if (permissions.includes(permission)) {
+            return next();
+        }
+
+        // LOG ACCESS DENIED
+        try {
+            const pool = await getDbConnection();
+            await pool.request()
+                .input('uid', user.id)
+                .input('un', user.full_name || user.username)
+                .input('acc', 'ACCESO_DENEGADO')
+                .input('ent', `Endpoint: ${req.method} ${req.baseUrl}${req.path}`)
+                .input('eid', permission)
+                .input('det', JSON.stringify({
+                    ip: req.ip,
+                    userAgent: req.get('user-agent'),
+                    params: req.params,
+                    query: req.query
+                }))
+                .query(`
+                    INSERT INTO [dbo].[GAC_APP_TB_AUDIT_LOG] 
+                    (UsuarioID, UsuarioNombre, Accion, Entidad, EntidadID, Detalle)
+                    VALUES (@uid, @un, @acc, @ent, @eid, @det)
+                `);
+        } catch (logErr) {
+            console.error('CRITICAL: Failed to log audit event:', logErr);
+        }
+
+        return res.status(403).json({ error: `Permission denied: ${permission}` });
+    };
 };

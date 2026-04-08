@@ -120,6 +120,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const hasPermission = (permission: Permission): boolean => {
         if (!user) return false;
+        
+        // Administrador bypass
+        if (user.role_name?.toLowerCase() === 'administrador') return true;
+        
         if (!user.permissions) return false;
         return user.permissions.includes(permission);
     };
