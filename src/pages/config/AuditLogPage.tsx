@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Terminal, ShieldAlert, User, Clock, AlertCircle, Search, Filter } from 'lucide-react';
+import { Terminal, ShieldAlert, Clock, AlertCircle, Search, Filter } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
 interface AuditLog {
