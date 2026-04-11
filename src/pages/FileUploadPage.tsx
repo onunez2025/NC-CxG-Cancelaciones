@@ -174,8 +174,7 @@ export function FileUploadPage() {
     const isReady = missing.length === 0;
 
     return (
-        <div className="space-y-6">
-        <div className="flex flex-col h-full font-lato">
+        <div className="flex flex-col h-full font-lato bg-background animate-in fade-in duration-500">
             <div className="shrink-0 mb-6">
                 <h1 className="text-2xl font-black tracking-tight text-slate-800 dark:text-white">Carga de Archivos</h1>
                 <p className="text-slate-500 text-sm font-medium">Gestione la importación de reportes SAP para la reconciliación de datos</p>
