@@ -180,131 +180,126 @@ export function UsersPage() {
     };
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col shadow-sm rounded-lg border border-border bg-card overflow-hidden h-[calc(100vh-140px)]">
-                <div className="p-6 border-b border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card shrink-0">
-                    <div>
-                        <h2 className="text-lg font-medium flex items-center gap-2 text-foreground">
-                            <Users className="w-5 h-5 text-primary" /> Gestión de Usuarios
-                        </h2>
-                        <p className="text-sm text-muted-foreground mt-1">Administra los usuarios con acceso al sistema EBM</p>
-                    </div>
-                    {hasPermission('ebm.config.users') && (
-                        <button onClick={handleCreate} className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium shadow-sm shrink-0">
-                            <Plus className="w-4 h-4" /> Nuevo Usuario
-                        </button>
-                    )}
+        <div className="flex flex-col h-full bg-background animate-in fade-in zoom-in duration-300">
+            {/* Header */}
+            <div className="p-6 bg-card border border-border rounded-t-lg flex justify-between items-center shrink-0">
+                <div>
+                    <h2 className="text-lg font-medium flex items-center gap-2 text-foreground">
+                        <Users className="w-5 h-5 text-primary" /> Gestión de Usuarios
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-1">Administra los usuarios con acceso al sistema EBM</p>
                 </div>
-                
-                <div className="flex-1 overflow-y-auto">
-                    <div className="p-6 space-y-6">
-                        <div className="sticky top-0 z-30 bg-card pb-4 -mt-2">
-                            <div className="relative max-w-md">
-                                <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
-                                <input
-                                    type="text"
-                                    value={searchTerm}
-                                    onChange={handleSearch}
-                                    placeholder="Buscar por nombre, usuario o email..."
-                                    className="w-full pl-9 pr-4 py-2 bg-background border border-input rounded-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-sm"
-                                />
-                            </div>
-                        </div>
+                {hasPermission('ebm.config.users') && (
+                    <button onClick={handleCreate} className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium shadow-sm">
+                        <Plus className="w-4 h-4" /> Nuevo Usuario
+                    </button>
+                )}
+            </div>
+            
+            {/* Toolbar */}
+            <div className="p-4 bg-muted/30 border-x border-border flex items-center gap-4 shrink-0">
+                <div className="relative max-w-md flex-1">
+                    <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
+                    <input
+                        type="text"
+                        value={searchTerm}
+                        onChange={handleSearch}
+                        placeholder="Buscar por nombre, usuario o email..."
+                        className="w-full pl-9 pr-4 py-2 bg-background border border-input rounded-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-sm"
+                    />
+                </div>
+            </div>
 
-                        <div className="bg-card rounded-lg border border-border overflow-hidden">
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-sm text-left table-fixed border-collapse">
-                                    <thead className="sticky top-0 z-20 bg-muted/50 text-muted-foreground font-medium border-b border-border">
-                                        <tr>
-                                            <ResizableHeader columnId="usuario" width={widths.usuario} onResizeStart={onResizeStart} className="px-6 py-3 group/header bg-muted/50">
-                                                <div className="flex items-center justify-between gap-1 w-full overflow-hidden">
-                                                    <span className="truncate pr-1 font-bold">Usuario</span>
-                                                    <button onClick={(e) => { e.stopPropagation(); handleSort('username'); }} className="p-1 hover:bg-primary/10 rounded-md transition-colors shrink-0"><SortIcon column="username" /></button>
-                                                </div>
-                                            </ResizableHeader>
-                                            <ResizableHeader columnId="email" width={widths.email} onResizeStart={onResizeStart} className="px-6 py-3 group/header bg-muted/50">
-                                                <div className="flex items-center justify-between gap-1 w-full overflow-hidden">
-                                                    <span className="truncate pr-1 font-bold">Email</span>
-                                                    <button onClick={(e) => { e.stopPropagation(); handleSort('email'); }} className="p-1 hover:bg-primary/10 rounded-md transition-colors shrink-0"><SortIcon column="email" /></button>
-                                                </div>
-                                            </ResizableHeader>
-                                            <ResizableHeader columnId="rol" width={widths.rol} onResizeStart={onResizeStart} className="px-6 py-3 group/header bg-muted/50">
-                                                <div className="flex items-center justify-between gap-1 w-full overflow-hidden">
-                                                    <span className="truncate pr-1 font-bold">Rol</span>
-                                                    <button onClick={(e) => { e.stopPropagation(); handleSort('rol'); }} className="p-1 hover:bg-primary/10 rounded-md transition-colors shrink-0"><SortIcon column="rol" /></button>
-                                                </div>
-                                            </ResizableHeader>
-                                            <ResizableHeader columnId="apps" width={widths.apps} onResizeStart={onResizeStart} className="px-6 py-3 bg-muted/50">Aplicaciones</ResizableHeader>
-                                            <th className="px-6 py-3 text-right w-24 bg-muted/50">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-border">
-                                        {filteredUsers.length > 0 ? (
-                                            filteredUsers.map((user) => (
-                                                <tr key={user.id} className="hover:bg-muted/50 transition-colors">
-                                                    <td style={{ width: widths.usuario }} className="px-6 py-4 truncate">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase shrink-0">
-                                                                {user.username.substring(0, 2).toUpperCase()}
-                                                            </div>
-                                                            <div className="truncate">
-                                                                <div className="font-medium text-foreground truncate">{user.full_name || user.username}</div>
-                                                                <div className="text-xs text-muted-foreground truncate">@{user.username}</div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td style={{ width: widths.email }} className="px-6 py-4 text-foreground truncate">{user.email}</td>
-                                                    <td style={{ width: widths.rol }} className="px-6 py-4 truncate">
-                                                        <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
-                                                            {user.role_name || 'Sin Rol'}
-                                                        </span>
-                                                    </td>
-                                                    <td style={{ width: widths.apps }} className="px-6 py-4 truncate">
-                                                        <div className="flex flex-wrap gap-1">
-                                                            {(user.apps || 'EBM').split(',').map(app => (
-                                                                <span key={app} className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/5 text-primary border border-primary/10 uppercase">
-                                                                    {app.trim()}
-                                                                </span>
-                                                            ))}
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-right">
-                                                        <div className="flex items-center justify-end gap-2">
-                                                            {hasPermission('ebm.config.users') && (
-                                                                <>
-                                                                    <button
-                                                                        onClick={() => handleEdit(user)}
-                                                                        className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-md transition-colors"
-                                                                        title="Editar"
-                                                                    >
-                                                                        <Edit2 className="w-4 h-4" />
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => handleDelete(user.id)}
-                                                                        className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors"
-                                                                        title="Eliminar"
-                                                                    >
-                                                                        <Trash2 className="w-4 h-4" />
-                                                                    </button>
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        ) : (
-                                            <tr>
-                                                <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground font-medium italic opacity-60">
-                                                    No se encontraron usuarios que coincidan con la búsqueda.
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            {/* Table Content */}
+            <div className="flex-1 overflow-auto bg-card border-x border-b border-border rounded-b-lg">
+                <table className="w-full text-sm text-left table-fixed border-collapse">
+                    <thead className="sticky top-0 z-20 bg-muted/80 backdrop-blur-sm text-muted-foreground font-medium border-b border-border">
+                        <tr>
+                            <ResizableHeader columnId="usuario" width={widths.usuario} onResizeStart={onResizeStart} className="px-6 py-3 group/header border-b border-border">
+                                <div className="flex items-center justify-between gap-1 w-full overflow-hidden">
+                                    <span className="truncate pr-1 font-bold">Usuario</span>
+                                    <button onClick={(e) => { e.stopPropagation(); handleSort('username'); }} className="p-1 hover:bg-primary/10 rounded-md transition-colors shrink-0"><SortIcon column="username" /></button>
+                                </div>
+                            </ResizableHeader>
+                            <ResizableHeader columnId="email" width={widths.email} onResizeStart={onResizeStart} className="px-6 py-3 group/header border-b border-border">
+                                <div className="flex items-center justify-between gap-1 w-full overflow-hidden">
+                                    <span className="truncate pr-1 font-bold">Email</span>
+                                    <button onClick={(e) => { e.stopPropagation(); handleSort('email'); }} className="p-1 hover:bg-primary/10 rounded-md transition-colors shrink-0"><SortIcon column="email" /></button>
+                                </div>
+                            </ResizableHeader>
+                            <ResizableHeader columnId="rol" width={widths.rol} onResizeStart={onResizeStart} className="px-6 py-3 group/header border-b border-border">
+                                <div className="flex items-center justify-between gap-1 w-full overflow-hidden">
+                                    <span className="truncate pr-1 font-bold">Rol</span>
+                                    <button onClick={(e) => { e.stopPropagation(); handleSort('rol'); }} className="p-1 hover:bg-primary/10 rounded-md transition-colors shrink-0"><SortIcon column="rol" /></button>
+                                </div>
+                            </ResizableHeader>
+                            <ResizableHeader columnId="apps" width={widths.apps} onResizeStart={onResizeStart} className="px-6 py-3 border-b border-border font-bold">Aplicaciones</ResizableHeader>
+                            <th className="px-6 py-3 text-right w-24 border-b border-border font-bold">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                        {filteredUsers.length > 0 ? (
+                            filteredUsers.map((user) => (
+                                <tr key={user.id} className="hover:bg-muted/50 transition-colors">
+                                    <td style={{ width: widths.usuario }} className="px-6 py-4 truncate">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase shrink-0">
+                                                {user.username.substring(0, 2).toUpperCase()}
+                                            </div>
+                                            <div className="truncate">
+                                                <div className="font-medium text-foreground truncate">{user.full_name || user.username}</div>
+                                                <div className="text-xs text-muted-foreground truncate">@{user.username}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style={{ width: widths.email }} className="px-6 py-4 text-foreground truncate">{user.email}</td>
+                                    <td style={{ width: widths.rol }} className="px-6 py-4 truncate">
+                                        <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
+                                            {user.role_name || 'Sin Rol'}
+                                        </span>
+                                    </td>
+                                    <td style={{ width: widths.apps }} className="px-6 py-4 truncate">
+                                        <div className="flex flex-wrap gap-1">
+                                            {(user.apps || 'EBM').split(',').map(app => (
+                                                <span key={app} className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/5 text-primary border border-primary/10 uppercase">
+                                                    {app.trim()}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <div className="flex items-center justify-end gap-2">
+                                            {hasPermission('ebm.config.users') && (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleEdit(user)}
+                                                        className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-md transition-colors"
+                                                        title="Editar"
+                                                    >
+                                                        <Edit2 className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(user.id)}
+                                                        className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors"
+                                                        title="Eliminar"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground font-medium italic opacity-60">
+                                    No se encontraron usuarios que coincidan con la búsqueda.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
 
             {/* Add/Edit Modal */}

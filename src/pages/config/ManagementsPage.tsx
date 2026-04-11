@@ -87,66 +87,68 @@ export function ManagementsPage() {
     };
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-col h-full bg-background animate-in fade-in zoom-in duration-300">
+            {/* Header */}
+            <div className="p-6 bg-card border border-border rounded-t-lg flex justify-between items-center shrink-0">
                 <div>
-                    <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
-                        <Briefcase className="w-5 h-5 text-primary" />
-                        Gerencias
+                    <h2 className="text-lg font-medium flex items-center gap-2 text-foreground">
+                        <Briefcase className="w-5 h-5 text-primary" /> Gerencias
                     </h2>
-                    <p className="text-sm text-muted-foreground">
-                        Gestione las gerencias de la organización.
-                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">Gestione las gerencias de la organización.</p>
                 </div>
                 <button
                     onClick={handleCreate}
-                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-bold text-sm flex items-center gap-2 hover:bg-primary/90 transition-colors shadow-sm"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium shadow-sm shrink-0"
                 >
                     <Plus className="w-4 h-4" />
                     Nueva Gerencia
                 </button>
             </div>
 
-            {/* Search */}
-            <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <input
-                    type="text"
-                    placeholder="Buscar por nombre o código..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-card border border-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-                />
+            {/* Toolbar */}
+            <div className="p-4 bg-muted/30 border-x border-border shrink-0">
+                <div className="relative max-w-sm flex-1">
+                    <Search className="w-4 h-4 absolute left-3 top-2.5 text-muted-foreground" />
+                    <input
+                        type="text"
+                        placeholder="Buscar por nombre o código..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 bg-background border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 shadow-sm transition-all"
+                    />
+                </div>
             </div>
 
-            {/* Table */}
-            <div className="bg-card rounded-lg border shadow-sm overflow-hidden">
-                <table className="w-full text-sm">
-                    <thead>
-                        <tr className="border-b bg-muted/30">
-                            <th className="text-left py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground">Código</th>
-                            <th className="text-left py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground">Nombre</th>
-                            <th className="text-right py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground">Acciones</th>
+            {/* Table Content */}
+            <div className="flex-1 overflow-auto bg-card border-x border-b border-border rounded-b-lg scrollbar-thin scrollbar-thumb-border hover:scrollbar-thumb-muted-foreground/20">
+                <table className="w-full text-sm text-left border-collapse">
+                    <thead className="sticky top-0 z-20 bg-muted/80 backdrop-blur-sm text-muted-foreground font-bold border-b border-border">
+                        <tr>
+                            <th className="px-6 py-3 font-bold text-xs uppercase tracking-wider">Código</th>
+                            <th className="px-6 py-3 font-bold text-xs uppercase tracking-wider">Nombre</th>
+                            <th className="px-6 py-3 text-right font-bold text-xs uppercase tracking-wider">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y">
+                    <tbody className="divide-y divide-border">
                         {filteredManagements.map(mgmt => (
                             <tr key={mgmt.id} className="hover:bg-muted/10 transition-colors">
-                                <td className="py-3 px-4">
-                                    <span className="font-mono text-primary font-bold text-xs">{mgmt.code}</span>
+                                <td className="px-6 py-4">
+                                    <span className="font-mono text-primary font-bold text-xs uppercase">{mgmt.code}</span>
                                 </td>
-                                <td className="py-3 px-4 font-medium">{mgmt.name}</td>
-                                <td className="py-3 px-4">
-                                    <div className="flex items-center justify-end gap-1">
+                                <td className="px-6 py-4 font-medium text-foreground">{mgmt.name}</td>
+                                <td className="px-6 py-4">
+                                    <div className="flex items-center justify-end gap-2">
                                         <button
                                             onClick={() => handleEdit(mgmt)}
-                                            className="p-1.5 hover:bg-accent rounded-md transition-colors text-muted-foreground hover:text-foreground"
+                                            className="p-1.5 hover:bg-primary/10 rounded-md transition-colors text-muted-foreground hover:text-primary"
+                                            title="Editar"
                                         >
                                             <Edit2 className="w-4 h-4" />
                                         </button>
                                         <button
                                             onClick={() => handleDelete(mgmt.id)}
                                             className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors text-muted-foreground hover:text-red-600"
+                                            title="Eliminar"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>
@@ -156,8 +158,8 @@ export function ManagementsPage() {
                         ))}
                         {filteredManagements.length === 0 && (
                             <tr>
-                                <td colSpan={3} className="text-center py-8 text-muted-foreground text-sm">
-                                    No se encontraron gerencias.
+                                <td colSpan={3} className="text-center py-12 text-muted-foreground italic opacity-60">
+                                    No se encontraron gerencias que coincidan con la búsqueda.
                                 </td>
                             </tr>
                         )}

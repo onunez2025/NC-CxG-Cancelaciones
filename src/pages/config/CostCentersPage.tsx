@@ -105,26 +105,28 @@ export function CostCentersPage() {
     };
 
     return (
-        <div className="space-y-6">
-            {/* Page Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col h-full bg-background animate-in fade-in zoom-in duration-300">
+            {/* Header */}
+            <div className="p-6 bg-card border border-border rounded-t-lg flex justify-between items-center shrink-0">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight">Centros de Coste</h1>
-                    <p className="text-muted-foreground">Gestiona los centros de coste (CeCos) y su asignación a gerencias.</p>
+                    <h2 className="text-lg font-medium flex items-center gap-2 text-foreground">
+                        <Building2 className="w-5 h-5 text-primary" /> Centros de Coste
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-1">Gestiona los centros de coste (CeCos) y su asignación a gerencias.</p>
                 </div>
                 <button
                     onClick={handleCreate}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium shadow-sm"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium shadow-sm"
                 >
                     <Plus className="w-4 h-4" />
                     Nuevo CeCo
                 </button>
             </div>
 
-            {/* Filters and Search */}
-            <div className="flex items-center gap-4 bg-card p-4 rounded-lg border border-border shadow-sm">
-                <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            {/* Toolbar */}
+            <div className="p-4 bg-muted/30 border-x border-border flex items-center gap-4 shrink-0">
+                <div className="relative max-w-sm flex-1">
+                    <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
                     <input
                         type="text"
                         placeholder="Buscar por código o nombre..."
@@ -135,76 +137,74 @@ export function CostCentersPage() {
                 </div>
             </div>
 
-            {/* Cecos Table */}
-            <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-muted/50 text-muted-foreground font-medium border-b border-border">
-                            <tr>
-                                <th className="px-6 py-3">Código</th>
-                                <th className="px-6 py-3">Nombre</th>
-                                <th className="px-6 py-3">Gerencia</th>
-                                <th className="px-6 py-3">Estado</th>
-                                <th className="px-6 py-3 text-right">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border">
-                            {filteredCecos.length > 0 ? (
-                                filteredCecos.map((ceco) => (
-                                    <tr key={ceco.id} className="hover:bg-muted/50 transition-colors">
-                                        <td className="px-6 py-4 font-mono text-xs font-medium">
-                                            {ceco.code}
-                                        </td>
-                                        <td className="px-6 py-4 font-medium">
-                                            {ceco.name}
-                                        </td>
-                                        <td className="px-6 py-4 text-muted-foreground">
-                                            {managements.find(m => m.id === ceco.management_id)?.name || ceco.management_id}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {ceco.is_active ? (
-                                                <div className="flex items-center gap-1.5 text-green-600 dark:text-green-400 text-xs font-medium">
-                                                    <CheckCircle className="w-3.5 h-3.5" />
-                                                    Activo
-                                                </div>
-                                            ) : (
-                                                <div className="flex items-center gap-1.5 text-muted-foreground text-xs font-medium">
-                                                    <XCircle className="w-3.5 h-3.5" />
-                                                    Inactivo
-                                                </div>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <button
-                                                    onClick={() => handleEdit(ceco)}
-                                                    className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-md transition-colors"
-                                                    title="Editar"
-                                                >
-                                                    <Edit2 className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(ceco.id)}
-                                                    className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
-                                                    title="Eliminar"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
+            {/* Table Content */}
+            <div className="flex-1 overflow-auto bg-card border-x border-b border-border rounded-b-lg scrollbar-thin scrollbar-thumb-border hover:scrollbar-thumb-muted-foreground/20">
+                <table className="w-full text-sm text-left border-collapse">
+                    <thead className="sticky top-0 z-20 bg-muted/80 backdrop-blur-sm text-muted-foreground font-medium border-b border-border">
+                        <tr>
+                            <th className="px-6 py-3">Código</th>
+                            <th className="px-6 py-3">Nombre</th>
+                            <th className="px-6 py-3">Gerencia</th>
+                            <th className="px-6 py-3">Estado</th>
+                            <th className="px-6 py-3 text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                        {filteredCecos.length > 0 ? (
+                            filteredCecos.map((ceco) => (
+                                <tr key={ceco.id} className="hover:bg-muted/50 transition-colors">
+                                    <td className="px-6 py-4 font-mono text-xs font-medium">
+                                        {ceco.code}
+                                    </td>
+                                    <td className="px-6 py-4 font-medium">
+                                        {ceco.name}
+                                    </td>
+                                    <td className="px-6 py-4 text-muted-foreground">
+                                        {managements.find(m => m.id === ceco.management_id)?.name || ceco.management_id}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {ceco.is_active ? (
+                                            <div className="flex items-center gap-1.5 text-green-600 dark:text-green-400 text-xs font-medium">
+                                                <CheckCircle className="w-3.5 h-3.5" />
+                                                Activo
                                             </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
-                                        <Building2 className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                                        <p>No se encontraron Centros de Coste</p>
+                                        ) : (
+                                            <div className="flex items-center gap-1.5 text-muted-foreground text-xs font-medium">
+                                                <XCircle className="w-3.5 h-3.5" />
+                                                Inactivo
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <div className="flex items-center justify-end gap-2">
+                                            <button
+                                                onClick={() => handleEdit(ceco)}
+                                                className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-md transition-colors"
+                                                title="Editar"
+                                            >
+                                                <Edit2 className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(ceco.id)}
+                                                className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+                                                title="Eliminar"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
+                                    <Building2 className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                                    <p>No se encontraron Centros de Coste</p>
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
 
             {/* Add/Edit Modal */}

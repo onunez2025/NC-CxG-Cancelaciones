@@ -117,87 +117,89 @@ export function RolesPage() {
 
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col shadow-sm rounded-lg text-slate-800">
-                <div className="sticky top-0 z-30 p-6 border border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-card rounded-t-lg before:content-[''] before:absolute before:bottom-full before:-translate-y-px before:-left-4 before:-right-4 before:h-12 before:bg-background before:pointer-events-none">
-                    <div>
-                        <h2 className="text-lg font-medium flex items-center gap-2 text-foreground"><Shield className="w-5 h-5 text-primary" /> Gestión de Roles</h2>
-                        <p className="text-sm text-muted-foreground mt-1">Define permisos y niveles de acceso para los usuarios</p>
-                    </div>
-                    {hasPermission('ebm.config.roles') && (
-                        <button
-                            onClick={handleCreate}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium shadow-sm shrink-0"
-                        >
-                            <Plus className="w-4 h-4" />
-                            Nuevo Rol
-                        </button>
-                    )}
+        <div className="flex flex-col h-full bg-background animate-in fade-in zoom-in duration-300">
+            {/* Header */}
+            <div className="p-6 bg-card border border-border rounded-t-lg flex justify-between items-center shrink-0">
+                <div>
+                    <h2 className="text-lg font-medium flex items-center gap-2 text-foreground">
+                        <Shield className="w-5 h-5 text-primary" /> Gestión de Roles
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-1">Define permisos y niveles de acceso para los usuarios</p>
                 </div>
+                {hasPermission('ebm.config.roles') && (
+                    <button
+                        onClick={handleCreate}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium shadow-sm shrink-0"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Nuevo Rol
+                    </button>
+                )}
+            </div>
 
-                <div className="p-6 space-y-6 bg-card border-x border-b border-border rounded-b-lg">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {roles
-                            .filter(role => (role.apps || 'EBM').split(',').some(a => a.trim().toUpperCase() === 'EBM'))
-                            .map((role) => (
-                                <div key={role.id} className="bg-background rounded-lg border border-border shadow-sm p-5 hover:shadow-md transition-shadow">
-                                    <div className="flex items-start justify-between mb-3">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                                                <Shield className="w-5 h-5 text-primary" />
-                                            </div>
-                                            <div>
-                                                <h3 className="font-bold text-foreground text-sm">{role.name}</h3>
-                                                <p className="text-[11px] text-muted-foreground">{role.permissions.length} permisos asignados</p>
-                                            </div>
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-auto p-6 bg-card border-x border-b border-border rounded-b-lg scrollbar-thin scrollbar-thumb-border hover:scrollbar-thumb-muted-foreground/20">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {roles
+                        .filter(role => (role.apps || 'EBM').split(',').some(a => a.trim().toUpperCase() === 'EBM'))
+                        .map((role) => (
+                            <div key={role.id} className="bg-background rounded-lg border border-border shadow-sm p-5 hover:shadow-md transition-shadow">
+                                <div className="flex items-start justify-between mb-3">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                                            <Shield className="w-5 h-5 text-primary" />
                                         </div>
-                                        <div className="flex gap-1">
-                                            {hasPermission('ebm.config.roles') && (
-                                                <>
-                                                    <button
-                                                        onClick={() => handleEdit(role)}
-                                                        className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
-                                                        title="Editar"
-                                                    >
-                                                        <Edit2 className="w-4 h-4" />
-                                                    </button>
-                                                    {role.id !== 'admin' && ( // Prevent deleting admin
-                                                        <button
-                                                            onClick={() => handleDelete(role.id)}
-                                                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                                                            title="Eliminar"
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </button>
-                                                    )}
-                                                </>
-                                            )}
+                                        <div>
+                                            <h3 className="font-bold text-foreground text-sm">{role.name}</h3>
+                                            <p className="text-[11px] text-muted-foreground">{role.permissions.length} permisos asignados</p>
                                         </div>
                                     </div>
-
-                                    <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1 custom-scrollbar">
-                                        {role.permissions.filter(p => availablePermissions.some(ap => ap.id === p)).length === 0 ? (
-                                            <span className="text-xs text-muted-foreground italic">Sin permisos asignados</span>
-                                        ) : (
-                                            role.permissions
-                                                .filter(p => availablePermissions.some(ap => ap.id === p))
-                                                .map(perm => {
-                                                    const label = availablePermissions.find(p => p.id === perm)?.label || perm;
-                                                    return (
-                                                        <span key={perm} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-secondary text-secondary-foreground border border-border">
-                                                            {label}
-                                                        </span>
-                                                    );
-                                                })
+                                    <div className="flex gap-1">
+                                        {hasPermission('ebm.config.roles') && (
+                                            <>
+                                                <button
+                                                    onClick={() => handleEdit(role)}
+                                                    className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
+                                                    title="Editar"
+                                                >
+                                                    <Edit2 className="w-4 h-4" />
+                                                </button>
+                                                {role.id !== 'admin' && ( // Prevent deleting admin
+                                                    <button
+                                                        onClick={() => handleDelete(role.id)}
+                                                        className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                                        title="Eliminar"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                )}
+                                            </>
                                         )}
                                     </div>
                                 </div>
-                            ))
-                        }
-                        {roles.filter(role => (role.apps || 'EBM').split(',').some(a => a.trim().toUpperCase() === 'EBM')).length === 0 && (
-                            <div className="col-span-full text-center py-12 text-muted-foreground font-medium italic opacity-60">No hay roles definidos para mostrar.</div>
-                        )}
-                    </div>
+
+                                <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1 custom-scrollbar">
+                                    {role.permissions.filter(p => availablePermissions.some(ap => ap.id === p)).length === 0 ? (
+                                        <span className="text-xs text-muted-foreground italic">Sin permisos asignados</span>
+                                    ) : (
+                                        role.permissions
+                                            .filter(p => availablePermissions.some(ap => ap.id === p))
+                                            .map(perm => {
+                                                const label = availablePermissions.find(p => p.id === perm)?.label || perm;
+                                                return (
+                                                    <span key={perm} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-secondary text-secondary-foreground border border-border">
+                                                        {label}
+                                                    </span>
+                                                );
+                                            })
+                                    )}
+                                </div>
+                            </div>
+                        ))
+                    }
+                    {roles.filter(role => (role.apps || 'EBM').split(',').some(a => a.trim().toUpperCase() === 'EBM')).length === 0 && (
+                        <div className="col-span-full text-center py-12 text-muted-foreground font-medium italic opacity-60">No hay roles definidos para mostrar.</div>
+                    )}
                 </div>
             </div>
 
