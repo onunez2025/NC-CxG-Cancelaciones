@@ -264,9 +264,6 @@ export function VendorsPage() {
                         </table>
                     </div>
                 </div>
-                        );
-                    })}
-                </div>
             )}
         </div>
     );
