@@ -135,7 +135,7 @@ export function DashboardPage() {
         return (
             <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-black tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
+                <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
                     <LayoutDashboard className="w-6 h-6 text-primary" />
                     Panel de Control
                 </h1>
@@ -144,7 +144,7 @@ export function DashboardPage() {
 
                 <div className="bg-card border rounded-2xl p-12 text-center shadow-sm">
                     <Upload className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-black mb-2 text-slate-800 dark:text-white">{t('dashboard.empty.title')}</h3>
+                    <h3 className="text-xl font-bold mb-2 text-slate-800 dark:text-white">{t('dashboard.empty.title')}</h3>
                     <p className="text-sm text-slate-500 mb-6 max-w-md mx-auto">
                         {t('dashboard.empty.desc')}
                     </p>
@@ -165,14 +165,16 @@ export function DashboardPage() {
     const maxVendorAmount = analytics ? Math.max(...analytics.topVendors.map(v => v.amount), 1) : 1;
 
     return (
-        <div className="space-y-6">
+        <div className="flex flex-col h-full gap-6 animate-in fade-in duration-500 p-1">
             {/* Header */}
-            <div>
-                <h1 className="text-2xl font-black tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
-                    <LayoutDashboard className="w-6 h-6 text-primary" />
-                    Panel de Control
-                </h1>
-                <p className="text-slate-500 text-sm font-medium">{t('common.welcome')}, {user?.username || 'Administrador'}</p>
+            <div className="flex items-center justify-between px-1">
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
+                        <LayoutDashboard className="w-6 h-6 text-primary" />
+                        Panel de Control
+                    </h1>
+                    <p className="text-slate-500 text-sm font-medium">{t('common.welcome')}, {user?.username || 'Administrador'}</p>
+                </div>
             </div>
 
             {/* KPI Cards */}
@@ -218,7 +220,7 @@ export function DashboardPage() {
                 {/* Status Distribution */}
                 {analytics && (
                     <div className="bg-card border rounded-2xl p-6 shadow-sm">
-                        <h3 className="text-sm font-black mb-6 flex items-center gap-2 text-slate-800 dark:text-white">
+                        <h3 className="text-sm font-bold mb-6 flex items-center gap-2 text-slate-800 dark:text-white">
                             <Package className="w-4 h-4 text-primary" />
                             Distribución de Estados
                         </h3>
@@ -249,7 +251,7 @@ export function DashboardPage() {
                 {/* Spend by CeCo */}
                 {analytics && (
                     <div className="bg-card border rounded-2xl p-6 shadow-sm">
-                        <h3 className="text-sm font-black mb-6 flex items-center gap-2 text-slate-800 dark:text-white">
+                        <h3 className="text-sm font-bold mb-6 flex items-center gap-2 text-slate-800 dark:text-white">
                             <BarChart3 className="w-4 h-4 text-primary" />
                             Gasto por Centro de Coste
                         </h3>
@@ -278,7 +280,7 @@ export function DashboardPage() {
                 {/* Top Vendors */}
                 {analytics && (
                     <div className="bg-card border rounded-2xl p-6 shadow-sm">
-                        <h3 className="text-sm font-black mb-6 flex items-center gap-2 text-slate-800 dark:text-white">
+                        <h3 className="text-sm font-bold mb-6 flex items-center gap-2 text-slate-800 dark:text-white">
                             <Users className="w-4 h-4 text-primary" />
                             Principales Proveedores
                         </h3>
@@ -314,7 +316,7 @@ export function DashboardPage() {
                 {analytics && (
                     <div className="bg-card border rounded-2xl p-6 shadow-sm">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-sm font-black flex items-center gap-2 text-slate-800 dark:text-white">
+                            <h3 className="text-sm font-bold flex items-center gap-2 text-slate-800 dark:text-white">
                                 <FileText className="w-4 h-4 text-primary" />
                                 Actividad Reciente
                             </h3>
@@ -344,7 +346,7 @@ export function DashboardPage() {
                 {analytics && (
                     <div className="bg-card border rounded-2xl p-6 shadow-sm">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-sm font-black flex items-center gap-2 text-slate-800 dark:text-white">
+                            <h3 className="text-sm font-bold flex items-center gap-2 text-slate-800 dark:text-white">
                                 <Upload className="w-4 h-4 text-primary" />
                                 Estado de Archivos
                             </h3>
@@ -414,7 +416,7 @@ function KPICard({ icon: Icon, label, value, sub, color, bgColor }: {
                 </div>
             </div>
             <div className="space-y-1">
-                <p className="text-2xl font-black tracking-tighter text-slate-800 dark:text-white">{value}</p>
+                <p className="text-2xl font-bold tracking-tighter text-slate-800 dark:text-white">{value}</p>
                 <p className="text-[11px] font-bold text-slate-400">{sub}</p>
             </div>
         </div>

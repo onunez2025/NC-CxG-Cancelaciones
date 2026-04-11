@@ -108,11 +108,11 @@ export function BudgetVsRealPage() {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-100px)]">
-            {/* Header Area - Non-sticky */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 shrink-0">
+        <div className="flex flex-col h-full gap-5 animate-in fade-in duration-500 p-1">
+            {/* Header Area */}
+            <div className="flex items-center justify-between px-1 shrink-0 mb-6">
                 <div>
-                    <h1 className="text-2xl font-black tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
+                    <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
                         <BarChart3 className="w-6 h-6 text-primary" />
                         Ppto vs Real
                     </h1>
@@ -188,7 +188,7 @@ export function BudgetVsRealPage() {
                                                 <DollarSign className="w-4 h-4 text-primary" />
                                             </div>
                                         </div>
-                                        <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">{formatCurrency(totals?.budgeted || 0)}</h2>
+                                        <h2 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">{formatCurrency(totals?.budgeted || 0)}</h2>
                                     </div>
                                     <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-[11px] font-bold">
                                         <div className="flex items-center gap-2">
@@ -332,11 +332,11 @@ export function BudgetVsRealPage() {
                                 <thead className="bg-slate-50/80 dark:bg-slate-900/80 text-slate-500 font-bold border-b border-slate-100 dark:border-slate-800 sticky top-0 z-10 backdrop-blur-sm shadow-sm">
                                     <tr>
                                         <th className="px-6 py-4 w-1/3 min-w-[200px]">Cuenta Contable</th>
-                                        <th className="px-4 py-4 text-right text-primary font-black">Presupuesto</th>
+                                        <th className="px-4 py-4 text-right text-primary font-bold">Presupuesto</th>
                                         <th className="px-4 py-4 text-right text-indigo-600 font-bold whitespace-nowrap">Comprom. Pend.</th>
                                         <th className="px-4 py-4 text-right text-purple-600 font-bold whitespace-nowrap">Ord. Pend.</th>
                                         <th className="px-4 py-4 text-right text-amber-600 font-bold">Reserva Real</th>
-                                        <th className="px-6 py-4 text-right font-black w-32 text-slate-800 dark:text-white">Disponible</th>
+                                        <th className="px-6 py-4 text-right font-bold w-32 text-slate-800 dark:text-white">Disponible</th>
                                         <th className="px-4 py-4 text-center w-24">%</th>
                                     </tr>
                                 </thead>
@@ -424,7 +424,7 @@ function SummaryMiniCard({ label, value, color, note, icon, bgColor }: { label: 
                     {icon}
                 </div>
             </div>
-            <h3 className={cn("text-xl font-black tracking-tight", color)}>{value}</h3>
+            <h3 className={cn("text-xl font-bold tracking-tight", color)}>{value}</h3>
         </div>
     );
 }

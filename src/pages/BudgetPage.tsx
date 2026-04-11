@@ -227,11 +227,11 @@ export function BudgetPage() {
     const managementMonthTotal = budgets.reduce((sum, b) => sum + (b.monthly_amounts[currentMonthIndex] || 0), 0);
 
     return (
-        <div className="space-y-6">
+        <div className="flex flex-col h-full gap-5 animate-in fade-in duration-500 p-1">
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex items-center justify-between px-1 shrink-0">
                 <div>
-                    <h1 className="text-2xl font-black tracking-tight text-slate-800 dark:text-white">Presupuesto</h1>
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-800 dark:text-white">Presupuesto</h1>
                     <p className="text-slate-500 text-sm font-medium">Gestión de presupuesto anual por centro de coste</p>
                 </div>
 
@@ -267,7 +267,7 @@ export function BudgetPage() {
                     {hasPermission('budget.create') && (
                         <button
                             onClick={handleCreate}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-all font-bold text-sm shadow-lg shadow-primary/20"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-all font-bold text-sm shadow-sm"
                         >
                             <Plus className="w-4 h-4" />
                             Nuevo Registro
@@ -315,7 +315,7 @@ export function BudgetPage() {
                                     <p className="text-[11px] font-bold text-slate-500 mb-1">
                                         Total Presupuesto ({selectedYear})
                                     </p>
-                                    <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">{formatCurrency(managementTotalBudget)}</h2>
+                                    <h2 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">{formatCurrency(managementTotalBudget)}</h2>
                                 </div>
                                 <div className={`p-2.5 rounded-xl transition-colors ${selectedCostCenter === 'all' ? 'bg-primary/10 text-primary' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
                                     <Wallet className="w-5 h-5" />
@@ -429,7 +429,7 @@ export function BudgetPage() {
                         <button
                             onClick={() => setSelectedCostCenter('all')}
                             className={`w-full text-left px-4 py-2.5 rounded-xl transition-all ${selectedCostCenter === 'all'
-                                ? 'bg-primary/10 text-primary font-black shadow-sm'
+                                ? 'bg-primary/10 text-primary font-bold shadow-sm'
                                 : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700'
                                 }`}
                         >
@@ -440,7 +440,7 @@ export function BudgetPage() {
                                 key={ceco.id}
                                 onClick={() => setSelectedCostCenter(ceco.id)}
                                 className={`w-full text-left px-4 py-2.5 rounded-xl transition-all ${selectedCostCenter === ceco.id
-                                    ? 'bg-primary/10 text-primary font-black shadow-sm'
+                                    ? 'bg-primary/10 text-primary font-bold shadow-sm'
                                     : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700'
                                     }`}
                                 title={`${ceco.code} - ${ceco.name}`}
@@ -481,7 +481,7 @@ export function BudgetPage() {
                                     {months.map((month, idx) => (
                                         <th key={idx} className="px-4 py-4 text-right whitespace-nowrap">{month.substring(0, 3)}</th>
                                     ))}
-                                    <th className="px-6 py-4 text-right font-black text-slate-800 dark:text-white">Total Anual</th>
+                                    <th className="px-6 py-4 text-right font-bold text-slate-800 dark:text-white">Total Anual</th>
                                     {hasPermission('budget.edit') && (
                                         <th className="px-6 py-4 text-right">Acciones</th>
                                     )}

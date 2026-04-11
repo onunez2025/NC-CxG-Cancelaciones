@@ -81,10 +81,10 @@ export function TrackingPage() {
     };
 
     return (
-        <div className="flex-1 flex flex-col min-h-0">
-            <div className="shrink-0 mb-6 font-lato">
+        <div className="flex flex-col h-full gap-5 animate-in fade-in duration-500 p-1">
+            <div className="shrink-0 mb-2 px-1">
                 <div>
-                    <h1 className="text-2xl font-black tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
+                    <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
                         <Activity className="w-6 h-6 text-primary" />
                         Seguimiento
                     </h1>
@@ -446,7 +446,7 @@ function MetricCard({ icon: Icon, label, value, sub, color }: {
                 </div>
             </div>
             <div>
-                <h3 className="text-xl font-black text-slate-800 dark:text-white tracking-tight">{value}</h3>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white tracking-tight">{value}</h3>
                 <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">{sub}</p>
             </div>
         </div>

@@ -114,8 +114,8 @@ export function MainLayout({ children }: MainLayoutProps) {
                 </header>
 
                 {/* Content Area */}
-                <main className="flex-1 overflow-hidden flex flex-col">
-                    <div className="flex-1 mx-auto max-w-7xl w-full flex flex-col min-h-0 animate-in fade-in zoom-in duration-300 h-full">
+                <main className="flex-1 overflow-y-auto p-4 lg:p-8 flex flex-col custom-scrollbar">
+                    <div className="flex-1 mx-auto max-w-7xl w-full flex flex-col min-h-0 animate-in fade-in zoom-in-95 duration-300">
                         {children}
                     </div>
                 </main>

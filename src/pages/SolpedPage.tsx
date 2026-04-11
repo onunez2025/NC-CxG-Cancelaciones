@@ -131,12 +131,12 @@ export function SolpedPage() {
     };
 
     return (
-        <div className="flex-1 flex flex-col min-h-0">
+        <div className="flex flex-col h-full gap-5 animate-in fade-in duration-500 p-1">
             {/* Header Area */}
-            <div className="shrink-0 mb-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="shrink-0 mb-2">
+                <div className="flex items-center justify-between px-1">
                     <div>
-                        <h1 className="text-2xl font-black tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
+                        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
                             <FileText className="w-6 h-6 text-primary" />
                             Solicitudes
                         </h1>
@@ -368,7 +368,7 @@ function KPICard({ label, value, icon: Icon, color, bgColor, active, onClick }: 
         >
             <div className="space-y-1">
                 <p className={cn("text-[10px] font-bold uppercase tracking-tighter opacity-80", color)}>{label}</p>
-                <p className="text-lg font-black text-slate-800 dark:text-white leading-none">{value}</p>
+                <p className="text-lg font-bold text-slate-800 dark:text-white leading-none">{value}</p>
             </div>
             <div className={cn("p-2 rounded-xl bg-white/50 dark:bg-black/20", color)}>
                 <Icon className="w-5 h-5" />
@@ -381,7 +381,7 @@ function DetailItem({ label, value, highlight }: { label: string; value: string;
     return (
         <div>
             <span className="text-slate-400 font-bold uppercase text-[10px] tracking-tight">{label}</span>
-            <p className={cn("font-medium mt-1 text-slate-700 dark:text-slate-200", highlight && "text-primary font-black")}>{value}</p>
+            <p className={cn("font-medium mt-1 text-slate-700 dark:text-slate-200", highlight && "text-primary font-bold")}>{value}</p>
         </div>
     );
 }

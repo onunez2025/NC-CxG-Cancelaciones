@@ -79,9 +79,9 @@ export function VendorsPage() {
     }), [vendors]);
 
     return (
-        <div className="flex flex-col h-full font-lato">
-            <div className="shrink-0 mb-6">
-                <h1 className="text-2xl font-black tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
+        <div className="flex flex-col h-full gap-5 animate-in fade-in duration-500 p-1">
+            <div className="shrink-0 mb-2 px-1">
+                <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
                     <Users className="w-6 h-6 text-primary" />
                     Proveedores
                 </h1>
@@ -179,10 +179,10 @@ export function VendorsPage() {
                                                         <p className="text-[10px] font-bold text-slate-400 truncate uppercase mt-0.5">{v.cost_centers.join(', ') || 'Sin CeCo'}</p>
                                                     </div>
                                                 </td>
-                                                <td className="py-3 px-4 text-center font-black text-slate-600 dark:text-slate-400">{v.po_count}</td>
-                                                <td className="py-3 px-4 text-right font-black text-slate-700 bg-slate-50/30 dark:bg-slate-900/10">{formatCurrency(v.po_total)}</td>
+                                                <td className="py-3 px-4 text-center font-bold text-slate-600 dark:text-slate-400">{v.po_count}</td>
+                                                <td className="py-3 px-4 text-right font-bold text-slate-700 bg-slate-50/30 dark:bg-slate-900/10">{formatCurrency(v.po_total)}</td>
                                                 <td className="py-3 px-4 text-right font-bold text-slate-500">{v.invoice_count || '—'}</td>
-                                                <td className="py-3 px-4 text-right font-black text-emerald-600 bg-emerald-50/30 dark:bg-emerald-900/10">
+                                                <td className="py-3 px-4 text-right font-bold text-emerald-600 bg-emerald-50/30 dark:bg-emerald-900/10">
                                                     {v.paid_total > 0 ? formatCurrency(v.paid_total) : '—'}
                                                 </td>
                                             </tr>
@@ -193,7 +193,7 @@ export function VendorsPage() {
                                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                                             {/* POs */}
                                                             <div className="bg-card border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
-                                                                <h4 className="text-xs font-black mb-4 flex items-center gap-2 text-slate-500 uppercase tracking-tighter">
+                                                                <h4 className="text-xs font-bold mb-4 flex items-center gap-2 text-slate-500 uppercase tracking-tighter">
                                                                     <div className="p-1.5 bg-indigo-50 dark:bg-indigo-950 rounded-lg">
                                                                         <ShoppingCart className="w-3.5 h-3.5 text-indigo-500" />
                                                                     </div>
@@ -206,18 +206,18 @@ export function VendorsPage() {
                                                                                 <span className="font-mono font-bold text-indigo-600">{po.po_number}</span>
                                                                                 <p className="text-[10px] font-bold text-slate-400 truncate max-w-[250px] mt-0.5">{po.description}</p>
                                                                             </div>
-                                                                            <span className="font-black text-slate-700 dark:text-slate-300 ml-4">{formatCurrency(po.value)}</span>
+                                                                            <span className="font-bold text-slate-700 dark:text-slate-300 ml-4">{formatCurrency(po.value)}</span>
                                                                         </div>
                                                                     ))}
                                                                 </div>
-                                                                <div className="text-sm font-black text-right pt-4 border-t border-slate-100 dark:border-slate-800 mt-4 text-indigo-600">
+                                                                <div className="text-sm font-bold text-right pt-4 border-t border-slate-100 dark:border-slate-800 mt-4 text-indigo-600">
                                                                     Total Órdenes: {formatCurrency(v.po_total)}
                                                                 </div>
                                                             </div>
 
                                                             {/* Invoices */}
                                                             <div className="bg-card border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
-                                                                <h4 className="text-xs font-black mb-4 flex items-center gap-2 text-slate-500 uppercase tracking-tighter">
+                                                                <h4 className="text-xs font-bold mb-4 flex items-center gap-2 text-slate-500 uppercase tracking-tighter">
                                                                     <div className="p-1.5 bg-amber-50 dark:bg-amber-950 rounded-lg">
                                                                         <FileText className="w-3.5 h-3.5 text-amber-500" />
                                                                     </div>
@@ -235,8 +235,8 @@ export function VendorsPage() {
                                                                                         <p className="text-[10px] font-bold text-slate-400 mt-0.5">{formatExcelDate(inv.date)}</p>
                                                                                     </div>
                                                                                     <div className="text-right ml-4">
-                                                                                        <span className="font-black text-slate-700 dark:text-slate-200">{formatCurrency(inv.amount)}</span>
-                                                                                        <p className={cn("text-[10px] font-black uppercase tracking-tighter mt-0.5", inv.status === 'paid' ? "text-emerald-500" : "text-amber-500")}>
+                                                                                        <span className="font-bold text-slate-700 dark:text-slate-200">{formatCurrency(inv.amount)}</span>
+                                                                                        <p className={cn("text-[10px] font-bold uppercase tracking-tighter mt-0.5", inv.status === 'paid' ? "text-emerald-500" : "text-amber-500")}>
                                                                                             {inv.status === 'paid' ? '✓ Pagado' : '◷ Pendiente'}
                                                                                         </p>
                                                                                     </div>
@@ -246,7 +246,7 @@ export function VendorsPage() {
                                                                                 <p className="text-[10px] text-slate-400 italic text-center py-2">+ {v.invoices.length - 50} registros adicionales</p>
                                                                             )}
                                                                         </div>
-                                                                        <div className="text-[11px] font-black pt-4 border-t border-slate-100 dark:border-slate-800 mt-4 flex justify-between uppercase tracking-tighter">
+                                                                        <div className="text-[11px] font-bold pt-4 border-t border-slate-100 dark:border-slate-800 mt-4 flex justify-between uppercase tracking-tighter">
                                                                             <span className="text-emerald-600">Total Pagado: {formatCurrency(v.paid_total)}</span>
                                                                             <span className="text-red-500">Saldo Pendiente: {formatCurrency(v.pending_total)}</span>
                                                                         </div>
@@ -280,7 +280,7 @@ function MetricCard({ icon: Icon, label, value, color }: { icon: any; label: str
                     <Icon className="w-5 h-5" />
                 </div>
             </div>
-            <h3 className="text-xl font-black text-slate-800 dark:text-white tracking-tight">{value}</h3>
+            <h3 className="text-xl font-bold text-slate-800 dark:text-white tracking-tight">{value}</h3>
         </div>
     );
 }
