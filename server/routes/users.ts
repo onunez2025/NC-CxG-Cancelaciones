@@ -14,26 +14,29 @@ router.get('/', async (req: Request, res: Response) => {
         const pool = await getDbConnection();
         // Return users without PasswordHash for security
         // Also joining Roles and Managements to include names, matching User interface
-        const result = await pool.request().query(`
-            SELECT 
-                u.Id as id,
-                u.FullName as full_name,
-                u.Username as username,
-                u.Email as email,
-                u.RoleId as role_id,
-                r.Name as role_name,
-                u.ManagementId as management_id,
-                m.Name as management_name,
-                CAST(u.IsActive AS BIT) as is_active,
-                u.CreatedAt as created_at,
-                u.Language as language,
-                u.Theme as theme,
-                u.AvatarUrl as avatar_url,
-                u.Apps as apps
-            FROM EBM.Users u
-            LEFT JOIN EBM.Roles r ON u.RoleId = r.Id
-            LEFT JOIN EBM.Managements m ON u.ManagementId = m.Id
-        `);
+        const result = await pool.request()
+            .input('app', APP_IDENTIFIER)
+            .query(`
+                SELECT 
+                    u.Id as id,
+                    u.FullName as full_name,
+                    u.Username as username,
+                    u.Email as email,
+                    u.RoleId as role_id,
+                    r.Name as role_name,
+                    u.ManagementId as management_id,
+                    m.Name as management_name,
+                    CAST(u.IsActive AS BIT) as is_active,
+                    u.CreatedAt as created_at,
+                    u.Language as language,
+                    u.Theme as theme,
+                    u.AvatarUrl as avatar_url,
+                    u.Apps as apps
+                FROM EBM.Users u
+                LEFT JOIN EBM.Roles r ON u.RoleId = r.Id
+                LEFT JOIN EBM.Managements m ON u.ManagementId = m.Id
+                WHERE u.Apps LIKE '%' + @app + '%'
+            `);
         res.json(result.recordset);
     } catch (error: any) {
         console.error('Error fetching users:', error);

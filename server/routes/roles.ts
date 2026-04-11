@@ -12,16 +12,18 @@ router.get('/', async (req: Request, res: Response) => {
     try {
         const pool = await getDbConnection();
         // We get roles and left join permissions to aggregate them
-        const result = await pool.request().query(`
-            SELECT 
-                r.Id as id,
-                r.Name as name,
-                r.Apps as apps,
-                p.Permission as permission
-            FROM EBM.Roles r
-            LEFT JOIN EBM.RolePermissions p ON r.Id = p.RoleId
-            WHERE r.Apps LIKE '%' + @app + '%'
-        `).input('app', APP_IDENTIFIER);
+        const result = await pool.request()
+            .input('app', APP_IDENTIFIER)
+            .query(`
+                SELECT 
+                    r.Id as id,
+                    r.Name as name,
+                    r.Apps as apps,
+                    p.Permission as permission
+                FROM EBM.Roles r
+                LEFT JOIN EBM.RolePermissions p ON r.Id = p.RoleId
+                WHERE r.Apps LIKE '%' + @app + '%'
+            `);
 
         // Group permissions by role since SQL returns flat rows
         const rolesMap = new Map();
