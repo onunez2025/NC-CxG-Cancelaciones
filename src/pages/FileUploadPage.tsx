@@ -175,47 +175,64 @@ export function FileUploadPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl font-bold tracking-tight">{t('files.title')}</h1>
-                <p className="text-muted-foreground">{t('files.subtitle')}</p>
+        <div className="flex flex-col h-full font-lato">
+            <div className="shrink-0 mb-6">
+                <h1 className="text-2xl font-black tracking-tight text-slate-800 dark:text-white">Carga de Archivos</h1>
+                <p className="text-slate-500 text-sm font-medium">Gestione la importación de reportes SAP para la reconciliación de datos</p>
             </div>
 
             {/* Status Summary */}
             <div className={cn(
-                "p-4 rounded-lg border flex flex-col sm:flex-row items-center justify-between gap-4",
-                isReady ? "bg-green-50 border-green-200 dark:bg-green-900/10" : "bg-orange-50 border-orange-200 dark:bg-orange-900/10"
+                "shrink-0 mb-6 p-6 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-4 transition-all shadow-sm",
+                isReady 
+                    ? "bg-emerald-50/50 border-emerald-100 dark:bg-emerald-900/10 dark:border-emerald-900/30" 
+                    : "bg-amber-50/50 border-amber-100 dark:bg-amber-900/10 dark:border-amber-900/30"
             )}>
-                <div className="flex items-center gap-3">
-                    {isReady ? <CheckCircle className="w-6 h-6 text-green-600" /> : <AlertCircle className="w-6 h-6 text-orange-600" />}
+                <div className="flex items-center gap-4">
+                    <div className={cn(
+                        "p-3 rounded-xl bg-white dark:bg-slate-900 border",
+                        isReady ? "border-emerald-200 text-emerald-600" : "border-amber-200 text-amber-600"
+                    )}>
+                        {isReady ? <CheckCircle className="w-6 h-6" /> : <AlertCircle className="w-6 h-6" />}
+                    </div>
                     <div>
-                        <h3 className="font-bold text-sm">
-                            {isReady ? t('files.status.title_ready') : t('files.status.title_missing')}
+                        <h3 className={cn("font-black text-sm uppercase tracking-tight", isReady ? "text-emerald-700 dark:text-emerald-400" : "text-amber-700 dark:text-amber-400")}>
+                            {isReady ? "Sistema Preparado" : "Reportes Pendientes"}
                         </h3>
-                        <p className="text-xs text-muted-foreground">
-                            {isReady ? t('files.status.desc_ready') : t('files.status.desc_missing', { missing: missing.join(', ') })}
+                        <p className="text-xs font-medium text-slate-500 mt-0.5">
+                            {isReady 
+                                ? "Todos los reportes críticos han sido cargados. Puede proceder al seguimiento." 
+                                : `Faltan cargar los reportes: ${missing.join(', ')}`}
                         </p>
                     </div>
                 </div>
                 {isReady && (
-                    <a href="/tracking" className="px-4 py-1.5 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 transition-colors">
-                        {t('files.status.view_tracking')}
+                    <a href="/tracking" className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-black transition-all shadow-lg shadow-emerald-600/20 hover:-translate-y-0.5">
+                        Ver Seguimiento
                     </a>
                 )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* File Dropzone & Queue */}
-                <div className="lg:col-span-2 space-y-4">
+                <div className="lg:col-span-2 space-y-6">
                     <div
                         onDragOver={handleDragOver}
                         onDragLeave={handleDragLeave}
                         onDrop={handleDrop}
                         className={cn(
-                            "bg-card rounded-lg border-2 border-dashed p-10 flex flex-col items-center justify-center text-center transition-all",
-                            isDragging ? "border-primary bg-primary/5 scale-[1.01]" : "border-input hover:bg-accent/50"
+                            "bg-card rounded-2xl border-2 border-dashed p-12 flex flex-col items-center justify-center text-center transition-all shadow-sm",
+                            isDragging 
+                                ? "border-primary bg-primary/5 scale-[1.01] ring-4 ring-primary/10" 
+                                : "border-slate-200 dark:border-slate-800 hover:border-primary/50 hover:bg-slate-50/50 dark:hover:bg-slate-900/50"
                         )}
                     >
-                        <UploadCloud className={cn("w-12 h-12 mb-4 transition-colors", isDragging ? "text-primary" : "text-muted-foreground")} />
+                        <div className={cn(
+                            "w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-colors shadow-sm border",
+                            isDragging ? "bg-primary text-white border-primary" : "bg-slate-50 dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800"
+                        )}>
+                            <UploadCloud className="w-8 h-8" />
+                        </div>
                         <input
                             type="file"
                             multiple
@@ -224,26 +241,26 @@ export function FileUploadPage() {
                             className="hidden"
                             id="bulk-upload"
                         />
-                        <label htmlFor="bulk-upload" className="cursor-pointer">
-                            <span className="text-primary font-bold hover:underline">{t('files.dropzone.label')}</span>
+                        <label htmlFor="bulk-upload" className="cursor-pointer group">
+                            <span className="text-primary font-black text-lg group-hover:underline tracking-tight">Seleccionar archivos de Excel</span>
                         </label>
-                        <p className="text-xs text-muted-foreground mt-2 font-medium">{t('files.dropzone.formats')}</p>
+                        <p className="text-[11px] font-bold text-slate-400 mt-3 uppercase tracking-wider">Formatos admitidos: .XLSX, .XLS (Reportes SAP)</p>
                     </div>
 
                     {fileQueue.length > 0 && (
-                        <div className="bg-card rounded-lg border shadow-sm divide-y">
-                            <div className="p-4 flex items-center justify-between bg-muted/30">
-                                <h3 className="font-bold text-sm">{t('files.queue.title', { count: fileQueue.length })}</h3>
+                        <div className="bg-card rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden divide-y divide-slate-100 dark:divide-slate-800">
+                            <div className="p-4 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
+                                <h3 className="font-black text-xs uppercase tracking-tighter text-slate-500">Cola de Procesamiento ({fileQueue.length})</h3>
                                 <button
                                     onClick={processAll}
                                     disabled={isProcessingAll || fileQueue.every(f => f.status === 'success')}
-                                    className="px-4 py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-bold flex items-center gap-2 hover:bg-primary/90 disabled:opacity-50"
+                                    className="px-6 py-2 bg-primary text-primary-foreground rounded-xl text-xs font-black flex items-center gap-2 hover:bg-primary/90 disabled:opacity-50 transition-all shadow-lg shadow-primary/20"
                                 >
-                                    {isProcessingAll ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
-                                    {t('files.queue.process_all')}
+                                    {isProcessingAll ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+                                    Procesar Todo
                                 </button>
                             </div>
-                            <div className="max-h-[400px] overflow-y-auto">
+                            <div className="max-h-[500px] overflow-auto custom-scrollbar">
                                 {fileQueue.map((item) => (
                                     <div key={item.id} className="p-4 flex items-center gap-4 hover:bg-muted/10 transition-colors">
                                         <div className="p-2 bg-muted rounded-md tracking-tighter shrink-0">
@@ -289,46 +306,46 @@ export function FileUploadPage() {
                 </div>
 
                 {/* Database State Sidebar */}
-                <div className="space-y-4">
-                    <div className="bg-card rounded-lg border shadow-sm p-5">
-                        <h3 className="text-sm font-bold mb-4 flex items-center justify-between">
+                <div className="space-y-6">
+                    <div className="bg-card border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6">
+                        <h3 className="text-xs font-black text-slate-500 uppercase tracking-tighter mb-6 flex items-center justify-between">
                             <span className="flex items-center gap-2">
-                                <CheckCircle className="w-4 h-4 text-primary" />
-                                {t('files.db.title')}
+                                <CheckCircle className="w-4 h-4 text-emerald-500" />
+                                Estado Base de Datos
                             </span>
                             {uploads.length > 0 && (
                                 <button
                                     onClick={() => setShowConfirmClear(true)}
-                                    className="text-[10px] text-red-500 hover:text-red-600 hover:underline font-bold transition-colors"
+                                    className="text-[10px] text-red-500 hover:text-red-600 font-black transition-colors"
                                 >
-                                    {t('files.db.clear_all')}
+                                    LIMPIAR TODO
                                 </button>
                             )}
                         </h3>
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                             {TRANSACTION_TYPES.map(type => {
                                 const upload = uploads.find(u => u.transaction_type === type.value);
                                 return (
-                                    <div key={type.value} className="flex items-center justify-between group">
-                                        <div className="flex items-center gap-2">
+                                    <div key={type.value} className="flex items-center justify-between group p-2 hover:bg-slate-50 dark:hover:bg-slate-900/50 rounded-xl transition-colors">
+                                        <div className="flex items-center gap-3">
                                             <div className={cn(
-                                                "w-2 h-2 rounded-full",
-                                                upload ? "bg-green-500" : "bg-muted"
+                                                "w-2.5 h-2.5 rounded-full ring-4 ring-white dark:ring-slate-900 shadow-sm",
+                                                upload ? "bg-emerald-500 shadow-emerald-500/20" : "bg-slate-200 dark:bg-slate-800"
                                             )} />
-                                            <span className="text-xs font-medium">{type.value}</span>
+                                            <span className="text-xs font-black text-slate-700 dark:text-slate-300">{type.value}</span>
                                         </div>
                                         {upload ? (
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-[10px] text-muted-foreground">{t('files.db.records', { count: (upload as any).record_count ?? 0 })}</span>
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-[10px] font-black text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-lg">{(upload as any).record_count ?? 0} REG.</span>
                                                 <button
                                                     onClick={() => handleDeleteUpload(upload.id)}
-                                                    className="opacity-0 group-hover:opacity-100 p-1 text-red-500 hover:bg-red-50 rounded transition-all"
+                                                    className="opacity-0 group-hover:opacity-100 p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-all"
                                                 >
-                                                    <X className="w-3 h-3" />
+                                                    <X className="w-3.5 h-3.5" />
                                                 </button>
                                             </div>
                                         ) : (
-                                            <span className="text-[10px] text-muted-foreground">{t('files.db.missing')}</span>
+                                            <span className="text-[10px] font-black text-amber-500 uppercase italic">Pendiente</span>
                                         )}
                                     </div>
                                 );
@@ -336,9 +353,10 @@ export function FileUploadPage() {
                         </div>
                     </div>
 
-                    <div className="p-5 bg-primary/5 rounded-lg border border-primary/10">
-                        <h4 className="text-xs font-bold text-primary uppercase tracking-wider mb-2">{t('files.db.note_title')}</h4>
-                        <p className="text-[11px] text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: t('files.db.note_desc').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+                    <div className="p-6 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-2xl border border-indigo-100 dark:border-indigo-900/30">
+                        <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-3">IMPORTANTE</h4>
+                        <p className="text-[11px] font-medium text-slate-500 leading-relaxed" 
+                           dangerouslySetInnerHTML={{ __html: t('files.db.note_desc').replace(/\*\*(.*?)\*\*/g, '<strong class="text-indigo-600">$1</strong>') }} />
                     </div>
                 </div>
             </div>

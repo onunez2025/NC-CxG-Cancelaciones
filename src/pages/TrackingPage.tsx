@@ -83,14 +83,14 @@ export function TrackingPage() {
 
     return (
         <div className="flex-1 flex flex-col min-h-0">
-            <div className="shrink-0 mb-6">
+            <div className="shrink-0 mb-6 font-lato">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+                    <h1 className="text-2xl font-black tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
                         <Activity className="w-6 h-6 text-primary" />
-                        {t('tracking.title')}
+                        Seguimiento
                     </h1>
-                    <p className="text-muted-foreground text-sm">
-                        {t('tracking.subtitle')}
+                    <p className="text-slate-500 text-sm font-medium">
+                        Trazabilidad completa de procesos logísticos
                     </p>
                 </div>
             </div>
@@ -98,76 +98,89 @@ export function TrackingPage() {
             {/* Metrics Cards */}
             {metrics && (
                 <div className="shrink-0 mb-6">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         <MetricCard
                             icon={ShoppingCart}
-                            label={t('tracking.metrics.pos')}
+                            label="Órdenes de Compra"
                             value={metrics.total_pos.toString()}
-                            sub={`${metrics.pos_with_solped} ${t('tracking.metrics.with_solped')}`}
-                            color="text-blue-600"
+                            sub={`${metrics.pos_with_solped} con Solped`}
+                            color="text-indigo-600"
+                            bgColor="bg-indigo-50/50 border-indigo-100"
                         />
                         <MetricCard
                             icon={DollarSign}
-                            label={t('tracking.metrics.total_po_value')}
+                            label="Valor Total PO"
                             value={formatCurrency(metrics.total_po_value)}
-                            sub={t('tracking.metrics.committed')}
-                            color="text-violet-600"
+                            sub="Monto comprometido"
+                            color="text-purple-600"
+                            bgColor="bg-purple-50/50 border-purple-100"
                         />
                         <MetricCard
                             icon={BarChart3}
-                            label={t('tracking.metrics.real_expense')}
+                            label="Gasto Real"
                             value={formatCurrency(metrics.total_real_expense)}
-                            sub={`${metrics.pos_with_invoice} ${t('tracking.metrics.with_invoice')}`}
+                            sub={`${metrics.pos_with_invoice} con factura`}
                             color="text-amber-600"
+                            bgColor="bg-amber-50/50 border-amber-100"
                         />
                         <MetricCard
                             icon={TrendingUp}
-                            label={t('tracking.metrics.total_paid')}
+                            label="Total Pagado"
                             value={formatCurrency(metrics.total_paid)}
-                            sub={`${metrics.pos_fully_paid} ${t('tracking.metrics.pos_paid')}`}
-                            color="text-green-600"
+                            sub={`${metrics.pos_fully_paid} pagadas`}
+                            color="text-emerald-600"
+                            bgColor="bg-emerald-50/50 border-emerald-100"
                         />
                     </div>
                 </div>
             )}
 
             {/* Filters */}
-            <div className="shrink-0 space-y-4 mb-4">
-                <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="relative flex-1">
-                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <div className="shrink-0 mb-6">
+                <div className="bg-card border border-slate-200 dark:border-slate-800 rounded-xl p-2 shadow-sm flex items-center flex-wrap gap-2">
+                    <div className="relative flex-1 min-w-[300px]">
+                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                         <input
                             type="text"
-                            placeholder={t('tracking.search_placeholder')}
+                            placeholder="Buscar por pedido, proveedor, descripción..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
+                            className="w-full pl-10 pr-4 py-2 bg-transparent border-none focus:ring-0 text-sm placeholder:text-slate-400"
                         />
                     </div>
+
+                    <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1 hidden sm:block" />
+
                     <select
                         value={filterStatus}
                         onChange={(e) => setFilterStatus(e.target.value)}
-                        className="px-3 py-2 bg-card border border-input rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
+                        className="bg-transparent border-none px-3 py-1.5 text-sm font-bold text-slate-700 dark:text-slate-200 focus:ring-0 outline-none cursor-pointer"
                     >
-                        <option value="all">{t('tracking.filters.all_status')}</option>
+                        <option value="all">Filtro Estado</option>
                         {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
                             <option key={key} value={key}>{cfg.label}</option>
                         ))}
                     </select>
+
+                    <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1 hidden sm:block" />
+
                     <select
                         value={filterCeCo}
                         onChange={(e) => setFilterCeCo(e.target.value)}
-                        className="px-3 py-2 bg-card border border-input rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow min-w-[150px]"
+                        className="bg-transparent border-none px-3 py-1.5 text-sm font-bold text-slate-700 dark:text-slate-200 focus:ring-0 outline-none cursor-pointer min-w-[150px]"
                     >
-                        <option value="all">{t('tracking.filters.all_cecos')}</option>
+                        <option value="all">Filtro Centro Costo</option>
                         {uniqueCecos.map(c => (
                             <option key={c} value={c}>{c}</option>
                         ))}
                     </select>
+
+                    <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1 hidden sm:block" />
+
                     <select
                         value={filterCurrency}
                         onChange={(e) => setFilterCurrency(e.target.value)}
-                        className="px-3 py-2 bg-card border border-input rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
+                        className="bg-transparent border-none px-3 py-1.5 text-sm font-bold text-slate-700 dark:text-slate-200 focus:ring-0 outline-none cursor-pointer"
                     >
                         <option value="all">Todas las Monedas</option>
                         <option value="PEN">PEN (Soles)</option>
@@ -175,11 +188,12 @@ export function TrackingPage() {
                     </select>
                 </div>
 
-                {/* Results count */}
-                <p className="text-xs text-muted-foreground font-medium flex items-center gap-1">
-                    <Filter className="w-3 h-3" />
-                    {t('tracking.results_count', { count: filteredTransactions.length, total: transactions.length })}
-                </p>
+                <div className="mt-4 flex items-center justify-between">
+                    <p className="text-xs font-bold text-slate-400 flex items-center gap-1.5">
+                        <Filter className="w-3.5 h-3.5" />
+                        Mostrando {filteredTransactions.length} de {transactions.length} registros
+                    </p>
+                </div>
             </div>
 
             {/* Transaction List */}
@@ -190,21 +204,21 @@ export function TrackingPage() {
                     <p className="text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: t('tracking.empty.desc') }} />
                 </div>
             ) : (
-                <div className="flex-1 bg-card border rounded-lg shadow-sm overflow-hidden flex flex-col min-h-0">
-                    <div className="flex-1 overflow-y-auto">
+                <div className="flex-1 bg-card border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden flex flex-col min-h-0">
+                    <div className="flex-1 overflow-auto custom-scrollbar">
                         <table className="w-full text-left text-sm whitespace-nowrap">
-                            <thead className="sticky top-0 z-10 bg-card shadow-sm ring-1 ring-border/50">
-                                <tr className="border-b bg-muted/30">
-                                    <th className="w-8 py-3 px-2"></th>
-                                    <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground">PEDIDO</th>
-                                    <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground w-28 text-center">{t('tracking.table.status', { defaultValue: 'ESTADO' })}</th>
-                                    <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground hidden md:table-cell w-24">CECO</th>
-                                    <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground w-full">{t('tracking.table.vendor_desc', { defaultValue: 'PROVEEDOR / DESCR.' })}</th>
-                                    <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground text-center">MONEDA</th>
-                                    <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground text-right">{t('tracking.table.po_value', { defaultValue: 'VALOR PO' })}</th>
-                                    <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground text-right">{t('tracking.table.real', { defaultValue: 'REAL (KSB1)' })}</th>
-                                    <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground text-right" title="Incluye IGV (18%)">{t('tracking.table.paid', { defaultValue: 'PAGADO (Inc. IGV)' })}</th>
-                                    <th className="py-3 px-4 font-bold text-xs uppercase tracking-wider text-muted-foreground text-center hidden lg:table-cell">TRAZABILIDAD</th>
+                            <thead className="sticky top-0 z-10 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-sm shadow-sm ring-1 ring-slate-100 dark:ring-slate-800">
+                                <tr>
+                                    <th className="w-10 py-4 px-3"></th>
+                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500">Número Pedido</th>
+                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 w-28 text-center">Estado SAP</th>
+                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 hidden md:table-cell w-24">Centro Costo</th>
+                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 w-full">Proveedor / Descripción</th>
+                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-center">Moneda</th>
+                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-right">Valor PO</th>
+                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-right">Gasto Real</th>
+                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-right">Pagado Total</th>
+                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-center hidden lg:table-cell">Trazabilidad</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y relative">
@@ -421,21 +435,26 @@ export function TrackingPage() {
 
 // ─── Sub-components ─────────────────────────────────
 
-function MetricCard({ icon: Icon, label, value, sub, color }: {
+function MetricCard({ icon: Icon, label, value, sub, color, bgColor }: {
     icon: any;
     label: string;
     value: string;
     sub: string;
     color: string;
+    bgColor: string;
 }) {
     return (
-        <div className="bg-card border rounded-lg p-4 shadow-sm">
-            <div className="flex items-center gap-2 mb-2">
-                <Icon className={cn("w-4 h-4", color)} />
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</span>
+        <div className={cn("p-6 rounded-2xl border transition-all shadow-sm flex flex-col justify-between h-full bg-card border-slate-100 dark:border-slate-800")}>
+            <div className="flex justify-between items-start mb-4">
+                <p className={cn("text-[10px] font-bold uppercase tracking-tighter opacity-80", color)}>{label}</p>
+                <div className={cn("p-2 rounded-xl bg-white/50 dark:bg-black/20", color)}>
+                    <Icon className="w-5 h-5" />
+                </div>
             </div>
-            <p className="text-lg font-bold tracking-tight">{value}</p>
-            <p className="text-[10px] text-muted-foreground">{sub}</p>
+            <div>
+                <h3 className="text-xl font-black text-slate-800 dark:text-white tracking-tight">{value}</h3>
+                <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">{sub}</p>
+            </div>
         </div>
     );
 }

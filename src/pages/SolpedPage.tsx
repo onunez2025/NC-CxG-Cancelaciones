@@ -136,12 +136,12 @@ export function SolpedPage() {
             <div className="shrink-0 mb-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+                        <h1 className="text-2xl font-black tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
                             <FileText className="w-6 h-6 text-primary" />
-                            {t('solped.title')}
+                            Solicitudes
                         </h1>
-                        <p className="text-muted-foreground text-sm">
-                            {t('solped.subtitle')}
+                        <p className="text-slate-500 text-sm font-medium">
+                            Gestión y seguimiento de Solped / OC
                         </p>
                     </div>
                 </div>
@@ -149,55 +149,64 @@ export function SolpedPage() {
 
             {/* KPI Area */}
             <div className="shrink-0 mb-6">
-                <div className="flex flex-wrap gap-3">
-                    <Pill label={t('solped.kpi.total')} value={metrics.total} color="bg-card" active={filterStatus === 'all'} onClick={() => togglePillFilter('all')} />
-                    <Pill label={t('solped.kpi.to_approve')} value={metrics.pendienteFirma} color="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400" active={filterStatus === 'pendiente'} onClick={() => togglePillFilter('pendiente')} />
-                    <Pill label={t('solped.kpi.ready_for_po')} value={metrics.liberadas} color="bg-cyan-50 dark:bg-cyan-900/20 text-cyan-700 dark:text-cyan-400" active={filterStatus === 'liberada'} onClick={() => togglePillFilter('liberada')} />
-                    <Pill label={t('solped.kpi.with_po')} value={metrics.conPO} color="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400" active={filterStatus === 'con_po'} onClick={() => togglePillFilter('con_po')} />
-                    <Pill label={t('solped.kpi.executed')} value={metrics.ejecutados} color="bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400" active={filterStatus === 'ejecutado'} onClick={() => togglePillFilter('ejecutado')} />
-                    <Pill label={t('solped.kpi.billed')} value={metrics.facturados} color="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400" active={filterStatus === 'facturado'} onClick={() => togglePillFilter('facturado')} />
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <KPICard label="Total" value={metrics.total} active={filterStatus === 'all'} onClick={() => togglePillFilter('all')} icon={FileText} color="text-slate-600" bgColor="bg-slate-50 border-slate-200" />
+                    <KPICard label="Por Firmar" value={metrics.pendienteFirma} active={filterStatus === 'pendiente'} onClick={() => togglePillFilter('pendiente')} icon={Clock} color="text-red-600" bgColor="bg-red-50/50 border-red-100" />
+                    <KPICard label="Liberadas" value={metrics.liberadas} active={filterStatus === 'liberada'} onClick={() => togglePillFilter('liberada')} icon={Package} color="text-cyan-600" bgColor="bg-cyan-50/50 border-cyan-100" />
+                    <KPICard label="Con OC (PO)" value={metrics.conPO} active={filterStatus === 'con_po'} onClick={() => togglePillFilter('con_po')} icon={ShoppingCart} color="text-blue-600" bgColor="bg-blue-50/50 border-blue-100" />
+                    <KPICard label="Ejecutados" value={metrics.ejecutados} active={filterStatus === 'ejecutado'} onClick={() => togglePillFilter('ejecutado')} icon={Package} color="text-amber-600" bgColor="bg-amber-50/50 border-amber-100" />
+                    <KPICard label="Facturados" value={metrics.facturados} active={filterStatus === 'facturado'} onClick={() => togglePillFilter('facturado')} icon={CreditCard} color="text-emerald-600" bgColor="bg-emerald-50/50 border-emerald-100" />
                 </div>
             </div>
 
             {/* Filters Area */}
-            <div className="shrink-0 space-y-4 mb-4">
-                <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="relative flex-1">
-                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <div className="shrink-0 mb-6">
+                <div className="bg-card border border-slate-200 dark:border-slate-800 rounded-xl p-2 shadow-sm flex items-center flex-wrap gap-2">
+                    <div className="relative flex-1 min-w-[300px]">
+                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                         <input
                             type="text"
-                            placeholder={t('solped.search_placeholder')}
+                            placeholder="Buscar por Solped, OC, proveedor o descripción..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 bg-card border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
+                            className="w-full pl-10 pr-4 py-2 bg-transparent border-none focus:ring-0 text-sm placeholder:text-slate-400"
                         />
                     </div>
+
+                    <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1 hidden sm:block" />
+
                     <select
                         value={filterStatus}
                         onChange={(e) => setFilterStatus(e.target.value)}
-                        className="px-3 py-2 bg-card border border-input rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
+                        className="bg-transparent border-none px-3 py-1.5 text-sm font-bold text-slate-700 dark:text-slate-200 focus:ring-0 outline-none cursor-pointer"
                     >
-                        <option value="all">{t('solped.filter_status')}</option>
-                        <option value="pendiente">{t('solped.status.pending_approval')}</option>
-                        <option value="liberada">{t('solped.status.released')}</option>
-                        <option value="con_po">{t('solped.status.with_po')}</option>
-                        <option value="ejecutado">{t('solped.status.executed')}</option>
-                        <option value="facturado">{t('solped.status.billed')}</option>
+                        <option value="all">Filtro Estado</option>
+                        <option value="pendiente">Pendiente Firma</option>
+                        <option value="liberada">Liberada SAP</option>
+                        <option value="con_po">Con Orden Compra</option>
+                        <option value="ejecutado">Ejecutado (KSB1)</option>
+                        <option value="facturado">Facturado (FBL1N)</option>
                     </select>
+
+                    <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1 hidden sm:block" />
+
                     <select
                         value={filterCeCo}
                         onChange={(e) => setFilterCeCo(e.target.value)}
-                        className="px-3 py-2 bg-card border border-input rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow min-w-[150px]"
+                        className="bg-transparent border-none px-3 py-1.5 text-sm font-bold text-slate-700 dark:text-slate-200 focus:ring-0 outline-none cursor-pointer min-w-[150px]"
                     >
-                        <option value="all">{t('solped.filter_ceco')}</option>
+                        <option value="all">Filtro Centro Costo</option>
                         {uniqueCecos.map(c => (
                             <option key={c} value={c}>{c}</option>
                         ))}
                     </select>
+
+                    <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1 hidden sm:block" />
+
                     <select
                         value={filterCurrency}
                         onChange={(e) => setFilterCurrency(e.target.value)}
-                        className="px-3 py-2 bg-card border border-input rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
+                        className="bg-transparent border-none px-3 py-1.5 text-sm font-bold text-slate-700 dark:text-slate-200 focus:ring-0 outline-none cursor-pointer"
                     >
                         <option value="all">Todas las Monedas</option>
                         <option value="PEN">PEN (Soles)</option>
@@ -205,10 +214,12 @@ export function SolpedPage() {
                     </select>
                 </div>
 
-                <p className="text-xs text-muted-foreground font-medium flex items-center gap-1">
-                    <Filter className="w-3 h-3" />
-                    {t('solped.results_label', { count: filteredRows.length, total: rows.length })}
-                </p>
+                <div className="mt-4 flex items-center justify-between">
+                    <p className="text-xs font-bold text-slate-400 flex items-center gap-1.5">
+                        <Filter className="w-3.5 h-3.5" />
+                        Mostrando {filteredRows.length} de {rows.length} registros
+                    </p>
+                </div>
             </div>
 
             {/* ─── Table Area ─── */}
@@ -220,19 +231,19 @@ export function SolpedPage() {
                         <p className="text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: t('solped.empty_state.desc') }} />
                     </div>
                 ) : (
-                    <div className="flex-1 bg-card border rounded-lg shadow-sm overflow-hidden flex flex-col min-h-0">
-                        <div className="flex-1 overflow-y-auto">
+                    <div className="flex-1 bg-card border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden flex flex-col min-h-0">
+                        <div className="flex-1 overflow-auto custom-scrollbar">
                             <table className="w-full text-sm">
-                                <thead className="sticky top-0 z-10 bg-card shadow-sm ring-1 ring-border/50">
-                                    <tr className="border-b bg-muted/30">
-                                        <th className="w-8 py-3 px-2"></th>
-                                        <th className="text-left py-3 px-3 font-bold text-xs uppercase tracking-wider text-muted-foreground">{t('solped.table.solped')}</th>
-                                        <th className="text-left py-3 px-3 font-bold text-xs uppercase tracking-wider text-muted-foreground">{t('solped.table.po')}</th>
-                                        <th className="text-left py-3 px-3 font-bold text-xs uppercase tracking-wider text-muted-foreground hidden lg:table-cell">{t('solped.table.description')}</th>
-                                        <th className="text-left py-3 px-3 font-bold text-xs uppercase tracking-wider text-muted-foreground hidden md:table-cell">{t('solped.table.ceco')}</th>
-                                        <th className="text-center py-3 px-3 font-bold text-xs uppercase tracking-wider text-muted-foreground">{t('solped.table.currency', { defaultValue: 'MONEDA' })}</th>
-                                        <th className="text-right py-3 px-3 font-bold text-xs uppercase tracking-wider text-muted-foreground">{t('solped.table.value')}</th>
-                                        <th className="text-center py-3 px-3 font-bold text-xs uppercase tracking-wider text-muted-foreground">{t('solped.table.status')}</th>
+                                <thead className="sticky top-0 z-10 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-sm shadow-sm ring-1 ring-slate-100 dark:ring-slate-800">
+                                    <tr>
+                                        <th className="w-10 py-4 px-3"></th>
+                                        <th className="text-left py-4 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500">Solped</th>
+                                        <th className="text-left py-4 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500">Orden Compra</th>
+                                        <th className="text-left py-4 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500 hidden lg:table-cell">Descripción</th>
+                                        <th className="text-left py-4 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500 hidden md:table-cell">Centro Costo</th>
+                                        <th className="text-center py-4 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500">Moneda</th>
+                                        <th className="text-right py-4 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500">Valor Neto</th>
+                                        <th className="text-center py-4 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500">Estado SAP</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y">
@@ -345,17 +356,23 @@ export function SolpedPage() {
 
 // ─── Sub-components ─────────────────────────────────
 
-function Pill({ label, value, color, active, onClick }: { label: string; value: string | number; color: string; active?: boolean; onClick?: () => void }) {
+function KPICard({ label, value, icon: Icon, color, bgColor, active, onClick }: { label: string; value: string | number; icon: any; color: string; bgColor: string; active?: boolean; onClick?: () => void }) {
     return (
         <div
             onClick={onClick}
             className={cn(
-                "px-3 py-1.5 rounded-full text-xs font-bold border shadow-sm cursor-pointer select-none transition-all duration-150 hover:scale-105",
-                color,
-                active && "ring-2 ring-primary ring-offset-2 dark:ring-offset-background scale-105"
+                "p-4 rounded-2xl border transition-all cursor-pointer select-none flex items-center justify-between gap-3 shadow-sm",
+                bgColor,
+                active ? "ring-2 ring-primary ring-offset-2 dark:ring-offset-background border-primary/50 shadow-md transform scale-[1.02]" : "border-slate-100 hover:border-slate-300"
             )}
         >
-            {label}: <span className="font-bold">{value}</span>
+            <div className="space-y-1">
+                <p className={cn("text-[10px] font-bold uppercase tracking-tighter opacity-80", color)}>{label}</p>
+                <p className="text-lg font-black text-slate-800 dark:text-white leading-none">{value}</p>
+            </div>
+            <div className={cn("p-2 rounded-xl bg-white/50 dark:bg-black/20", color)}>
+                <Icon className="w-5 h-5" />
+            </div>
         </div>
     );
 }
@@ -363,8 +380,8 @@ function Pill({ label, value, color, active, onClick }: { label: string; value: 
 function DetailItem({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
     return (
         <div>
-            <span className="text-muted-foreground">{label}</span>
-            <p className={cn("font-medium mt-0.5", highlight && "text-primary font-bold")}>{value}</p>
+            <span className="text-slate-400 font-bold uppercase text-[10px] tracking-tight">{label}</span>
+            <p className={cn("font-medium mt-1 text-slate-700 dark:text-slate-200", highlight && "text-primary font-black")}>{value}</p>
         </div>
     );
 }

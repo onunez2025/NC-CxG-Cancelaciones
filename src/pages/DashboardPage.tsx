@@ -23,6 +23,7 @@ import { CostCentersService } from '../services/costCentersService';
 import type { CostCenter } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { cn } from '../utils/cn';
+import { toTitleCase } from '../utils/formatters';
 
 function formatCurrency(amount: number): string {
     return new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(amount);
@@ -133,23 +134,23 @@ export function DashboardPage() {
     if (!hasData) {
         return (
             <div className="space-y-6">
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-                        <LayoutDashboard className="w-6 h-6 text-primary" />
-                        {t('nav.dashboard')}
-                    </h1>
-                    <p className="text-muted-foreground text-sm">{t('common.welcome')}, {user?.username || 'Administrador'}</p>
-                </div>
+            <div>
+                <h1 className="text-2xl font-black tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
+                    <LayoutDashboard className="w-6 h-6 text-primary" />
+                    Panel de Control
+                </h1>
+                <p className="text-slate-500 text-sm">{t('common.welcome')}, {user?.username || 'Administrador'}</p>
+            </div>
 
-                <div className="bg-card border rounded-lg p-12 text-center">
-                    <Upload className="w-16 h-16 text-muted-foreground/40 mx-auto mb-4" />
-                    <h3 className="text-xl font-bold mb-2">{t('dashboard.empty.title')}</h3>
-                    <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
+                <div className="bg-card border rounded-2xl p-12 text-center shadow-sm">
+                    <Upload className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-black mb-2 text-slate-800 dark:text-white">{t('dashboard.empty.title')}</h3>
+                    <p className="text-sm text-slate-500 mb-6 max-w-md mx-auto">
                         {t('dashboard.empty.desc')}
                     </p>
                     <button
                         onClick={() => navigate('/files')}
-                        className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-bold text-sm hover:bg-primary/90 transition-colors shadow-sm inline-flex items-center gap-2"
+                        className="px-6 py-3 bg-primary text-primary-foreground rounded-xl font-bold text-sm hover:opacity-90 transition-all shadow-lg shadow-primary/20 inline-flex items-center gap-2"
                     >
                         <Upload className="w-4 h-4" />
                         {t('dashboard.empty.button')}
@@ -167,11 +168,11 @@ export function DashboardPage() {
         <div className="space-y-6">
             {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+                <h1 className="text-2xl font-black tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
                     <LayoutDashboard className="w-6 h-6 text-primary" />
-                    {t('nav.dashboard')}
+                    Panel de Control
                 </h1>
-                <p className="text-muted-foreground text-sm">{t('common.welcome')}, {user?.username || 'Administrador'}</p>
+                <p className="text-slate-500 text-sm font-medium">{t('common.welcome')}, {user?.username || 'Administrador'}</p>
             </div>
 
             {/* KPI Cards */}
@@ -216,10 +217,10 @@ export function DashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* Status Distribution */}
                 {analytics && (
-                    <div className="bg-card border rounded-lg p-4 shadow-sm">
-                        <h3 className="text-sm font-bold mb-4 flex items-center gap-2">
+                    <div className="bg-card border rounded-2xl p-6 shadow-sm">
+                        <h3 className="text-sm font-black mb-6 flex items-center gap-2 text-slate-800 dark:text-white">
                             <Package className="w-4 h-4 text-primary" />
-                            {t('dashboard.requestStatus')}
+                            Distribución de Estados
                         </h3>
                         <div className="space-y-3">
                             {['solicitado', 'pedido', 'recibido', 'facturado', 'pagado'].map((key) => {
@@ -247,10 +248,10 @@ export function DashboardPage() {
 
                 {/* Spend by CeCo */}
                 {analytics && (
-                    <div className="bg-card border rounded-lg p-4 shadow-sm">
-                        <h3 className="text-sm font-bold mb-4 flex items-center gap-2">
+                    <div className="bg-card border rounded-2xl p-6 shadow-sm">
+                        <h3 className="text-sm font-black mb-6 flex items-center gap-2 text-slate-800 dark:text-white">
                             <BarChart3 className="w-4 h-4 text-primary" />
-                            {t('dashboard.spendingByCeco')}
+                            Gasto por Centro de Coste
                         </h3>
                         <div className="space-y-3">
                             {analytics.spendByCeCo.slice(0, 6).map(c => (
@@ -276,10 +277,10 @@ export function DashboardPage() {
 
                 {/* Top Vendors */}
                 {analytics && (
-                    <div className="bg-card border rounded-lg p-4 shadow-sm">
-                        <h3 className="text-sm font-bold mb-4 flex items-center gap-2">
+                    <div className="bg-card border rounded-2xl p-6 shadow-sm">
+                        <h3 className="text-sm font-black mb-6 flex items-center gap-2 text-slate-800 dark:text-white">
                             <Users className="w-4 h-4 text-primary" />
-                            {t('dashboard.topVendors')}
+                            Principales Proveedores
                         </h3>
                         <div className="space-y-2.5">
                             {analytics.topVendors.map((v, i) => (
@@ -311,11 +312,11 @@ export function DashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Recent POs */}
                 {analytics && (
-                    <div className="bg-card border rounded-lg p-4 shadow-sm">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-sm font-bold flex items-center gap-2">
+                    <div className="bg-card border rounded-2xl p-6 shadow-sm">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-sm font-black flex items-center gap-2 text-slate-800 dark:text-white">
                                 <FileText className="w-4 h-4 text-primary" />
-                                {t('dashboard.recentActivity')}
+                                Actividad Reciente
                             </h3>
                             <button
                                 onClick={() => navigate('/tracking')}
@@ -341,11 +342,11 @@ export function DashboardPage() {
 
                 {/* Upload Status */}
                 {analytics && (
-                    <div className="bg-card border rounded-lg p-4 shadow-sm">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-sm font-bold flex items-center gap-2">
+                    <div className="bg-card border rounded-2xl p-6 shadow-sm">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-sm font-black flex items-center gap-2 text-slate-800 dark:text-white">
                                 <Upload className="w-4 h-4 text-primary" />
-                                {t('dashboard.fileStatus')}
+                                Estado de Archivos
                             </h3>
                             <button
                                 onClick={() => navigate('/files')}
@@ -405,15 +406,17 @@ function KPICard({ icon: Icon, label, value, sub, color, bgColor }: {
     icon: any; label: string; value: string; sub: string; color: string; bgColor: string;
 }) {
     return (
-        <div className="bg-card border rounded-lg p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</span>
-                <div className={cn("p-2 rounded-lg", bgColor)}>
-                    <Icon className={cn("w-4 h-4", color)} />
+        <div className="bg-card border rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+            <div className="flex items-center justify-between mb-4">
+                <span className="text-[11px] font-bold text-slate-500">{toTitleCase(label)}</span>
+                <div className={cn("p-2.5 rounded-xl", bgColor)}>
+                    <Icon className={cn("w-5 h-5", color)} />
                 </div>
             </div>
-            <p className="text-xl font-bold tracking-tight">{value}</p>
-            <p className="text-[10px] text-muted-foreground mt-1">{sub}</p>
+            <div className="space-y-1">
+                <p className="text-2xl font-black tracking-tighter text-slate-800 dark:text-white">{value}</p>
+                <p className="text-[11px] font-bold text-slate-400">{sub}</p>
+            </div>
         </div>
     );
 }

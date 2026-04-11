@@ -231,26 +231,28 @@ export function BudgetPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight">{t('budget.title')}</h1>
-                    <p className="text-muted-foreground">{t('budget.subtitle')}</p>
+                    <h1 className="text-2xl font-black tracking-tight text-slate-800 dark:text-white">Presupuesto</h1>
+                    <p className="text-slate-500 text-sm font-medium">Gestión de presupuesto anual por centro de coste</p>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="bg-card border border-slate-200 dark:border-slate-800 rounded-xl p-2 shadow-sm flex items-center gap-2">
                     <select
                         value={selectedYear}
                         onChange={(e) => setSelectedYear(Number(e.target.value))}
-                        className="bg-background border border-input px-3 py-2 rounded-md text-sm font-medium focus:ring-2 focus:ring-primary outline-none"
+                        className="bg-transparent border-none px-3 py-1.5 text-sm font-bold text-slate-700 dark:text-slate-200 focus:ring-0 outline-none cursor-pointer"
                     >
                         {[2024, 2025, 2026].map(y => (
                             <option key={y} value={y}>{y}</option>
                         ))}
                     </select>
 
+                    <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1" />
+
                     <select
                         value={selectedManagement}
                         onChange={(e) => setSelectedManagement(e.target.value)}
                         disabled={!isAdministrador}
-                        className="bg-background border border-input px-3 py-2 rounded-md text-sm font-medium focus:ring-2 focus:ring-primary outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-transparent border-none px-3 py-1.5 text-sm font-bold text-slate-700 dark:text-slate-200 focus:ring-0 outline-none cursor-pointer disabled:opacity-50"
                     >
                         {managements
                             .filter(m => isAdministrador || m.id === user?.management_id)
@@ -258,14 +260,17 @@ export function BudgetPage() {
                                 <option key={m.id} value={m.id}>{m.name}</option>
                             ))}
                     </select>
+                </div>
+
+                <div className="flex items-center gap-2">
 
                     {hasPermission('budget.create') && (
                         <button
                             onClick={handleCreate}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium shadow-sm"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-all font-bold text-sm shadow-lg shadow-primary/20"
                         >
                             <Plus className="w-4 h-4" />
-                            {t('budget.new')}
+                            Nuevo Registro
                         </button>
                     )}
 
@@ -300,20 +305,20 @@ export function BudgetPage() {
                         {/* Main Summary Card (Click to reset filter) */}
                         <div
                             onClick={() => setSelectedCostCenter('all')}
-                            className={`p-4 rounded-xl border shadow-sm flex flex-col justify-between relative overflow-hidden group cursor-pointer transition-all hover:shadow-md ${selectedCostCenter === 'all'
-                                ? 'bg-card border-primary ring-1 ring-primary'
-                                : 'bg-card/50 border-border hover:border-primary/50'
+                            className={`p-6 rounded-2xl border shadow-sm flex flex-col justify-between relative overflow-hidden group cursor-pointer transition-all hover:shadow-md ${selectedCostCenter === 'all'
+                                ? 'bg-card border-primary ring-1 ring-primary/20'
+                                : 'bg-card border-border hover:border-primary/50'
                                 }`}
                         >
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <p className="text-xs font-medium text-muted-foreground mb-1">
-                                        {t('budget.total_budget')} ({selectedYear})
+                                    <p className="text-[11px] font-bold text-slate-500 mb-1">
+                                        Total Presupuesto ({selectedYear})
                                     </p>
-                                    <h2 className="text-xl font-bold text-primary tracking-tight">{formatCurrency(managementTotalBudget)}</h2>
+                                    <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">{formatCurrency(managementTotalBudget)}</h2>
                                 </div>
-                                <div className={`p-1.5 rounded-lg transition-colors ${selectedCostCenter === 'all' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                                    <Wallet className="w-4 h-4" />
+                                <div className={`p-2.5 rounded-xl transition-colors ${selectedCostCenter === 'all' ? 'bg-primary/10 text-primary' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
+                                    <Wallet className="w-5 h-5" />
                                 </div>
                             </div>
 
@@ -416,69 +421,69 @@ export function BudgetPage() {
             {/* Content */}
             <div className="flex flex-col md:flex-row gap-6">
                 {/* Sidebar - Cost Centers */}
-                <div className="hidden md:block w-56 shrink-0 space-y-2 sticky top-[180px] self-start h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
-                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 px-1">
-                        {t('config.sections.cost_centers', { defaultValue: 'Centros de Costo' })}
+                <div className="hidden md:block w-64 shrink-0 space-y-2 sticky top-[180px] self-start h-[calc(100vh-280px)] overflow-y-auto custom-scrollbar">
+                    <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 px-3">
+                        Centros de Costo
                     </h3>
-                    <div className="space-y-0.5 pr-2">
+                    <div className="space-y-1 px-1">
                         <button
                             onClick={() => setSelectedCostCenter('all')}
-                            className={`w-full text-left px-3 py-2 rounded-md transition-colors ${selectedCostCenter === 'all'
-                                ? 'bg-primary/10 text-primary'
-                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                            className={`w-full text-left px-4 py-2.5 rounded-xl transition-all ${selectedCostCenter === 'all'
+                                ? 'bg-primary/10 text-primary font-black shadow-sm'
+                                : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700'
                                 }`}
                         >
-                            <div className="text-sm font-bold">{t('common.all', { defaultValue: 'Todos' })}</div>
+                            <div className="text-sm">Todos los Centros</div>
                         </button>
                         {filteredCostCenters.map(ceco => (
                             <button
                                 key={ceco.id}
                                 onClick={() => setSelectedCostCenter(ceco.id)}
-                                className={`w-full text-left px-3 py-2 rounded-md transition-colors ${selectedCostCenter === ceco.id
-                                    ? 'bg-primary/10 text-primary'
-                                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                className={`w-full text-left px-4 py-2.5 rounded-xl transition-all ${selectedCostCenter === ceco.id
+                                    ? 'bg-primary/10 text-primary font-black shadow-sm'
+                                    : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700'
                                     }`}
                                 title={`${ceco.code} - ${ceco.name}`}
                             >
-                                <div className="text-sm font-bold leading-tight mb-0.5">{ceco.name}</div>
-                                <div className="text-xs font-mono opacity-70">{ceco.code}</div>
+                                <div className="text-sm leading-tight mb-0.5">{ceco.name}</div>
+                                <div className="text-[10px] font-mono opacity-60 tracking-tighter">{ceco.code}</div>
                             </button>
                         ))}
                     </div>
                 </div>
 
                 {/* Main Table */}
-                <div className="flex-1 bg-card rounded-lg border border-border shadow-sm overflow-hidden flex flex-col h-[calc(100vh-220px)]">
-                    <div className="p-3 border-b border-border flex items-center gap-3 bg-muted/20">
+                <div className="flex-1 bg-card rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-[calc(100vh-280px)]">
+                    <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
                         <div className="relative flex-1 max-w-sm">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                             <input
                                 type="text"
-                                placeholder={t('budget.search_account')}
+                                placeholder="Buscar por cuenta o descripción..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-9 pr-4 py-1.5 bg-background border border-input rounded-md focus:ring-1 focus:ring-primary focus:border-primary outline-none text-xs"
+                                className="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none text-sm transition-all"
                             />
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                            {tableFilteredBudgets.length} registros
+                        <div className="text-xs font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
+                            {tableFilteredBudgets.length} Registros
                         </div>
                     </div>
 
                     <div className="overflow-auto flex-1 relative">
                         <table className="w-full text-xs text-left">
-                            <thead className="bg-muted/90 text-muted-foreground font-medium border-b border-border sticky top-0 z-10 backdrop-blur-sm shadow-sm">
+                            <thead className="bg-slate-50/80 dark:bg-slate-900/80 text-slate-500 font-bold border-b border-slate-100 dark:border-slate-800 sticky top-0 z-10 backdrop-blur-sm shadow-sm">
                                 <tr>
-                                    <th className="px-6 py-3">{t('budget.table.account')}</th>
+                                    <th className="px-6 py-4">Cuenta Contable</th>
                                     {selectedCostCenter === 'all' && (
-                                        <th className="px-6 py-3">CECO</th>
+                                        <th className="px-6 py-4">Centro Costo</th>
                                     )}
                                     {months.map((month, idx) => (
-                                        <th key={idx} className="px-4 py-2 text-right whitespace-nowrap">{month.substring(0, 3)}</th>
+                                        <th key={idx} className="px-4 py-4 text-right whitespace-nowrap">{month.substring(0, 3)}</th>
                                     ))}
-                                    <th className="px-4 py-2 text-right font-bold text-foreground">{t('budget.table.total')}</th>
+                                    <th className="px-6 py-4 text-right font-black text-slate-800 dark:text-white">Total Anual</th>
                                     {hasPermission('budget.edit') && (
-                                        <th className="px-4 py-2 text-right">{t('common.actions')}</th>
+                                        <th className="px-6 py-4 text-right">Acciones</th>
                                     )}
                                 </tr>
                             </thead>
