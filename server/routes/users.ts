@@ -1,7 +1,12 @@
 import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import bcrypt from 'bcrypt';
-import crypto from 'crypto'; const router = Router();
+import crypto from 'crypto';
+import { logAudit } from '../middleware/auth.js';
+
+const router = Router();
+const APP_IDENTIFIER = 'EBM';
+const cleanApps = (str: string) => [...new Set((str || '').split(',').map(s => s.trim()).filter(Boolean))].join(', ');
 
 // GET all Users
 router.get('/', async (req: Request, res: Response) => {
@@ -53,25 +58,29 @@ router.post('/', async (req: Request, res: Response) => {
             .input('email', email)
             .query("SELECT Id, Apps FROM EBM.Users WHERE Username = @username OR Email = @email");
 
-        const appsToSave = Array.isArray(apps) ? apps.join(', ') : (apps || 'EBM');
+        const appsToSaveInput = Array.isArray(apps) ? apps.join(', ') : (apps || APP_IDENTIFIER);
+        const appsToSave = cleanApps(appsToSaveInput);
 
         if (checkResult.recordset.length > 0) {
             // 2a. User EXISTS -> UPSERT (Update existing user)
             const existingUser = checkResult.recordset[0];
             const userId = existingUser.Id || existingUser.id;
+            const mergedApps = cleanApps(existingUser.Apps + ', ' + APP_IDENTIFIER);
 
             await pool.request()
                 .input('id', userId)
                 .input('fullName', full_name)
                 .input('roleId', role_id)
                 .input('managementId', management_id)
-                .input('apps', appsToSave)
+                .input('apps', mergedApps)
                 .input('avatarUrl', req.body.avatar_url || null)
                 .query(`
                     UPDATE EBM.Users 
                     SET FullName = @fullName, RoleId = @roleId, ManagementId = @managementId, Apps = @apps, AvatarUrl = @avatarUrl, IsActive = 1
                     WHERE Id = @id
                 `);
+
+            await logAudit(req, 'REACTIVATE/UPDATE', 'USERS', username, { apps: mergedApps });
 
             const updatedUserResult = await pool.request().input('id', userId).query(`
                 SELECT u.Id as id, u.FullName as full_name, u.Username as username, u.Email as email,
@@ -111,7 +120,9 @@ router.post('/', async (req: Request, res: Response) => {
                 VALUES (@fullName, @username, @email, @password, @roleId, @managementId, @language, @theme, 1, @avatarUrl, @apps)
             `);
 
-        res.status(201).json(result.recordset[0]);
+        const createdUser = result.recordset[0];
+        await logAudit(req, 'CREATE', 'USERS', username, { apps: appsToSave });
+        res.status(201).json(createdUser);
     } catch (error: any) {
         console.error('Error in router.post(/):', error);
         res.status(500).json({ error: error.message });
@@ -140,6 +151,9 @@ router.put('/:id', async (req: Request, res: Response) => {
                 Apps = @apps
         `;
 
+        const appsToSaveInput = Array.isArray(apps) ? apps.join(', ') : (apps || APP_IDENTIFIER);
+        const appsToSave = cleanApps(appsToSaveInput);
+
         const request = pool.request()
             .input('id', userId)
             .input('fullName', full_name)
@@ -151,7 +165,7 @@ router.put('/:id', async (req: Request, res: Response) => {
             .input('language', language)
             .input('theme', theme)
             .input('avatarUrl', avatar_url || null)
-            .input('apps', Array.isArray(apps) ? apps.join(', ') : (apps || 'EBM'));
+            .input('apps', appsToSave);
 
         // Only update password if provided
         if (password_hash && password_hash.trim() !== '') {
@@ -183,7 +197,9 @@ router.put('/:id', async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        res.json(result.recordset[0]);
+        const updatedUser = result.recordset[0];
+        await logAudit(req, 'UPDATE', 'USERS', userId, { apps: appsToSave });
+        res.json(updatedUser);
     } catch (error: any) {
         console.error('Error updating user:', error);
         if (error.number === 2601 || error.number === 2627) {
@@ -203,7 +219,9 @@ router.delete('/:id', async (req: Request, res: Response) => {
         // EBM uses is_active mostly, but delete in storage was absolute. We'll do hard delete.
         const result = await pool.request()
             .input('id', userId)
-            .query(`DELETE FROM EBM.Users WHERE Id = @id`);
+            .query(`UPDATE EBM.Users SET IsActive = 0 WHERE Id = @id`);
+
+        await logAudit(req, 'DEACTIVATE', 'USERS', userId, {});
 
         if (result.rowsAffected[0] === 0) {
             return res.status(404).json({ error: 'User not found' });

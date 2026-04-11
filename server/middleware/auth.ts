@@ -39,6 +39,28 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
     }
 };
 
+export async function logAudit(req: Request, action: string, entity: string, entityId: string, details: any) {
+    try {
+        const user = req.user;
+        if (!user) return;
+        const pool = await getDbConnection();
+        await pool.request()
+            .input('uid', user.id)
+            .input('un', user.full_name || user.username)
+            .input('acc', action)
+            .input('ent', entity)
+            .input('eid', entityId)
+            .input('det', JSON.stringify(details))
+            .query(`
+                INSERT INTO [dbo].[GAC_APP_TB_AUDIT_LOG] 
+                (UsuarioID, UsuarioNombre, Accion, Entidad, EntidadID, Detalle, Fecha)
+                VALUES (@uid, @un, @acc, @ent, @eid, @det, GETDATE())
+            `);
+    } catch (logErr) {
+        console.error('CRITICAL: Failed to log audit event:', logErr);
+    }
+}
+
 export const verifyPermission = (permission: string) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         const user = req.user;
@@ -58,28 +80,12 @@ export const verifyPermission = (permission: string) => {
         }
 
         // LOG ACCESS DENIED
-        try {
-            const pool = await getDbConnection();
-            await pool.request()
-                .input('uid', user.id)
-                .input('un', user.full_name || user.username)
-                .input('acc', 'ACCESO_DENEGADO')
-                .input('ent', `Endpoint: ${req.method} ${req.baseUrl}${req.path}`)
-                .input('eid', permission)
-                .input('det', JSON.stringify({
-                    ip: req.ip,
-                    userAgent: req.get('user-agent'),
-                    params: req.params,
-                    query: req.query
-                }))
-                .query(`
-                    INSERT INTO [dbo].[GAC_APP_TB_AUDIT_LOG] 
-                    (UsuarioID, UsuarioNombre, Accion, Entidad, EntidadID, Detalle)
-                    VALUES (@uid, @un, @acc, @ent, @eid, @det)
-                `);
-        } catch (logErr) {
-            console.error('CRITICAL: Failed to log audit event:', logErr);
-        }
+        await logAudit(req, 'ACCESO_DENEGADO', `Endpoint: ${req.method} ${req.baseUrl}${req.path}`, permission, {
+            ip: req.ip,
+            userAgent: req.get('user-agent'),
+            params: req.params,
+            query: req.query
+        });
 
         return res.status(403).json({ error: `Permission denied: ${permission}` });
     };

@@ -1,8 +1,11 @@
 import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
+import { logAudit } from '../middleware/auth.js';
 
 const router = Router();
+const APP_IDENTIFIER = 'EBM';
+const cleanApps = (str: string) => [...new Set((str || '').split(',').map(s => s.trim()).filter(Boolean))].join(', ');
 
 // GET all Roles and their permissions
 router.get('/', async (req: Request, res: Response) => {
@@ -17,8 +20,8 @@ router.get('/', async (req: Request, res: Response) => {
                 p.Permission as permission
             FROM EBM.Roles r
             LEFT JOIN EBM.RolePermissions p ON r.Id = p.RoleId
-            WHERE r.Apps LIKE '%EBM%'
-        `);
+            WHERE r.Apps LIKE '%' + @app + '%'
+        `).input('app', APP_IDENTIFIER);
 
         // Group permissions by role since SQL returns flat rows
         const rolesMap = new Map();
@@ -56,10 +59,13 @@ router.post('/', async (req: Request, res: Response) => {
         await transaction.begin();
 
         try {
+            const appsToSaveInput = Array.isArray(apps) ? apps.join(', ') : (apps || APP_IDENTIFIER);
+            const appsToSave = cleanApps(appsToSaveInput);
+
             // 1. Insert Role
             const roleResult = await transaction.request()
                 .input('name', name)
-                .input('apps', apps || 'EBM')
+                .input('apps', appsToSave)
                 .query(`
                     INSERT INTO EBM.Roles (Name, Apps)
                     OUTPUT INSERTED.Id as id, INSERTED.Name as name, INSERTED.Apps as apps
@@ -82,6 +88,7 @@ router.post('/', async (req: Request, res: Response) => {
             }
 
             await transaction.commit();
+            await logAudit(req, 'CREATE', 'ROLES', name, { apps: appsToSave });
             res.status(201).json({ ...newRole, permissions: permissions || [] });
         } catch (trxError) {
             await transaction.rollback();
@@ -105,11 +112,14 @@ router.put('/:id', async (req: Request, res: Response) => {
         await transaction.begin();
 
         try {
+            const appsToSaveInput = Array.isArray(apps) ? apps.join(', ') : (apps || APP_IDENTIFIER);
+            const appsToSave = cleanApps(appsToSaveInput);
+
             // 1. Update Role Name & Apps
             await transaction.request()
                 .input('id', roleId)
                 .input('name', name)
-                .input('apps', apps || 'EBM')
+                .input('apps', appsToSave)
                 .query(`UPDATE EBM.Roles SET Name = @name, Apps = @apps WHERE Id = @id`);
 
             // 2. Refresh permissions: Delete ALL permissions for this role 
@@ -131,6 +141,7 @@ router.put('/:id', async (req: Request, res: Response) => {
             }
 
             await transaction.commit();
+            await logAudit(req, 'UPDATE', 'ROLES', roleId, { apps: appsToSave });
             res.json({ id: roleId, name, permissions });
         } catch (trxError) {
             await transaction.rollback();
@@ -162,6 +173,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
                 .query(`DELETE FROM EBM.Roles WHERE Id = @id`);
 
             await transaction.commit();
+            await logAudit(req, 'DELETE', 'ROLES', roleId, {});
             res.status(204).send();
         } catch (trxError) {
             await transaction.rollback();
