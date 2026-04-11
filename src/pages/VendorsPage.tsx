@@ -93,11 +93,11 @@ export function VendorsPage() {
             {/* KPI Cards */}
             <div className="shrink-0 mb-6">
                 <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-                    <MetricCard icon={Users} label="Total Proveedores" value={String(metrics.totalVendors)} color="text-indigo-600" bgColor="bg-indigo-50/50 border-indigo-100" />
-                    <MetricCard icon={ShoppingCart} label="Total Órdenes" value={formatCurrency(metrics.totalPOValue)} color="text-purple-600" bgColor="bg-purple-50/50 border-purple-100" />
-                    <MetricCard icon={CreditCard} label="Total Facturado" value={formatCurrency(metrics.totalInvoiced)} color="text-amber-600" bgColor="bg-amber-50/50 border-amber-100" />
-                    <MetricCard icon={TrendingUp} label="Total Pagado" value={formatCurrency(metrics.totalPaid)} color="text-emerald-600" bgColor="bg-emerald-50/50 border-emerald-100" />
-                    <MetricCard icon={DollarSign} label="Saldo Pendiente" value={formatCurrency(metrics.totalPending)} color="text-red-600" bgColor="bg-red-50/50 border-red-100" />
+                    <MetricCard icon={Users} label="Total Proveedores" value={String(metrics.totalVendors)} color="text-indigo-600" />
+                    <MetricCard icon={ShoppingCart} label="Total Órdenes" value={formatCurrency(metrics.totalPOValue)} color="text-purple-600" />
+                    <MetricCard icon={CreditCard} label="Total Facturado" value={formatCurrency(metrics.totalInvoiced)} color="text-amber-600" />
+                    <MetricCard icon={TrendingUp} label="Total Pagado" value={formatCurrency(metrics.totalPaid)} color="text-emerald-600" />
+                    <MetricCard icon={DollarSign} label="Saldo Pendiente" value={formatCurrency(metrics.totalPending)} color="text-red-600" />
                 </div>
             </div>
 
@@ -271,7 +271,7 @@ export function VendorsPage() {
 
 // ─── Sub-components ─────────────────────────────────
 
-function MetricCard({ icon: Icon, label, value, color, bgColor }: { icon: any; label: string; value: string; color: string; bgColor: string }) {
+function MetricCard({ icon: Icon, label, value, color }: { icon: any; label: string; value: string; color: string }) {
     return (
         <div className={cn("p-6 rounded-2xl border transition-all shadow-sm flex flex-col justify-between h-full bg-card border-slate-100 dark:border-slate-800")}>
             <div className="flex justify-between items-start mb-4">

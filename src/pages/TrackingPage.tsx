@@ -105,7 +105,6 @@ export function TrackingPage() {
                             value={metrics.total_pos.toString()}
                             sub={`${metrics.pos_with_solped} con Solped`}
                             color="text-indigo-600"
-                            bgColor="bg-indigo-50/50 border-indigo-100"
                         />
                         <MetricCard
                             icon={DollarSign}
@@ -113,15 +112,13 @@ export function TrackingPage() {
                             value={formatCurrency(metrics.total_po_value)}
                             sub="Monto comprometido"
                             color="text-purple-600"
-                            bgColor="bg-purple-50/50 border-purple-100"
                         />
                         <MetricCard
-                            icon={BarChart3}
+                            icon={FileText}
                             label="Gasto Real"
                             value={formatCurrency(metrics.total_real_expense)}
                             sub={`${metrics.pos_with_invoice} con factura`}
                             color="text-amber-600"
-                            bgColor="bg-amber-50/50 border-amber-100"
                         />
                         <MetricCard
                             icon={TrendingUp}
@@ -129,7 +126,6 @@ export function TrackingPage() {
                             value={formatCurrency(metrics.total_paid)}
                             sub={`${metrics.pos_fully_paid} pagadas`}
                             color="text-emerald-600"
-                            bgColor="bg-emerald-50/50 border-emerald-100"
                         />
                     </div>
                 </div>
@@ -435,13 +431,12 @@ export function TrackingPage() {
 
 // ─── Sub-components ─────────────────────────────────
 
-function MetricCard({ icon: Icon, label, value, sub, color, bgColor }: {
+function MetricCard({ icon: Icon, label, value, sub, color }: {
     icon: any;
     label: string;
     value: string;
     sub: string;
     color: string;
-    bgColor: string;
 }) {
     return (
         <div className={cn("p-6 rounded-2xl border transition-all shadow-sm flex flex-col justify-between h-full bg-card border-slate-100 dark:border-slate-800")}>
