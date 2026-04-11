@@ -10,7 +10,6 @@ import {
     ChevronDown,
     ChevronRight,
     DollarSign,
-    BarChart3,
     CheckCircle2,
     Clock,
     AlertTriangle,
