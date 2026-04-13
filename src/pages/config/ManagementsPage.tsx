@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Briefcase,
     Search,
@@ -16,7 +16,6 @@ import { ManagementsService } from '../../services/managementsService';
 import type { Management } from '../../types';
 import { Modal } from '../../components/common/Modal';
 import { useDialog } from '../../context/DialogContext';
-import { cn } from '../../utils/cn';
 
 export default function ManagementsPage() {
     const { confirm, alert } = useDialog();

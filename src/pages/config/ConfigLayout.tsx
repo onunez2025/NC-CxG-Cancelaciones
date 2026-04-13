@@ -50,15 +50,19 @@ export default function ConfigLayout() {
                                                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
                                         )}
                                     >
-                                        <div className="flex items-center gap-3 relative z-10">
-                                            <item.icon className={cn(
-                                                "w-4 h-4 transition-transform group-hover:scale-110",
-                                                isActive ? "text-primary-foreground" : "text-primary"
-                                            )} />
-                                            <span>{item.label}</span>
-                                        </div>
-                                        {location.pathname === item.to && (
-                                            <ChevronRight className="w-4 h-4 text-primary-foreground/50 animate-in slide-in-from-left-2" />
+                                        {({ isActive }) => (
+                                            <>
+                                                <div className="flex items-center gap-3 relative z-10">
+                                                    <item.icon className={cn(
+                                                        "w-4 h-4 transition-transform group-hover:scale-110",
+                                                        isActive ? "text-primary-foreground" : "text-primary"
+                                                    )} />
+                                                    <span>{item.label}</span>
+                                                </div>
+                                                {location.pathname === item.to && (
+                                                    <ChevronRight className="w-4 h-4 text-primary-foreground/50 animate-in slide-in-from-left-2" />
+                                                )}
+                                            </>
                                         )}
                                     </NavLink>
                                 ))}

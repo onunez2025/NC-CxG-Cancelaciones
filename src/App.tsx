@@ -6,20 +6,20 @@ import { AuthProvider, useAuth } from './hooks/useAuth';
 import { DialogProvider } from './context/DialogContext';
 import { LoginPage } from './pages/LoginPage';
 import { ForceChangePasswordPage } from './pages/ForceChangePasswordPage';
-import { UsersPage } from './pages/config/UsersPage';
-import { RolesPage } from './pages/config/RolesPage';
+import UsersPage from './pages/config/UsersPage';
+import RolesPage from './pages/config/RolesPage';
 import AuditLogPage from './pages/config/AuditLogPage';
-import { ConfigLayout } from './pages/config/ConfigLayout';
+import ConfigLayout from './pages/config/ConfigLayout';
 import { RequirePermission } from './components/common/RequirePermission';
 
 // Placeholder Pages
 import { DashboardPage } from './pages/DashboardPage';
 const NotFound = () => <div className="p-4"><h1>404 Not Found</h1></div>;
-import { CostCentersPage } from './pages/config/CostCentersPage';
+import CostCentersPage from './pages/config/CostCentersPage';
 // const CostCentersPage = () => <div className="p-4"><h1 className="text-xl font-bold">Centros de Coste</h1><p>Gestión de CeCos (Próximamente)</p></div>;
-import { AccountsPage } from './pages/config/AccountsPage';
-import { ManagementsPage } from './pages/config/ManagementsPage';
-import { ExchangeRatesPage } from './pages/config/ExchangeRatesPage';
+import AccountsPage from './pages/config/AccountsPage';
+import ManagementsPage from './pages/config/ManagementsPage';
+import ExchangeRatesPage from './pages/config/ExchangeRatesPage';
 import { BudgetPage } from './pages/BudgetPage';
 import { FileUploadPage } from './pages/FileUploadPage';
 import { TrackingPage } from './pages/TrackingPage';

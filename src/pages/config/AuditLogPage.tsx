@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Terminal, ShieldAlert, Clock, AlertCircle, Search, Filter, RotateCcw, ChevronRight, Activity, TerminalSquare, Database } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, RotateCcw, Clock, ChevronRight, Database, ShieldAlert, Terminal } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
 interface AuditLog {
@@ -56,7 +56,7 @@ export default function AuditLogPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
                 <div className="space-y-1">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
-                        <TerminalSquare className="w-4 h-4" />
+                        <Terminal className="w-4 h-4" />
                         <span>Configuración</span>
                         <ChevronRight className="w-3 h-3 opacity-50" />
                         <span className="text-foreground">Auditoría</span>
