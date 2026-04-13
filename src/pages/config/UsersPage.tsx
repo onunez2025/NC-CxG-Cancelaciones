@@ -1,85 +1,125 @@
-import { useState, useEffect } from 'react';
-// import { useTranslation } from 'react-i18next';
-import {
-    Users,
-    Search,
-    Plus,
-    Edit2,
-    Trash2,
-    AlertCircle,
-    Save,
-    ChevronUp,
-    ChevronDown
+import React, { useState, useEffect } from 'react';
+import { 
+    Plus, 
+    Trash2, 
+    Search, 
+    Edit2, 
+    Save, 
+    Users, 
+    ChevronUp, 
+    ChevronDown,
+    X,
+    UserCircle2,
+    Mail,
+    ShieldCheck,
+    ChevronRight,
+    Activity,
+    Check
 } from 'lucide-react';
-import { ManagementsService } from '../../services/managementsService';
-import { UsersService } from '../../services/usersService';
-import { RolesService } from '../../services/rolesService';
-import type { User, Management, Role } from '../../types';
 import { Modal } from '../../components/common/Modal';
 import { useDialog } from '../../context/DialogContext';
-import { cn } from '../../utils/cn';
+import { UsersService } from '../../services/usersService';
+import { RolesService } from '../../services/rolesService';
+import { ManagementsService } from '../../services/managementsService';
+import type { User, Role, Management } from '../../types';
 import { useTableResizer } from '../../hooks/useTableResizer';
 import { ResizableHeader } from '../../components/common/ResizableHeader';
 import { useAuth } from '../../hooks/useAuth';
+import { cn } from '../../utils/cn';
 
-export function UsersPage() {
-    // const { t } = useTranslation();
-    const { confirm } = useDialog();
+export default function UsersPage() {
+    const { confirm, alert } = useDialog();
     const { hasPermission } = useAuth();
     const [users, setUsers] = useState<User[]>([]);
-    const [managements, setManagements] = useState<Management[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
-
-    const [searchTerm, setSearchTerm] = useState('');
+    const [managements, setManagements] = useState<Management[]>([]);
+    const [search, setSearch] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingUser, setEditingUser] = useState<User | null>(null);
+    const [editingUser, setEditingUser] = useState<Partial<User> & { password_hash?: string } | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
     const [sortBy, setSortBy] = useState<string>('username');
     const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('ASC');
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState('');
 
     // Resizing logic
     const { widths, onResizeStart } = useTableResizer('ebm_users_column_widths', {
-        usuario: 250,
-        email: 200,
-        rol: 150,
-        apps: 200
+        usuario: 280,
+        email: 220,
+        rol: 160,
+        apps: 220
     });
 
-    // Form state
-    const [formData, setFormData] = useState<Partial<User>>({
-        full_name: '',
-        username: '',
-        email: '',
-        role_id: 'viewer',
-        management_id: 'it',
-        is_active: true,
-        language: 'es',
-        theme: 'light',
-        password_hash: '',
-        apps: 'EBM'
-    });
-
-    useEffect(() => {
-        loadData();
-    }, []);
+    useEffect(() => { loadData(); }, []);
 
     const loadData = async () => {
+        setIsLoading(true);
         try {
-            const [usersData, mgmtData, rolesData] = await Promise.all([
+            const [u, r, m] = await Promise.all([
                 UsersService.getUsers(),
-                ManagementsService.getManagements(),
-                RolesService.getRoles()
+                RolesService.getRoles(),
+                ManagementsService.getManagements()
             ]);
-            setUsers(usersData);
-            setManagements(mgmtData);
-            setRoles(rolesData);
-        } catch (error) {
-            console.error("Failed to load users data:", error);
+            setUsers(u);
+            setRoles(r);
+            setManagements(m);
+        } catch (err: any) { 
+            console.error(err);
+            setError(err.message || 'Error de comunicación con el servidor central');
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(e.target.value);
+    const handleSave = async () => {
+        if (!editingUser) return;
+        setError('');
+        try {
+            await UsersService.saveUser(editingUser as User);
+            setIsModalOpen(false);
+            setEditingUser(null);
+            loadData();
+        } catch (err: any) {
+            setError(err.message || 'Error al procesar la solicitud');
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        confirm({
+            title: 'Baja de Usuario',
+            message: '¿Está seguro de revocar el acceso a este usuario en EBM Central? Esta acción no afectará sus accesos en otras aplicaciones del ecosistema.',
+            type: 'danger',
+            confirmText: 'Revocar Acceso',
+            onConfirm: async () => {
+                try {
+                    await UsersService.deleteUser(id);
+                    loadData();
+                } catch (err: any) { 
+                    alert({ title: 'Error', message: err.message || 'No se pudo eliminar el usuario', type: 'error' });
+                }
+            }
+        });
+    };
+
+    const openNew = () => {
+        setEditingUser({ full_name: '', username: '', email: '', role_id: '', management_id: '', is_active: true, apps: 'EBM', password_hash: '' });
+        setError('');
+        setIsModalOpen(true);
+    };
+
+    const toggleApp = (appCode: string) => {
+        if (!editingUser) return;
+        const currentApps = (editingUser.apps || '').split(',').map(a => a.trim()).filter(Boolean);
+        const updatedApps = currentApps.includes(appCode)
+            ? currentApps.filter(a => a !== appCode)
+            : [...currentApps, appCode];
+        
+        setEditingUser({ ...editingUser, apps: updatedApps.join(', ') });
+    };
+
+    const openEdit = (user: User) => {
+        setEditingUser({ ...user, password_hash: '' });
+        setError('');
+        setIsModalOpen(true);
     };
 
     const handleSort = (column: string) => {
@@ -98,12 +138,12 @@ export function UsersPage() {
             : <ChevronDown className="w-3.5 h-3.5 text-primary" />;
     };
 
-    const filteredUsers = users
-        .filter(user =>
-            (user.apps || 'EBM').split(',').some(a => a.trim().toUpperCase() === 'EBM') &&
-            (user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (user.full_name || '').toLowerCase().includes(searchTerm.toLowerCase()))
+    const filtered = users
+        .filter(u =>
+            ((u.apps || 'EBM').split(',').some(a => a.trim().toUpperCase() === 'EBM') || (u.apps || '').toUpperCase().includes('EBM')) &&
+            (u.full_name?.toLowerCase().includes(search.toLowerCase()) ||
+            u.username?.toLowerCase().includes(search.toLowerCase()) ||
+            u.email?.toLowerCase().includes(search.toLowerCase()))
         )
         .sort((a, b) => {
             const factor = sortOrder === 'ASC' ? 1 : -1;
@@ -113,304 +153,255 @@ export function UsersPage() {
             return 0;
         });
 
-    const handleCreate = () => {
-        setEditingUser(null);
-        setError(null);
-        setFormData({
-            full_name: '',
-            username: '',
-            email: '',
-            role_id: roles.length > 0 ? roles[0].id : 'viewer',
-            management_id: managements.length > 0 ? managements[0].id : 'it',
-            is_active: true,
-            language: 'es',
-            theme: 'light',
-            password_hash: '',
-            apps: 'EBM'
-        });
-        setIsModalOpen(true);
-    };
-
-    const toggleApp = (appCode: string) => {
-        const currentApps = (formData.apps || '').split(',').map(a => a.trim()).filter(Boolean);
-        const updatedApps = currentApps.includes(appCode)
-            ? currentApps.filter(a => a !== appCode)
-            : [...currentApps, appCode];
-        
-        setFormData({ ...formData, apps: updatedApps.join(', ') });
-    };
-
-    const handleEdit = (user: User) => {
-        setEditingUser(user);
-        setError(null);
-        setFormData({ ...user, password_hash: '' }); // Clear password field on edit so it's not pre-filled
-        setIsModalOpen(true);
-    };
-
-    const handleDelete = (id: string) => {
-        confirm({
-            title: 'Eliminar Usuario',
-            message: '¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer y el usuario perderá el acceso a todas las aplicaciones asociadas.',
-            onConfirm: async () => {
-                try {
-                    await UsersService.deleteUser(id);
-                    await loadData();
-                } catch (error) {
-                    console.error("Error deleting user:", error);
-                }
-            }
-        });
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError(null);
-        try {
-            if (editingUser) {
-                await UsersService.saveUser({ ...editingUser, ...formData } as User);
-            } else {
-                await UsersService.saveUser(formData as User);
-            }
-            setIsModalOpen(false);
-            await loadData();
-        } catch (error: any) {
-            console.error("Error saving user:", error);
-            setError(error.message);
-        }
-    };
-
     return (
-        <div className="flex flex-col h-full bg-background animate-in fade-in zoom-in duration-300">
-            {/* Header */}
-            <div className="p-6 bg-card border border-border rounded-t-lg flex justify-between items-center shrink-0">
-                <div>
-                    <h2 className="text-lg font-medium flex items-center gap-2 text-foreground">
-                        <Users className="w-5 h-5 text-primary" /> Gestión de Usuarios
-                    </h2>
-                    <p className="text-sm text-muted-foreground mt-1">Administra los usuarios con acceso al sistema EBM</p>
+        <div className="flex flex-col h-full space-y-4 min-h-0 animate-in fade-in duration-500">
+            {/* Header: SIATC Standard */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+                <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
+                        <Users className="w-4 h-4" />
+                        <span>Configuración</span>
+                        <ChevronRight className="w-3 h-3 opacity-50" />
+                        <span className="text-foreground">Usuarios</span>
+                    </div>
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground">Gestión de Usuarios</h1>
+                    <p className="text-sm text-muted-foreground">Administra los accesos y perfiles autorizados para EBM Central</p>
                 </div>
                 {hasPermission('ebm.config.users') && (
-                    <button onClick={handleCreate} className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium shadow-sm">
-                        <Plus className="w-4 h-4" /> Nuevo Usuario
+                    <button 
+                        onClick={openNew}
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-all active:scale-95 font-semibold text-sm shadow-sm"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Nuevo Usuario
                     </button>
                 )}
             </div>
-            
-            {/* Toolbar */}
-            <div className="p-4 bg-muted/30 border-x border-border flex items-center gap-4 shrink-0">
-                <div className="relative max-w-md flex-1">
-                    <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
-                    <input
-                        type="text"
-                        value={searchTerm}
-                        onChange={handleSearch}
-                        placeholder="Buscar por nombre, usuario o email..."
-                        className="w-full pl-9 pr-4 py-2 bg-background border border-input rounded-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-sm"
-                    />
+
+            {/* Content Container */}
+            <div className="flex-1 min-h-0 flex flex-col bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+                {/* Search / Filters */}
+                <div className="p-4 border-b border-border bg-muted/20">
+                    <div className="relative max-w-md">
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <input
+                            type="text"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Buscar por nombre, usuario o email..."
+                            className="w-full pl-10 pr-4 py-2.5 bg-background border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium"
+                        />
+                    </div>
+                </div>
+
+                {/* Table Area */}
+                <div className="flex-1 overflow-auto relative custom-scrollbar">
+                    {isLoading ? (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-card/50 backdrop-blur-sm z-50">
+                            <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                            <span className="text-sm font-medium text-muted-foreground mt-4">Sincronizando con el directorio...</span>
+                        </div>
+                    ) : (
+                        <table className="w-full text-sm text-left border-collapse table-fixed min-w-[800px]">
+                            <thead className="sticky top-0 z-20 bg-muted/90 backdrop-blur-md">
+                                <tr className="border-b border-border">
+                                    <ResizableHeader columnId="usuario" width={widths.usuario} onResizeStart={onResizeStart} className="px-6 py-4">
+                                        <div className="flex items-center justify-between gap-2">
+                                            <span className="font-bold text-xs uppercase tracking-wider text-muted-foreground">Identidad / Perfil</span>
+                                            <button onClick={() => handleSort('username')} className="p-1 hover:bg-primary/10 rounded transition-colors">
+                                                <SortIcon column="username" />
+                                            </button>
+                                        </div>
+                                    </ResizableHeader>
+                                    <ResizableHeader columnId="email" width={widths.email} onResizeStart={onResizeStart} className="px-6 py-4">
+                                        <div className="flex items-center justify-between gap-2">
+                                            <span className="font-bold text-xs uppercase tracking-wider text-muted-foreground">Comunicación</span>
+                                            <button onClick={() => handleSort('email')} className="p-1 hover:bg-primary/10 rounded transition-colors">
+                                                <SortIcon column="email" />
+                                            </button>
+                                        </div>
+                                    </ResizableHeader>
+                                    <ResizableHeader columnId="rol" width={widths.rol} onResizeStart={onResizeStart} className="px-6 py-4">
+                                        <div className="flex items-center justify-between gap-2">
+                                            <span className="font-bold text-xs uppercase tracking-wider text-muted-foreground">Rol Asignado</span>
+                                            <button onClick={() => handleSort('rol')} className="p-1 hover:bg-primary/10 rounded transition-colors">
+                                                <SortIcon column="rol" />
+                                            </button>
+                                        </div>
+                                    </ResizableHeader>
+                                    <ResizableHeader columnId="apps" width={widths.apps} onResizeStart={onResizeStart} className="px-6 py-4">
+                                        <span className="font-bold text-xs uppercase tracking-wider text-muted-foreground">Ecosistema SIATC</span>
+                                    </ResizableHeader>
+                                    <th className="px-6 py-4 w-24 font-bold text-xs uppercase tracking-wider text-muted-foreground text-right italic">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border">
+                                {filtered.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={5} className="px-6 py-20 text-center opacity-60">
+                                            <div className="flex flex-col items-center gap-3">
+                                                <Activity className="w-12 h-12 text-muted-foreground/20" />
+                                                <p className="text-sm font-medium text-muted-foreground">No se encontraron registros</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    filtered.map((user) => (
+                                        <tr key={user.id} className="group hover:bg-muted/30 transition-colors">
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs border border-primary/20 shrink-0">
+                                                        {user.username?.substring(0, 2).toUpperCase()}
+                                                    </div>
+                                                    <div className="flex flex-col min-w-0">
+                                                        <span className="font-bold text-foreground truncate uppercase">{user.full_name || user.username}</span>
+                                                        <span className="text-[10px] text-muted-foreground font-mono">@{user.username}</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 font-medium text-muted-foreground truncate">
+                                                {user.email}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase shadow-sm border bg-secondary/50 text-secondary-foreground border-border">
+                                                     <ShieldCheck className="w-3 h-3 text-primary/60" />
+                                                    {user.role_name || 'INVITADO'}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex flex-wrap gap-1">
+                                                    {(user.apps || 'EBM').split(',').map(app => (
+                                                        <span key={app} className="px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-tighter border bg-primary/5 text-primary border-primary/10">
+                                                            {app.trim()}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    {hasPermission('ebm.config.users') && (
+                                                        <>
+                                                            <button
+                                                                onClick={() => openEdit(user)}
+                                                                className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-all active:scale-90"
+                                                                title="Editar"
+                                                            >
+                                                                <Edit2 className="w-4 h-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDelete(user.id)}
+                                                                className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all active:scale-90"
+                                                                title="Revocar"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+                
+                {/* Footer Stats */}
+                <div className="px-6 py-3 border-t border-border bg-muted/30 flex items-center justify-between shrink-0">
+                    <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                        Total usuarios: <span className="text-foreground ml-1">{filtered.length}</span>
+                    </p>
                 </div>
             </div>
 
-            {/* Table Content */}
-            <div className="flex-1 overflow-auto bg-card border-x border-b border-border rounded-b-lg">
-                <table className="w-full text-sm text-left table-fixed border-collapse">
-                    <thead className="sticky top-0 z-20 bg-muted/80 backdrop-blur-sm text-muted-foreground font-medium border-b border-border">
-                        <tr>
-                            <ResizableHeader columnId="usuario" width={widths.usuario} onResizeStart={onResizeStart} className="px-6 py-3 group/header border-b border-border">
-                                <div className="flex items-center justify-between gap-1 w-full overflow-hidden">
-                                    <span className="truncate pr-1 font-bold">Usuario</span>
-                                    <button onClick={(e) => { e.stopPropagation(); handleSort('username'); }} className="p-1 hover:bg-primary/10 rounded-md transition-colors shrink-0"><SortIcon column="username" /></button>
-                                </div>
-                            </ResizableHeader>
-                            <ResizableHeader columnId="email" width={widths.email} onResizeStart={onResizeStart} className="px-6 py-3 group/header border-b border-border">
-                                <div className="flex items-center justify-between gap-1 w-full overflow-hidden">
-                                    <span className="truncate pr-1 font-bold">Email</span>
-                                    <button onClick={(e) => { e.stopPropagation(); handleSort('email'); }} className="p-1 hover:bg-primary/10 rounded-md transition-colors shrink-0"><SortIcon column="email" /></button>
-                                </div>
-                            </ResizableHeader>
-                            <ResizableHeader columnId="rol" width={widths.rol} onResizeStart={onResizeStart} className="px-6 py-3 group/header border-b border-border">
-                                <div className="flex items-center justify-between gap-1 w-full overflow-hidden">
-                                    <span className="truncate pr-1 font-bold">Rol</span>
-                                    <button onClick={(e) => { e.stopPropagation(); handleSort('rol'); }} className="p-1 hover:bg-primary/10 rounded-md transition-colors shrink-0"><SortIcon column="rol" /></button>
-                                </div>
-                            </ResizableHeader>
-                            <ResizableHeader columnId="apps" width={widths.apps} onResizeStart={onResizeStart} className="px-6 py-3 border-b border-border font-bold">Aplicaciones</ResizableHeader>
-                            <th className="px-6 py-3 text-right w-24 border-b border-border font-bold">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                        {filteredUsers.length > 0 ? (
-                            filteredUsers.map((user) => (
-                                <tr key={user.id} className="hover:bg-muted/50 transition-colors">
-                                    <td style={{ width: widths.usuario }} className="px-6 py-4 truncate">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase shrink-0">
-                                                {user.username.substring(0, 2).toUpperCase()}
-                                            </div>
-                                            <div className="truncate">
-                                                <div className="font-medium text-foreground truncate">{user.full_name || user.username}</div>
-                                                <div className="text-xs text-muted-foreground truncate">@{user.username}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td style={{ width: widths.email }} className="px-6 py-4 text-foreground truncate">{user.email}</td>
-                                    <td style={{ width: widths.rol }} className="px-6 py-4 truncate">
-                                        <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
-                                            {user.role_name || 'Sin Rol'}
-                                        </span>
-                                    </td>
-                                    <td style={{ width: widths.apps }} className="px-6 py-4 truncate">
-                                        <div className="flex flex-wrap gap-1">
-                                            {(user.apps || 'EBM').split(',').map(app => (
-                                                <span key={app} className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/5 text-primary border border-primary/10 uppercase">
-                                                    {app.trim()}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <div className="flex items-center justify-end gap-2">
-                                            {hasPermission('ebm.config.users') && (
-                                                <>
-                                                    <button
-                                                        onClick={() => handleEdit(user)}
-                                                        className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-md transition-colors"
-                                                        title="Editar"
-                                                    >
-                                                        <Edit2 className="w-4 h-4" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(user.id)}
-                                                        className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors"
-                                                        title="Eliminar"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                </>
-                                            )}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground font-medium italic opacity-60">
-                                    No se encontraron usuarios que coincidan con la búsqueda.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* Add/Edit Modal */}
-            <Modal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                title={editingUser ? 'Editar Usuario' : 'Nuevo Usuario'}
-                size="lg"
-            >
-                <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Modal: SIATC Standard */}
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingUser?.id ? 'CONFIGURACIÓN DE IDENTIDAD' : 'REGISTRO DE USUARIO'} size="lg">
+                <div className="p-6 pt-2 space-y-6">
                     {error && (
-                        <div className="p-3 bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400 rounded-lg text-sm font-medium flex items-center gap-2">
-                            <AlertCircle className="w-4 h-4" />
+                        <div className="p-4 bg-destructive/10 border border-destructive/20 text-destructive text-[11px] font-bold uppercase rounded-xl flex items-center gap-3">
+                            <Activity className="w-4 h-4 shrink-0" />
                             {error}
                         </div>
                     )}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-foreground mb-1">Nombre Completo *</label>
-                            <input
-                                type="text"
-                                value={formData.full_name || ''}
-                                onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                                className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-4 md:col-span-2 bg-muted/30 p-5 rounded-2xl border border-border/50">
+                            <div className="flex items-center gap-2 text-xs font-black text-muted-foreground uppercase tracking-[0.2em]">
+                                <UserCircle2 className="w-4 h-4 text-primary" />
+                                Nombre Completo del Colaborador:
+                            </div>
+                            <input 
+                                type="text" 
+                                required
+                                value={editingUser?.full_name || ''} 
+                                onChange={e => setEditingUser(prev => prev ? { ...prev, full_name: e.target.value } : null)}
+                                className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-muted-foreground/30" 
+                                placeholder="Ej: JUAN PEREZ"
                             />
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-foreground mb-1">Usuario *</label>
-                            <input
-                                type="text"
-                                value={formData.username || ''}
-                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                                className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
-                            />
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">ID / Login User:</label>
+                            <input type="text" required value={editingUser?.username || ''} onChange={e => setEditingUser(prev => prev ? { ...prev, username: e.target.value } : null)}
+                                className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-mono" />
                         </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-foreground mb-1">Email *</label>
-                            <input
-                                type="email"
-                                value={formData.email || ''}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
-                            />
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Correo Institucional:</label>
+                            <div className="relative">
+                                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
+                                <input type="email" required value={editingUser?.email || ''} onChange={e => setEditingUser(prev => prev ? { ...prev, email: e.target.value } : null)}
+                                    className="w-full h-11 pl-10 pr-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
+                            </div>
                         </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-foreground mb-1">
-                                {editingUser ? 'Nueva Contraseña (dejar vacío para no cambiar)' : 'Contraseña *'}
-                            </label>
-                            <input
-                                type="password"
-                                value={formData.password_hash || ''}
-                                onChange={(e) => setFormData({ ...formData, password_hash: e.target.value })}
-                                className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
-                                placeholder={editingUser ? "••••••••" : ""}
-                            />
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">{editingUser?.id ? 'Cambiar Password:' : 'Password de Seguridad:'}</label>
+                            <input type="password" required={!editingUser?.id} value={editingUser?.password_hash || ''} onChange={e => setEditingUser(prev => prev ? { ...prev, password_hash: e.target.value } : null)}
+                                className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" placeholder="••••••••" />
                         </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-foreground mb-1">Rol *</label>
-                            <select
-                                value={formData.role_id || ''}
-                                onChange={(e) => setFormData({ ...formData, role_id: e.target.value })}
-                                className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                                <option value="">Seleccionar rol</option>
-                                {roles.map(role => (
-                                    <option key={role.id} value={role.id}>{role.name}</option>
-                                ))}
+                        <div className="space-y-2">
+                             <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Rol de Seguridad:</label>
+                            <select required value={editingUser?.role_id || ''} onChange={e => setEditingUser(prev => prev ? { ...prev, role_id: e.target.value } : null)}
+                                className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all appearance-none cursor-pointer">
+                                <option value="" disabled>Seleccionar perfil...</option>
+                                {roles.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                             </select>
                         </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-foreground mb-1">Gerencia *</label>
-                            <select
-                                value={formData.management_id || ''}
-                                onChange={(e) => setFormData({ ...formData, management_id: e.target.value })}
-                                className="w-full flex h-10 px-3 py-2 bg-background border border-input rounded-md text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                                <option value="">Seleccionar gerencia</option>
-                                {managements.map(mgmt => (
-                                    <option key={mgmt.id} value={mgmt.id}>{mgmt.name}</option>
-                                ))}
+                        <div className="space-y-2 md:col-span-2">
+                            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Gerencia / Sede Asignada:</label>
+                            <select required value={editingUser?.management_id || ''} onChange={e => setEditingUser(prev => prev ? { ...prev, management_id: e.target.value } : null)}
+                                className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all appearance-none cursor-pointer">
+                                <option value="" disabled>Seleccionar ubicación corporativa...</option>
+                                {managements.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
                             </select>
                         </div>
-
-                        <div className="col-span-full border-t border-border pt-4 mt-2">
-                            <label className="block text-sm font-medium text-foreground mb-3">Acceso a Aplicaciones</label>
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        
+                        <div className="col-span-full space-y-4 pt-4">
+                            <div className="flex items-center gap-2 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-2 px-1">
+                                <ShieldCheck className="w-4 h-4 text-primary" /> Alcance en Ecosistema SIATC:
+                            </div>
+                            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                                 {[
-                                    { id: 'EBM', label: 'EBM (Principal)' },
+                                    { id: 'EBM', label: 'EBM Central' },
                                     { id: 'FSM', label: 'Gestor FSM' },
-                                    { id: 'TCtrl', label: 'Tablero Control' },
-                                    { id: 'Liq', label: 'Liquidaciones' }
+                                    { id: 'TCtrl', label: 'Tablero' },
+                                    { id: 'Liq', label: 'Liquidaciones' },
+                                    { id: 'VAL', label: 'Valuaciones' }
                                 ].map(app => {
-                                    const isSelected = (formData.apps || '').split(',').map(a => a.trim()).includes(app.id);
+                                    const isSelected = (editingUser?.apps || '').split(',').map(a => a.trim()).includes(app.id);
                                     return (
                                         <button key={app.id} type="button" onClick={() => toggleApp(app.id)}
                                             className={cn(
-                                                "flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-left transition-colors border",
+                                                "group flex flex-col items-center gap-3 p-4 rounded-2xl text-[10px] font-black transition-all border shadow-sm relative overflow-hidden",
                                                 isSelected
-                                                    ? "bg-primary/5 border-primary/20 text-primary"
-                                                    : "bg-card border-border text-foreground hover:bg-muted"
+                                                    ? 'bg-primary border-primary text-primary-foreground shadow-lg shadow-primary/20'
+                                                    : 'bg-muted/30 border-border/50 text-muted-foreground hover:bg-muted/50'
                                             )}>
                                             <div className={cn(
-                                                "w-4 h-4 rounded border flex items-center justify-center transition-colors",
-                                                isSelected ? "bg-primary border-primary text-white" : "border-input bg-background"
+                                                "w-5 h-5 rounded-lg border flex items-center justify-center transition-all",
+                                                isSelected ? 'bg-white border-white text-primary scale-110 shadow-sm' : 'border-border bg-background'
                                             )}>
-                                                {isSelected && <Save className="w-2.5 h-2.5" />}
+                                                {isSelected && <Check className="w-3.5 h-3.5 stroke-[4]" /> }
                                             </div>
                                             {app.label}
                                         </button>
@@ -419,38 +410,43 @@ export function UsersPage() {
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-4 col-span-full border-t border-border pt-4">
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    id="is_active"
-                                    checked={formData.is_active ?? true}
-                                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                                    className="rounded border-input text-primary focus:ring-primary"
-                                />
-                                <label htmlFor="is_active" className="text-sm font-medium text-foreground">
-                                    Usuario activo
-                                </label>
-                            </div>
+                        <div className="col-span-full pt-4">
+                            <button
+                                type="button"
+                                onClick={() => setEditingUser(prev => prev ? { ...prev, is_active: !prev.is_active } : null)}
+                                className={cn(
+                                    "w-full flex items-center justify-between px-6 py-4 rounded-2xl text-xs font-black uppercase transition-all border shadow-sm",
+                                    editingUser?.is_active
+                                        ? "bg-emerald-50 text-emerald-700 border-emerald-200/50"
+                                        : "bg-rose-50 text-rose-700 border-rose-200/50"
+                                )}
+                            >
+                                <span className="tracking-widest">Acceso al Ecosistema:</span>
+                                <div className="flex items-center gap-3">
+                                    {editingUser?.is_active ? 'HABILITADO' : 'SUSPENDIDO'}
+                                    <div className={cn(
+                                        "w-10 h-5 rounded-full relative transition-colors",
+                                        editingUser?.is_active ? "bg-emerald-500" : "bg-rose-500"
+                                    )}>
+                                        <div className={cn(
+                                            "absolute top-1 w-3 h-3 rounded-full bg-white transition-all",
+                                            editingUser?.is_active ? "left-6" : "left-1"
+                                        )} />
+                                    </div>
+                                </div>
+                            </button>
                         </div>
                     </div>
-
-                    <div className="flex justify-end gap-3 pt-4 border-t border-border mt-6">
-                        <button
-                            type="button"
-                            onClick={() => setIsModalOpen(false)}
-                            className="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-accent rounded-md transition-colors"
-                        >
+                    
+                    <div className="flex justify-end gap-3 pt-4 border-t border-border mt-2">
+                        <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2.5 text-xs font-bold text-muted-foreground hover:bg-muted rounded-xl transition-all uppercase tracking-widest active:scale-95">
                             Cancelar
                         </button>
-                        <button
-                            type="submit"
-                            className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-md shadow-sm transition-colors"
-                        >
-                            Guardar
+                        <button onClick={handleSave} className="px-8 py-2.5 text-xs font-bold text-primary-foreground bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/25 active:scale-95 transition-all uppercase tracking-widest flex items-center gap-2">
+                            <Check className="w-4 h-4 stroke-[3]" /> Confirmar Cambios
                         </button>
                     </div>
-                </form>
+                </div>
             </Modal>
         </div>
     );
