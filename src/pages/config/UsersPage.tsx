@@ -160,7 +160,7 @@ export default function UsersPage() {
                         <Users className="w-4 h-4" />
                         <span>Configuración</span>
                         <ChevronRight className="w-3 h-3 opacity-50" />
-                        <span className="text-foreground">Usuarios</span>
+                        <span className="text-foreground">Gestión de Usuarios</span>
                     </div>
                     <h1 className="text-2xl font-bold tracking-tight text-foreground">Gestión de Usuarios</h1>
                     <p className="text-sm text-muted-foreground">Administra los accesos y perfiles autorizados para EBM Central</p>
@@ -200,37 +200,31 @@ export default function UsersPage() {
                             <span className="text-sm font-medium text-muted-foreground mt-4">Sincronizando con el directorio...</span>
                         </div>
                     ) : (
-                        <table className="w-full text-sm text-left border-collapse table-fixed min-w-[800px]">
+                        <table className="w-full text-sm text-left border-collapse table-fixed min-w-[1000px]">
                             <thead className="sticky top-0 z-20 bg-muted/90 backdrop-blur-md">
                                 <tr className="border-b border-border">
                                     <ResizableHeader columnId="usuario" width={widths.usuario} onResizeStart={onResizeStart} className="px-6 py-4">
-                                        <div className="flex items-center justify-between gap-2">
-                                            <span className="font-bold text-xs uppercase tracking-wider text-muted-foreground">Identidad / Perfil</span>
-                                            <button onClick={() => handleSort('username')} className="p-1 hover:bg-primary/10 rounded transition-colors">
-                                                <SortIcon column="username" />
-                                            </button>
+                                        <div className="flex items-center justify-between gap-2 group/header cursor-pointer" onClick={() => handleSort('username')}>
+                                            <span className="font-bold text-xs uppercase tracking-wider text-muted-foreground">Responsable / ID</span>
+                                            <SortIcon column="username" />
                                         </div>
                                     </ResizableHeader>
                                     <ResizableHeader columnId="email" width={widths.email} onResizeStart={onResizeStart} className="px-6 py-4">
-                                        <div className="flex items-center justify-between gap-2">
-                                            <span className="font-bold text-xs uppercase tracking-wider text-muted-foreground">Comunicación</span>
-                                            <button onClick={() => handleSort('email')} className="p-1 hover:bg-primary/10 rounded transition-colors">
-                                                <SortIcon column="email" />
-                                            </button>
+                                        <div className="flex items-center justify-between gap-2 group/header cursor-pointer" onClick={() => handleSort('email')}>
+                                            <span className="font-bold text-xs uppercase tracking-wider text-muted-foreground">Correo Corporativo</span>
+                                            <SortIcon column="email" />
                                         </div>
                                     </ResizableHeader>
                                     <ResizableHeader columnId="rol" width={widths.rol} onResizeStart={onResizeStart} className="px-6 py-4">
-                                        <div className="flex items-center justify-between gap-2">
-                                            <span className="font-bold text-xs uppercase tracking-wider text-muted-foreground">Rol Asignado</span>
-                                            <button onClick={() => handleSort('rol')} className="p-1 hover:bg-primary/10 rounded transition-colors">
-                                                <SortIcon column="rol" />
-                                            </button>
+                                        <div className="flex items-center justify-between gap-2 group/header cursor-pointer" onClick={() => handleSort('rol')}>
+                                            <span className="font-bold text-xs uppercase tracking-wider text-muted-foreground">Perfil de Seguridad</span>
+                                            <SortIcon column="rol" />
                                         </div>
                                     </ResizableHeader>
                                     <ResizableHeader columnId="apps" width={widths.apps} onResizeStart={onResizeStart} className="px-6 py-4">
-                                        <span className="font-bold text-xs uppercase tracking-wider text-muted-foreground">Ecosistema SIATC</span>
+                                        <span className="font-bold text-xs uppercase tracking-wider text-muted-foreground text-center">Alcance Ecosistema</span>
                                     </ResizableHeader>
-                                    <th className="px-6 py-4 w-24 font-bold text-xs uppercase tracking-wider text-muted-foreground text-right italic">Acciones</th>
+                                    <th className="px-6 py-4 w-28 bg-muted/30 text-right italic font-medium text-xs text-muted-foreground">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border">
@@ -248,12 +242,14 @@ export default function UsersPage() {
                                         <tr key={user.id} className="group hover:bg-muted/30 transition-colors">
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs border border-primary/20 shrink-0">
+                                                    <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs border border-primary/20 shadow-inner shrink-0 group-hover:scale-105 transition-transform">
                                                         {user.username?.substring(0, 2).toUpperCase()}
                                                     </div>
-                                                    <div className="flex flex-col min-w-0">
-                                                        <span className="font-bold text-foreground truncate uppercase">{user.full_name || user.username}</span>
-                                                        <span className="text-[10px] text-muted-foreground font-mono">@{user.username}</span>
+                                                    <div className="min-w-0">
+                                                        <div className="font-bold text-foreground text-sm uppercase truncate tracking-tight">{user.full_name || user.username}</div>
+                                                        <div className="text-[10px] text-muted-foreground font-mono truncate uppercase flex items-center gap-1.5 opacity-60 mt-0.5">
+                                                            <Activity className="w-2.5 h-2.5" /> ID: {user.username}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </td>

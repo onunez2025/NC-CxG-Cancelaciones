@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation, Navigate } from 'react-router-dom';
-import { Users, Shield, Building2, Wallet, Briefcase, Calculator, Terminal, ChevronRight } from 'lucide-react';
+import { Users, Shield, Building2, Wallet, Briefcase, RefreshCw, Terminal, ChevronRight, Settings2 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { cn } from '../../utils/cn';
 
@@ -8,13 +8,13 @@ export default function ConfigLayout() {
     const location = useLocation();
 
     const configItems = [
-        { to: '/config/users', icon: Users, label: 'Usuarios', permission: 'ebm.config.users' as const },
-        { to: '/config/roles', icon: Shield, label: 'Roles', permission: 'ebm.config.roles' as const },
-        { to: '/config/audit', icon: Terminal, label: 'Auditoría', permission: 'ebm.config.users' as const },
+        { to: '/config/users', icon: Users, label: 'Gestión de Usuarios', permission: 'ebm.config.users' as const },
+        { to: '/config/roles', icon: Shield, label: 'Perfiles y Permisos', permission: 'ebm.config.roles' as const },
         { to: '/config/cecos', icon: Building2, label: 'Centros de Coste' },
         { to: '/config/accounts', icon: Wallet, label: 'Cuentas Contables' },
         { to: '/config/managements', icon: Briefcase, label: 'Gerencias' },
-        { to: '/config/exchange-rates', icon: Calculator, label: 'Tipos de Cambio' },
+        { to: '/config/exchange-rates', icon: RefreshCw, label: 'Tipos de Cambio' },
+        { to: '/config/audit', icon: Terminal, label: 'Logs de Auditoría', permission: 'ebm.config.users' as const },
     ];
 
     const filteredItems = configItems.filter(item =>
@@ -29,81 +29,71 @@ export default function ConfigLayout() {
     }
 
     return (
-        <div className="flex-1 h-full overflow-hidden flex flex-col p-4 lg:p-8 animate-in fade-in duration-500">
-            <div className="grid grid-cols-1 lg:grid-cols-[16rem_1fr] gap-8 h-full min-h-0">
-                {/* Secondary Sidebar: SIATC Premium Style */}
-                <aside className="hidden lg:flex flex-col gap-6 shrink-0">
-                    <div className="space-y-4">
-                        <div>
-                            <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-4 mb-4">
-                                Configuración de Sistema
-                            </h3>
-                            <nav className="space-y-1">
-                                {filteredItems.map(item => (
-                                    <NavLink
-                                        key={item.to}
-                                        to={item.to}
-                                        className={({ isActive }) => cn(
-                                            "group flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-bold transition-all relative overflow-hidden",
-                                            isActive
-                                                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
-                                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                                        )}
-                                    >
-                                        {({ isActive }) => (
-                                            <>
-                                                <div className="flex items-center gap-3 relative z-10">
-                                                    <item.icon className={cn(
-                                                        "w-4 h-4 transition-transform group-hover:scale-110",
-                                                        isActive ? "text-primary-foreground" : "text-primary"
-                                                    )} />
-                                                    <span>{item.label}</span>
-                                                </div>
-                                                {location.pathname === item.to && (
-                                                    <ChevronRight className="w-4 h-4 text-primary-foreground/50 animate-in slide-in-from-left-2" />
-                                                )}
-                                            </>
-                                        )}
-                                    </NavLink>
-                                ))}
-                            </nav>
+        <div className="flex-1 h-full overflow-hidden flex flex-col p-4 lg:p-8 bg-slate-50 dark:bg-slate-950">
+            <div className="grid grid-cols-1 lg:grid-cols-[18rem_1fr] gap-8 h-full min-h-0 w-full">
+                {/* SIATC Premium Sidebar */}
+                <aside className="shrink-0 flex flex-col min-h-0 h-fit lg:h-full group">
+                    <div className="bg-card rounded-[2rem] border border-border/50 shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden flex flex-col h-full backdrop-blur-sm">
+                        <div className="p-6 border-b border-border/50 bg-gradient-to-br from-primary/5 to-transparent">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2.5 bg-primary text-white rounded-2xl shadow-lg shadow-primary/20 ring-4 ring-primary/5">
+                                    <Settings2 className="w-5 h-5 stroke-[2.5]" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] leading-none">Módulo de</span>
+                                    <span className="text-lg font-bold text-foreground tracking-tight">Configuración</span>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Visual Divider / Branding */}
-                        <div className="px-4 pt-4 border-t border-border/50">
-                            <div className="bg-muted/30 rounded-2xl p-4 border border-border/50 relative overflow-hidden group">
-                                <div className="absolute -right-4 -bottom-4 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity">
-                                    <Shield className="w-20 h-20" />
+                        <nav className="flex-1 p-3 space-y-1 overflow-y-auto custom-scrollbar">
+                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-4 py-3 opacity-60">Control Gestión Presupuestal</p>
+                            {filteredItems.map((item) => (
+                                <NavLink
+                                    key={item.to}
+                                    to={item.to}
+                                    className={({ isActive }) => cn(
+                                        "group/item flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300 relative overflow-hidden",
+                                        isActive
+                                            ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 translate-x-1"
+                                            : "text-muted-foreground hover:bg-muted hover:text-foreground hover:translate-x-1"
+                                    )}
+                                >
+                                    <div className="flex items-center gap-3 relative z-10">
+                                        <item.icon className={cn(
+                                            "w-5 h-5 transition-transform duration-500",
+                                            "group-hover/item:scale-110"
+                                        )} />
+                                        <span className="tracking-tight">{item.label}</span>
+                                    </div>
+                                    <ChevronRight className={cn(
+                                        "w-4 h-4 transition-all duration-300 opacity-0 -translate-x-2 relative z-10",
+                                        "group-hover/item:opacity-100 group-hover/item:translate-x-0"
+                                    )} />
+                                </NavLink>
+                            ))}
+                        </nav>
+
+                        {/* Sidebar Footer Info */}
+                        <div className="p-4 bg-muted/30 border-t border-border/50">
+                            <div className="p-4 bg-background rounded-2xl border border-border/50 shadow-sm">
+                                <div className="flex items-center gap-2 mb-1.5 font-bold text-[10px] text-primary uppercase tracking-widest">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                                    Sistema SIATC
                                 </div>
-                                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest relative z-10">Ecosistema</p>
-                                <p className="text-xs font-black text-foreground relative z-10 mt-1">SIATC v3.0</p>
+                                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-tighter leading-relaxed">
+                                    Gestión Presupuestal EBM v3.5.0
+                                </p>
                             </div>
                         </div>
                     </div>
                 </aside>
 
-                {/* Mobile Navigation (Simplified) */}
-                <div className="lg:hidden shrink-0 pb-2 overflow-x-auto no-scrollbar flex items-center gap-2">
-                    {filteredItems.map(item => (
-                        <NavLink
-                            key={item.to}
-                            to={item.to}
-                            className={({ isActive }) => cn(
-                                "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border",
-                                isActive
-                                    ? "bg-primary text-primary-foreground border-primary shadow-md"
-                                    : "bg-card text-muted-foreground border-border hover:bg-muted"
-                            )}
-                        >
-                            <item.icon className="w-3.5 h-3.5" />
-                            {item.label}
-                        </NavLink>
-                    ))}
-                </div>
-
-                {/* Config Content */}
-                <main className="flex-1 min-w-0 h-full flex flex-col min-h-0 bg-background/50 rounded-3xl lg:p-0">
-                    <Outlet />
+                {/* Main Content Area */}
+                <main className="flex-1 min-w-0 h-full flex flex-col min-h-0 bg-transparent">
+                    <div className="flex-1 flex flex-col min-h-0">
+                        <Outlet />
+                    </div>
                 </main>
             </div>
         </div>
