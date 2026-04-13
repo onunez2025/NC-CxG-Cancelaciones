@@ -154,7 +154,7 @@ export default function UsersPage() {
     return (
         <div className="flex flex-col h-full space-y-4 min-h-0 animate-in fade-in duration-500">
             {/* Header: SIATC Standard */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 px-1">
                 <div className="space-y-1">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
                         <Users className="w-4 h-4" />
@@ -205,24 +205,24 @@ export default function UsersPage() {
                                 <tr className="border-b border-border">
                                     <ResizableHeader columnId="usuario" width={widths.usuario} onResizeStart={onResizeStart} className="px-6 py-4">
                                         <div className="flex items-center justify-between gap-2 group/header cursor-pointer" onClick={() => handleSort('username')}>
-                                            <span className="font-bold text-xs uppercase tracking-wider text-muted-foreground">Responsable / ID</span>
+                                            <span className="font-bold text-xs tracking-wider text-muted-foreground">Responsable / ID</span>
                                             <SortIcon column="username" />
                                         </div>
                                     </ResizableHeader>
                                     <ResizableHeader columnId="email" width={widths.email} onResizeStart={onResizeStart} className="px-6 py-4">
                                         <div className="flex items-center justify-between gap-2 group/header cursor-pointer" onClick={() => handleSort('email')}>
-                                            <span className="font-bold text-xs uppercase tracking-wider text-muted-foreground">Correo Corporativo</span>
+                                            <span className="font-bold text-xs tracking-wider text-muted-foreground">Correo Corporativo</span>
                                             <SortIcon column="email" />
                                         </div>
                                     </ResizableHeader>
                                     <ResizableHeader columnId="rol" width={widths.rol} onResizeStart={onResizeStart} className="px-6 py-4">
                                         <div className="flex items-center justify-between gap-2 group/header cursor-pointer" onClick={() => handleSort('rol')}>
-                                            <span className="font-bold text-xs uppercase tracking-wider text-muted-foreground">Perfil de Seguridad</span>
+                                            <span className="font-bold text-xs tracking-wider text-muted-foreground">Perfil de Seguridad</span>
                                             <SortIcon column="rol" />
                                         </div>
                                     </ResizableHeader>
-                                    <ResizableHeader columnId="apps" width={widths.apps} onResizeStart={onResizeStart} className="px-6 py-4">
-                                        <span className="font-bold text-xs uppercase tracking-wider text-muted-foreground text-center">Alcance Ecosistema</span>
+                                    <ResizableHeader columnId="apps" width={widths.apps} onResizeStart={onResizeStart} className="px-6 py-4 text-center">
+                                        <span className="font-bold text-xs tracking-wider text-muted-foreground">Alcance Ecosistema</span>
                                     </ResizableHeader>
                                     <th className="px-6 py-4 w-28 bg-muted/30 text-right italic font-medium text-xs text-muted-foreground">Acciones</th>
                                 </tr>
@@ -246,8 +246,8 @@ export default function UsersPage() {
                                                         {user.username?.substring(0, 2).toUpperCase()}
                                                     </div>
                                                     <div className="min-w-0">
-                                                        <div className="font-bold text-foreground text-sm uppercase truncate tracking-tight">{user.full_name || user.username}</div>
-                                                        <div className="text-[10px] text-muted-foreground font-mono truncate uppercase flex items-center gap-1.5 opacity-60 mt-0.5">
+                                                        <div className="font-bold text-foreground text-sm truncate tracking-tight">{user.full_name || user.username}</div>
+                                                        <div className="text-[10px] text-muted-foreground font-mono truncate flex items-center gap-1.5 opacity-60 mt-0.5">
                                                             <Activity className="w-2.5 h-2.5" /> ID: {user.username}
                                                         </div>
                                                     </div>
@@ -257,21 +257,21 @@ export default function UsersPage() {
                                                 {user.email}
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase shadow-sm border bg-secondary/50 text-secondary-foreground border-border">
+                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black shadow-sm border bg-secondary/50 text-secondary-foreground border-border">
                                                      <ShieldCheck className="w-3 h-3 text-primary/60" />
-                                                    {user.role_name || 'INVITADO'}
+                                                    {user.role_name || 'Invitado'}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-wrap gap-1">
                                                     {(user.apps || 'EBM').split(',').map(app => (
-                                                        <span key={app} className="px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-tighter border bg-primary/5 text-primary border-primary/10">
+                                                        <span key={app} className="px-2 py-0.5 rounded-lg text-[9px] font-black tracking-tighter border bg-primary/5 text-primary border-primary/10">
                                                             {app.trim()}
                                                         </span>
                                                     ))}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4">
+                                            <td className="px-6 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     {hasPermission('ebm.config.users') && (
                                                         <>
@@ -303,17 +303,17 @@ export default function UsersPage() {
                 
                 {/* Footer Stats */}
                 <div className="px-6 py-3 border-t border-border bg-muted/30 flex items-center justify-between shrink-0">
-                    <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                    <p className="text-[11px] font-bold text-muted-foreground tracking-wider">
                         Total usuarios: <span className="text-foreground ml-1">{filtered.length}</span>
                     </p>
                 </div>
             </div>
 
             {/* Modal: SIATC Standard */}
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingUser?.id ? 'CONFIGURACIÓN DE IDENTIDAD' : 'REGISTRO DE USUARIO'} size="lg">
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingUser?.id ? 'Configuración de Identidad' : 'Registro de Usuario'} size="lg">
                 <div className="p-6 pt-2 space-y-6">
                     {error && (
-                        <div className="p-4 bg-destructive/10 border border-destructive/20 text-destructive text-[11px] font-bold uppercase rounded-xl flex items-center gap-3">
+                        <div className="p-4 bg-destructive/10 border border-destructive/20 text-destructive text-[11px] font-bold rounded-xl flex items-center gap-3">
                             <Activity className="w-4 h-4 shrink-0" />
                             {error}
                         </div>
@@ -321,9 +321,9 @@ export default function UsersPage() {
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-4 md:col-span-2 bg-muted/30 p-5 rounded-2xl border border-border/50">
-                            <div className="flex items-center gap-2 text-xs font-black text-muted-foreground uppercase tracking-[0.2em]">
+                            <div className="flex items-center gap-2 text-xs font-black text-muted-foreground tracking-[0.2em]">
                                 <UserCircle2 className="w-4 h-4 text-primary" />
-                                Nombre Completo del Colaborador:
+                                Nombre completo del colaborador:
                             </div>
                             <input 
                                 type="text" 
@@ -331,17 +331,17 @@ export default function UsersPage() {
                                 value={editingUser?.full_name || ''} 
                                 onChange={e => setEditingUser(prev => prev ? { ...prev, full_name: e.target.value } : null)}
                                 className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-muted-foreground/30" 
-                                placeholder="Ej: JUAN PEREZ"
+                                placeholder="Ej: Juan Pérez"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">ID / Login User:</label>
+                            <label className="text-[10px] font-black text-muted-foreground tracking-widest pl-1">ID / Login User:</label>
                             <input type="text" required value={editingUser?.username || ''} onChange={e => setEditingUser(prev => prev ? { ...prev, username: e.target.value } : null)}
                                 className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-mono" />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Correo Institucional:</label>
+                            <label className="text-[10px] font-black text-muted-foreground tracking-widest pl-1">Correo institucional:</label>
                             <div className="relative">
                                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
                                 <input type="email" required value={editingUser?.email || ''} onChange={e => setEditingUser(prev => prev ? { ...prev, email: e.target.value } : null)}
@@ -349,12 +349,12 @@ export default function UsersPage() {
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">{editingUser?.id ? 'Cambiar Password:' : 'Password de Seguridad:'}</label>
+                            <label className="text-[10px] font-black text-muted-foreground tracking-widest pl-1">{editingUser?.id ? 'Cambiar password:' : 'Password de seguridad:'}</label>
                             <input type="password" required={!editingUser?.id} value={editingUser?.password_hash || ''} onChange={e => setEditingUser(prev => prev ? { ...prev, password_hash: e.target.value } : null)}
                                 className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" placeholder="••••••••" />
                         </div>
                         <div className="space-y-2">
-                             <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Rol de Seguridad:</label>
+                             <label className="text-[10px] font-black text-muted-foreground tracking-widest pl-1">Rol de seguridad:</label>
                             <select required value={editingUser?.role_id || ''} onChange={e => setEditingUser(prev => prev ? { ...prev, role_id: e.target.value } : null)}
                                 className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all appearance-none cursor-pointer">
                                 <option value="" disabled>Seleccionar perfil...</option>
@@ -362,7 +362,7 @@ export default function UsersPage() {
                             </select>
                         </div>
                         <div className="space-y-2 md:col-span-2">
-                            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Gerencia / Sede Asignada:</label>
+                            <label className="text-[10px] font-black text-muted-foreground tracking-widest pl-1">Gerencia / Sede asignada:</label>
                             <select required value={editingUser?.management_id || ''} onChange={e => setEditingUser(prev => prev ? { ...prev, management_id: e.target.value } : null)}
                                 className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all appearance-none cursor-pointer">
                                 <option value="" disabled>Seleccionar ubicación corporativa...</option>
@@ -371,8 +371,8 @@ export default function UsersPage() {
                         </div>
                         
                         <div className="col-span-full space-y-4 pt-4">
-                            <div className="flex items-center gap-2 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-2 px-1">
-                                <ShieldCheck className="w-4 h-4 text-primary" /> Alcance en Ecosistema SIATC:
+                            <div className="flex items-center gap-2 text-[10px] font-black text-muted-foreground tracking-[0.2em] mb-2 px-1">
+                                <ShieldCheck className="w-4 h-4 text-primary" /> Alcance en ecosistema SIATC:
                             </div>
                             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                                 {[
@@ -409,15 +409,15 @@ export default function UsersPage() {
                                 type="button"
                                 onClick={() => setEditingUser(prev => prev ? { ...prev, is_active: !prev.is_active } : null)}
                                 className={cn(
-                                    "w-full flex items-center justify-between px-6 py-4 rounded-2xl text-xs font-black uppercase transition-all border shadow-sm",
+                                    "w-full flex items-center justify-between px-6 py-4 rounded-2xl text-xs font-black transition-all border shadow-sm",
                                     editingUser?.is_active
                                         ? "bg-emerald-50 text-emerald-700 border-emerald-200/50"
                                         : "bg-rose-50 text-rose-700 border-rose-200/50"
                                 )}
                             >
-                                <span className="tracking-widest">Acceso al Ecosistema:</span>
+                                <span className="tracking-widest">Acceso al ecosistema:</span>
                                 <div className="flex items-center gap-3">
-                                    {editingUser?.is_active ? 'HABILITADO' : 'SUSPENDIDO'}
+                                    {editingUser?.is_active ? 'Habilitado' : 'Suspendido'}
                                     <div className={cn(
                                         "w-10 h-5 rounded-full relative transition-colors",
                                         editingUser?.is_active ? "bg-emerald-500" : "bg-rose-500"
@@ -433,11 +433,11 @@ export default function UsersPage() {
                     </div>
                     
                     <div className="flex justify-end gap-3 pt-4 border-t border-border mt-2">
-                        <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2.5 text-xs font-bold text-muted-foreground hover:bg-muted rounded-xl transition-all uppercase tracking-widest active:scale-95">
+                        <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2.5 text-xs font-bold text-muted-foreground hover:bg-muted rounded-xl transition-all tracking-widest active:scale-95">
                             Cancelar
                         </button>
-                        <button onClick={handleSave} className="px-8 py-2.5 text-xs font-bold text-primary-foreground bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/25 active:scale-95 transition-all uppercase tracking-widest flex items-center gap-2">
-                            <Check className="w-4 h-4 stroke-[3]" /> Confirmar Cambios
+                        <button onClick={handleSave} className="px-8 py-2.5 text-xs font-bold text-primary-foreground bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/25 active:scale-95 transition-all tracking-widest flex items-center gap-2">
+                            <Check className="w-4 h-4 stroke-[3]" /> Confirmar cambios
                         </button>
                     </div>
                 </div>

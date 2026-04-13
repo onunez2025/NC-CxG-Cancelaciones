@@ -12,7 +12,8 @@ import {
     Activity,
     Check,
     Hash,
-    Database
+    Database,
+    Save
 } from 'lucide-react';
 import { CostCentersService } from '../../services/costCentersService';
 import { ManagementsService } from '../../services/managementsService';
@@ -82,8 +83,8 @@ export default function CostCentersPage() {
 
     const handleDelete = (id: string) => {
         confirm({
-            title: 'Eliminar Centro de Coste',
-            message: '¿Está seguro de eliminar este Centro de Coste? Esta acción es irreversible y podría afectar la asignación presupuestaria.',
+            title: 'Eliminar centro de coste',
+            message: '¿Está seguro de eliminar este centro de coste? Esta acción es irreversible y podría afectar la asignación presupuestaria.',
             type: 'danger',
             confirmText: 'Eliminar CeCo',
             onConfirm: async () => {
@@ -108,14 +109,14 @@ export default function CostCentersPage() {
             setIsModalOpen(false);
             await loadData();
         } catch (error: any) {
-             alert({ title: 'Error de Guardado', message: error.message || 'No se pudo procesar la solicitud', type: 'error' });
+             alert({ title: 'Error de guardado', message: error.message || 'No se pudo procesar la solicitud', type: 'error' });
         }
     };
 
     return (
         <div className="flex flex-col h-full space-y-4 min-h-0 animate-in fade-in duration-500">
             {/* Header: SIATC Standard */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 px-1">
                 <div className="space-y-1">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
                         <Building2 className="w-4 h-4" />
@@ -156,17 +157,17 @@ export default function CostCentersPage() {
                     {isLoading ? (
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-card/50 backdrop-blur-sm z-50">
                             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                            <span className="text-sm font-medium text-muted-foreground mt-4 uppercase tracking-[0.2em]">Cargando centros de coste...</span>
+                            <span className="text-sm font-medium text-muted-foreground mt-4 tracking-[0.2em]">Cargando centros de coste...</span>
                         </div>
                     ) : (
                         <table className="w-full text-sm text-left border-collapse table-fixed min-w-[900px]">
                             <thead className="sticky top-0 z-20 bg-muted/90 backdrop-blur-md">
                                 <tr className="border-b border-border">
-                                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-muted-foreground w-48">Código SAP</th>
-                                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-muted-foreground">Nombre del Centro</th>
-                                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-muted-foreground w-64">Gerencia Vinculada</th>
-                                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-muted-foreground w-40">Estado</th>
-                                    <th className="px-6 py-4 w-24 font-bold text-xs uppercase tracking-wider text-muted-foreground text-right italic">Acciones</th>
+                                    <th className="px-6 py-4 font-bold text-xs tracking-wider text-muted-foreground w-48">Código SAP</th>
+                                    <th className="px-6 py-4 font-bold text-xs tracking-wider text-muted-foreground">Nombre del centro</th>
+                                    <th className="px-6 py-4 font-bold text-xs tracking-wider text-muted-foreground w-64">Gerencia vinculada</th>
+                                    <th className="px-6 py-4 font-bold text-xs tracking-wider text-muted-foreground w-40">Estado</th>
+                                    <th className="px-6 py-4 w-28 font-bold text-xs tracking-wider text-muted-foreground text-right italic">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border">
@@ -183,15 +184,15 @@ export default function CostCentersPage() {
                                     filteredCecos.map((ceco) => (
                                         <tr key={ceco.id} className="group hover:bg-muted/30 transition-colors">
                                             <td className="px-6 py-4">
-                                                <div className="flex items-center gap-2 font-mono text-primary font-bold text-xs uppercase bg-primary/5 px-3 py-1.5 rounded-xl border border-primary/20 w-fit shadow-sm group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
+                                                <div className="flex items-center gap-2 font-mono text-primary font-bold text-[11px] uppercase bg-primary/5 px-3 py-1.5 rounded-xl border border-primary/20 w-fit shadow-sm group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
                                                     <Hash className="w-3.5 h-3.5 opacity-50" />
                                                     {ceco.code}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-col">
-                                                    <span className="font-bold text-foreground text-sm uppercase tracking-tight">{ceco.name}</span>
-                                                    <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest mt-0.5">Centro de Coste Directo</span>
+                                                    <span className="font-bold text-foreground text-sm tracking-tight">{ceco.name}</span>
+                                                    <span className="text-[10px] text-muted-foreground font-medium mt-0.5">Centro de coste directo</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
@@ -199,21 +200,21 @@ export default function CostCentersPage() {
                                                     <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-all border border-transparent group-hover:border-primary/20">
                                                         <Building className="w-4 h-4" />
                                                     </div>
-                                                    <span className="font-bold text-muted-foreground text-xs uppercase truncate">
-                                                        {managements.find(m => m.id === ceco.management_id)?.name || 'SIN ASIGNAR'}
+                                                    <span className="font-bold text-muted-foreground text-xs truncate">
+                                                        {managements.find(m => m.id === ceco.management_id)?.name || 'Sin asignar'}
                                                     </span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 {ceco.is_active ? (
-                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/50 text-[10px] font-black uppercase shadow-sm">
+                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/50 text-[10px] font-black shadow-sm">
                                                         <CheckCircle className="w-3 h-3 stroke-[3]" />
-                                                        OPERATIVO
+                                                        Operativo
                                                     </span>
                                                 ) : (
-                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-destructive/10 text-destructive border border-destructive/20 text-[10px] font-black uppercase opacity-70">
+                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-destructive/10 text-destructive border border-destructive/20 text-[10px] font-black opacity-70">
                                                         <XCircle className="w-3 h-3 stroke-[3]" />
-                                                        SUSPENDIDO
+                                                        Suspendido
                                                     </span>
                                                 )}
                                             </td>
@@ -252,38 +253,38 @@ export default function CostCentersPage() {
             </div>
 
             {/* Modal: SIATC Standard */}
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingCeco ? 'CONFIGURACIÓN DE CECO' : 'NUEVO CENTRO DE COSTE'} size="lg">
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingCeco ? 'Configuración de CeCo' : 'Nuevo Centro de Coste'} size="lg">
                 <form onSubmit={handleSubmit} className="p-6 pt-2 space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2 bg-muted/30 p-5 rounded-2xl border border-border/50 relative overflow-hidden group">
                            <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
                                 <Hash className="w-16 h-16 rotate-12" />
                             </div>
-                            <label className="text-xs font-black text-muted-foreground uppercase tracking-widest pl-1 relative z-10">Código SAP / Identificador:</label>
+                            <label className="text-xs font-bold text-muted-foreground tracking-widest pl-1 relative z-10">Código SAP / Identificador:</label>
                             <input
                                 type="text"
                                 required
                                 value={formData.code || ''}
                                 onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                                 className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all uppercase placeholder:text-muted-foreground/30 relative z-10"
-                                placeholder="EJ: 10001"
+                                placeholder="Ej: 10001"
                             />
                         </div>
 
-                        <div className="space-y-4 px-1 py-1">
-                            <label className="text-xs font-black text-muted-foreground uppercase tracking-widest pl-1">Nombre Descriptivo:</label>
+                        <div className="space-y-2 px-1">
+                            <label className="text-xs font-bold text-muted-foreground tracking-widest pl-1">Nombre descriptivo:</label>
                             <input
                                 type="text"
                                 required
                                 value={formData.name || ''}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value.toUpperCase() })}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground/30"
-                                placeholder="EJ: OPERACIONES LOGÍSTICAS"
+                                placeholder="Ej: Operaciones Logísticas"
                             />
                         </div>
 
                         <div className="space-y-2 md:col-span-2 px-1">
-                            <label className="text-xs font-black text-muted-foreground uppercase tracking-widest pl-1">Gerencia / Unidad Responsable:</label>
+                            <label className="text-xs font-bold text-muted-foreground tracking-widest pl-1">Gerencia / unidad responsable:</label>
                             <div className="relative">
                                 <Database className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
                                 <select
@@ -292,7 +293,7 @@ export default function CostCentersPage() {
                                     className="w-full h-12 pl-10 pr-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer"
                                     required
                                 >
-                                    <option value="" disabled>Seleccionar Gerencia de origen...</option>
+                                    <option value="" disabled>Seleccionar gerencia de origen...</option>
                                     {managements.map(mgmt => (
                                         <option key={mgmt.id} value={mgmt.id}>{mgmt.name}</option>
                                     ))}
@@ -305,15 +306,15 @@ export default function CostCentersPage() {
                                 type="button"
                                 onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
                                 className={cn(
-                                    "w-full flex items-center justify-between px-6 py-4 rounded-2xl text-xs font-black uppercase transition-all border shadow-sm",
+                                    "w-full flex items-center justify-between px-6 py-4 rounded-2xl text-xs font-bold transition-all border shadow-sm",
                                     formData.is_active
                                         ? "bg-emerald-50 text-emerald-700 border-emerald-200/50"
                                         : "bg-rose-50 text-rose-700 border-rose-200/50"
                                 )}
                             >
-                                <span className="tracking-widest">Estado Operativo del Centro:</span>
+                                <span className="tracking-widest">Estado operativo del centro:</span>
                                 <div className="flex items-center gap-3">
-                                    {formData.is_active ? 'HABILITADO' : 'SUSPENDIDO'}
+                                    {formData.is_active ? 'Habilitado' : 'Suspendido'}
                                     <div className={cn(
                                         "w-10 h-5 rounded-full relative transition-colors",
                                         formData.is_active ? "bg-emerald-500" : "bg-rose-500"
@@ -332,17 +333,16 @@ export default function CostCentersPage() {
                         <button
                             type="button"
                             onClick={() => setIsModalOpen(false)}
-                            className="flex-1 px-4 py-2.5 text-xs font-bold text-muted-foreground hover:bg-muted rounded-xl transition-all uppercase tracking-widest active:scale-95 flex items-center justify-center gap-2"
+                            className="flex-1 px-4 py-2.5 text-xs font-bold text-muted-foreground hover:bg-muted font-bold rounded-xl transition-all tracking-widest active:scale-95 flex items-center justify-center gap-2"
                         >
-                            <XCircle className="w-4 h-4" />
                             Cancelar
                         </button>
                         <button
                             type="submit"
-                            className="flex-1 px-4 py-2.5 text-xs font-bold text-primary-foreground bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/25 active:scale-95 transition-all uppercase tracking-widest flex items-center justify-center gap-2"
+                            className="flex-1 px-4 py-2.5 text-xs font-bold text-primary-foreground bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/25 active:scale-95 transition-all tracking-widest flex items-center justify-center gap-2"
                         >
-                            <Check className="w-4 h-4 stroke-[3]" />
-                            {editingCeco ? 'Guardar Cambios' : 'Registrar CeCo'}
+                            <Save className="w-4 h-4" />
+                            {editingCeco ? 'Guardar cambios' : 'Registrar CeCo'}
                         </button>
                     </div>
                 </form>

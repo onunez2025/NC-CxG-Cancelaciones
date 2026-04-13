@@ -10,7 +10,8 @@ import {
     Hash,
     ChevronRight,
     Activity,
-    Check
+    Check,
+    Save
 } from 'lucide-react';
 import { ManagementsService } from '../../services/managementsService';
 import type { Management } from '../../types';
@@ -65,10 +66,10 @@ export default function ManagementsPage() {
 
     const handleDelete = (id: string) => {
         confirm({
-            title: 'Eliminar Gerencia / Sede',
+            title: 'Eliminar gerencia / sede',
             message: '¿Está seguro de eliminar esta gerencia? Esta acción es irreversible y podría afectar centros de coste y usuarios vinculados.',
             type: 'danger',
-            confirmText: 'Eliminar Gerencia',
+            confirmText: 'Eliminar gerencia',
             onConfirm: async () => {
                 try {
                     await ManagementsService.deleteManagement(id);
@@ -101,14 +102,14 @@ export default function ManagementsPage() {
             setIsModalOpen(false);
             await loadManagements();
         } catch (error: any) {
-            alert({ title: 'Error de Guardado', message: error.message || 'No se pudo procesar la solicitud', type: 'error' });
+            alert({ title: 'Error de guardado', message: error.message || 'No se pudo procesar la solicitud', type: 'error' });
         }
     };
 
     return (
         <div className="flex flex-col h-full space-y-4 min-h-0 animate-in fade-in duration-500">
             {/* Header: SIATC Standard */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 px-1">
                 <div className="space-y-1">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
                         <Briefcase className="w-4 h-4" />
@@ -149,15 +150,15 @@ export default function ManagementsPage() {
                     {isLoading ? (
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-card/50 backdrop-blur-sm z-50">
                             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                            <span className="text-sm font-medium text-muted-foreground mt-4 uppercase tracking-[0.2em]">Cargando gerencias...</span>
+                            <span className="text-sm font-medium text-muted-foreground mt-4 tracking-[0.2em]">Cargando gerencias...</span>
                         </div>
                     ) : (
                         <table className="w-full text-sm text-left border-collapse table-fixed min-w-[600px]">
                             <thead className="sticky top-0 z-20 bg-muted/90 backdrop-blur-md">
                                 <tr className="border-b border-border">
-                                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-muted-foreground w-48">ID / Código</th>
-                                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-muted-foreground">Denominación Gerencial</th>
-                                    <th className="px-6 py-4 w-24 font-bold text-xs uppercase tracking-wider text-muted-foreground text-right italic">Acciones</th>
+                                    <th className="px-6 py-4 font-bold text-xs tracking-wider text-muted-foreground w-48">Código identificador</th>
+                                    <th className="px-6 py-4 font-bold text-xs tracking-wider text-muted-foreground">Denominación gerencial</th>
+                                    <th className="px-6 py-4 w-28 font-bold text-xs tracking-wider text-muted-foreground text-right italic">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border">
@@ -174,7 +175,7 @@ export default function ManagementsPage() {
                                     filteredManagements.map((mgmt) => (
                                         <tr key={mgmt.id} className="group hover:bg-muted/30 transition-colors">
                                             <td className="px-6 py-4">
-                                                <div className="flex items-center gap-2 font-mono text-primary font-bold text-xs uppercase bg-primary/5 px-3 py-1.5 rounded-xl border border-primary/20 w-fit shadow-sm group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
+                                                <div className="flex items-center gap-2 font-mono text-primary font-bold text-[11px] uppercase bg-primary/5 px-3 py-1.5 rounded-xl border border-primary/20 w-fit shadow-sm group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
                                                     <Hash className="w-3.5 h-3.5 opacity-50" />
                                                     {mgmt.code}
                                                 </div>
@@ -184,7 +185,7 @@ export default function ManagementsPage() {
                                                     <div className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-all border border-transparent group-hover:border-primary/20">
                                                         <Building className="w-4.5 h-4.5" />
                                                     </div>
-                                                    <span className="font-bold text-foreground text-sm uppercase tracking-tight">{mgmt.name}</span>
+                                                    <span className="font-bold text-foreground text-sm tracking-tight">{mgmt.name}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
@@ -222,31 +223,31 @@ export default function ManagementsPage() {
             </div>
 
             {/* Modal: SIATC Standard */}
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingMgmt ? 'GESTIÓN DE GERENCIA' : 'NUEVA GERENCIA'} size="md">
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingMgmt ? 'Configuración de Gerencia' : 'Nueva Gerencia'} size="md">
                 <form onSubmit={handleSubmit} className="p-6 pt-2 space-y-6">
                     <div className="space-y-4">
                         <div className="space-y-2 bg-muted/30 p-5 rounded-2xl border border-border/50 relative overflow-hidden group">
                            <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
                                 <Hash className="w-16 h-16 rotate-12" />
                             </div>
-                            <label className="text-xs font-black text-muted-foreground uppercase tracking-widest pl-1 relative z-10">Código Identificador:</label>
+                            <label className="text-xs font-bold text-muted-foreground tracking-widest pl-1 relative z-10">Código identificador:</label>
                             <input
                                 type="text"
                                 value={formData.code || ''}
                                 onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                                 className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all uppercase placeholder:text-muted-foreground/30 relative z-10"
-                                placeholder="EJ: AT01"
+                                placeholder="Ej: AT01"
                                 required
                             />
                         </div>
                         <div className="space-y-2 px-1">
-                            <label className="text-xs font-black text-muted-foreground uppercase tracking-widest pl-1">Denominación Gerencial:</label>
+                            <label className="text-xs font-bold text-muted-foreground tracking-widest pl-1">Denominación gerencial:</label>
                             <input
                                 type="text"
                                 value={formData.name || ''}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value.toUpperCase() })}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground/30"
-                                placeholder="EJ: GERENCIA DE ATENCIÓN AL CLIENTE"
+                                placeholder="Ej: Gerencia de Atención al Cliente"
                                 required
                             />
                         </div>
@@ -256,17 +257,16 @@ export default function ManagementsPage() {
                         <button
                             type="button"
                             onClick={() => setIsModalOpen(false)}
-                            className="flex-1 px-4 py-2.5 text-xs font-bold text-muted-foreground hover:bg-muted rounded-xl transition-all uppercase tracking-widest active:scale-95 flex items-center justify-center gap-2"
+                            className="flex-1 px-4 py-2.5 text-xs font-bold text-muted-foreground hover:bg-muted font-bold rounded-xl transition-all tracking-widest active:scale-95 flex items-center justify-center gap-2"
                         >
-                            <X className="w-4 h-4" />
-                            Descartar
+                            Cancelar
                         </button>
                         <button
                             type="submit"
-                            className="flex-1 px-4 py-2.5 text-xs font-bold text-primary-foreground bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/25 active:scale-95 transition-all uppercase tracking-widest flex items-center justify-center gap-2"
+                            className="flex-1 px-4 py-2.5 text-xs font-bold text-primary-foreground bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/25 active:scale-95 transition-all tracking-widest flex items-center justify-center gap-2"
                         >
-                            <Check className="w-4 h-4 stroke-[3]" />
-                            {editingMgmt ? 'Guardar Cambios' : 'Confirmar Registro'}
+                            <Save className="w-4 h-4" />
+                            {editingMgmt ? 'Guardar cambios' : 'Confirmar registro'}
                         </button>
                     </div>
                 </form>

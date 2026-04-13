@@ -13,7 +13,8 @@ import {
     Activity,
     Check,
     Hash,
-    Database
+    Database,
+    Save
 } from 'lucide-react';
 import { AccountsService } from '../../services/accountsService';
 import type { AccountingAccount } from '../../types';
@@ -38,9 +39,9 @@ export default function AccountsPage() {
     });
 
     const CATEGORIES = [
-        { value: 'expense', label: 'Gasto Operativo', color: 'rose' },
+        { value: 'expense', label: 'Gasto operativo', color: 'rose' },
         { value: 'investment', label: 'Inversión / CAPEX', color: 'blue' },
-        { value: 'service', label: 'Servicios Externos', color: 'amber' }
+        { value: 'service', label: 'Servicios externos', color: 'amber' }
     ];
 
     useEffect(() => {
@@ -83,10 +84,10 @@ export default function AccountsPage() {
 
     const handleDelete = (id: string) => {
         confirm({
-            title: 'Eliminar Cuenta Contable',
+            title: 'Eliminar cuenta contable',
             message: '¿Está seguro de eliminar esta cuenta del plan contable? Esta acción podría afectar la integridad de presupuestos y liquidaciones vinculadas.',
             type: 'danger',
-            confirmText: 'Eliminar Cuenta',
+            confirmText: 'Eliminar cuenta',
             onConfirm: async () => {
                 try {
                     await AccountsService.deleteAccount(id);
@@ -109,7 +110,7 @@ export default function AccountsPage() {
             setIsModalOpen(false);
             await loadAccounts();
         } catch (error: any) {
-            alert({ title: 'Error de Guardado', message: error.message || 'No se pudo procesar la solicitud', type: 'error' });
+            alert({ title: 'Error de guardado', message: error.message || 'No se pudo procesar la solicitud', type: 'error' });
         }
     };
 
@@ -124,7 +125,7 @@ export default function AccountsPage() {
         };
 
         return (
-            <span className={cn("inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tight border shadow-sm", styleMap[cat.color as string])}>
+            <span className={cn("inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black tracking-tight border shadow-sm", styleMap[cat.color as string])}>
                 {cat.label}
             </span>
         );
@@ -133,7 +134,7 @@ export default function AccountsPage() {
     return (
         <div className="flex flex-col h-full space-y-4 min-h-0 animate-in fade-in duration-500">
             {/* Header: SIATC Standard */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 px-1">
                 <div className="space-y-1">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
                         <Wallet className="w-4 h-4" />
@@ -174,17 +175,17 @@ export default function AccountsPage() {
                     {isLoading ? (
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-card/50 backdrop-blur-sm z-50">
                             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                            <span className="text-sm font-medium text-muted-foreground mt-4 uppercase tracking-[0.2em]">Cargando plan de cuentas...</span>
+                            <span className="text-sm font-medium text-muted-foreground mt-4 tracking-[0.2em]">Cargando plan de cuentas...</span>
                         </div>
                     ) : (
                         <table className="w-full text-sm text-left border-collapse table-fixed min-w-[900px]">
                             <thead className="sticky top-0 z-20 bg-muted/90 backdrop-blur-md">
                                 <tr className="border-b border-border">
-                                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-muted-foreground w-48">Plan Contable (SAP)</th>
-                                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-muted-foreground">Denominación de Cuenta</th>
-                                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-muted-foreground w-64 text-center">Naturaleza</th>
-                                    <th className="px-6 py-4 font-bold text-xs uppercase tracking-wider text-muted-foreground w-40 text-center">Disponibilidad</th>
-                                    <th className="px-6 py-4 w-24 font-bold text-xs uppercase tracking-wider text-muted-foreground text-right italic">Acciones</th>
+                                    <th className="px-6 py-4 font-bold text-xs tracking-wider text-muted-foreground w-48">Plan contable (SAP)</th>
+                                    <th className="px-6 py-4 font-bold text-xs tracking-wider text-muted-foreground">Denominación de cuenta</th>
+                                    <th className="px-6 py-4 font-bold text-xs tracking-wider text-muted-foreground w-64 text-center">Naturaleza</th>
+                                    <th className="px-6 py-4 font-bold text-xs tracking-wider text-muted-foreground w-40 text-center">Disponibilidad</th>
+                                    <th className="px-6 py-4 w-28 font-bold text-xs tracking-wider text-muted-foreground text-right italic">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border">
@@ -201,16 +202,16 @@ export default function AccountsPage() {
                                     filteredAccounts.map((account) => (
                                         <tr key={account.id} className="group hover:bg-muted/30 transition-colors">
                                             <td className="px-6 py-4">
-                                                <div className="flex items-center gap-2 font-mono text-primary font-bold text-xs uppercase bg-primary/5 px-3 py-1.5 rounded-xl border border-primary/20 w-fit shadow-sm group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
+                                                <div className="flex items-center gap-2 font-mono text-primary font-bold text-[11px] uppercase bg-primary/5 px-3 py-1.5 rounded-xl border border-primary/20 w-fit shadow-sm group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
                                                     <Hash className="w-3.5 h-3.5 opacity-50" />
                                                     {account.code}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-col">
-                                                    <span className="font-bold text-foreground text-sm uppercase tracking-tight">{account.name}</span>
-                                                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1 opacity-60">
-                                                        <BadgePercent className="w-3 h-3 text-primary/70" /> Account ID #{account.id.substring(0,8)}
+                                                    <span className="font-bold text-foreground text-sm tracking-tight">{account.name}</span>
+                                                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-bold tracking-widest mt-1 opacity-60">
+                                                        <BadgePercent className="w-3 h-3 text-primary/70" /> Account ID #{account.id.substring(0,8).toUpperCase()}
                                                     </div>
                                                 </div>
                                             </td>
@@ -219,14 +220,14 @@ export default function AccountsPage() {
                                             </td>
                                             <td className="px-6 py-4 text-center">
                                                 {account.is_active ? (
-                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/50 text-[10px] font-black uppercase shadow-sm">
+                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/50 text-[10px] font-black shadow-sm">
                                                         <CheckCircle className="w-3 h-3 stroke-[3]" />
-                                                        HABILITADA
+                                                        Habilitada
                                                     </span>
                                                 ) : (
-                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-destructive/10 text-destructive border border-destructive/20 text-[10px] font-black uppercase opacity-70">
+                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-destructive/10 text-destructive border border-destructive/20 text-[10px] font-black opacity-70">
                                                         <XCircle className="w-3 h-3 stroke-[3]" />
-                                                        BLOQUEADA
+                                                        Bloqueada
                                                     </span>
                                                 )}
                                             </td>
@@ -265,7 +266,7 @@ export default function AccountsPage() {
             </div>
 
             {/* Modal: SIATC Standard */}
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingAccount ? 'GESTIÓN DE CUENTA ERP' : 'ALTA DE CUENTA CONTABLE'} size="lg">
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingAccount ? 'Configuración de Cuenta ERP' : 'Alta de Cuenta Contable'} size="lg">
                 <form onSubmit={handleSubmit} className="p-6 pt-2 space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-4 bg-muted/30 p-5 rounded-2xl border border-border/50 relative overflow-hidden group">
@@ -273,7 +274,7 @@ export default function AccountsPage() {
                                 <ArrowUpRight className="w-16 h-16 rotate-12" />
                             </div>
                             <div className="flex flex-col gap-1.5 relative z-10">
-                                <label className="text-xs font-black text-muted-foreground uppercase tracking-widest pl-1">Código SAP / Plan Contable:</label>
+                                <label className="text-xs font-bold text-muted-foreground tracking-widest pl-1">Código SAP / Plan contable:</label>
                                 <div className="relative">
                                     <Hash className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
                                     <input
@@ -282,26 +283,26 @@ export default function AccountsPage() {
                                         value={formData.code || ''}
                                         onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                                         className="w-full h-11 pl-10 pr-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all uppercase placeholder:text-muted-foreground/30 font-mono"
-                                        placeholder="EJ: 600100"
+                                        placeholder="Ej: 600100"
                                     />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="space-y-4 px-1 py-1">
-                            <label className="text-xs font-black text-muted-foreground uppercase tracking-widest pl-1">Nombre Descriptivo de Cuenta:</label>
+                        <div className="space-y-2 px-1">
+                            <label className="text-xs font-bold text-muted-foreground tracking-widest pl-1">Nombre descriptivo de cuenta:</label>
                             <input
                                 type="text"
                                 required
                                 value={formData.name || ''}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value.toUpperCase() })}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground/30"
-                                placeholder="EJ: GASTOS DE OPERACIÓN"
+                                placeholder="Ej: Gastos de operación"
                             />
                         </div>
 
                         <div className="space-y-2 md:col-span-2 px-1">
-                            <label className="text-xs font-black text-muted-foreground uppercase tracking-widest pl-1">Categorización / Naturaleza del Gasto:</label>
+                            <label className="text-xs font-bold text-muted-foreground tracking-widest pl-1">Categorización / naturaleza del gasto:</label>
                             <div className="relative">
                                 <Database className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
                                 <select
@@ -322,15 +323,15 @@ export default function AccountsPage() {
                                 type="button"
                                 onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
                                 className={cn(
-                                    "w-full flex items-center justify-between px-6 py-4 rounded-2xl text-xs font-black uppercase transition-all border shadow-sm",
+                                    "w-full flex items-center justify-between px-6 py-4 rounded-2xl text-xs font-bold transition-all border shadow-sm",
                                     formData.is_active
                                         ? "bg-primary/5 text-primary border-primary/20"
                                         : "bg-rose-50 text-rose-700 border-rose-200/50"
                                 )}
                             >
-                                <span className="tracking-widest">Estado Contable en SIATC:</span>
+                                <span className="tracking-widest">Estado contable en SIATC:</span>
                                 <div className="flex items-center gap-3">
-                                    {formData.is_active ? 'CUENTA HABILITADA' : 'CUENTA BLOQUEADA'}
+                                    {formData.is_active ? 'Cuenta habilitada' : 'Cuenta bloqueada'}
                                     <div className={cn(
                                         "w-10 h-5 rounded-full relative transition-colors",
                                         formData.is_active ? "bg-primary" : "bg-rose-500"
@@ -349,17 +350,16 @@ export default function AccountsPage() {
                         <button
                             type="button"
                             onClick={() => setIsModalOpen(false)}
-                            className="flex-1 px-4 py-2.5 text-xs font-bold text-muted-foreground hover:bg-muted rounded-xl transition-all uppercase tracking-widest active:scale-95 flex items-center justify-center gap-2"
+                            className="flex-1 px-4 py-2.5 text-xs font-bold text-muted-foreground hover:bg-muted font-bold rounded-xl transition-all tracking-widest active:scale-95 flex items-center justify-center gap-2"
                         >
-                            <XCircle className="w-4 h-4" />
                             Cancelar
                         </button>
                         <button
                             type="submit"
-                            className="flex-1 px-4 py-2.5 text-xs font-bold text-primary-foreground bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/25 active:scale-95 transition-all uppercase tracking-widest flex items-center justify-center gap-2"
+                            className="flex-1 px-4 py-2.5 text-xs font-bold text-primary-foreground bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/25 active:scale-95 transition-all tracking-widest flex items-center justify-center gap-2"
                         >
-                            <Check className="w-4 h-4 stroke-[3]" />
-                            {editingAccount ? 'Aplicar Cambios' : 'Abrir Cuenta SAP'}
+                            <Save className="w-4 h-4" />
+                            {editingAccount ? 'Guardar cambios' : 'Abrir cuenta SAP'}
                         </button>
                     </div>
                 </form>
