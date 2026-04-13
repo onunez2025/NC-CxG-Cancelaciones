@@ -11,7 +11,6 @@ import {
     ArrowUpRight,
     ChevronRight,
     Activity,
-    Check,
     Hash,
     Database,
     Save

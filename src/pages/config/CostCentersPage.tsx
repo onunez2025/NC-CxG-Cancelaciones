@@ -10,7 +10,6 @@ import {
     Building,
     ChevronRight,
     Activity,
-    Check,
     Hash,
     Database,
     Save

@@ -5,12 +5,10 @@ import {
     Plus,
     Edit2,
     Trash2,
-    X,
     Building,
     Hash,
     ChevronRight,
     Activity,
-    Check,
     Save
 } from 'lucide-react';
 import { ManagementsService } from '../../services/managementsService';
