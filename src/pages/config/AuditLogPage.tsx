@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Search, RotateCcw, Clock, ChevronRight, Database, ShieldAlert, Terminal } from 'lucide-react';
 import { cn } from '../../utils/cn';
+import { toTitleCase } from '../../utils/formatters';
 
 interface AuditLog {
     Id: number;
@@ -82,7 +83,7 @@ export default function AuditLogPage() {
             </div>
 
             {/* Content Container */}
-            <div className="flex-1 min-h-0 flex flex-col bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+            <div className="flex-1 min-h-0 flex flex-col bg-card rounded-[2rem] border border-border shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden backdrop-blur-sm">
                 {/* Search / Filters Toolbar */}
                 <div className="p-4 border-b border-border bg-muted/20 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div className="relative max-w-md w-full">
@@ -125,11 +126,11 @@ export default function AuditLogPage() {
                         <table className="w-full text-sm text-left border-collapse min-w-[1000px]">
                             <thead className="sticky top-0 z-20 bg-muted/90 backdrop-blur-md">
                                 <tr className="border-b border-border">
-                                    <th className="px-6 py-4 font-bold text-xs tracking-wider text-muted-foreground w-48">Fecha y Hora</th>
-                                    <th className="px-6 py-4 font-bold text-xs tracking-wider text-muted-foreground w-64">Usuario Responsable</th>
-                                    <th className="px-6 py-4 font-bold text-xs tracking-wider text-muted-foreground w-40">Operación</th>
-                                    <th className="px-6 py-4 font-bold text-xs tracking-wider text-muted-foreground w-56">Ref. Entidad</th>
-                                    <th className="px-6 py-4 font-bold text-xs tracking-wider text-muted-foreground">Payload / Detalle Técnico</th>
+                                    <th className="px-6 py-4 font-bold text-sm text-foreground tracking-tight w-48">Fecha y Hora</th>
+                                    <th className="px-6 py-4 font-bold text-sm text-foreground tracking-tight w-64">Usuario Responsable</th>
+                                    <th className="px-6 py-4 font-bold text-sm text-foreground tracking-tight w-40">Operación</th>
+                                    <th className="px-6 py-4 font-bold text-sm text-foreground tracking-tight w-56">Ref. Entidad</th>
+                                    <th className="px-6 py-4 font-bold text-sm text-foreground tracking-tight">Payload / Detalle Técnico</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border">
@@ -158,11 +159,11 @@ export default function AuditLogPage() {
                                             </td>
                                             <td className="px-6 py-4 align-top">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs border border-primary/20 shrink-0">
+                                                    <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs border border-primary/20 shrink-0">
                                                         {log.UsuarioNombre?.substring(0, 2).toUpperCase()}
                                                     </div>
                                                     <div className="flex flex-col min-w-0">
-                                                        <span className="font-bold text-foreground truncate">{log.UsuarioNombre}</span>
+                                                        <span className="font-bold text-foreground truncate">{toTitleCase(log.UsuarioNombre)}</span>
                                                         <span className="text-[10px] text-muted-foreground font-mono truncate">ID: {log.UsuarioID}</span>
                                                     </div>
                                                 </div>
@@ -212,20 +213,14 @@ export default function AuditLogPage() {
                     )}
                 </div>
                 
-                {/* Footer Warning: SIATC Standard */}
-                <div className="px-6 py-4 border-t border-border bg-muted/30 flex items-center justify-between shrink-0">
-                    <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0 border border-amber-500/20 shadow-sm">
-                            <ShieldAlert className="w-5 h-5 text-amber-600" />
-                        </div>
-                        <div className="flex flex-col">
-                            <p className="text-[11px] text-foreground font-black tracking-wider leading-none">Bitácora de Seguridad Certificada</p>
-                            <p className="text-[10px] text-muted-foreground font-medium mt-1">Los registros son inalterables y cumplen con el Estándar SIATC v3.0 de Auditoría Centralizada.</p>
-                        </div>
-                    </div>
-                    <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-background rounded-lg border border-border shadow-inner">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] font-black text-muted-foreground tracking-widest">Sincronizado</span>
+                {/* Footer Stats: SIATC Standard */}
+                <div className="px-6 py-3 border-t border-border/50 bg-muted/30 flex items-center justify-between shrink-0">
+                    <p className="text-[10px] font-black text-muted-foreground tracking-[0.2em] uppercase opacity-60">
+                        Total de registros: <span className="text-foreground ml-1">{filteredLogs.length}</span>
+                    </p>
+                    <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-background rounded-lg border border-border shadow-inner">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-[9px] font-black text-muted-foreground tracking-widest uppercase">Sincronizado</span>
                     </div>
                 </div>
             </div>

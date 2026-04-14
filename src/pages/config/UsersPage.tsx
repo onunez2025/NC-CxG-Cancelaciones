@@ -24,6 +24,7 @@ import { useTableResizer } from '../../hooks/useTableResizer';
 import { ResizableHeader } from '../../components/common/ResizableHeader';
 import { useAuth } from '../../hooks/useAuth';
 import { cn } from '../../utils/cn';
+import { toTitleCase } from '../../utils/formatters';
 
 export default function UsersPage() {
     const { confirm, alert } = useDialog();
@@ -177,7 +178,8 @@ export default function UsersPage() {
             </div>
 
             {/* Content Container */}
-            <div className="flex-1 min-h-0 flex flex-col bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+            {/* Content Container */}
+            <div className="flex-1 min-h-0 flex flex-col bg-card rounded-[2rem] border border-border/50 shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden backdrop-blur-sm">
                 {/* Search / Filters */}
                 <div className="p-4 border-b border-border bg-muted/20">
                     <div className="relative max-w-md">
@@ -205,26 +207,26 @@ export default function UsersPage() {
                                 <tr className="border-b border-border">
                                     <ResizableHeader columnId="usuario" width={widths.usuario} onResizeStart={onResizeStart} className="px-6 py-4">
                                         <div className="flex items-center justify-between gap-2 group/header cursor-pointer" onClick={() => handleSort('username')}>
-                                            <span className="font-bold text-xs tracking-wider text-muted-foreground">Responsable / ID</span>
+                                            <span className="font-bold text-sm text-foreground tracking-tight">Responsable / ID</span>
                                             <SortIcon column="username" />
                                         </div>
                                     </ResizableHeader>
                                     <ResizableHeader columnId="email" width={widths.email} onResizeStart={onResizeStart} className="px-6 py-4">
                                         <div className="flex items-center justify-between gap-2 group/header cursor-pointer" onClick={() => handleSort('email')}>
-                                            <span className="font-bold text-xs tracking-wider text-muted-foreground">Correo Corporativo</span>
+                                            <span className="font-bold text-sm text-foreground tracking-tight">Correo Corporativo</span>
                                             <SortIcon column="email" />
                                         </div>
                                     </ResizableHeader>
                                     <ResizableHeader columnId="rol" width={widths.rol} onResizeStart={onResizeStart} className="px-6 py-4">
                                         <div className="flex items-center justify-between gap-2 group/header cursor-pointer" onClick={() => handleSort('rol')}>
-                                            <span className="font-bold text-xs tracking-wider text-muted-foreground">Perfil de Seguridad</span>
+                                            <span className="font-bold text-sm text-foreground tracking-tight">Perfil de Seguridad</span>
                                             <SortIcon column="rol" />
                                         </div>
                                     </ResizableHeader>
                                     <ResizableHeader columnId="apps" width={widths.apps} onResizeStart={onResizeStart} className="px-6 py-4 text-center">
-                                        <span className="font-bold text-xs tracking-wider text-muted-foreground">Alcance Ecosistema</span>
+                                        <span className="font-bold text-sm text-foreground tracking-tight">Alcance Ecosistema</span>
                                     </ResizableHeader>
-                                    <th className="px-6 py-4 w-28 bg-muted/30 text-right italic font-medium text-xs text-muted-foreground">Acciones</th>
+                                    <th className="px-6 py-4 w-28 bg-muted/30 text-right italic font-medium text-[10px] text-muted-foreground uppercase tracking-widest">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border">
@@ -242,11 +244,13 @@ export default function UsersPage() {
                                         <tr key={user.id} className="group hover:bg-muted/30 transition-colors">
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs border border-primary/20 shadow-inner shrink-0 group-hover:scale-105 transition-transform">
+                                                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-extrabold text-xs border border-primary/20 shadow-inner shrink-0 group-hover:scale-110 transition-transform">
                                                         {user.username?.substring(0, 2).toUpperCase()}
                                                     </div>
                                                     <div className="min-w-0">
-                                                        <div className="font-bold text-foreground text-sm truncate tracking-tight">{user.full_name || user.username}</div>
+                                                        <div className="font-bold text-foreground text-sm truncate tracking-tight">
+                                                            {toTitleCase(user.full_name || user.username)}
+                                                        </div>
                                                         <div className="text-[10px] text-muted-foreground font-mono truncate flex items-center gap-1.5 opacity-60 mt-0.5">
                                                             <Activity className="w-2.5 h-2.5" /> ID: {user.username}
                                                         </div>
@@ -302,9 +306,9 @@ export default function UsersPage() {
                 </div>
                 
                 {/* Footer Stats */}
-                <div className="px-6 py-3 border-t border-border bg-muted/30 flex items-center justify-between shrink-0">
-                    <p className="text-[11px] font-bold text-muted-foreground tracking-wider">
-                        Total usuarios: <span className="text-foreground ml-1">{filtered.length}</span>
+                <div className="px-6 py-3 border-t border-border/50 bg-muted/30 flex items-center justify-between shrink-0">
+                    <p className="text-[10px] font-black text-muted-foreground tracking-[0.2em] uppercase opacity-60">
+                        Total de registros: <span className="text-foreground ml-1">{filtered.length}</span>
                     </p>
                 </div>
             </div>

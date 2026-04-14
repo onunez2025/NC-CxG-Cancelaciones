@@ -6,6 +6,7 @@ import type { Role, Permission } from '../../types';
 import { Modal } from '../../components/common/Modal';
 import { useDialog } from '../../context/DialogContext';
 import { cn } from '../../utils/cn';
+import { toTitleCase } from '../../utils/formatters';
 
 export default function RolesPage() {
     const { confirm, alert } = useDialog();
@@ -175,7 +176,9 @@ export default function RolesPage() {
                                                 <Shield className="w-5 h-5 text-primary" />
                                             </div>
                                             <div>
-                                                <h3 className="font-black text-foreground text-sm tracking-tight">{role.name}</h3>
+                                                <h3 className="font-bold text-foreground text-sm tracking-tight">
+                                                    {toTitleCase(role.name)}
+                                                </h3>
                                                 <p className="text-[10px] font-bold text-muted-foreground flex items-center gap-1.5 mt-0.5">
                                                     <ListChecks className="w-3 h-3 text-primary/60" />
                                                     {role.permissions.length} Permisos autorizados
