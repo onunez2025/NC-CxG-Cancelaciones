@@ -81,8 +81,8 @@ export function TrackingPage() {
     };
 
     return (
-        <div className="flex flex-col h-full gap-5 animate-in fade-in duration-500 p-1">
-            <div className="shrink-0 mb-2 px-1">
+        <div className="flex flex-col h-full gap-3 animate-in fade-in duration-500 p-1">
+            <div className="shrink-0 mb-1 px-1">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
                         <Activity className="w-6 h-6 text-primary" />
@@ -96,7 +96,7 @@ export function TrackingPage() {
 
             {/* Metrics Cards */}
             {metrics && (
-                <div className="shrink-0 mb-6">
+                <div className="shrink-0 mb-1">
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         <MetricCard
                             icon={ShoppingCart}
@@ -131,7 +131,7 @@ export function TrackingPage() {
             )}
 
             {/* Filters */}
-            <div className="shrink-0 mb-6">
+            <div className="shrink-0 mb-1">
                 <div className="bg-card border border-slate-200 dark:border-slate-800 rounded-xl p-2 shadow-sm flex items-center flex-wrap gap-2">
                     <div className="relative flex-1 min-w-[300px]">
                         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -183,7 +183,7 @@ export function TrackingPage() {
                     </select>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between">
+                <div className="flex items-center justify-between">
                     <p className="text-xs font-bold text-slate-400 flex items-center gap-1.5">
                         <Filter className="w-3.5 h-3.5" />
                         Mostrando {filteredTransactions.length} de {transactions.length} registros
@@ -204,16 +204,16 @@ export function TrackingPage() {
                         <table className="w-full text-left text-sm whitespace-nowrap">
                             <thead className="sticky top-0 z-10 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-sm shadow-sm ring-1 ring-slate-100 dark:ring-slate-800">
                                 <tr>
-                                    <th className="w-10 py-4 px-3"></th>
-                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500">Número Pedido</th>
-                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 w-28 text-center">Estado SAP</th>
-                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 hidden md:table-cell w-24">Centro Costo</th>
-                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 w-full">Proveedor / Descripción</th>
-                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-center">Moneda</th>
-                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-right">Valor PO</th>
-                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-right">Gasto Real</th>
-                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-right">Pagado Total</th>
-                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-center hidden lg:table-cell">Trazabilidad</th>
+                                    <th className="w-10 py-2 px-3"></th>
+                                    <th className="py-2 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500">Número Pedido</th>
+                                    <th className="py-2 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 w-28 text-center">Estado SAP</th>
+                                    <th className="py-2 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 hidden md:table-cell w-24">Centro Costo</th>
+                                    <th className="py-2 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 w-full">Proveedor / Descripción</th>
+                                    <th className="py-2 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-center">Moneda</th>
+                                    <th className="py-2 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-right">Valor PO</th>
+                                    <th className="py-2 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-right">Gasto Real</th>
+                                    <th className="py-2 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-right">Pagado Total</th>
+                                    <th className="py-2 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-center hidden lg:table-cell">Trazabilidad</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y relative">
@@ -235,12 +235,12 @@ export function TrackingPage() {
                                                 onClick={() => toggleExpand(txn.po_number)}
                                             >
                                                 {/* Chevron */}
-                                                <td className="py-2.5 px-2 text-muted-foreground text-center">
+                                                <td className="py-1.5 px-2 text-muted-foreground text-center">
                                                     {isExpanded ? <ChevronDown className="w-3.5 h-3.5 mx-auto" /> : <ChevronRight className="w-3.5 h-3.5 mx-auto" />}
                                                 </td>
 
                                                 {/* PO Number */}
-                                                <td className="py-2.5 px-4">
+                                                <td className="py-1.5 px-4">
                                                     <div className="flex flex-row items-center gap-1.5 w-max">
                                                         <span className="font-mono text-xs font-bold text-primary">{txn.po_number}</span>
                                                         {txn.release_info && (
@@ -253,7 +253,7 @@ export function TrackingPage() {
                                                 </td>
 
                                                 {/* Status Badge */}
-                                                <td className="py-2.5 px-4 text-center">
+                                                <td className="py-1.5 px-4 text-center">
                                                     <span className={cn("inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold", statusCfg?.color)}>
                                                         <StatusIcon className="w-3 h-3" />
                                                         {statusCfg?.label}
@@ -261,42 +261,42 @@ export function TrackingPage() {
                                                 </td>
 
                                                 {/* CeCo */}
-                                                <td className="py-2.5 px-4 hidden md:table-cell">
+                                                <td className="py-1.5 px-4 hidden md:table-cell">
                                                     <span className="text-xs font-mono text-muted-foreground">{txn.cost_center}</span>
                                                 </td>
 
                                                 {/* Vendor */}
-                                                <td className="py-2.5 px-4 max-w-[200px] xl:max-w-[300px]">
+                                                <td className="py-1.5 px-4 max-w-[200px] xl:max-w-[300px]">
                                                     <p className="text-xs font-medium truncate block" title={txn.vendor_name || ''}>{txn.vendor_name || t('tracking.list.no_vendor')}</p>
                                                     <p className="text-[11px] text-muted-foreground truncate block" title={txn.description || ''}>{txn.description}</p>
                                                 </td>
 
                                                 {/* Currency */}
-                                                <td className="py-2.5 px-4 text-center border-l bg-muted/5">
+                                                <td className="py-1.5 px-4 text-center border-l bg-muted/5">
                                                     <span className="text-xs font-bold text-muted-foreground uppercase">{String(txn.currency || 'PEN').toUpperCase()}</span>
                                                 </td>
 
                                                 {/* PO Value */}
-                                                <td className="py-2.5 px-4 text-right bg-muted/5">
+                                                <td className="py-1.5 px-4 text-right bg-muted/5">
                                                     <span className="text-xs font-bold">{formatCurrency(txn.po_value, txn.currency)}</span>
                                                 </td>
 
                                                 {/* Real Expense */}
-                                                <td className="py-2.5 px-4 text-right bg-muted/5">
+                                                <td className="py-1.5 px-4 text-right bg-muted/5">
                                                     <span className={cn("text-xs font-bold", txn.total_real_expense > 0 ? "text-amber-600 dark:text-amber-500" : "text-muted-foreground")}>
                                                         {txn.total_real_expense > 0 ? formatCurrency(txn.total_real_expense, txn.currency) : '—'}
                                                     </span>
                                                 </td>
 
                                                 {/* Paid */}
-                                                <td className="py-2.5 px-4 text-right bg-muted/5">
+                                                <td className="py-1.5 px-4 text-right bg-muted/5">
                                                     <span className={cn("text-xs font-bold", txn.total_paid > 0 ? "text-green-600 dark:text-green-500" : "text-muted-foreground")}>
                                                         {txn.total_paid > 0 ? formatCurrency(txn.total_paid, txn.currency) : '—'}
                                                     </span>
                                                 </td>
 
                                                 {/* Links */}
-                                                <td className="py-2.5 px-4 text-center hidden lg:table-cell">
+                                                <td className="py-1.5 px-4 text-center hidden lg:table-cell">
                                                     <div className="flex items-center justify-center gap-1">
                                                         <div className="relative">
                                                             <SourceDot label="SP" active={!!txn.solped || !!txn.me5a} title="Solicitud de Pedido" />
@@ -438,16 +438,14 @@ function MetricCard({ icon: Icon, label, value, sub, color }: {
     color: string;
 }) {
     return (
-        <div className={cn("p-6 rounded-2xl border transition-all shadow-sm flex flex-col justify-between h-full bg-card border-slate-100 dark:border-slate-800")}>
-            <div className="flex justify-between items-start mb-4">
-                <p className={cn("text-[10px] font-bold uppercase tracking-tighter opacity-80", color)}>{label}</p>
-                <div className={cn("p-2 rounded-xl bg-white/50 dark:bg-black/20", color)}>
-                    <Icon className="w-5 h-5" />
-                </div>
+        <div className={cn("py-1 px-4 h-[60px] rounded-xl border transition-all shadow-sm flex items-center justify-between gap-3 bg-card border-slate-100 dark:border-slate-800")}>
+            <div className="flex flex-col justify-center min-w-0">
+                <p className={cn("text-[9px] font-bold uppercase tracking-tighter opacity-80 leading-tight", color)}>{label}</p>
+                <h3 className="text-base font-bold text-slate-800 dark:text-white tracking-tight leading-none truncate">{value}</h3>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter leading-tight truncate">{sub}</p>
             </div>
-            <div>
-                <h3 className="text-xl font-bold text-slate-800 dark:text-white tracking-tight">{value}</h3>
-                <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">{sub}</p>
+            <div className={cn("p-1.5 rounded-lg bg-white/50 dark:bg-black/20 shrink-0", color)}>
+                <Icon className="w-4 h-4" />
             </div>
         </div>
     );
