@@ -110,7 +110,7 @@ export function BudgetVsRealPage() {
     return (
         <div className="flex flex-col h-full gap-5 animate-in fade-in duration-500 p-1">
             {/* Header Area */}
-            <div className="flex items-center justify-between px-1 shrink-0 mb-6">
+            <div className="flex items-center justify-between px-1 shrink-0 mb-1">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
                         <BarChart3 className="w-6 h-6 text-primary" />
@@ -176,26 +176,26 @@ export function BudgetVsRealPage() {
                                 {/* Total Management Card */}
                                 <div
                                     onClick={() => setSelectedCostCenter('all')}
-                                    className={`p-4 rounded-xl border shadow-sm flex flex-col justify-between cursor-pointer transition-all hover:shadow-md ${selectedCostCenter === 'all'
+                                    className={`py-2 px-5 h-[85px] rounded-xl border shadow-sm flex flex-col justify-between cursor-pointer transition-all hover:shadow-md ${selectedCostCenter === 'all'
                                         ? 'bg-card border-primary ring-1 ring-primary'
                                         : 'bg-card/50 border-border hover:border-primary/50'
                                         }`}
                                 >
                                     <div>
-                                        <div className="flex justify-between items-start mb-3">
+                                        <div className="flex justify-between items-start mb-0.5">
                                             <p className="text-[11px] font-bold text-slate-500 uppercase tracking-tighter">Total Gerencia ({selectedYear})</p>
-                                            <div className="p-2 bg-primary/10 rounded-lg">
+                                            <div className="p-1.5 bg-primary/10 rounded-lg">
                                                 <DollarSign className="w-4 h-4 text-primary" />
                                             </div>
                                         </div>
-                                        <h2 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">{formatCurrency(totals?.budgeted || 0)}</h2>
+                                        <h2 className="text-lg font-bold text-slate-800 dark:text-white tracking-tight">{formatCurrency(totals?.budgeted || 0)}</h2>
                                     </div>
-                                    <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-[11px] font-bold">
+                                    <div className="mt-1 pt-1 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-[10px] font-bold">
                                         <div className="flex items-center gap-2">
-                                            <TrendingUp className="w-3.5 h-3.5 text-slate-400" />
-                                            <span className="text-slate-400">Ejecutado:</span>
+                                            <TrendingUp className="w-3 h-3 text-slate-400" />
+                                            <span className="text-slate-400 uppercase tracking-widest text-[8px]">Ejecutado:</span>
                                         </div>
-                                        <span className="font-bold">{formatCurrency(totals?.real || 0)}</span>
+                                        <span className="font-bold text-slate-600">{formatCurrency(totals?.real || 0)}</span>
                                     </div>
                                 </div>
 
@@ -415,16 +415,16 @@ export function BudgetVsRealPage() {
 
 function SummaryMiniCard({ label, value, color, note, icon, bgColor }: { label: string; value: string; color: string; note?: string; icon?: React.ReactNode; bgColor?: string }) {
     return (
-        <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-card shadow-sm flex flex-col justify-between">
-            <div className="flex justify-between items-start mb-4">
+        <div className="py-2 px-5 h-[85px] rounded-xl border border-slate-200 dark:border-slate-800 bg-card shadow-sm flex flex-col justify-between">
+            <div className="flex justify-between items-start mb-0.5">
                 <p className="text-[11px] font-bold text-slate-500 uppercase tracking-tighter">
-                    {label} {note && <span className="text-[10px] opacity-60 normal-case ml-1">{note}</span>}
+                    {label} {note && <span className="text-[9px] opacity-60 normal-case ml-1">{note}</span>}
                 </p>
-                <div className={cn("p-2 rounded-xl", bgColor)}>
+                <div className={cn("p-1.5 rounded-lg", bgColor)}>
                     {icon}
                 </div>
             </div>
-            <h3 className={cn("text-xl font-bold tracking-tight", color)}>{value}</h3>
+            <h3 className={cn("text-base font-bold tracking-tight", color)}>{value}</h3>
         </div>
     );
 }
