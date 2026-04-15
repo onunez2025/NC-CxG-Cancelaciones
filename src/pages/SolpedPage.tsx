@@ -361,7 +361,7 @@ function KPICard({ label, value, icon: Icon, color, bgColor, active, onClick }: 
         <div
             onClick={onClick}
             className={cn(
-                "py-2 px-4 h-[80px] rounded-2xl border transition-all cursor-pointer select-none flex items-center justify-between gap-3 shadow-sm",
+                "py-1 px-4 h-[60px] rounded-xl border transition-all cursor-pointer select-none flex items-center justify-between gap-3 shadow-sm",
                 bgColor,
                 active ? "ring-2 ring-primary ring-offset-2 dark:ring-offset-background border-primary/50 shadow-md transform scale-[1.02]" : "border-slate-100 hover:border-slate-300"
             )}
@@ -370,7 +370,7 @@ function KPICard({ label, value, icon: Icon, color, bgColor, active, onClick }: 
                 <p className={cn("text-[10px] font-bold uppercase tracking-tighter opacity-80", color)}>{label}</p>
                 <p className="text-base font-bold text-slate-800 dark:text-white leading-none">{value}</p>
             </div>
-            <div className={cn("p-1.5 rounded-xl bg-white/50 dark:bg-black/20", color)}>
+            <div className={cn("p-1.5 rounded-lg bg-white/50 dark:bg-black/20", color)}>
                 <Icon className="w-4 h-4" />
             </div>
         </div>
