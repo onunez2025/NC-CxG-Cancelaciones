@@ -50,16 +50,20 @@ export class RolesService {
 
             { group: 'Archivos', id: 'files.upload', label: 'Cargar Archivos SAP' },
             { group: 'Archivos', id: 'files.view', label: 'Ver Archivos Cargados' },
+            { group: 'Archivos', id: 'ebm.config.sap', label: 'Acceso Técnico SAP' },
 
             { group: 'Seguimiento', id: 'tracking.view', label: 'Ver Seguimiento' },
             { group: 'Seguimiento', id: 'tracking.export', label: 'Exportar Reportes' },
 
             { group: 'Configuración', id: 'config.users', label: 'Gestionar Usuarios' },
+            { group: 'Configuración', id: 'ebm.config.users', label: 'Api: Usuarios' },
             { group: 'Configuración', id: 'config.roles', label: 'Gestionar Roles' },
+            { group: 'Configuración', id: 'ebm.config.roles', label: 'Api: Roles' },
             { group: 'Configuración', id: 'config.cecos', label: 'Gestionar CeCos' },
             { group: 'Configuración', id: 'config.accounts', label: 'Gestionar Cuentas' },
             { group: 'Configuración', id: 'config.managements', label: 'Gestionar Gerencias' },
             { group: 'Configuración', id: 'config.exchange_rates', label: 'Gestionar Tipos de Cambio' },
+            { group: 'Configuración', id: 'ebm.config.audit', label: 'Api: Auditoría' },
 
             { group: 'Gastos', id: 'expenses.map', label: 'Mapear Gastos' },
             { group: 'Gastos', id: 'expenses.view', label: 'Ver Gastos' },
