@@ -26,6 +26,17 @@ import { useAuth } from '../../hooks/useAuth';
 import { cn } from '../../utils/cn';
 import { toTitleCase } from '../../utils/formatters';
 
+// SIATC DESIGN SYSTEM IMPORTS
+import { SIATC_THEME } from '../../utils/siatc-theme';
+import { SIATCButton } from '../../components/siatc/SIATCButton';
+import { SIATCBadge } from '../../components/siatc/SIATCBadge';
+import { 
+    SIATCTable, 
+    SIATCTableRow, 
+    SIATCTableCell, 
+    SIATCTableFooter 
+} from '../../components/siatc/table/SIATCTable';
+
 export default function UsersPage() {
     const { confirm, alert } = useDialog();
     const { hasPermission } = useAuth();
@@ -39,6 +50,10 @@ export default function UsersPage() {
     const [sortBy, setSortBy] = useState<string>('username');
     const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('ASC');
     const [error, setError] = useState('');
+
+    // Pagination State (SIATC Standard)
+    const [currentPage, setCurrentPage] = useState(1);
+    const recordsPerPage = 10;
 
     // Resizing logic
     const { widths, onResizeStart } = useTableResizer('ebm_users_column_widths', {
@@ -152,10 +167,14 @@ export default function UsersPage() {
             return 0;
         });
 
+    // Pagination Logic
+    const totalPages = Math.ceil(filtered.length / recordsPerPage);
+    const paginatedRecords = filtered.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage);
+
     return (
-        <div className="flex flex-col h-full space-y-4 min-h-0 animate-in fade-in duration-500">
+        <div className={SIATC_THEME.LAYOUT.PAGE_WRAPPER}>
             {/* Header: SIATC Standard */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 px-1">
+            <div className={SIATC_THEME.LAYOUT.HEADER_WRAPPER}>
                 <div className="space-y-1">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
                         <Users className="w-4 h-4" />
@@ -163,23 +182,18 @@ export default function UsersPage() {
                         <ChevronRight className="w-3 h-3 opacity-50" />
                         <span className="text-foreground">Gestión de Usuarios</span>
                     </div>
-                    <h1 className="text-2xl font-bold tracking-tight text-foreground">Gestión de Usuarios</h1>
-                    <p className="text-sm text-muted-foreground">Administra los accesos y perfiles autorizados para EBM Central</p>
+                    <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Gestión de Usuarios</h1>
+                    <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>Administra los accesos y perfiles autorizados para EBM Central</p>
                 </div>
                 {hasPermission('ebm.config.users') && (
-                    <button 
-                        onClick={openNew}
-                        className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-all active:scale-95 font-semibold text-sm shadow-sm"
-                    >
-                        <Plus className="w-4 h-4" />
+                    <SIATCButton onClick={openNew} icon={Plus}>
                         Nuevo Usuario
-                    </button>
+                    </SIATCButton>
                 )}
             </div>
 
             {/* Content Container */}
-            {/* Content Container */}
-            <div className="flex-1 min-h-0 flex flex-col bg-card rounded-[2rem] border border-border/50 shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden backdrop-blur-sm">
+            <div className={SIATC_THEME.LAYOUT.CONTENT_CONTAINER}>
                 {/* Search / Filters */}
                 <div className="p-4 border-b border-border bg-muted/20">
                     <div className="relative max-w-md">
@@ -187,50 +201,50 @@ export default function UsersPage() {
                         <input
                             type="text"
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
                             placeholder="Buscar por nombre, usuario o email..."
-                            className="w-full pl-10 pr-4 py-2.5 bg-background border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium"
+                            className={SIATC_THEME.COMPONENTS.INPUT}
                         />
                     </div>
                 </div>
 
                 {/* Table Area */}
-                <div className="flex-1 overflow-auto relative custom-scrollbar">
+                <SIATCTable>
                     {isLoading ? (
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-card/50 backdrop-blur-sm z-50">
                             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                            <span className="text-sm font-medium text-muted-foreground mt-4">Sincronizando con el directorio...</span>
+                            <span className="text-sm font-medium text-muted-foreground mt-4 tracking-[0.2em]">Sincronizando con el directorio...</span>
                         </div>
                     ) : (
-                        <table className="w-full text-sm text-left border-collapse table-fixed min-w-[1000px]">
-                            <thead className="sticky top-0 z-20 bg-muted/90 backdrop-blur-md">
+                        <>
+                            <thead className={SIATC_THEME.TABLE.HEADER_ROW}>
                                 <tr className="border-b border-border">
                                     <ResizableHeader columnId="usuario" width={widths.usuario} onResizeStart={onResizeStart} className="px-6 py-4">
                                         <div className="flex items-center justify-between gap-2 group/header cursor-pointer" onClick={() => handleSort('username')}>
-                                            <span className="font-bold text-sm text-foreground tracking-tight">Responsable / ID</span>
+                                            <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Responsable / ID</span>
                                             <SortIcon column="username" />
                                         </div>
                                     </ResizableHeader>
                                     <ResizableHeader columnId="email" width={widths.email} onResizeStart={onResizeStart} className="px-6 py-4">
                                         <div className="flex items-center justify-between gap-2 group/header cursor-pointer" onClick={() => handleSort('email')}>
-                                            <span className="font-bold text-sm text-foreground tracking-tight">Correo Corporativo</span>
+                                            <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Correo Corporativo</span>
                                             <SortIcon column="email" />
                                         </div>
                                     </ResizableHeader>
                                     <ResizableHeader columnId="rol" width={widths.rol} onResizeStart={onResizeStart} className="px-6 py-4">
                                         <div className="flex items-center justify-between gap-2 group/header cursor-pointer" onClick={() => handleSort('rol')}>
-                                            <span className="font-bold text-sm text-foreground tracking-tight">Perfil de Seguridad</span>
+                                            <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Perfil de Seguridad</span>
                                             <SortIcon column="rol" />
                                         </div>
                                     </ResizableHeader>
                                     <ResizableHeader columnId="apps" width={widths.apps} onResizeStart={onResizeStart} className="px-6 py-4 text-center">
-                                        <span className="font-bold text-sm text-foreground tracking-tight">Alcance Ecosistema</span>
+                                        <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Alcance Ecosistema</span>
                                     </ResizableHeader>
                                     <th className="px-6 py-4 w-28 bg-muted/30 text-right italic font-medium text-[10px] text-muted-foreground uppercase tracking-widest">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border">
-                                {filtered.length === 0 ? (
+                                {paginatedRecords.length === 0 ? (
                                     <tr>
                                         <td colSpan={5} className="px-6 py-20 text-center opacity-60">
                                             <div className="flex flex-col items-center gap-3">
@@ -240,9 +254,9 @@ export default function UsersPage() {
                                         </td>
                                     </tr>
                                 ) : (
-                                    filtered.map((user) => (
-                                        <tr key={user.id} className="group hover:bg-muted/30 transition-colors">
-                                            <td className="px-6 py-4">
+                                    paginatedRecords.map((user) => (
+                                        <SIATCTableRow key={user.id}>
+                                            <SIATCTableCell>
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-extrabold text-xs border border-primary/20 shadow-inner shrink-0 group-hover:scale-110 transition-transform">
                                                         {user.username?.substring(0, 2).toUpperCase()}
@@ -251,22 +265,21 @@ export default function UsersPage() {
                                                         <div className="font-bold text-foreground text-sm truncate tracking-tight">
                                                             {toTitleCase(user.full_name || user.username)}
                                                         </div>
-                                                        <div className="text-[10px] text-muted-foreground font-mono truncate flex items-center gap-1.5 opacity-60 mt-0.5">
-                                                            <Activity className="w-2.5 h-2.5" /> ID: {user.username}
+                                                        <div className={SIATC_THEME.TYPOGRAPHY.TINY_MONO + " text-muted-foreground truncate uppercase opacity-60 mt-0.5"}>
+                                                            ID: {user.username}
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-4 font-medium text-muted-foreground truncate">
+                                            </SIATCTableCell>
+                                            <SIATCTableCell className="font-medium text-muted-foreground truncate">
                                                 {user.email}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black shadow-sm border bg-secondary/50 text-secondary-foreground border-border">
-                                                     <ShieldCheck className="w-3 h-3 text-primary/60" />
+                                            </SIATCTableCell>
+                                            <SIATCTableCell>
+                                                <SIATCBadge variant="info" icon={ShieldCheck}>
                                                     {user.role_name || 'Invitado'}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4">
+                                                </SIATCBadge>
+                                            </SIATCTableCell>
+                                            <SIATCTableCell>
                                                 <div className="flex flex-wrap gap-1">
                                                     {(user.apps || 'EBM').split(',').map(app => (
                                                         <span key={app} className="px-2 py-0.5 rounded-lg text-[9px] font-black tracking-tighter border bg-primary/5 text-primary border-primary/10">
@@ -274,8 +287,8 @@ export default function UsersPage() {
                                                         </span>
                                                     ))}
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
+                                            </SIATCTableCell>
+                                            <SIATCTableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     {hasPermission('ebm.config.users') && (
                                                         <>
@@ -296,21 +309,22 @@ export default function UsersPage() {
                                                         </>
                                                     )}
                                                 </div>
-                                            </td>
-                                        </tr>
+                                            </SIATCTableCell>
+                                        </SIATCTableRow>
                                     ))
                                 )}
                             </tbody>
-                        </table>
+                        </>
                     )}
-                </div>
+                </SIATCTable>
                 
-                {/* Footer Stats */}
-                <div className="px-6 py-3 border-t border-border/50 bg-muted/30 flex items-center justify-between shrink-0">
-                    <p className="text-[10px] font-black text-muted-foreground tracking-[0.2em] uppercase opacity-60">
-                        Total de registros: <span className="text-foreground ml-1">{filtered.length}</span>
-                    </p>
-                </div>
+                {/* Footer SIATC Standard */}
+                <SIATCTableFooter 
+                    totalRecords={filtered.length} 
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
             </div>
 
             {/* Modal: SIATC Standard */}
@@ -334,7 +348,7 @@ export default function UsersPage() {
                                 required
                                 value={editingUser?.full_name || ''} 
                                 onChange={e => setEditingUser(prev => prev ? { ...prev, full_name: e.target.value } : null)}
-                                className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-muted-foreground/30" 
+                                className="w-full h-12 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-muted-foreground/30" 
                                 placeholder="Ej: Juan Pérez"
                             />
                         </div>
@@ -358,7 +372,7 @@ export default function UsersPage() {
                                 className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" placeholder="••••••••" />
                         </div>
                         <div className="space-y-2">
-                             <label className="text-[10px] font-black text-muted-foreground tracking-widest pl-1">Rol de seguridad:</label>
+                            <label className="text-[10px] font-black text-muted-foreground tracking-widest pl-1">Rol de seguridad:</label>
                             <select required value={editingUser?.role_id || ''} onChange={e => setEditingUser(prev => prev ? { ...prev, role_id: e.target.value } : null)}
                                 className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all appearance-none cursor-pointer">
                                 <option value="" disabled>Seleccionar perfil...</option>
@@ -409,40 +423,36 @@ export default function UsersPage() {
                         </div>
 
                         <div className="col-span-full pt-4">
-                            <button
+                            <SIATCButton
                                 type="button"
+                                variant={editingUser?.is_active ? 'success' : 'danger'}
                                 onClick={() => setEditingUser(prev => prev ? { ...prev, is_active: !prev.is_active } : null)}
-                                className={cn(
-                                    "w-full flex items-center justify-between px-6 py-4 rounded-2xl text-xs font-black transition-all border shadow-sm",
-                                    editingUser?.is_active
-                                        ? "bg-emerald-50 text-emerald-700 border-emerald-200/50"
-                                        : "bg-rose-50 text-rose-700 border-rose-200/50"
-                                )}
+                                className="w-full flex items-center justify-between px-6 py-4 rounded-2xl"
                             >
-                                <span className="tracking-widest">Acceso al ecosistema:</span>
+                                <span className="tracking-widest capitalize">Acceso al ecosistema:</span>
                                 <div className="flex items-center gap-3">
                                     {editingUser?.is_active ? 'Habilitado' : 'Suspendido'}
                                     <div className={cn(
-                                        "w-10 h-5 rounded-full relative transition-colors",
+                                        "w-10 h-5 rounded-full relative transition-colors border border-white/20",
                                         editingUser?.is_active ? "bg-emerald-500" : "bg-rose-500"
                                     )}>
                                         <div className={cn(
-                                            "absolute top-1 w-3 h-3 rounded-full bg-white transition-all",
+                                            "absolute top-1 w-3 h-3 rounded-full bg-white transition-all shadow-sm",
                                             editingUser?.is_active ? "left-6" : "left-1"
                                         )} />
                                     </div>
                                 </div>
-                            </button>
+                            </SIATCButton>
                         </div>
                     </div>
                     
                     <div className="flex justify-end gap-3 pt-4 border-t border-border mt-2">
-                        <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2.5 text-xs font-bold text-muted-foreground hover:bg-muted rounded-xl transition-all tracking-widest active:scale-95">
+                        <SIATCButton type="button" variant="secondary" onClick={() => setIsModalOpen(false)}>
                             Cancelar
-                        </button>
-                        <button onClick={handleSave} className="px-8 py-2.5 text-xs font-bold text-primary-foreground bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/25 active:scale-95 transition-all tracking-widest flex items-center gap-2">
-                            <Check className="w-4 h-4 stroke-[3]" /> Confirmar cambios
-                        </button>
+                        </SIATCButton>
+                        <SIATCButton onClick={handleSave} variant="success" icon={Check}>
+                            Confirmar cambios
+                        </SIATCButton>
                     </div>
                 </div>
             </Modal>

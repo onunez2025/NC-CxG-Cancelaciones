@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Plus, Edit2, Trash2, Check, ChevronDown, Activity, Settings, CalendarDays, Users, Save, ChevronRight, ListChecks, ShieldAlert } from 'lucide-react';
+import { Shield, Plus, Edit2, Trash2, Check, ChevronDown, Activity, Settings, CalendarDays, Users, ChevronRight, ListChecks, ShieldAlert } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { RolesService } from '../../services/rolesService';
 import type { Role, Permission } from '../../types';
@@ -7,6 +7,10 @@ import { Modal } from '../../components/common/Modal';
 import { useDialog } from '../../context/DialogContext';
 import { cn } from '../../utils/cn';
 import { toTitleCase } from '../../utils/formatters';
+
+// SIATC DESIGN SYSTEM IMPORTS
+import { SIATC_THEME } from '../../utils/siatc-theme';
+import { SIATCButton } from '../../components/siatc/SIATCButton';
 
 export default function RolesPage() {
     const { confirm, alert } = useDialog();
@@ -124,9 +128,9 @@ export default function RolesPage() {
     const filteredRoles = roles.filter(role => (role.apps || 'EBM').split(',').some(a => a.trim().toUpperCase() === 'EBM'));
 
     return (
-        <div className="flex flex-col h-full space-y-4 min-h-0 animate-in fade-in duration-500">
+        <div className={SIATC_THEME.LAYOUT.PAGE_WRAPPER}>
             {/* Header: SIATC Standard */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 px-1">
+            <div className={SIATC_THEME.LAYOUT.HEADER_WRAPPER}>
                 <div className="space-y-1">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
                         <Shield className="w-4 h-4" />
@@ -134,17 +138,16 @@ export default function RolesPage() {
                         <ChevronRight className="w-3 h-3 opacity-50" />
                         <span className="text-foreground">Roles</span>
                     </div>
-                    <h1 className="text-2xl font-bold tracking-tight text-foreground">Gestión de Roles</h1>
-                    <p className="text-sm text-muted-foreground">Define las matrices de permisos y niveles de acceso para EBM Central</p>
+                    <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Gestión de Roles</h1>
+                    <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>Define las matrices de permisos y niveles de acceso para EBM Central</p>
                 </div>
                 {hasPermission('ebm.config.roles') && (
-                    <button 
+                    <SIATCButton 
                         onClick={handleCreate}
-                        className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-all active:scale-95 font-semibold text-sm shadow-sm"
+                        icon={Plus}
                     >
-                        <Plus className="w-4 h-4" />
                         Nuevo Rol
-                    </button>
+                    </SIATCButton>
                 )}
             </div>
 
@@ -161,9 +164,9 @@ export default function RolesPage() {
                          <p className="text-sm font-bold text-muted-foreground tracking-widest text-center">No se encontraron roles configurados</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-6 mt-2">
                         {filteredRoles.map((role) => (
-                            <div key={role.id} className="group bg-card rounded-2xl border border-border shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:border-primary/20 transition-all duration-300 relative overflow-hidden flex flex-col h-full">
+                            <div key={role.id} className="group bg-card rounded-[2rem] border border-border/50 shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:border-primary/20 transition-all duration-300 relative overflow-hidden flex flex-col h-full bg-card/50 backdrop-blur-sm">
                                 {/* Visual Accent */}
                                 <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
                                     <Shield className="w-20 h-20 rotate-12" />
@@ -203,7 +206,7 @@ export default function RolesPage() {
 
                                     {/* Permissions Matrix Snapshot */}
                                     <div className="space-y-2">
-                                        <p className="text-[9px] font-black text-muted-foreground tracking-widest pl-1">Vista rápida de facultades:</p>
+                                        <p className="text-[9px] font-black text-muted-foreground tracking-widest pl-1 uppercase opacity-60">Vista rápida de facultades:</p>
                                         <div className="flex flex-wrap gap-1.5 max-h-[140px] overflow-y-auto pr-2 custom-scrollbar-thin">
                                             {role.permissions.length === 0 ? (
                                                 <span className="text-[10px] text-muted-foreground italic font-medium px-1">Sin facultades administrativas...</span>
@@ -211,14 +214,14 @@ export default function RolesPage() {
                                                 role.permissions.slice(0, 15).map(perm => {
                                                     const label = availablePermissions.find(p => p.id === perm)?.label || perm;
                                                     return (
-                                                        <span key={perm} className="px-2 py-0.5 rounded-lg text-[9px] font-black bg-muted/60 text-muted-foreground border border-border tracking-tight group-hover:bg-primary/5 group-hover:border-primary/10 group-hover:text-primary/70 transition-all">
+                                                        <span key={perm} className="px-2 py-0.5 rounded-lg text-[9px] font-black bg-muted/60 text-muted-foreground border border-border tracking-tight group-hover:bg-primary/5 group-hover:border-primary/10 group-hover:text-primary transition-all">
                                                             {label}
                                                         </span>
                                                     );
                                                 })
                                             )}
                                             {role.permissions.length > 15 && (
-                                                <span className="px-2 py-0.5 rounded-lg text-[9px] font-black bg-primary text-primary-foreground shadow-sm">
+                                                <span className="px-2 py-0.5 rounded-lg text-[9px] font-black bg-primary text-primary-foreground shadow-lg shadow-primary/20">
                                                     +{role.permissions.length - 15} más
                                                 </span>
                                             )}
@@ -230,7 +233,7 @@ export default function RolesPage() {
                                 <div className="p-4 pt-0">
                                     <button 
                                         onClick={() => handleEdit(role)}
-                                        className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-border bg-muted/30 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all text-[10px] font-black tracking-[0.2em] group/btn"
+                                        className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-border bg-muted/40 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all text-[10px] font-black tracking-[0.2em] group/btn uppercase"
                                     >
                                         Configurar Matriz
                                         <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
@@ -313,11 +316,11 @@ export default function RolesPage() {
                     {/* Permissions Hierarchy Section */}
                     <div className="space-y-4">
                         <div className="flex items-center justify-between px-1 border-b border-border pb-4">
-                            <h3 className="text-xs font-black text-foreground tracking-widest flex items-center gap-2">
+                            <h3 className="text-xs font-black text-foreground tracking-widest flex items-center gap-2 uppercase">
                                 <ListChecks className="w-4 h-4 text-primary" /> Matriz de facultad administrativa
                             </h3>
                             <div className="flex items-center gap-2">
-                                <span className="text-[10px] font-black text-muted-foreground opacity-60">Seleccionados:</span>
+                                <span className="text-[10px] font-black text-muted-foreground opacity-60 uppercase">Seleccionados:</span>
                                 <span className="bg-primary/10 text-primary text-[10px] font-black px-2 py-0.5 rounded-lg border border-primary/20">
                                     {formData.permissions.length}
                                 </span>
@@ -328,7 +331,7 @@ export default function RolesPage() {
                             {permissionGroups.map(group => {
                                 const isExpanded = expandedGroup === group;
                                 return (
-                                    <div key={group} className="border border-border/50 rounded-2xl overflow-hidden bg-background hover:border-primary/20 transition-all">
+                                    <div key={group} className="border border-border/50 rounded-2xl overflow-hidden bg-muted/10 hover:border-primary/20 transition-all">
                                         <button 
                                             type="button"
                                             onClick={() => toggleGroup(group)}
@@ -340,13 +343,13 @@ export default function RolesPage() {
                                             <div className="flex items-center gap-4">
                                                 <div className={cn(
                                                     "w-10 h-10 rounded-xl flex items-center justify-center border transition-all group-hover/header:rotate-12",
-                                                    isExpanded ? "bg-primary text-primary-foreground border-primary" : "bg-muted text-primary border-border"
+                                                    isExpanded ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20" : "bg-card text-primary border-border"
                                                 )}>
                                                     {getGroupIcon(group)}
                                                 </div>
                                                 <div className="text-left">
                                                     <p className="text-xs font-black text-foreground tracking-tight">{group}</p>
-                                                    <p className="text-[9px] font-bold text-muted-foreground tracking-widest">
+                                                    <p className="text-[9px] font-bold text-muted-foreground tracking-widest uppercase">
                                                         {availablePermissions.filter(p => p.group === group).length} Permisos disponibles
                                                     </p>
                                                 </div>
@@ -354,11 +357,16 @@ export default function RolesPage() {
                                             <div className="flex items-center gap-3">
                                                 <div className="flex -space-x-1.5 overflow-hidden">
                                                     {formData.permissions.filter(p => availablePermissions.find(ap => ap.id === p)?.group === group).slice(0, 3).map((_, i) => (
-                                                        <div key={i} className="w-2 h-2 rounded-full bg-primary border border-white dark:border-zinc-950" />
+                                                        <div key={i} className="w-2 h-2 rounded-full bg-primary border-2 border-white dark:border-zinc-950 shadow-sm" />
                                                     ))}
+                                                    {formData.permissions.filter(p => availablePermissions.find(ap => ap.id === p)?.group === group).length > 3 && (
+                                                        <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center text-[7px] font-black text-white border-2 border-white dark:border-zinc-950 shadow-sm">
+                                                            +
+                                                        </div>
+                                                    )}
                                                 </div>
                                                 <div className={cn(
-                                                    "w-8 h-8 rounded-full bg-muted flex items-center justify-center transition-transform",
+                                                    "w-8 h-8 rounded-full bg-card border border-border flex items-center justify-center transition-transform",
                                                     isExpanded ? "rotate-180" : "rotate-0"
                                                 )}>
                                                     <ChevronDown className="w-4 h-4 text-muted-foreground" />
@@ -367,7 +375,7 @@ export default function RolesPage() {
                                         </button>
 
                                         {isExpanded && (
-                                            <div className="p-5 pt-2 border-t border-border/50 bg-muted/5 animate-in slide-in-from-top-2 duration-300">
+                                            <div className="p-5 pt-2 border-t border-border/50 bg-background/50 animate-in slide-in-from-top-2 duration-300">
                                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-3">
                                                     {availablePermissions.filter(p => p.group === group).map(perm => {
                                                         const isSelected = formData.permissions.includes(perm.id);
@@ -377,21 +385,21 @@ export default function RolesPage() {
                                                                 key={perm.id} 
                                                                 onClick={() => togglePermission(perm.id)}
                                                                 className={cn(
-                                                                    "group relative flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs text-left transition-all border",
+                                                                    "group relative flex items-center gap-3 px-4 py-3.5 rounded-xl text-[11px] text-left transition-all border",
                                                                     isSelected
-                                                                        ? 'bg-primary border-primary text-primary-foreground shadow-sm shadow-primary/10'
-                                                                        : 'bg-background border-border text-muted-foreground hover:border-primary/40 hover:bg-muted/30 hover:text-foreground'
+                                                                        ? 'bg-primary border-primary text-primary-foreground shadow-lg shadow-primary/10'
+                                                                        : 'bg-card border-border/60 text-muted-foreground hover:border-primary/40 hover:bg-muted/30 hover:text-foreground'
                                                                 )}
                                                             >
                                                                 <div className={cn(
-                                                                    "w-4 h-4 rounded-md flex items-center justify-center transition-all shrink-0",
+                                                                    "w-4 h-4 rounded-md flex items-center justify-center transition-all shrink-0 shadow-inner",
                                                                     isSelected 
                                                                         ? 'bg-white text-primary' 
                                                                         : 'bg-muted border border-border'
                                                                 )}>
                                                                     {isSelected && <Check className="w-3 h-3 stroke-[5px]" />}
                                                                 </div>
-                                                                <span className="font-bold tracking-tight leading-none truncate">
+                                                                <span className="font-bold tracking-tight leading-none">
                                                                     {perm.label}
                                                                 </span>
                                                             </button>
@@ -407,12 +415,12 @@ export default function RolesPage() {
                     </div>
 
                     <div className="flex justify-end gap-3 pt-6 border-t border-border mt-6">
-                        <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2.5 text-xs font-bold text-muted-foreground hover:bg-muted rounded-xl transition-all tracking-widest active:scale-95">
+                        <SIATCButton type="button" variant="secondary" onClick={() => setIsModalOpen(false)}>
                             Cancelar
-                        </button>
-                        <button type="submit" className="px-8 py-2.5 text-xs font-bold text-primary-foreground bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/25 active:scale-95 transition-all tracking-widest flex items-center gap-2">
-                            <Save className="w-4 h-4 stroke-[2]" /> {editingRole ? 'Guardar matriz' : 'Registrar rol'}
-                        </button>
+                        </SIATCButton>
+                        <SIATCButton type="submit" variant="success" icon={Check}>
+                            {editingRole ? 'Guardar Matriz' : 'Registrar Rol'}
+                        </SIATCButton>
                     </div>
                 </form>
             </Modal>

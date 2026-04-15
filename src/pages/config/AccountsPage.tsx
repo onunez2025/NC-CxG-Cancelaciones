@@ -13,13 +13,24 @@ import {
     Activity,
     Hash,
     Database,
-    Save
+    Check
 } from 'lucide-react';
 import { AccountsService } from '../../services/accountsService';
 import type { AccountingAccount } from '../../types';
 import { Modal } from '../../components/common/Modal';
 import { useDialog } from '../../context/DialogContext';
 import { cn } from '../../utils/cn';
+
+// SIATC DESIGN SYSTEM IMPORTS
+import { SIATC_THEME } from '../../utils/siatc-theme';
+import { SIATCButton } from '../../components/siatc/SIATCButton';
+import { 
+    SIATCTable, 
+    SIATCTableHeader, 
+    SIATCTableRow, 
+    SIATCTableCell, 
+    SIATCTableFooter 
+} from '../../components/siatc/table/SIATCTable';
 
 export default function AccountsPage() {
     const { confirm, alert } = useDialog();
@@ -131,9 +142,9 @@ export default function AccountsPage() {
     };
 
     return (
-        <div className="flex flex-col h-full space-y-4 min-h-0 animate-in fade-in duration-500">
+        <div className={SIATC_THEME.LAYOUT.PAGE_WRAPPER}>
             {/* Header: SIATC Standard */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 px-1">
+            <div className={SIATC_THEME.LAYOUT.HEADER_WRAPPER}>
                 <div className="space-y-1">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
                         <Wallet className="w-4 h-4" />
@@ -141,20 +152,19 @@ export default function AccountsPage() {
                         <ChevronRight className="w-3 h-3 opacity-50" />
                         <span className="text-foreground">Cuentas Contables</span>
                     </div>
-                    <h1 className="text-2xl font-bold tracking-tight text-foreground">Plan de Cuentas SAP</h1>
-                    <p className="text-sm text-muted-foreground">Administra la categorización financiera y asignación contable del ERP</p>
+                    <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Plan de Cuentas SAP</h1>
+                    <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>Administra la categorización financiera y asignación contable del ERP</p>
                 </div>
-                <button 
+                <SIATCButton 
                     onClick={handleCreate}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-all active:scale-95 font-semibold text-sm shadow-sm"
+                    icon={Plus}
                 >
-                    <Plus className="w-4 h-4" />
                     Nueva Cuenta
-                </button>
+                </SIATCButton>
             </div>
 
             {/* Content Container */}
-            <div className="flex-1 min-h-0 flex flex-col bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+            <div className={SIATC_THEME.LAYOUT.CONTENT_CONTAINER}>
                 {/* Search / Filters */}
                 <div className="p-4 border-b border-border bg-muted/20">
                     <div className="relative max-w-md">
@@ -164,27 +174,27 @@ export default function AccountsPage() {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             placeholder="Buscar por código contable o nombre..."
-                            className="w-full pl-10 pr-4 py-2.5 bg-background border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium"
+                            className={SIATC_THEME.COMPONENTS.INPUT}
                         />
                     </div>
                 </div>
 
                 {/* Table Area */}
-                <div className="flex-1 overflow-auto relative custom-scrollbar">
+                <SIATCTable>
                     {isLoading ? (
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-card/50 backdrop-blur-sm z-50">
                             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
                             <span className="text-sm font-medium text-muted-foreground mt-4 tracking-[0.2em]">Cargando plan de cuentas...</span>
                         </div>
                     ) : (
-                        <table className="w-full text-sm text-left border-collapse table-fixed min-w-[900px]">
-                            <thead className="sticky top-0 z-20 bg-muted/90 backdrop-blur-md">
+                        <>
+                            <thead className={SIATC_THEME.TABLE.HEADER_ROW}>
                                 <tr className="border-b border-border">
-                                    <th className="px-6 py-4 font-bold text-xs tracking-wider text-muted-foreground w-48">Plan contable (SAP)</th>
-                                    <th className="px-6 py-4 font-bold text-xs tracking-wider text-muted-foreground">Denominación de cuenta</th>
-                                    <th className="px-6 py-4 font-bold text-xs tracking-wider text-muted-foreground w-64 text-center">Naturaleza</th>
-                                    <th className="px-6 py-4 font-bold text-xs tracking-wider text-muted-foreground w-40 text-center">Disponibilidad</th>
-                                    <th className="px-6 py-4 w-28 font-bold text-xs tracking-wider text-muted-foreground text-right italic">Acciones</th>
+                                    <SIATCTableHeader className="w-48">Plan Contable (SAP)</SIATCTableHeader>
+                                    <SIATCTableHeader>Denominación de Cuenta</SIATCTableHeader>
+                                    <SIATCTableHeader className="w-64 text-center">Naturaleza</SIATCTableHeader>
+                                    <SIATCTableHeader className="w-40 text-center">Disponibilidad</SIATCTableHeader>
+                                    <SIATCTableHeader className="w-28 text-right italic uppercase">Acciones</SIATCTableHeader>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border">
@@ -199,25 +209,25 @@ export default function AccountsPage() {
                                     </tr>
                                 ) : (
                                     filteredAccounts.map((account) => (
-                                        <tr key={account.id} className="group hover:bg-muted/30 transition-colors">
-                                            <td className="px-6 py-4">
+                                        <SIATCTableRow key={account.id}>
+                                            <SIATCTableCell>
                                                 <div className="flex items-center gap-2 font-mono text-primary font-bold text-[11px] uppercase bg-primary/5 px-3 py-1.5 rounded-xl border border-primary/20 w-fit shadow-sm group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
                                                     <Hash className="w-3.5 h-3.5 opacity-50" />
                                                     {account.code}
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-4">
+                                            </SIATCTableCell>
+                                            <SIATCTableCell>
                                                 <div className="flex flex-col">
                                                     <span className="font-bold text-foreground text-sm tracking-tight">{account.name}</span>
                                                     <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-bold tracking-widest mt-1 opacity-60">
                                                         <BadgePercent className="w-3 h-3 text-primary/70" /> Account ID #{account.id.substring(0,8).toUpperCase()}
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
+                                            </SIATCTableCell>
+                                            <SIATCTableCell className="text-center">
                                                 {getCategoryBadge(account.category)}
-                                            </td>
-                                            <td className="px-6 py-4 text-center">
+                                            </SIATCTableCell>
+                                            <SIATCTableCell className="text-center">
                                                 {account.is_active ? (
                                                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/50 text-[10px] font-black shadow-sm">
                                                         <CheckCircle className="w-3 h-3 stroke-[3]" />
@@ -229,8 +239,8 @@ export default function AccountsPage() {
                                                         Bloqueada
                                                     </span>
                                                 )}
-                                            </td>
-                                            <td className="px-6 py-4">
+                                            </SIATCTableCell>
+                                            <SIATCTableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <button
                                                         onClick={() => handleEdit(account)}
@@ -247,21 +257,20 @@ export default function AccountsPage() {
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
                                                 </div>
-                                            </td>
-                                        </tr>
+                                            </SIATCTableCell>
+                                        </SIATCTableRow>
                                     ))
                                 )}
                             </tbody>
-                        </table>
+                        </>
                     )}
-                </div>
+                </SIATCTable>
                 
                 {/* Footer Stats */}
-                <div className="px-6 py-3 border-t border-border bg-muted/30 flex items-center justify-between shrink-0">
-                    <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-                        Cuentas registradas: <span className="text-foreground ml-1">{filteredAccounts.length}</span>
-                    </p>
-                </div>
+                <SIATCTableFooter 
+                    totalRecords={filteredAccounts.length}
+                    showPaging={false}
+                />
             </div>
 
             {/* Modal: SIATC Standard */}
@@ -346,20 +355,22 @@ export default function AccountsPage() {
                     </div>
 
                     <div className="flex items-center gap-3 pt-4 border-t border-border mt-2">
-                        <button
+                        <SIATCButton
                             type="button"
+                            variant="secondary"
                             onClick={() => setIsModalOpen(false)}
-                            className="flex-1 px-4 py-2.5 text-xs font-bold text-muted-foreground hover:bg-muted font-bold rounded-xl transition-all tracking-widest active:scale-95 flex items-center justify-center gap-2"
+                            className="flex-1"
                         >
                             Cancelar
-                        </button>
-                        <button
+                        </SIATCButton>
+                        <SIATCButton
                             type="submit"
-                            className="flex-1 px-4 py-2.5 text-xs font-bold text-primary-foreground bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/25 active:scale-95 transition-all tracking-widest flex items-center justify-center gap-2"
+                            variant="success"
+                            icon={Check}
+                            className="flex-1"
                         >
-                            <Save className="w-4 h-4" />
                             {editingAccount ? 'Guardar cambios' : 'Abrir cuenta SAP'}
-                        </button>
+                        </SIATCButton>
                     </div>
                 </form>
             </Modal>

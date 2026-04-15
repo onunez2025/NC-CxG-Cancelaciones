@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { 
     Calculator, 
-    Save, 
     ChevronLeft, 
     ChevronRight,
     Info,
@@ -9,10 +8,14 @@ import {
     CalendarDays,
     ChevronRight as ChevronRightIcon,
     Currency,
-    Check
+    Check,
+    Save
 } from 'lucide-react';
 import { ExchangeRatesService } from '../../services/exchangeRatesService';
-import { cn } from '../../utils/cn';
+
+// SIATC DESIGN SYSTEM IMPORTS
+import { SIATC_THEME } from '../../utils/siatc-theme';
+import { SIATCButton } from '../../components/siatc/SIATCButton';
 
 const MONTHS = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -59,9 +62,9 @@ export default function ExchangeRatesPage() {
     };
 
     return (
-        <div className="flex flex-col h-full space-y-4 min-h-0 animate-in fade-in duration-500">
+        <div className={SIATC_THEME.LAYOUT.PAGE_WRAPPER}>
             {/* Header: SIATC Standard */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 px-1">
+            <div className={SIATC_THEME.LAYOUT.HEADER_WRAPPER}>
                 <div className="space-y-1">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
                         <Calculator className="w-4 h-4" />
@@ -69,8 +72,8 @@ export default function ExchangeRatesPage() {
                         <ChevronRightIcon className="w-3 h-3 opacity-50" />
                         <span className="text-foreground">Tipos de Cambio</span>
                     </div>
-                    <h1 className="text-2xl font-bold tracking-tight text-foreground">Paridad Cambiaria</h1>
-                    <p className="text-sm text-muted-foreground">Define el valor del USD frente al PEN para proyecciones presupuestarias</p>
+                    <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Paridad Cambiaria</h1>
+                    <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>Define el valor del USD frente al PEN para proyecciones presupuestarias</p>
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -94,20 +97,15 @@ export default function ExchangeRatesPage() {
                         </button>
                     </div>
 
-                    <button
+                    <SIATCButton
                         onClick={handleSave}
-                        disabled={isSaving}
-                        className={cn(
-                            "w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs tracking-widest transition-all shadow-lg active:scale-95",
-                            savedSuccessfully
-                                ? "bg-emerald-500 text-white shadow-emerald-500/25"
-                                : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/25",
-                            isSaving && "opacity-70 cursor-wait"
-                        )}
+                        isLoading={isSaving}
+                        variant={savedSuccessfully ? "success" : "primary"}
+                        icon={savedSuccessfully ? Check : Save}
+                        className="w-full sm:w-auto"
                     >
-                        {savedSuccessfully ? <Check className="w-4 h-4 stroke-[3]" /> : <Save className="w-4 h-4" />}
-                        {isSaving ? 'Guardando...' : savedSuccessfully ? 'Actualizado' : 'Guardar cambios'}
-                    </button>
+                        {savedSuccessfully ? 'Actualizado' : 'Guardar Cambios'}
+                    </SIATCButton>
                 </div>
             </div>
 
@@ -117,13 +115,13 @@ export default function ExchangeRatesPage() {
                     {/* Insights SIATC Banner */}
                     <div className="relative group overflow-hidden">
                         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-transparent opacity-50" />
-                        <div className="relative bg-card border border-border p-6 rounded-3xl flex flex-col md:flex-row items-start md:items-center gap-6 shadow-sm group-hover:shadow-md transition-all">
+                        <div className="relative bg-card border border-border p-6 rounded-[2rem] flex flex-col md:flex-row items-start md:items-center gap-6 shadow-sm group-hover:shadow-md transition-all">
                             <div className="p-4 bg-primary/10 rounded-2xl text-primary ring-4 ring-primary/5 shadow-inner">
                                 <TrendingUp className="w-7 h-7 shrink-0" />
                             </div>
                             <div className="space-y-1.5 flex-1">
                                 <h3 className="font-bold text-foreground flex items-center gap-2 text-sm tracking-tight">
-                                    Motor de indexación financiera
+                                    Motor de Indexación Financiera
                                     <span className="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 text-[10px] font-black border border-emerald-100 uppercase">Activo</span>
                                 </h3>
                                 <p className="text-xs text-muted-foreground leading-relaxed font-medium">
@@ -131,7 +129,7 @@ export default function ExchangeRatesPage() {
                                 </p>
                             </div>
                             <div className="flex items-center gap-4 border-l border-border pl-6 text-muted-foreground/60 italic">
-                                <span className="text-[10px] font-bold tracking-widest">Referencia: SBS / Sunat</span>
+                                <span className="text-[10px] font-black tracking-widest">REFERENCIA: SBS / SUNAT</span>
                             </div>
                         </div>
                     </div>
@@ -145,7 +143,7 @@ export default function ExchangeRatesPage() {
                                     <div className="flex justify-between items-center mb-5">
                                         <div className="flex items-center gap-2">
                                             <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                                            <label className="text-[11px] font-bold tracking-widest text-muted-foreground group-focus-within/card:text-primary transition-colors">
+                                            <label className="text-[11px] font-bold tracking-widest text-muted-foreground group-focus-within/card:text-primary transition-colors uppercase">
                                                 {month}
                                             </label>
                                         </div>
@@ -172,9 +170,9 @@ export default function ExchangeRatesPage() {
                                         </div>
                                     </div>
 
-                                    <div className="mt-4 flex items-center justify-between text-[9px] font-bold text-muted-foreground/40 tracking-widest">
+                                    <div className="mt-4 flex items-center justify-between text-[9px] font-black text-muted-foreground/40 tracking-widest uppercase">
                                         <span>Paridad FI / CO</span>
-                                        <span className="group-focus-within/card:text-primary/60 transition-colors uppercase">USD → PEN</span>
+                                        <span className="group-focus-within/card:text-primary/60 transition-colors">USD → PEN</span>
                                     </div>
                                 </div>
                             </div>
@@ -182,7 +180,7 @@ export default function ExchangeRatesPage() {
                     </div>
 
                     {/* Safety Disclaimer */}
-                    <div className="flex items-center gap-4 p-5 rounded-2xl bg-amber-500/5 border border-amber-500/10 text-[10px] font-bold text-amber-600/80 tracking-widest justify-center mx-auto max-w-2xl text-center leading-relaxed">
+                    <div className="flex items-center gap-4 p-5 rounded-2xl bg-amber-500/5 border border-amber-500/10 text-[10px] font-bold text-amber-600/80 tracking-widest justify-center mx-auto max-w-2xl text-center leading-relaxed uppercase">
                         <Info className="w-4 h-4 shrink-0" />
                         Los cambios realizados son de carácter retroactivo para ejercicios no cerrados. Verifique con el área contable antes de persistir cambios.
                     </div>

@@ -3,6 +3,9 @@ import { Users, Shield, Building2, Wallet, Briefcase, RefreshCw, Terminal, Chevr
 import { useAuth } from '../../hooks/useAuth';
 import { cn } from '../../utils/cn';
 
+// SIATC DESIGN SYSTEM IMPORTS
+import { SIATC_THEME } from '../../utils/siatc-theme';
+
 export default function ConfigLayout() {
     const { hasPermission } = useAuth();
     const location = useLocation();
@@ -29,25 +32,28 @@ export default function ConfigLayout() {
     }
 
     return (
-        <div className="flex-1 h-full overflow-hidden flex flex-col p-1 lg:p-2 bg-slate-50">
+        <div className="flex-1 h-full overflow-hidden flex flex-col p-1 lg:p-2 bg-slate-50/50">
             <div className="grid grid-cols-1 lg:grid-cols-[18rem_1fr] gap-2 h-full min-h-0 w-full">
                 {/* SIATC Premium Sidebar */}
                 <aside className="shrink-0 flex flex-col min-h-0 h-fit lg:h-full group">
-                    <div className="bg-card rounded-[2rem] border border-border/50 shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden flex flex-col h-full backdrop-blur-sm">
+                    <div className={cn(
+                        "bg-card rounded-[2rem] border border-border/50 shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden flex flex-col h-full backdrop-blur-sm",
+                        SIATC_THEME.EFFECTS.GLASS_PANEL
+                    )}>
                         <div className="p-6 border-b border-border/50 bg-gradient-to-br from-primary/5 to-transparent">
                             <div className="flex items-center gap-3">
                                 <div className="p-2.5 bg-primary text-white rounded-2xl shadow-lg shadow-primary/20 ring-4 ring-primary/5">
                                     <Settings2 className="w-5 h-5 stroke-[2.5]" />
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-[10px] font-black text-primary tracking-[0.2em] leading-none">Módulo de</span>
+                                    <span className="text-[10px] font-black text-primary tracking-[0.2em] leading-none uppercase">Módulo de</span>
                                     <span className="text-lg font-bold text-foreground tracking-tight">Configuración</span>
                                 </div>
                             </div>
                         </div>
 
                         <nav className="flex-1 p-3 space-y-1 overflow-y-auto custom-scrollbar">
-                            <p className="text-[10px] font-black text-muted-foreground tracking-[0.2em] px-4 py-3 opacity-60">Control Gestión Presupuestal</p>
+                            <p className="text-[10px] font-black text-muted-foreground tracking-[0.2em] px-4 py-3 opacity-60 uppercase">Control Gestión</p>
                             {filteredItems.map((item) => (
                                 <NavLink
                                     key={item.to}
@@ -77,12 +83,12 @@ export default function ConfigLayout() {
                         {/* Sidebar Footer Info */}
                         <div className="p-4 bg-muted/30 border-t border-border/50">
                             <div className="p-4 bg-background rounded-2xl border border-border/50 shadow-sm">
-                                <div className="flex items-center gap-2 mb-1.5 font-bold text-[10px] text-primary tracking-widest">
+                                <div className="flex items-center gap-2 mb-1.5 font-bold text-[10px] text-primary tracking-widest uppercase">
                                     <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                                     Sistema SIATC
                                 </div>
-                                <p className="text-[10px] text-muted-foreground font-medium tracking-tighter leading-relaxed">
-                                    Gestión Presupuestal EBM v3.5.0
+                                <p className="text-[10px] text-muted-foreground font-black tracking-widest leading-relaxed uppercase opacity-60">
+                                    EBM v3.5.0 • PILOT
                                 </p>
                             </div>
                         </div>

@@ -3,6 +3,18 @@ import { Search, RotateCcw, Clock, ChevronRight, Database, ShieldAlert, Terminal
 import { cn } from '../../utils/cn';
 import { toTitleCase } from '../../utils/formatters';
 
+// SIATC DESIGN SYSTEM IMPORTS
+import { SIATC_THEME } from '../../utils/siatc-theme';
+import { SIATCButton } from '../../components/siatc/SIATCButton';
+import { SIATCBadge } from '../../components/siatc/SIATCBadge';
+import { 
+    SIATCTable, 
+    SIATCTableHeader, 
+    SIATCTableRow, 
+    SIATCTableCell, 
+    SIATCTableFooter 
+} from '../../components/siatc/table/SIATCTable';
+
 interface AuditLog {
     Id: number;
     Fecha: string;
@@ -19,6 +31,10 @@ export default function AuditLogPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState('ALL');
+
+    // Pagination State (SIATC Standard)
+    const [currentPage, setCurrentPage] = useState(1);
+    const recordsPerPage = 15;
 
     useEffect(() => {
         loadLogs();
@@ -51,6 +67,10 @@ export default function AuditLogPage() {
         return matchesSearch && log.Accion === filter;
     });
 
+    // Pagination Logic
+    const totalPages = Math.ceil(filteredLogs.length / recordsPerPage);
+    const paginatedRecords = filteredLogs.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage);
+
     const formatAction = (action: string) => {
         return action
             .toLowerCase()
@@ -59,10 +79,17 @@ export default function AuditLogPage() {
             .join(' ');
     };
 
+    const getActionVariant = (action: string): 'success' | 'warning' | 'error' | 'info' => {
+        if (action === 'ACCESO_DENEGADO') return 'error';
+        if (action === 'DELETE') return 'warning';
+        if (action === 'CREATE') return 'success';
+        return 'info';
+    };
+
     return (
-        <div className="flex flex-col h-full space-y-4 min-h-0 animate-in fade-in duration-500">
+        <div className={SIATC_THEME.LAYOUT.PAGE_WRAPPER}>
             {/* Header: SIATC Standard */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 px-1">
+            <div className={SIATC_THEME.LAYOUT.HEADER_WRAPPER}>
                 <div className="space-y-1">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
                         <Terminal className="w-4 h-4" />
@@ -70,20 +97,21 @@ export default function AuditLogPage() {
                         <ChevronRight className="w-3 h-3 opacity-50" />
                         <span className="text-foreground">Auditoría</span>
                     </div>
-                    <h1 className="text-2xl font-bold tracking-tight text-foreground">Bitácora de Seguridad</h1>
-                    <p className="text-sm text-muted-foreground">Registro centralizado e inmutable de acciones críticas e intentos de acceso</p>
+                    <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Bitácora de Seguridad</h1>
+                    <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>Registro centralizado e inmutable de acciones críticas e intentos de acceso</p>
                 </div>
-                <button 
-                    onClick={loadLogs}
-                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-muted text-muted-foreground rounded-xl hover:bg-primary hover:text-primary-foreground transition-all active:scale-95 font-semibold text-sm border border-border shadow-sm group"
+                <SIATCButton 
+                    variant="secondary"
+                    onClick={() => { loadLogs(); setCurrentPage(1); }}
+                    isLoading={isLoading}
+                    icon={RotateCcw}
                 >
-                    <RotateCcw className={cn("w-4 h-4 transition-transform group-hover:rotate-180 duration-500", isLoading && "animate-spin")} />
                     Sincronizar Bitácora
-                </button>
+                </SIATCButton>
             </div>
 
             {/* Content Container */}
-            <div className="flex-1 min-h-0 flex flex-col bg-card rounded-[2rem] border border-border shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden backdrop-blur-sm">
+            <div className={SIATC_THEME.LAYOUT.CONTENT_CONTAINER}>
                 {/* Search / Filters Toolbar */}
                 <div className="p-4 border-b border-border bg-muted/20 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div className="relative max-w-md w-full">
@@ -91,9 +119,9 @@ export default function AuditLogPage() {
                         <input
                             type="text"
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
                             placeholder="Filtrar por usuario, entidad o referencia..."
-                            className="w-full pl-10 pr-4 py-2.5 bg-background border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium"
+                            className={SIATC_THEME.COMPONENTS.INPUT}
                         />
                     </div>
                     
@@ -101,9 +129,9 @@ export default function AuditLogPage() {
                         {['ALL', 'CREATE', 'UPDATE', 'DELETE', 'ACCESO_DENEGADO'].map((f) => (
                             <button
                                 key={f}
-                                onClick={() => setFilter(f)}
+                                onClick={() => { setFilter(f); setCurrentPage(1); }}
                                 className={cn(
-                                    "px-3 py-1.5 text-[10px] font-black rounded-lg transition-all tracking-widest",
+                                    "px-3 py-1.5 text-[10px] font-black rounded-lg transition-all tracking-widest uppercase",
                                     filter === f 
                                         ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" 
                                         : "text-muted-foreground hover:bg-muted"
@@ -116,25 +144,25 @@ export default function AuditLogPage() {
                 </div>
 
                 {/* Table Area */}
-                <div className="flex-1 overflow-auto relative custom-scrollbar">
+                <SIATCTable>
                     {isLoading ? (
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-card/50 backdrop-blur-sm z-50">
                             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
                             <span className="text-sm font-medium text-muted-foreground mt-4 tracking-[0.2em]">Leyendo bitácora...</span>
                         </div>
                     ) : (
-                        <table className="w-full text-sm text-left border-collapse min-w-[1000px]">
-                            <thead className="sticky top-0 z-20 bg-muted/90 backdrop-blur-md">
+                        <>
+                            <thead className={SIATC_THEME.TABLE.HEADER_ROW}>
                                 <tr className="border-b border-border">
-                                    <th className="px-6 py-4 font-bold text-sm text-foreground tracking-tight w-48">Fecha y Hora</th>
-                                    <th className="px-6 py-4 font-bold text-sm text-foreground tracking-tight w-64">Usuario Responsable</th>
-                                    <th className="px-6 py-4 font-bold text-sm text-foreground tracking-tight w-40">Operación</th>
-                                    <th className="px-6 py-4 font-bold text-sm text-foreground tracking-tight w-56">Ref. Entidad</th>
-                                    <th className="px-6 py-4 font-bold text-sm text-foreground tracking-tight">Payload / Detalle Técnico</th>
+                                    <SIATCTableHeader className="w-48">Fecha y Hora</SIATCTableHeader>
+                                    <SIATCTableHeader className="w-64">Usuario Responsable</SIATCTableHeader>
+                                    <SIATCTableHeader className="w-40">Operación</SIATCTableHeader>
+                                    <SIATCTableHeader className="w-56">Ref. Entidad</SIATCTableHeader>
+                                    <SIATCTableHeader>Payload / Detalle Técnico</SIATCTableHeader>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border">
-                                {filteredLogs.length === 0 ? (
+                                {paginatedRecords.length === 0 ? (
                                     <tr>
                                         <td colSpan={5} className="px-6 py-20 text-center opacity-60">
                                             <div className="flex flex-col items-center gap-3">
@@ -144,9 +172,9 @@ export default function AuditLogPage() {
                                         </td>
                                     </tr>
                                 ) : (
-                                    filteredLogs.map((log) => (
-                                        <tr key={log.Id} className="group hover:bg-muted/30 transition-colors">
-                                            <td className="px-6 py-4 align-top">
+                                    paginatedRecords.map((log) => (
+                                        <SIATCTableRow key={log.Id}>
+                                            <SIATCTableCell>
                                                 <div className="flex items-center gap-3 text-foreground font-black text-[11px]">
                                                     <div className="p-1.5 rounded-lg bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors border border-border/50">
                                                         <Clock className="w-3.5 h-3.5" />
@@ -156,33 +184,24 @@ export default function AuditLogPage() {
                                                         <span className="text-primary/70">{new Date(log.Fecha).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-4 align-top">
+                                            </SIATCTableCell>
+                                            <SIATCTableCell>
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs border border-primary/20 shrink-0">
                                                         {log.UsuarioNombre?.substring(0, 2).toUpperCase()}
                                                     </div>
                                                     <div className="flex flex-col min-w-0">
                                                         <span className="font-bold text-foreground truncate">{toTitleCase(log.UsuarioNombre)}</span>
-                                                        <span className="text-[10px] text-muted-foreground font-mono truncate">ID: {log.UsuarioID}</span>
+                                                        <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO + " text-muted-foreground truncate uppercase opacity-60"}>ID: {log.UsuarioID}</span>
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-4 align-top">
-                                                <span className={cn(
-                                                    "inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black tracking-tighter border shadow-sm",
-                                                    log.Accion === 'ACCESO_DENEGADO' 
-                                                        ? "bg-rose-50 text-rose-700 border-rose-200/50" 
-                                                        : log.Accion === 'DELETE' 
-                                                            ? "bg-amber-50 text-amber-700 border-amber-200/50"
-                                                            : log.Accion === 'CREATE'
-                                                                ? "bg-emerald-50 text-emerald-700 border-emerald-200/50"
-                                                                : "bg-blue-50 text-blue-700 border-blue-200/50"
-                                                )}>
+                                            </SIATCTableCell>
+                                            <SIATCTableCell>
+                                                <SIATCBadge variant={getActionVariant(log.Accion)}>
                                                     {formatAction(log.Accion)}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 align-top">
+                                                </SIATCBadge>
+                                            </SIATCTableCell>
+                                            <SIATCTableCell>
                                                 <div className="flex flex-col gap-1.5">
                                                     <div className="flex items-center gap-1.5">
                                                         <Database className="w-3 h-3 text-muted-foreground opacity-50" />
@@ -192,37 +211,34 @@ export default function AuditLogPage() {
                                                         #{log.EntidadID}
                                                     </span>
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-4 align-top">
+                                            </SIATCTableCell>
+                                            <SIATCTableCell>
                                                 <div className="relative group/detail">
-                                                    <div className="max-h-24 overflow-hidden rounded-xl bg-muted/40 p-3 border border-border/50 group-hover/detail:max-h-none transition-all duration-300">
+                                                    <div className="max-h-24 overflow-hidden rounded-xl bg-muted/40 p-3 border border-border/50 group-hover/detail:max-h-none transition-all duration-300 shadow-inner">
                                                         <pre className="text-[10px] text-muted-foreground font-mono leading-relaxed whitespace-pre-wrap">
                                                             {log.Detalle}
                                                         </pre>
                                                     </div>
-                                                    <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-muted/40 to-transparent flex items-center justify-center group-hover/detail:hidden">
-                                                        <span className="text-[9px] font-black text-muted-foreground/60 tracking-[0.2em]">Expandir detalle</span>
+                                                    <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-muted/40 to-transparent flex items-center justify-center group-hover/detail:hidden pointer-events-none">
+                                                        <span className="text-[9px] font-black text-muted-foreground/60 tracking-[0.2em] uppercase">Expandir Detalle</span>
                                                     </div>
                                                 </div>
-                                            </td>
-                                        </tr>
+                                            </SIATCTableCell>
+                                        </SIATCTableRow>
                                     ))
                                 )}
                             </tbody>
-                        </table>
+                        </>
                     )}
-                </div>
+                </SIATCTable>
                 
-                {/* Footer Stats: SIATC Standard */}
-                <div className="px-6 py-3 border-t border-border/50 bg-muted/30 flex items-center justify-between shrink-0">
-                    <p className="text-[10px] font-black text-muted-foreground tracking-[0.2em] uppercase opacity-60">
-                        Total de registros: <span className="text-foreground ml-1">{filteredLogs.length}</span>
-                    </p>
-                    <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-background rounded-lg border border-border shadow-inner">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[9px] font-black text-muted-foreground tracking-widest uppercase">Sincronizado</span>
-                    </div>
-                </div>
+                {/* Footer SIATC Standard */}
+                <SIATCTableFooter 
+                    totalRecords={filteredLogs.length} 
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
             </div>
         </div>
     );
