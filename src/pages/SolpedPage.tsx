@@ -133,7 +133,7 @@ export function SolpedPage() {
     return (
         <div className="flex flex-col h-full gap-5 animate-in fade-in duration-500 p-1">
             {/* Header Area */}
-            <div className="shrink-0 mb-2">
+            <div className="shrink-0 mb-1">
                 <div className="flex items-center justify-between px-1">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
@@ -148,7 +148,7 @@ export function SolpedPage() {
             </div>
 
             {/* KPI Area */}
-            <div className="shrink-0 mb-6">
+            <div className="shrink-0 mb-2">
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                     <KPICard label="Total" value={metrics.total} active={filterStatus === 'all'} onClick={() => togglePillFilter('all')} icon={FileText} color="text-slate-600" bgColor="bg-slate-50 border-slate-200" />
                     <KPICard label="Por Firmar" value={metrics.pendienteFirma} active={filterStatus === 'pendiente'} onClick={() => togglePillFilter('pendiente')} icon={Clock} color="text-red-600" bgColor="bg-red-50/50 border-red-100" />
@@ -160,7 +160,7 @@ export function SolpedPage() {
             </div>
 
             {/* Filters Area */}
-            <div className="shrink-0 mb-6">
+            <div className="shrink-0 mb-2">
                 <div className="bg-card border border-slate-200 dark:border-slate-800 rounded-xl p-2 shadow-sm flex items-center flex-wrap gap-2">
                     <div className="relative flex-1 min-w-[300px]">
                         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -214,7 +214,7 @@ export function SolpedPage() {
                     </select>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between">
+                <div className="flex items-center justify-between">
                     <p className="text-xs font-bold text-slate-400 flex items-center gap-1.5">
                         <Filter className="w-3.5 h-3.5" />
                         Mostrando {filteredRows.length} de {rows.length} registros
@@ -236,14 +236,14 @@ export function SolpedPage() {
                             <table className="w-full text-sm">
                                 <thead className="sticky top-0 z-10 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-sm shadow-sm ring-1 ring-slate-100 dark:ring-slate-800">
                                     <tr>
-                                        <th className="w-10 py-4 px-3"></th>
-                                        <th className="text-left py-4 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500">Solped</th>
-                                        <th className="text-left py-4 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500">Orden Compra</th>
-                                        <th className="text-left py-4 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500 hidden lg:table-cell">Descripción</th>
-                                        <th className="text-left py-4 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500 hidden md:table-cell">Centro Costo</th>
-                                        <th className="text-center py-4 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500">Moneda</th>
-                                        <th className="text-right py-4 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500">Valor Neto</th>
-                                        <th className="text-center py-4 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500">Estado SAP</th>
+                                        <th className="w-10 py-2 px-3"></th>
+                                        <th className="text-left py-2 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500">Solped</th>
+                                        <th className="text-left py-2 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500">Orden Compra</th>
+                                        <th className="text-left py-2 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500 hidden lg:table-cell">Descripción</th>
+                                        <th className="text-left py-2 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500 hidden md:table-cell">Centro Costo</th>
+                                        <th className="text-center py-2 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500">Moneda</th>
+                                        <th className="text-right py-2 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500">Valor Neto</th>
+                                        <th className="text-center py-2 px-3 font-bold text-[11px] uppercase tracking-wider text-slate-500">Estado SAP</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y">
@@ -259,16 +259,16 @@ export function SolpedPage() {
                                                     className="hover:bg-muted/10 transition-colors cursor-pointer"
                                                     onClick={() => setExpandedPR(prev => prev === (r.pr_number || r.po_number) ? null : (r.pr_number || r.po_number))}
                                                 >
-                                                    <td className="py-2.5 px-2 text-muted-foreground">
+                                                    <td className="py-1.5 px-2 text-muted-foreground">
                                                         {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                                                     </td>
-                                                    <td className="py-2.5 px-3 font-mono text-xs font-bold text-primary">{r.pr_number || '—'}</td>
-                                                    <td className="py-2.5 px-3 font-mono text-xs text-muted-foreground">{r.po_number || '—'}</td>
-                                                    <td className="py-2.5 px-3 text-xs truncate max-w-[200px] hidden lg:table-cell">{r.description || '—'}</td>
-                                                    <td className="py-2.5 px-3 font-mono text-xs text-muted-foreground hidden md:table-cell">{r.cost_center || '—'}</td>
-                                                    <td className="py-2.5 px-3 font-mono text-xs font-bold text-center">{String(r.currency || 'PEN').toUpperCase()}</td>
-                                                    <td className="py-2.5 px-3 text-xs font-bold text-right">{formatCurrency(r.net_value, r.currency)}</td>
-                                                    <td className="py-2.5 px-3 text-center">
+                                                    <td className="py-1.5 px-3 font-mono text-xs font-bold text-primary">{r.pr_number || '—'}</td>
+                                                    <td className="py-1.5 px-3 font-mono text-xs text-muted-foreground">{r.po_number || '—'}</td>
+                                                    <td className="py-1.5 px-3 text-xs truncate max-w-[200px] hidden lg:table-cell">{r.description || '—'}</td>
+                                                    <td className="py-1.5 px-3 font-mono text-xs text-muted-foreground hidden md:table-cell">{r.cost_center || '—'}</td>
+                                                    <td className="py-1.5 px-3 font-mono text-xs font-bold text-center">{String(r.currency || 'PEN').toUpperCase()}</td>
+                                                    <td className="py-1.5 px-3 text-xs font-bold text-right">{formatCurrency(r.net_value, r.currency)}</td>
+                                                    <td className="py-1.5 px-3 text-center">
                                                         <span className={cn("inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold", status.color)}>
                                                             <StatusIcon className="w-3 h-3" />
                                                             {status.label}
@@ -361,17 +361,17 @@ function KPICard({ label, value, icon: Icon, color, bgColor, active, onClick }: 
         <div
             onClick={onClick}
             className={cn(
-                "p-4 rounded-2xl border transition-all cursor-pointer select-none flex items-center justify-between gap-3 shadow-sm",
+                "py-2 px-4 h-[80px] rounded-2xl border transition-all cursor-pointer select-none flex items-center justify-between gap-3 shadow-sm",
                 bgColor,
                 active ? "ring-2 ring-primary ring-offset-2 dark:ring-offset-background border-primary/50 shadow-md transform scale-[1.02]" : "border-slate-100 hover:border-slate-300"
             )}
         >
-            <div className="space-y-1">
+            <div className="space-y-0.5">
                 <p className={cn("text-[10px] font-bold uppercase tracking-tighter opacity-80", color)}>{label}</p>
-                <p className="text-lg font-bold text-slate-800 dark:text-white leading-none">{value}</p>
+                <p className="text-base font-bold text-slate-800 dark:text-white leading-none">{value}</p>
             </div>
-            <div className={cn("p-2 rounded-xl bg-white/50 dark:bg-black/20", color)}>
-                <Icon className="w-5 h-5" />
+            <div className={cn("p-1.5 rounded-xl bg-white/50 dark:bg-black/20", color)}>
+                <Icon className="w-4 h-4" />
             </div>
         </div>
     );
