@@ -79,8 +79,8 @@ export function VendorsPage() {
     }), [vendors]);
 
     return (
-        <div className="flex flex-col h-full gap-5 animate-in fade-in duration-500 p-1">
-            <div className="shrink-0 mb-2 px-1">
+        <div className="flex flex-col h-full gap-3 animate-in fade-in duration-500 p-1">
+            <div className="shrink-0 mb-1 px-1">
                 <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
                     <Users className="w-6 h-6 text-primary" />
                     Proveedores
@@ -91,7 +91,7 @@ export function VendorsPage() {
             </div>
 
             {/* KPI Cards */}
-            <div className="shrink-0 mb-6">
+            <div className="shrink-0 mb-1">
                 <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
                     <MetricCard icon={Users} label="Total Proveedores" value={String(metrics.totalVendors)} color="text-indigo-600" />
                     <MetricCard icon={ShoppingCart} label="Total Órdenes" value={formatCurrency(metrics.totalPOValue)} color="text-purple-600" />
@@ -101,7 +101,7 @@ export function VendorsPage() {
                 </div>
             </div>
 
-            <div className="shrink-0 mb-6">
+            <div className="shrink-0 mb-1">
                 <div className="bg-card border border-slate-200 dark:border-slate-800 rounded-xl p-2 shadow-sm flex items-center flex-wrap gap-2">
                     <div className="relative flex-1 min-w-[300px]">
                         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -127,7 +127,7 @@ export function VendorsPage() {
                     </select>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between">
+                <div className="flex items-center justify-between">
                     <p className="text-xs font-bold text-slate-400 flex items-center gap-1.5">
                         <Filter className="w-3.5 h-3.5" />
                         Mostrando {filteredVendors.length} registros
@@ -148,13 +148,13 @@ export function VendorsPage() {
                         <table className="w-full text-left text-sm whitespace-nowrap">
                             <thead className="sticky top-0 z-10 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-sm shadow-sm ring-1 ring-slate-100 dark:ring-slate-800">
                                 <tr>
-                                    <th className="w-10 py-4 px-3"></th>
-                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500">Código</th>
-                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 w-full">Proveedor</th>
-                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-center">Cant. PO</th>
-                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-right">Valor Total PO</th>
-                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-right">Cant. Facturas</th>
-                                    <th className="py-4 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-right">Total Pagado</th>
+                                    <th className="w-10 py-2 px-3"></th>
+                                    <th className="py-2 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500">Código</th>
+                                    <th className="py-2 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 w-full">Proveedor</th>
+                                    <th className="py-2 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-center">Cant. PO</th>
+                                    <th className="py-2 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-right">Valor Total PO</th>
+                                    <th className="py-2 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-right">Cant. Facturas</th>
+                                    <th className="py-2 px-4 font-bold text-[11px] uppercase tracking-wider text-slate-500 text-right">Total Pagado</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y relative">
@@ -167,22 +167,22 @@ export function VendorsPage() {
                                                 className="hover:bg-muted/10 transition-colors cursor-pointer"
                                                 onClick={() => setExpandedVendor(prev => prev === v.code ? null : v.code)}
                                             >
-                                                <td className="py-3 px-3 text-slate-400 text-center">
+                                                <td className="py-1.5 px-3 text-slate-400 text-center">
                                                     {isExpanded ? <ChevronDown className="w-3.5 h-3.5 mx-auto" /> : <ChevronRight className="w-3.5 h-3.5 mx-auto" />}
                                                 </td>
-                                                <td className="py-3 px-4">
+                                                <td className="py-1.5 px-4">
                                                     <span className="font-mono text-xs font-bold text-primary">{v.code}</span>
                                                 </td>
-                                                <td className="py-3 px-4">
+                                                <td className="py-1.5 px-4">
                                                     <div className="max-w-[300px]">
                                                         <p className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">{v.name}</p>
                                                         <p className="text-[10px] font-bold text-slate-400 truncate uppercase mt-0.5">{v.cost_centers.join(', ') || 'Sin CeCo'}</p>
                                                     </div>
                                                 </td>
-                                                <td className="py-3 px-4 text-center font-bold text-slate-600 dark:text-slate-400">{v.po_count}</td>
-                                                <td className="py-3 px-4 text-right font-bold text-slate-700 bg-slate-50/30 dark:bg-slate-900/10">{formatCurrency(v.po_total)}</td>
-                                                <td className="py-3 px-4 text-right font-bold text-slate-500">{v.invoice_count || '—'}</td>
-                                                <td className="py-3 px-4 text-right font-bold text-emerald-600 bg-emerald-50/30 dark:bg-emerald-900/10">
+                                                <td className="py-1.5 px-4 text-center font-bold text-slate-600 dark:text-slate-400">{v.po_count}</td>
+                                                <td className="py-1.5 px-4 text-right font-bold text-slate-700 bg-slate-50/30 dark:bg-slate-900/10">{formatCurrency(v.po_total)}</td>
+                                                <td className="py-1.5 px-4 text-right font-bold text-slate-500">{v.invoice_count || '—'}</td>
+                                                <td className="py-1.5 px-4 text-right font-bold text-emerald-600 bg-emerald-50/30 dark:bg-emerald-900/10">
                                                     {v.paid_total > 0 ? formatCurrency(v.paid_total) : '—'}
                                                 </td>
                                             </tr>
@@ -273,14 +273,14 @@ export function VendorsPage() {
 
 function MetricCard({ icon: Icon, label, value, color }: { icon: any; label: string; value: string; color: string }) {
     return (
-        <div className={cn("p-6 rounded-2xl border transition-all shadow-sm flex flex-col justify-between h-full bg-card border-slate-100 dark:border-slate-800")}>
-            <div className="flex justify-between items-start mb-4">
-                <p className={cn("text-[10px] font-bold uppercase tracking-tighter opacity-80", color)}>{label}</p>
-                <div className={cn("p-2 rounded-xl bg-white/50 dark:bg-black/20", color)}>
-                    <Icon className="w-5 h-5" />
-                </div>
+        <div className={cn("py-2 px-4 h-[81px] rounded-xl border transition-all shadow-sm flex items-center justify-between gap-3 bg-card border-slate-100 dark:border-slate-800")}>
+            <div className="flex flex-col justify-center min-w-0">
+                <p className={cn("text-[10px] font-bold uppercase tracking-tighter opacity-80 leading-tight", color)}>{label}</p>
+                <h3 className="text-lg font-bold text-slate-800 dark:text-white tracking-tight leading-none truncate">{value}</h3>
             </div>
-            <h3 className="text-xl font-bold text-slate-800 dark:text-white tracking-tight">{value}</h3>
+            <div className={cn("p-2 rounded-lg bg-white/50 dark:bg-black/20 shrink-0", color)}>
+                <Icon className="w-5 h-5" />
+            </div>
         </div>
     );
 }
