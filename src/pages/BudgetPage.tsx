@@ -226,6 +226,15 @@ export function BudgetPage() {
     const managementTotalBudget = budgets.reduce((sum, b) => sum + b.total, 0);
     const managementMonthTotal = budgets.reduce((sum, b) => sum + (b.monthly_amounts[currentMonthIndex] || 0), 0);
 
+    // Calculate Table Totals (Filtered)
+    const tableTotals = Array(12).fill(0);
+    tableFilteredBudgets.forEach(b => {
+        b.monthly_amounts.forEach((amt, i) => {
+            tableTotals[i] += amt;
+        });
+    });
+    const tableGrandTotal = tableTotals.reduce((a, b) => a + b, 0);
+
     return (
         <div className="flex flex-col h-full gap-5 animate-in fade-in duration-500 p-1">
             {/* Header */}
@@ -305,7 +314,7 @@ export function BudgetPage() {
                         {/* Main Summary Card (Click to reset filter) */}
                         <div
                             onClick={() => setSelectedCostCenter('all')}
-                            className={`p-6 rounded-2xl border shadow-sm flex flex-col justify-between relative overflow-hidden group cursor-pointer transition-all hover:shadow-md ${selectedCostCenter === 'all'
+                            className={`py-2.5 px-5 h-[100px] rounded-2xl border shadow-sm flex flex-col justify-between relative overflow-hidden group cursor-pointer transition-all hover:shadow-md ${selectedCostCenter === 'all'
                                 ? 'bg-card border-primary ring-1 ring-primary/20'
                                 : 'bg-card border-border hover:border-primary/50'
                                 }`}
@@ -315,14 +324,14 @@ export function BudgetPage() {
                                     <p className="text-[11px] font-bold text-slate-500 mb-1">
                                         Total Presupuesto ({selectedYear})
                                     </p>
-                                    <h2 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">{formatCurrency(managementTotalBudget)}</h2>
+                                    <h2 className="text-xl font-bold text-slate-800 dark:text-white tracking-tight">{formatCurrency(managementTotalBudget)}</h2>
                                 </div>
-                                <div className={`p-2.5 rounded-xl transition-colors ${selectedCostCenter === 'all' ? 'bg-primary/10 text-primary' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
+                                <div className={`p-2 rounded-xl transition-colors ${selectedCostCenter === 'all' ? 'bg-primary/10 text-primary' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
                                     <Wallet className="w-5 h-5" />
                                 </div>
                             </div>
 
-                            <div className="mt-3 flex items-center justify-between text-xs">
+                            <div className="mt-1 flex items-center justify-between text-[10px]">
                                 <span className="text-muted-foreground font-medium">{currentMonthName}:</span>
                                 <span className="font-bold text-foreground">{formatCurrency(managementMonthTotal)}</span>
                             </div>
@@ -338,7 +347,7 @@ export function BudgetPage() {
                                 <div
                                     key={ceco.id}
                                     onClick={() => setSelectedCostCenter(ceco.id)}
-                                    className={`p-4 rounded-xl border shadow-sm flex flex-col justify-between relative overflow-hidden group cursor-pointer transition-all hover:shadow-md ${selectedCostCenter === ceco.id
+                                    className={`py-2 px-4 h-[100px] rounded-xl border shadow-sm flex flex-col justify-between relative overflow-hidden group cursor-pointer transition-all hover:shadow-md ${selectedCostCenter === ceco.id
                                         ? 'bg-card border-primary ring-1 ring-primary'
                                         : 'bg-card/50 border-border hover:border-primary/50'
                                         }`}
@@ -351,11 +360,11 @@ export function BudgetPage() {
                                         <div className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1 ${cecoTotal > 0 ? 'bg-green-500' : 'bg-muted'}`} />
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <div className="text-lg font-bold text-blue-600 dark:text-blue-400 tracking-tight">
+                                    <div className="space-y-0.5">
+                                        <div className="text-base font-bold text-blue-600 dark:text-blue-400 tracking-tight">
                                             {formatCurrency(cecoTotal)}
                                         </div>
-                                        <div className="flex justify-between items-center text-xs pt-2 border-t border-border/50">
+                                        <div className="flex justify-between items-center text-[10px] pt-1 border-t border-border/50">
                                             <span className="text-muted-foreground font-medium">{currentMonthName}</span>
                                             <span className="font-bold text-foreground">{formatCurrency(cecoMonthTotal)}</span>
                                         </div>
@@ -374,8 +383,8 @@ export function BudgetPage() {
                         const cecoMonthTotal = cecoBudgets.reduce((sum, b) => sum + (b.monthly_amounts[currentMonthIndex] || 0), 0);
 
                         return (
-                            <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm pb-4 pt-2 -mx-2 px-2 border-b border-border/50 shadow-sm">
-                                <div className="bg-card p-6 rounded-lg border border-primary/20 shadow-sm ring-1 ring-primary/10 relative overflow-hidden">
+                            <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm pb-4 pt-1 -mx-2 px-2 border-b border-border/50 shadow-sm">
+                                <div className="bg-card py-3 px-6 h-[100px] rounded-lg border border-primary/20 shadow-sm ring-1 ring-primary/10 relative overflow-hidden flex flex-col justify-center">
                                     <div className="flex items-center justify-between relative z-10">
                                         <div>
                                             <div className="flex items-center gap-2 mb-1">
@@ -384,15 +393,15 @@ export function BudgetPage() {
                                                 </span>
                                                 <h2 className="text-lg font-bold text-foreground">{ceco?.name}</h2>
                                             </div>
-                                            <div className="flex items-baseline gap-4 mt-2">
+                                            <div className="flex items-baseline gap-4 mt-1">
                                                 <div>
-                                                    <p className="text-xs text-muted-foreground mb-0.5">{t('budget.total_budget')} ({selectedYear})</p>
-                                                    <h3 className="text-3xl font-bold text-primary tracking-tight">{formatCurrency(cecoTotal)}</h3>
+                                                    <p className="text-[10px] text-muted-foreground mb-0.5">{t('budget.total_budget')} ({selectedYear})</p>
+                                                    <h3 className="text-xl font-bold text-primary tracking-tight">{formatCurrency(cecoTotal)}</h3>
                                                 </div>
-                                                <div className="h-8 w-px bg-border mx-2"></div>
+                                                <div className="h-6 w-px bg-border mx-2"></div>
                                                 <div>
-                                                    <p className="text-xs text-muted-foreground mb-0.5">{currentMonthName} ({t('budget.table.total')})</p>
-                                                    <p className="text-xl font-bold text-foreground">{formatCurrency(cecoMonthTotal)}</p>
+                                                    <p className="text-[10px] text-muted-foreground mb-0.5">{currentMonthName} ({t('budget.table.total')})</p>
+                                                    <p className="text-base font-bold text-foreground">{formatCurrency(cecoMonthTotal)}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -453,7 +462,7 @@ export function BudgetPage() {
                 </div>
 
                 {/* Main Table */}
-                <div className="flex-1 bg-card rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-[calc(100vh-280px)]">
+                <div className="flex-1 bg-card rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-[calc(100vh-250px)]">
                     <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
                         <div className="relative flex-1 max-w-sm">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -537,13 +546,43 @@ export function BudgetPage() {
                                     })
                                 ) : (
                                     <tr>
-                                        <td colSpan={selectedCostCenter === 'all' ? 7 : 6} className="px-6 py-12 text-center text-muted-foreground">
+                                        <td colSpan={selectedCostCenter === 'all' ? (12 + 3) : (12 + 2)} className="px-6 py-12 text-center text-muted-foreground">
                                             <p>{t('budget.empty_state')}</p>
                                         </td>
                                     </tr>
                                 )}
                             </tbody>
+                            {tableFilteredBudgets.length > 0 && (
+                                <tfoot className="bg-slate-100 dark:bg-slate-900/90 font-bold sticky bottom-0 z-10 backdrop-blur-sm border-t-2 border-primary/20">
+                                    <tr className="text-primary-foreground bg-primary/5">
+                                        <td className="px-4 py-3 text-primary text-sm">TOTAL GENERAL</td>
+                                        {selectedCostCenter === 'all' && <td className="px-4 py-3" />}
+                                        {tableTotals.map((total, idx) => (
+                                            <td key={idx} className="px-4 py-3 text-right tabular-nums text-slate-800 dark:text-white">
+                                                {new Intl.NumberFormat('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(total)}
+                                            </td>
+                                        ))}
+                                        <td className="px-4 py-3 text-right text-primary tabular-nums text-sm">
+                                            {formatCurrency(tableGrandTotal)}
+                                        </td>
+                                        {hasPermission('budget.edit') && <td className="px-4 py-3" />}
+                                    </tr>
+                                </tfoot>
+                            )}
                         </table>
+                    </div>
+
+                    {/* Table Footer */}
+                    <div className="px-6 py-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center text-[10px] text-slate-500 font-bold uppercase tracking-widest shrink-0">
+                        <div className="flex items-center gap-4">
+                            <span>Año: {selectedYear}</span>
+                            <span className="w-1 h-1 rounded-full bg-slate-300" />
+                            <span>Moneda: Soles (PEN)</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-primary">
+                            <Wallet className="w-3 h-3" />
+                            EBM Control Presupuestal
+                        </div>
                     </div>
                 </div>
             </div>
