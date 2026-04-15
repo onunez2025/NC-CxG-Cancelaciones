@@ -236,9 +236,9 @@ export function BudgetPage() {
     const tableGrandTotal = tableTotals.reduce((a, b) => a + b, 0);
 
     return (
-        <div className="flex flex-col h-full gap-5 animate-in fade-in duration-500 p-1">
+        <div className="flex flex-col h-[calc(100vh-1rem)] gap-4 animate-in fade-in duration-500 overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between px-1 shrink-0">
+            <div className="flex items-center justify-between px-1 shrink-0 pb-1">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-slate-800 dark:text-white">Presupuesto</h1>
                     <p className="text-slate-500 text-sm font-medium">Gestión de presupuesto anual por centro de coste</p>
@@ -306,163 +306,101 @@ export function BudgetPage() {
                 </div>
             </div>
 
-            {/* Dynamic Summary Section */}
-            <div className="space-y-4">
-                {selectedCostCenter === 'all' ? (
-                    /* Grid View for "All" */
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                        {/* Main Summary Card (Click to reset filter) */}
-                        <div
-                            onClick={() => setSelectedCostCenter('all')}
-                            className={`py-2.5 px-5 h-[100px] rounded-2xl border shadow-sm flex flex-col justify-between relative overflow-hidden group cursor-pointer transition-all hover:shadow-md ${selectedCostCenter === 'all'
-                                ? 'bg-card border-primary ring-1 ring-primary/20'
-                                : 'bg-card border-border hover:border-primary/50'
-                                }`}
-                        >
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <p className="text-[11px] font-bold text-slate-500 mb-1">
-                                        Total Presupuesto ({selectedYear})
-                                    </p>
-                                    <h2 className="text-xl font-bold text-slate-800 dark:text-white tracking-tight">{formatCurrency(managementTotalBudget)}</h2>
-                                </div>
-                                <div className={`p-2 rounded-xl transition-colors ${selectedCostCenter === 'all' ? 'bg-primary/10 text-primary' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
-                                    <Wallet className="w-5 h-5" />
-                                </div>
-                            </div>
-
-                            <div className="mt-1 flex items-center justify-between text-[10px]">
-                                <span className="text-muted-foreground font-medium">{currentMonthName}:</span>
-                                <span className="font-bold text-foreground">{formatCurrency(managementMonthTotal)}</span>
-                            </div>
+            {/* Compact Metric Ribbon (New) */}
+            <div className="bg-card border border-border rounded-xl px-6 py-2 shadow-sm flex items-center justify-between shrink-0 h-[55px]">
+                <div className="flex items-center gap-8">
+                    <div className="flex items-center gap-3">
+                        <div className="p-1.5 bg-primary/10 rounded-lg text-primary">
+                            <Wallet className="w-4 h-4" />
                         </div>
-
-                        {/* CECO Cards Grid */}
-                        {filteredCostCenters.map(ceco => {
-                            const cecoBudgets = budgets.filter(b => b.cost_center_id === ceco.id);
-                            const cecoTotal = cecoBudgets.reduce((sum, b) => sum + b.total, 0);
-                            const cecoMonthTotal = cecoBudgets.reduce((sum, b) => sum + (b.monthly_amounts[currentMonthIndex] || 0), 0);
-
-                            return (
-                                <div
-                                    key={ceco.id}
-                                    onClick={() => setSelectedCostCenter(ceco.id)}
-                                    className={`py-2 px-4 h-[100px] rounded-xl border shadow-sm flex flex-col justify-between relative overflow-hidden group cursor-pointer transition-all hover:shadow-md ${selectedCostCenter === ceco.id
-                                        ? 'bg-card border-primary ring-1 ring-primary'
-                                        : 'bg-card/50 border-border hover:border-primary/50'
-                                        }`}
-                                >
-                                    <div className="flex justify-between items-start mb-2">
-                                        <div className="overflow-hidden">
-                                            <h4 className="font-bold text-xs truncate pr-2 text-foreground" title={ceco.name}>{ceco.name}</h4>
-                                            <p className="text-[10px] font-mono text-muted-foreground mt-0.5">{ceco.code}</p>
-                                        </div>
-                                        <div className={`w-1.5 h-1.5 rounded-full shrink-0 mt-1 ${cecoTotal > 0 ? 'bg-green-500' : 'bg-muted'}`} />
-                                    </div>
-
-                                    <div className="space-y-0.5">
-                                        <div className="text-base font-bold text-blue-600 dark:text-blue-400 tracking-tight">
-                                            {formatCurrency(cecoTotal)}
-                                        </div>
-                                        <div className="flex justify-between items-center text-[10px] pt-1 border-t border-border/50">
-                                            <span className="text-muted-foreground font-medium">{currentMonthName}</span>
-                                            <span className="font-bold text-foreground">{formatCurrency(cecoMonthTotal)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                        <div>
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">{t('budget.total_budget')} ({selectedYear})</p>
+                            <p className="text-base font-bold text-slate-900 dark:text-white leading-tight">{formatCurrency(managementTotalBudget)}</p>
+                        </div>
                     </div>
-                ) : (
-                    /* Hero Card for Selected CECO */
-                    (() => {
-                        const ceco = costCenters.find(c => c.id === selectedCostCenter);
-                        // Calculate totals for this specific CECO
-                        const cecoBudgets = budgets.filter(b => b.cost_center_id === selectedCostCenter);
-                        const cecoTotal = cecoBudgets.reduce((sum, b) => sum + b.total, 0);
-                        const cecoMonthTotal = cecoBudgets.reduce((sum, b) => sum + (b.monthly_amounts[currentMonthIndex] || 0), 0);
 
-                        return (
-                            <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm pb-4 pt-1 -mx-2 px-2 border-b border-border/50 shadow-sm">
-                                <div className="bg-card py-3 px-6 h-[100px] rounded-lg border border-primary/20 shadow-sm ring-1 ring-primary/10 relative overflow-hidden flex flex-col justify-center">
-                                    <div className="flex items-center justify-between relative z-10">
-                                        <div>
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-mono font-bold">
-                                                    {ceco?.code}
-                                                </span>
-                                                <h2 className="text-lg font-bold text-foreground">{ceco?.name}</h2>
-                                            </div>
-                                            <div className="flex items-baseline gap-4 mt-1">
-                                                <div>
-                                                    <p className="text-[10px] text-muted-foreground mb-0.5">{t('budget.total_budget')} ({selectedYear})</p>
-                                                    <h3 className="text-xl font-bold text-primary tracking-tight">{formatCurrency(cecoTotal)}</h3>
-                                                </div>
-                                                <div className="h-6 w-px bg-border mx-2"></div>
-                                                <div>
-                                                    <p className="text-[10px] text-muted-foreground mb-0.5">{currentMonthName} ({t('budget.table.total')})</p>
-                                                    <p className="text-base font-bold text-foreground">{formatCurrency(cecoMonthTotal)}</p>
-                                                </div>
-                                            </div>
-                                        </div>
+                    <div className="w-px h-8 bg-border" />
 
-                                        <button
-                                            onClick={() => setSelectedCostCenter('all')}
-                                            className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground"
-                                            title="Ver todos"
-                                        >
-                                            <div className="text-xs font-medium flex items-center gap-1">
-                                                <span className="hidden sm:inline">Ver todos</span>
-                                                <Wallet className="w-5 h-5" />
-                                            </div>
-                                        </button>
-                                    </div>
-
-                                    {/* Decorative background element */}
-                                    <div className="absolute right-0 top-0 h-full w-32 bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
-                                </div>
-                            </div>
-                        );
-                    })()
-                )}
-            </div>
-
-            {/* Content */}
-            <div className="flex flex-col md:flex-row gap-6">
-                {/* Sidebar - Cost Centers */}
-                <div className="hidden md:block w-64 shrink-0 space-y-2 sticky top-[180px] self-start h-[calc(100vh-280px)] overflow-y-auto custom-scrollbar">
-                    <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 px-3">
-                        Centros de Costo
-                    </h3>
-                    <div className="space-y-1 px-1">
-                        <button
-                            onClick={() => setSelectedCostCenter('all')}
-                            className={`w-full text-left px-4 py-2.5 rounded-xl transition-all ${selectedCostCenter === 'all'
-                                ? 'bg-primary/10 text-primary font-bold shadow-sm'
-                                : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700'
-                                }`}
-                        >
-                            <div className="text-sm">Todos los Centros</div>
-                        </button>
-                        {filteredCostCenters.map(ceco => (
-                            <button
-                                key={ceco.id}
-                                onClick={() => setSelectedCostCenter(ceco.id)}
-                                className={`w-full text-left px-4 py-2.5 rounded-xl transition-all ${selectedCostCenter === ceco.id
-                                    ? 'bg-primary/10 text-primary font-bold shadow-sm'
-                                    : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700'
-                                    }`}
-                                title={`${ceco.code} - ${ceco.name}`}
-                            >
-                                <div className="text-sm leading-tight mb-0.5">{ceco.name}</div>
-                                <div className="text-[10px] font-mono opacity-60 tracking-tighter">{ceco.code}</div>
-                            </button>
-                        ))}
+                    <div className="flex items-center gap-3">
+                        <div className="p-1.5 bg-blue-500/10 rounded-lg text-blue-500">
+                            <Calendar className="w-4 h-4" />
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">{currentMonthName} ({t('budget.table.total')})</p>
+                            <p className="text-base font-bold text-slate-900 dark:text-white leading-tight">{formatCurrency(managementMonthTotal)}</p>
+                        </div>
                     </div>
                 </div>
 
-                {/* Main Table */}
-                <div className="flex-1 bg-card rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-[calc(100vh-250px)]">
+                <div className="flex items-center gap-2">
+                    <div className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-[10px] font-bold text-slate-600">
+                        CECO: {selectedCostCenter === 'all' ? 'Todos' : costCenters.find(c => c.id === selectedCostCenter)?.code}
+                    </div>
+                    <div className="px-3 py-1 bg-green-500/10 rounded-lg text-[10px] font-bold text-green-600">
+                        Soles (PEN)
+                    </div>
+                </div>
+            </div>
+            {/* Content Container (Fixed Height) */}
+            <div className="flex flex-1 gap-4 min-h-0 overflow-hidden">
+                {/* Sidebar - Cost Centers */}
+                <div className="w-64 shrink-0 flex flex-col bg-card/50 dark:bg-slate-900/50 rounded-2xl border border-border overflow-hidden">
+                    <div className="px-4 py-3 border-b border-border/50 shrink-0">
+                        <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                            Centros de Costo
+                        </h3>
+                    </div>
+                    
+                    <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1 custom-scrollbar">
+                        <button
+                            onClick={() => setSelectedCostCenter('all')}
+                            className={`w-full text-left px-3 py-2.5 rounded-xl transition-all relative group ${selectedCostCenter === 'all'
+                                ? 'bg-primary text-primary-foreground font-bold shadow-md shadow-primary/20'
+                                : 'text-slate-600 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:bg-slate-800'
+                                }`}
+                        >
+                            <div className="flex justify-between items-start">
+                                <span className="text-xs">Todos los Centros</span>
+                                <Wallet className={`w-3.5 h-3.5 ${selectedCostCenter === 'all' ? 'opacity-100' : 'opacity-30 group-hover:opacity-100'}`} />
+                            </div>
+                            <div className={`text-[10px] mt-1 ${selectedCostCenter === 'all' ? 'text-primary-foreground/80' : 'text-primary font-bold'}`}>
+                                {formatCurrency(managementTotalBudget)}
+                            </div>
+                        </button>
+
+                        <div className="my-2 h-px bg-border/50 mx-2" />
+
+                        {filteredCostCenters.map(ceco => {
+                            const cecoBudgets = budgets.filter(b => b.cost_center_id === ceco.id);
+                            const cecoTotal = cecoBudgets.reduce((sum, b) => sum + b.total, 0);
+
+                            return (
+                                <button
+                                    key={ceco.id}
+                                    onClick={() => setSelectedCostCenter(ceco.id)}
+                                    className={`w-full text-left px-3 py-2.5 rounded-xl transition-all relative group ${selectedCostCenter === ceco.id
+                                        ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-500/20'
+                                        : 'text-slate-600 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:bg-slate-800'
+                                        }`}
+                                    title={`${ceco.code} - ${ceco.name}`}
+                                >
+                                    <div className="flex justify-between items-start gap-2">
+                                        <span className="text-xs truncate flex-1">{ceco.name}</span>
+                                        <span className={`text-[9px] font-mono px-1 rounded border ${selectedCostCenter === ceco.id ? 'border-white/30 text-white/80' : 'border-border text-slate-400'}`}>
+                                            {ceco.code}
+                                        </span>
+                                    </div>
+                                    <div className={`text-[10px] mt-0.5 font-bold ${selectedCostCenter === ceco.id ? 'text-white/90' : 'text-blue-500'}`}>
+                                        {formatCurrency(cecoTotal)}
+                                    </div>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* Main Table Section */}
+                <div className="flex-1 bg-card rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col min-w-0">
                     <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
                         <div className="relative flex-1 max-w-sm">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
