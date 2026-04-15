@@ -219,12 +219,12 @@ export function DashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* Status Distribution */}
                 {analytics && (
-                    <div className="bg-card border rounded-2xl py-4 px-6 shadow-sm">
-                        <h3 className="text-sm font-bold mb-3 flex items-center gap-2 text-slate-800 dark:text-white">
+                    <div className="bg-card border rounded-2xl py-[18px] px-6 shadow-sm">
+                        <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white">
                             <Package className="w-4 h-4 text-primary" />
                             Distribución de Estados
                         </h3>
-                        <div className="space-y-1.5">
+                        <div className="space-y-2">
                             {['solicitado', 'pedido', 'recibido', 'facturado', 'pagado'].map((key) => {
                                 const label = t(`dashboard.status_labels.${key}`);
                                 const count = analytics.statusCounts[key] || 0;
@@ -250,12 +250,12 @@ export function DashboardPage() {
 
                 {/* Spend by CeCo */}
                 {analytics && (
-                    <div className="bg-card border rounded-2xl py-4 px-6 shadow-sm">
-                        <h3 className="text-sm font-bold mb-3 flex items-center gap-2 text-slate-800 dark:text-white">
+                    <div className="bg-card border rounded-2xl py-[18px] px-6 shadow-sm">
+                        <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white">
                             <BarChart3 className="w-4 h-4 text-primary" />
                             Gasto por Centro de Coste
                         </h3>
-                        <div className="space-y-1.5">
+                        <div className="space-y-2">
                             {analytics.spendByCeCo.slice(0, 6).map(c => (
                                 <div key={c.code} className="space-y-1">
                                     <div className="flex justify-between text-xs">
@@ -279,12 +279,12 @@ export function DashboardPage() {
 
                 {/* Top Vendors */}
                 {analytics && (
-                    <div className="bg-card border rounded-2xl py-4 px-6 shadow-sm">
-                        <h3 className="text-sm font-bold mb-3 flex items-center gap-2 text-slate-800 dark:text-white">
+                    <div className="bg-card border rounded-2xl py-[18px] px-6 shadow-sm">
+                        <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-slate-800 dark:text-white">
                             <Users className="w-4 h-4 text-primary" />
                             Principales Proveedores
                         </h3>
-                        <div className="space-y-1">
+                        <div className="space-y-2">
                             {analytics.topVendors.map((v, i) => (
                                 <div key={i} className="space-y-1">
                                     <div className="flex justify-between text-xs">
@@ -408,8 +408,8 @@ function KPICard({ icon: Icon, label, value, sub, color, bgColor }: {
     icon: any; label: string; value: string; sub: string; color: string; bgColor: string;
 }) {
     return (
-        <div className="bg-card border rounded-2xl py-[18px] px-6 shadow-sm flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-3">
+        <div className="bg-card border rounded-2xl py-4 px-6 shadow-sm flex flex-col justify-between">
+            <div className="flex items-center justify-between mb-2">
                 <span className="text-[11px] font-bold text-slate-500">{toTitleCase(label)}</span>
                 <div className={cn("p-2.5 rounded-xl", bgColor)}>
                     <Icon className={cn("w-5 h-5", color)} />
