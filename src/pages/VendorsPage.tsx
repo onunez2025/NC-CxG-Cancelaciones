@@ -273,8 +273,8 @@ export function VendorsPage() {
 
 function MetricCard({ icon: Icon, label, value, color }: { icon: any; label: string; value: string; color: string }) {
     return (
-        <div className={cn("py-2 px-4 h-[81px] rounded-xl border transition-all shadow-sm flex items-center justify-between gap-3 bg-card border-slate-100 dark:border-slate-800")}>
-            <div className="flex flex-col justify-center min-w-0">
+        <div className={cn("py-2 px-2.5 h-[81px] rounded-xl border transition-all shadow-sm flex items-center justify-between gap-2 bg-card border-slate-100 dark:border-slate-800")}>
+            <div className="flex flex-col justify-center min-w-0 space-y-1">
                 <p className={cn("text-[10px] font-bold uppercase tracking-tighter opacity-80 leading-tight", color)}>{label}</p>
                 <h3 className="text-lg font-bold text-slate-800 dark:text-white tracking-tight leading-none truncate">{value}</h3>
             </div>

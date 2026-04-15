@@ -438,11 +438,11 @@ function MetricCard({ icon: Icon, label, value, sub, color }: {
     color: string;
 }) {
     return (
-        <div className={cn("py-2 px-4 h-[81px] rounded-xl border transition-all shadow-sm flex items-center justify-between gap-3 bg-card border-slate-100 dark:border-slate-800")}>
-            <div className="flex flex-col justify-center min-w-0">
+        <div className={cn("py-2 px-2.5 h-[81px] rounded-xl border transition-all shadow-sm flex items-center justify-between gap-2 bg-card border-slate-100 dark:border-slate-800")}>
+            <div className="flex flex-col justify-center min-w-0 space-y-1">
                 <p className={cn("text-[10px] font-bold uppercase tracking-tighter opacity-80 leading-tight", color)}>{label}</p>
                 <h3 className="text-lg font-bold text-slate-800 dark:text-white tracking-tight leading-none truncate">{value}</h3>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter leading-tight truncate mt-1">{sub}</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter leading-tight truncate">{sub}</p>
             </div>
             <div className={cn("p-2 rounded-lg bg-white/50 dark:bg-black/20 shrink-0", color)}>
                 <Icon className="w-5 h-5" />
