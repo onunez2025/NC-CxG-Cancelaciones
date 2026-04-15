@@ -131,7 +131,7 @@ export function SolpedPage() {
     };
 
     return (
-        <div className="flex flex-col h-full gap-5 animate-in fade-in duration-500 p-1">
+        <div className="flex flex-col h-full gap-3 animate-in fade-in duration-500 p-1">
             {/* Header Area */}
             <div className="shrink-0 mb-1">
                 <div className="flex items-center justify-between px-1">
@@ -148,7 +148,7 @@ export function SolpedPage() {
             </div>
 
             {/* KPI Area */}
-            <div className="shrink-0 mb-2">
+            <div className="shrink-0 mb-1">
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                     <KPICard label="Total" value={metrics.total} active={filterStatus === 'all'} onClick={() => togglePillFilter('all')} icon={FileText} color="text-slate-600" bgColor="bg-slate-50 border-slate-200" />
                     <KPICard label="Por Firmar" value={metrics.pendienteFirma} active={filterStatus === 'pendiente'} onClick={() => togglePillFilter('pendiente')} icon={Clock} color="text-red-600" bgColor="bg-red-50/50 border-red-100" />
@@ -160,7 +160,7 @@ export function SolpedPage() {
             </div>
 
             {/* Filters Area */}
-            <div className="shrink-0 mb-2">
+            <div className="shrink-0 mb-1">
                 <div className="bg-card border border-slate-200 dark:border-slate-800 rounded-xl p-2 shadow-sm flex items-center flex-wrap gap-2">
                     <div className="relative flex-1 min-w-[300px]">
                         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
