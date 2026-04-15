@@ -176,7 +176,7 @@ export function BudgetVsRealPage() {
                                 {/* Total Management Card */}
                                 <div
                                     onClick={() => setSelectedCostCenter('all')}
-                                    className={`py-2 px-5 h-[85px] rounded-xl border shadow-sm flex flex-col justify-between cursor-pointer transition-all hover:shadow-md ${selectedCostCenter === 'all'
+                                    className={`py-2 px-5 h-[96px] rounded-xl border shadow-sm flex flex-col justify-between cursor-pointer transition-all hover:shadow-md ${selectedCostCenter === 'all'
                                         ? 'bg-card border-primary ring-1 ring-primary'
                                         : 'bg-card/50 border-border hover:border-primary/50'
                                         }`}
@@ -190,12 +190,12 @@ export function BudgetVsRealPage() {
                                         </div>
                                         <h2 className="text-lg font-bold text-slate-800 dark:text-white tracking-tight">{formatCurrency(totals?.budgeted || 0)}</h2>
                                     </div>
-                                    <div className="mt-1 pt-1 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-[10px] font-bold">
+                                    <div className="flex justify-between items-center text-[10px] font-bold border-t border-slate-100 dark:border-slate-800/50 pt-1">
                                         <div className="flex items-center gap-2">
                                             <TrendingUp className="w-3 h-3 text-slate-400" />
-                                            <span className="text-slate-400 uppercase tracking-widest text-[8px]">Ejecutado:</span>
+                                            <span className="text-slate-500 uppercase tracking-widest text-[8px]">Ejecutado:</span>
                                         </div>
-                                        <span className="font-bold text-slate-600">{formatCurrency(totals?.real || 0)}</span>
+                                        <span className="font-bold text-primary/80">{formatCurrency(totals?.real || 0)}</span>
                                     </div>
                                 </div>
 
@@ -415,8 +415,8 @@ export function BudgetVsRealPage() {
 
 function SummaryMiniCard({ label, value, color, note, icon, bgColor }: { label: string; value: string; color: string; note?: string; icon?: React.ReactNode; bgColor?: string }) {
     return (
-        <div className="py-2 px-5 h-[85px] rounded-xl border border-slate-200 dark:border-slate-800 bg-card shadow-sm flex flex-col justify-between">
-            <div className="flex justify-between items-start mb-0.5">
+        <div className="py-2 px-5 h-[96px] rounded-xl border border-slate-200 dark:border-slate-800 bg-card shadow-sm flex flex-col justify-center">
+            <div className="flex justify-between items-start mb-1">
                 <p className="text-[11px] font-bold text-slate-500 uppercase tracking-tighter">
                     {label} {note && <span className="text-[9px] opacity-60 normal-case ml-1">{note}</span>}
                 </p>
