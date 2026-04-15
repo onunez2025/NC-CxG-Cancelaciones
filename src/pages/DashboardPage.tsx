@@ -314,8 +314,8 @@ export function DashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Recent POs */}
                 {analytics && (
-                    <div className="bg-card border rounded-2xl p-6 shadow-sm">
-                        <div className="flex items-center justify-between mb-6">
+                    <div className="bg-card border rounded-2xl py-3 px-6 h-[273px] shadow-sm">
+                        <div className="flex items-center justify-between mb-3">
                             <h3 className="text-sm font-bold flex items-center gap-2 text-slate-800 dark:text-white">
                                 <FileText className="w-4 h-4 text-primary" />
                                 Actividad Reciente
@@ -327,9 +327,9 @@ export function DashboardPage() {
                                 {t('dashboard.seeAll')} <ArrowRight className="w-3 h-3" />
                             </button>
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-1">
                             {analytics.recentPOs.map(po => (
-                                <div key={po.po_number} className="flex items-center gap-3 py-2 border-b last:border-0">
+                                <div key={po.po_number} className="flex items-center gap-3 py-1 border-b last:border-0">
                                     <StatusIcon status={po.status} />
                                     <div className="flex-1 min-w-0">
                                         <p className="text-xs font-bold font-mono text-primary">{po.po_number}</p>
@@ -344,8 +344,8 @@ export function DashboardPage() {
 
                 {/* Upload Status */}
                 {analytics && (
-                    <div className="bg-card border rounded-2xl p-6 shadow-sm">
-                        <div className="flex items-center justify-between mb-6">
+                    <div className="bg-card border rounded-2xl py-3 px-6 h-[273px] shadow-sm">
+                        <div className="flex items-center justify-between mb-3">
                             <h3 className="text-sm font-bold flex items-center gap-2 text-slate-800 dark:text-white">
                                 <Upload className="w-4 h-4 text-primary" />
                                 Estado de Archivos
@@ -357,7 +357,7 @@ export function DashboardPage() {
                                 {t('dashboard.manage')} <ArrowRight className="w-3 h-3" />
                             </button>
                         </div>
-                        <div className="space-y-3">
+                        <div className="space-y-1">
                             {analytics.uploadStatus.map(f => (
                                 <div key={f.type} className="flex items-center gap-3">
                                     <div className={cn(
