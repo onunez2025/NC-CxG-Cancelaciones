@@ -174,22 +174,22 @@ export function FileUploadPage() {
     const isReady = missing.length === 0;
 
     return (
-        <div className="flex flex-col h-full gap-5 animate-in fade-in duration-500 p-1">
-            <div className="shrink-0 mb-2 px-1">
+        <div className="flex flex-col h-full gap-3 animate-in fade-in duration-500 p-1">
+            <div className="shrink-0 mb-1 px-1">
                 <h1 className="text-2xl font-bold tracking-tight text-slate-800 dark:text-white">Carga de Archivos</h1>
                 <p className="text-slate-500 text-sm font-medium">Gestione la importación de reportes SAP para la reconciliación de datos</p>
             </div>
 
             {/* Status Summary */}
             <div className={cn(
-                "shrink-0 mb-6 p-6 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-4 transition-all shadow-sm",
+                "shrink-0 mb-1 py-2 px-4 rounded-xl border flex flex-col sm:flex-row items-center justify-between gap-3 transition-all shadow-sm",
                 isReady 
                     ? "bg-emerald-50/50 border-emerald-100 dark:bg-emerald-900/10 dark:border-emerald-900/30" 
                     : "bg-amber-50/50 border-amber-100 dark:bg-amber-900/10 dark:border-amber-900/30"
             )}>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                     <div className={cn(
-                        "p-3 rounded-xl bg-white dark:bg-slate-900 border",
+                        "p-2 rounded-xl bg-white dark:bg-slate-900 border",
                         isReady ? "border-emerald-200 text-emerald-600" : "border-amber-200 text-amber-600"
                     )}>
                         {isReady ? <CheckCircle className="w-6 h-6" /> : <AlertCircle className="w-6 h-6" />}
@@ -212,22 +212,22 @@ export function FileUploadPage() {
                 )}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                 {/* File Dropzone & Queue */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="lg:col-span-2 space-y-3">
                     <div
                         onDragOver={handleDragOver}
                         onDragLeave={handleDragLeave}
                         onDrop={handleDrop}
                         className={cn(
-                            "bg-card rounded-2xl border-2 border-dashed p-12 flex flex-col items-center justify-center text-center transition-all shadow-sm",
+                            "bg-card rounded-2xl border-2 border-dashed py-6 px-10 flex flex-col items-center justify-center text-center transition-all shadow-sm",
                             isDragging 
                                 ? "border-primary bg-primary/5 scale-[1.01] ring-4 ring-primary/10" 
                                 : "border-slate-200 dark:border-slate-800 hover:border-primary/50 hover:bg-slate-50/50 dark:hover:bg-slate-900/50"
                         )}
                     >
                         <div className={cn(
-                            "w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-colors shadow-sm border",
+                            "w-12 h-12 rounded-xl flex items-center justify-center mb-3 transition-colors shadow-sm border",
                             isDragging ? "bg-primary text-white border-primary" : "bg-slate-50 dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800"
                         )}>
                             <UploadCloud className="w-8 h-8" />
@@ -241,7 +241,7 @@ export function FileUploadPage() {
                             id="bulk-upload"
                         />
                         <label htmlFor="bulk-upload" className="cursor-pointer group">
-                            <span className="text-primary font-bold text-lg group-hover:underline tracking-tight">Seleccionar archivos de Excel</span>
+                            <span className="text-primary font-bold text-base group-hover:underline tracking-tight">Seleccionar archivos de Excel</span>
                         </label>
                         <p className="text-[11px] font-bold text-slate-400 mt-3 uppercase tracking-wider">Formatos admitidos: .XLSX, .XLS (Reportes SAP)</p>
                     </div>
@@ -305,9 +305,9 @@ export function FileUploadPage() {
                 </div>
 
                 {/* Database State Sidebar */}
-                <div className="space-y-6">
-                    <div className="bg-card border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6">
-                        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-tighter mb-6 flex items-center justify-between">
+                <div className="space-y-3">
+                    <div className="bg-card border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm py-3 px-4">
+                        <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter mb-3 flex items-center justify-between">
                             <span className="flex items-center gap-2">
                                 <CheckCircle className="w-4 h-4 text-emerald-500" />
                                 Estado Base de Datos
@@ -321,7 +321,7 @@ export function FileUploadPage() {
                                 </button>
                             )}
                         </h3>
-                        <div className="space-y-4">
+                        <div className="space-y-1">
                             {TRANSACTION_TYPES.map(type => {
                                 const upload = uploads.find(u => u.transaction_type === type.value);
                                 return (
@@ -352,7 +352,7 @@ export function FileUploadPage() {
                         </div>
                     </div>
 
-                    <div className="p-6 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-2xl border border-indigo-100 dark:border-indigo-900/30">
+                    <div className="p-3 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-2xl border border-indigo-100 dark:border-indigo-900/30">
                         <h4 className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest mb-3">IMPORTANTE</h4>
                         <p className="text-[11px] font-medium text-slate-500 leading-relaxed" 
                            dangerouslySetInnerHTML={{ __html: t('files.db.note_desc').replace(/\*\*(.*?)\*\*/g, '<strong class="text-indigo-600">$1</strong>') }} />
