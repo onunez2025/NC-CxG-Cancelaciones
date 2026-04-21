@@ -79,7 +79,7 @@ router.get('/cancelaciones/:id', async (req: Request, res: Response) => {
                     CASE 
                         WHEN c.Gestionado = 'Si' AND c.Cancelacion_Correcta = 'Si' THEN 'APROBADO'
                         WHEN c.Gestionado = 'Si' AND c.Cancelacion_Correcta = 'No' THEN 'RECHAZADO'
-                        WHEN c.Gestionado = 'No' THEN 'EN GESTIÓN'
+                        WHEN c.Gestionado = 'No' OR c.Asignado_a IS NOT NULL THEN 'EN GESTIÓN'
                         ELSE 'PENDIENTE'
                     END as estado
                 FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
@@ -116,9 +116,9 @@ router.get('/cancelaciones', async (req: Request, res: Response) => {
             whereClause += ` AND (c.Ticket LIKE @search OR t.NombreCliente LIKE @search OR m.Motivo LIKE @search OR c.Autorizador_Cancelacion LIKE @search)`;
         }
         if (estado === 'PENDIENTE') {
-            whereClause += ` AND (c.Gestionado IS NULL OR c.Gestionado = '')`;
+            whereClause += ` AND (c.Gestionado IS NULL OR c.Gestionado = '') AND c.Asignado_a IS NULL`;
         } else if (estado === 'EN GESTION') {
-            whereClause += ` AND c.Gestionado = 'No'`;
+            whereClause += ` AND (c.Gestionado = 'No' OR (c.Asignado_a IS NOT NULL AND (c.Gestionado IS NULL OR c.Gestionado = '')))`;
         } else if (estado === 'APROBADO') {
             whereClause += ` AND c.Gestionado = 'Si' AND c.Cancelacion_Correcta = 'Si'`;
         } else if (estado === 'RECHAZADO') {
@@ -162,7 +162,7 @@ router.get('/cancelaciones', async (req: Request, res: Response) => {
                     CASE 
                         WHEN c.Gestionado = 'Si' AND c.Cancelacion_Correcta = 'Si' THEN 'APROBADO'
                         WHEN c.Gestionado = 'Si' AND c.Cancelacion_Correcta = 'No' THEN 'RECHAZADO'
-                        WHEN c.Gestionado = 'No' THEN 'EN GESTIÓN'
+                        WHEN c.Gestionado = 'No' OR c.Asignado_a IS NOT NULL THEN 'EN GESTIÓN'
                         ELSE 'PENDIENTE'
                     END as estado
                 FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
