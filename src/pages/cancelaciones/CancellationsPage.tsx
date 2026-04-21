@@ -88,7 +88,7 @@ const ActionsMenu = ({
               Asignar
             </button>
           )}
-          {canGestionar && (estado === 'PENDIENTE' || estado === 'EN GESTIÓN') && (
+          {canGestionar && (estado === 'EN GESTIÓN') && (
             <button 
               className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               onClick={() => { onGestionar(); setOpen(false); }}
@@ -561,7 +561,7 @@ export const CancellationsPage = () => {
                     </SIATCTableCell>
                     <SIATCTableCell className="text-right" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                       <div className="flex justify-end gap-1">
-                        {canProcess && (item.estado === 'PENDIENTE' || item.estado === 'EN GESTIÓN') && (
+                        {canProcess && item.estado === 'EN GESTIÓN' && (
                           <>
                             <SIATCButton 
                               variant="ghost" 

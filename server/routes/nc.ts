@@ -319,7 +319,8 @@ router.post('/cancelaciones/:id/asignar', async (req: Request, res: Response) =>
                 SET 
                     Asignado_a = @asignado_a,
                     Asignado_por = @asignado_por,
-                    Asignado_el = GETDATE()
+                    Asignado_el = GETDATE(),
+                    Gestionado = 'No'
                 WHERE ID_Cancelados = @id
             `);
         res.json({ message: 'Cancelación asignada' });
