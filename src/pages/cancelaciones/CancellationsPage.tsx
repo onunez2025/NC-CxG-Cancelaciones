@@ -217,7 +217,6 @@ export const CancellationsPage = () => {
         cliente: formData.tienda,
         motive: formData.motivo,
         ticket: formData.ticket,
-        observacion: formData.observacion,
         usuario: user?.username || 'Sistema'
       });
       

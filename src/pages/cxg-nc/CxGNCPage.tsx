@@ -5,7 +5,10 @@ import {
   FileText,
   Loader2,
   FileSpreadsheet,
-  UserPlus
+  UserPlus,
+  DollarSign,
+  Calendar,
+  CheckCircle2
 } from 'lucide-react';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 import { SIATCButton } from '../../components/siatc/SIATCButton';
@@ -22,7 +25,7 @@ import { ncService } from '../../services/ncService';
 import type { CxGNC } from '../../services/ncService';
 import { auditService } from '../../services/auditService';
 import { useAuth } from '../../hooks/useAuth';
-import { userService } from '../../services/userService';
+import { UsersService } from '../../services/usersService';
 import type { User } from '../../types';
 
 export const CxGNCPage = () => {
@@ -86,8 +89,8 @@ export const CxGNCPage = () => {
   useEffect(() => {
     const fetchAnalysts = async () => {
       try {
-        const users = await userService.getUsers();
-        setAnalysts(users.filter(u => u.is_active));
+        const users = await UsersService.getUsers();
+        setAnalysts(users.filter((u: User) => u.is_active));
       } catch (error) {
         console.error('Error fetching analysts:', error);
       }
@@ -106,8 +109,7 @@ export const CxGNCPage = () => {
         tipo: formData.tipo,
         cliente: formData.cliente,
         estado: 'PENDIENTE',
-        ticket: formData.ticket,
-        observacion: formData.observacion
+        ticket: formData.ticket
       });
       
       await auditService.logAction({
