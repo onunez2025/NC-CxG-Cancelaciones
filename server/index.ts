@@ -58,16 +58,9 @@ app.use('/api/auth/login', authLimiter);
 // CORS Validation
 app.use(cors({
     origin: (origin, callback) => {
-        // In local development or if not strictly defined, we can be more permissive.
-        if (process.env.NODE_ENV !== 'production') return callback(null, true);
-
-        const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim());
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            console.error(`Blocked CORS attempt from: ${origin}`);
-            callback(new Error('Not allowed by CORS'));
-        }
+        // En producción, permitimos cualquier origen para evitar que el middleware de CORS 
+        // intercepte y bloquee la carga de archivos estáticos (CSS/JS) con errores 500.
+        callback(null, true);
     },
     credentials: true
 }));
