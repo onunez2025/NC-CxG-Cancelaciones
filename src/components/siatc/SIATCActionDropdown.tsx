@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MoreVertical, LucideIcon } from 'lucide-react';
-import { SIATC_THEME } from '../../utils/siatc-theme';
+import { MoreVertical, type LucideIcon } from 'lucide-react';
 
 export interface Action {
   label: string;
