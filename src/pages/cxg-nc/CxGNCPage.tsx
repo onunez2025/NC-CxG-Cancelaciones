@@ -44,8 +44,7 @@ export const CxGNCPage = () => {
   const [formData, setFormData] = useState({
     tipo: 'NC' as 'NC' | 'CXG',
     cliente: '',
-    ticket: '',
-    observacion: ''
+    ticket: ''
   });
 
   const fetchData = async () => {
@@ -101,8 +100,7 @@ export const CxGNCPage = () => {
       setFormData({ 
         tipo: 'NC', 
         cliente: '', 
-        ticket: '', 
-        observacion: '' 
+        ticket: ''
       });
     } catch (error) {
       console.error(error);
@@ -119,8 +117,7 @@ export const CxGNCPage = () => {
       const ticketInfo = await ncService.getTicketDetails(formData.ticket);
       setFormData(prev => ({
         ...prev,
-        cliente: ticketInfo.cliente,
-        observacion: `Producto: ${ticketInfo.producto}\nAsunto: ${ticketInfo.asunto}\n${prev.observacion}`
+        cliente: ticketInfo.cliente
       }));
     } catch (error: any) {
       console.error("Lookup error:", error);
@@ -397,17 +394,9 @@ export const CxGNCPage = () => {
               <option value="CXG">Cargo x Generar</option>
             </select>
           </div>
+          
           <div>
-            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Cliente</label>
-            <input 
-              className={SIATC_THEME.COMPONENTS.INPUT}
-              value={formData.cliente}
-              onChange={(e) => setFormData({...formData, cliente: e.target.value})}
-              placeholder="Nombre del cliente"
-            />
-          </div>
-          <div>
-            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Ticket de Referencia (Opcional)</label>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Ticket de Referencia</label>
             <div className="flex gap-2">
               <input 
                 className={SIATC_THEME.COMPONENTS.INPUT}
@@ -429,16 +418,11 @@ export const CxGNCPage = () => {
                 className="w-12 h-10 flex-shrink-0"
               />
             </div>
-          </div>
-
-          <div>
-            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Observaciones</label>
-            <textarea 
-              className={`${SIATC_THEME.COMPONENTS.INPUT} h-20 pt-2 resize-none`}
-              value={formData.observacion}
-              onChange={(e) => setFormData({...formData, observacion: e.target.value})}
-              placeholder="Detalles adicionales..."
-            />
+            {formData.cliente && (
+              <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-1.5 pl-4">
+                ✔ {formData.cliente}
+              </p>
+            )}
           </div>
         </div>
       </SIATCModalWrapper>
