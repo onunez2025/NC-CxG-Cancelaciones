@@ -2,13 +2,29 @@ import { apiClient, API_BASE_URL } from './apiClient';
 
 export interface Cancellation {
     id: string;
-    correlativo: string;
-    fecha_solicitud: string;
+    ticket: string;
+    motivo_cancelacion_id: string;
+    motivo: string;  // texto del motivo resuelto
+    autorizador: string;
+    fecha_generado: string;
+    gestionado_por: string;
+    cancelacion_correcta: string | null; // 'Si' | 'No' | null
+    gestionado: string | null; // 'Si' | 'No' | null
+    observacion: string;
+    fecha_gestionado: string | null;
+    asignado_a: string;
+    asignado_por: string;
+    fecha_asignado: string | null;
     cliente: string;
-    motive: string;
-    estado: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO';
-    ticket?: string;
-    observacion?: string;
+    estado: 'PENDIENTE' | 'EN GESTIÓN' | 'APROBADO' | 'RECHAZADO';
+}
+
+export interface CancellationDetail extends Cancellation {
+    motivo_cancelacion_texto: string;
+    motivo_correcto_id: string | null;
+    motivo_correcto_texto: string | null;
+    producto: string;
+    asunto: string;
 }
 
 export interface CxGNC {
@@ -36,19 +52,34 @@ export interface PaginatedResponse<T> {
     pageSize: number;
 }
 
+export interface GestionarData {
+    cancelacion_correcta: 'Si' | 'No';
+    motivo_correcto?: string;
+    observacion?: string;
+    gestionado_por: string;
+}
+
 export const ncService = {
     async getCancellations(params?: { 
         page?: number; 
         pageSize?: number; 
-        search?: string; 
+        search?: string;
+        estado?: string;
     }): Promise<PaginatedResponse<Cancellation>> {
         const queryParams = new URLSearchParams();
         if (params?.page) queryParams.append('page', params.page.toString());
         if (params?.pageSize) queryParams.append('pageSize', params.pageSize.toString());
         if (params?.search) queryParams.append('search', params.search);
+        if (params?.estado && params.estado !== 'TODOS') queryParams.append('estado', params.estado);
 
         const response = await apiClient(`${API_BASE_URL}/cancelaciones?${queryParams.toString()}`);
         if (!response.ok) throw new Error('Error al obtener cancelaciones');
+        return response.json();
+    },
+
+    async getCancellationDetail(id: string): Promise<CancellationDetail> {
+        const response = await apiClient(`${API_BASE_URL}/cancelaciones/${id}`);
+        if (!response.ok) throw new Error('Error al obtener detalle de cancelación');
         return response.json();
     },
 
@@ -67,6 +98,14 @@ export const ncService = {
         return response.json();
     },
 
+    async gestionarCancellation(id: string, data: GestionarData): Promise<void> {
+        const response = await apiClient(`${API_BASE_URL}/cancelaciones/${id}/gestionar`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Error al gestionar cancelación');
+    },
+
     async approveCancellation(id: string): Promise<void> {
         const response = await apiClient(`${API_BASE_URL}/cancelaciones/${id}/approve`, {
             method: 'POST'
@@ -81,7 +120,13 @@ export const ncService = {
         if (!response.ok) throw new Error('Error al rechazar cancelación');
     },
 
-    async createCancellation(data: Partial<Cancellation>): Promise<Cancellation> {
+    async createCancellation(data: { 
+        cliente: string; 
+        motive: string; 
+        ticket?: string; 
+        observacion?: string;
+        usuario?: string;
+    }): Promise<any> {
         const response = await apiClient(`${API_BASE_URL}/cancelaciones`, {
             method: 'POST',
             body: JSON.stringify(data)

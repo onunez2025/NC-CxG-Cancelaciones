@@ -31,6 +31,7 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 // GET Cancellation Motives
 router.get('/cancelaciones/motivos', async (req: Request, res: Response) => {
     try {
@@ -47,19 +48,81 @@ router.get('/cancelaciones/motivos', async (req: Request, res: Response) => {
     }
 });
 
+// GET single Cancelacion detail
+router.get('/cancelaciones/:id', async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const pool = await getDbConnection();
+        const result = await pool.request()
+            .input('id', sql.VarChar, id)
+            .query(`
+                SELECT 
+                    c.ID_Cancelados as id,
+                    c.Ticket as ticket,
+                    c.Motivo_Cancelacion as motivo_cancelacion_id,
+                    m.Motivo as motivo_cancelacion_texto,
+                    c.Autorizador_Cancelacion as autorizador,
+                    c.Generado_el as fecha_generado,
+                    c.Gestionado_por as gestionado_por,
+                    c.Cancelacion_Correcta as cancelacion_correcta,
+                    c.Motivo_Correcto as motivo_correcto_id,
+                    mc.Motivo as motivo_correcto_texto,
+                    c.Gestionado as gestionado,
+                    c.Observacion_Gestionado as observacion,
+                    c.Gestionado_el as fecha_gestionado,
+                    c.Asignado_a as asignado_a,
+                    c.Asignado_por as asignado_por,
+                    c.Asignado_el as fecha_asignado,
+                    ISNULL(t.NombreCliente, '') as cliente,
+                    ISNULL(t.NombreEquipo, '') as producto,
+                    ISNULL(t.Asunto, '') as asunto,
+                    CASE 
+                        WHEN c.Gestionado = 'Si' AND c.Cancelacion_Correcta = 'Si' THEN 'APROBADO'
+                        WHEN c.Gestionado = 'Si' AND c.Cancelacion_Correcta = 'No' THEN 'RECHAZADO'
+                        WHEN c.Gestionado = 'No' THEN 'EN GESTIÓN'
+                        ELSE 'PENDIENTE'
+                    END as estado
+                FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
+                LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
+                LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] m ON c.Motivo_Cancelacion = m.ID_Cancelados_motivo
+                LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] mc ON c.Motivo_Correcto = mc.ID_Cancelados_motivo
+                WHERE c.ID_Cancelados = @id
+            `);
+
+        if (result.recordset.length === 0) {
+            return res.status(404).json({ error: 'Cancelación no encontrada' });
+        }
+
+        res.json(result.recordset[0]);
+    } catch (error: any) {
+        console.error('Error fetching cancellation detail:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // GET all Cancelaciones (Paginated)
 router.get('/cancelaciones', async (req: Request, res: Response) => {
     try {
         const page = parseInt(req.query.page as string) || 1;
         const pageSize = parseInt(req.query.pageSize as string) || 20;
         const search = req.query.search as string || '';
+        const estado = req.query.estado as string || '';
         const offset = (page - 1) * pageSize;
 
         const pool = await getDbConnection();
         
         let whereClause = 'WHERE 1=1';
         if (search) {
-            whereClause += ` AND (c.Ticket LIKE @search OR t.NombreCliente LIKE @search OR c.Motivo_Cancelacion LIKE @search)`;
+            whereClause += ` AND (c.Ticket LIKE @search OR t.NombreCliente LIKE @search OR m.Motivo LIKE @search OR c.Autorizador_Cancelacion LIKE @search)`;
+        }
+        if (estado === 'PENDIENTE') {
+            whereClause += ` AND (c.Gestionado IS NULL OR c.Gestionado = '')`;
+        } else if (estado === 'EN GESTION') {
+            whereClause += ` AND c.Gestionado = 'No'`;
+        } else if (estado === 'APROBADO') {
+            whereClause += ` AND c.Gestionado = 'Si' AND c.Cancelacion_Correcta = 'Si'`;
+        } else if (estado === 'RECHAZADO') {
+            whereClause += ` AND c.Gestionado = 'Si' AND c.Cancelacion_Correcta = 'No'`;
         }
 
         // Get total count for pagination
@@ -69,6 +132,7 @@ router.get('/cancelaciones', async (req: Request, res: Response) => {
                 SELECT COUNT(*) as total 
                 FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
+                LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] m ON c.Motivo_Cancelacion = m.ID_Cancelados_motivo
                 ${whereClause}
             `);
         
@@ -81,17 +145,29 @@ router.get('/cancelaciones', async (req: Request, res: Response) => {
             .query(`
                 SELECT 
                     c.ID_Cancelados as id,
-                    c.Ticket as correlativo,
-                    c.Generado_el as fecha_solicitud,
-                    ISNULL(t.NombreCliente, c.Gestionado_por) as cliente,
-                    c.Motivo_Cancelacion as motive,
+                    c.Ticket as ticket,
+                    c.Motivo_Cancelacion as motivo_cancelacion_id,
+                    ISNULL(m.Motivo, c.Motivo_Cancelacion) as motivo,
+                    c.Autorizador_Cancelacion as autorizador,
+                    c.Generado_el as fecha_generado,
+                    c.Gestionado_por as gestionado_por,
+                    c.Cancelacion_Correcta as cancelacion_correcta,
+                    c.Gestionado as gestionado,
+                    c.Observacion_Gestionado as observacion,
+                    c.Gestionado_el as fecha_gestionado,
+                    c.Asignado_a as asignado_a,
+                    c.Asignado_por as asignado_por,
+                    c.Asignado_el as fecha_asignado,
+                    ISNULL(t.NombreCliente, '') as cliente,
                     CASE 
-                        WHEN c.Cancelacion_Correcta = 'SI' THEN 'APROBADO'
-                        WHEN c.Cancelacion_Correcta = 'NO' THEN 'RECHAZADO'
+                        WHEN c.Gestionado = 'Si' AND c.Cancelacion_Correcta = 'Si' THEN 'APROBADO'
+                        WHEN c.Gestionado = 'Si' AND c.Cancelacion_Correcta = 'No' THEN 'RECHAZADO'
+                        WHEN c.Gestionado = 'No' THEN 'EN GESTIÓN'
                         ELSE 'PENDIENTE'
                     END as estado
                 FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
+                LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] m ON c.Motivo_Cancelacion = m.ID_Cancelados_motivo
                 ${whereClause}
                 ORDER BY c.Generado_el DESC
                 OFFSET @offset ROWS
@@ -166,27 +242,93 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
 // POST Create Cancelacion
 router.post('/cancelaciones', async (req: Request, res: Response) => {
     try {
-        const { cliente, motive, ticket } = req.body;
+        const { cliente, motive, ticket, observacion, usuario } = req.body;
         const pool = await getDbConnection();
         
+        // Generate a short UUID-like ID to match existing format
+        const id = Math.random().toString(16).substring(2, 10);
+
         await pool.request()
-            .input('id', sql.VarChar, `CAN-${Date.now()}`)
-            .input('ticket', sql.VarChar, ticket || 'MT-TK-TEMP')
+            .input('id', sql.VarChar, id)
+            .input('ticket', sql.VarChar, ticket || '')
             .input('motivo', sql.VarChar, motive)
-            .input('usuario', sql.VarChar, req.body.usuario || 'Sistema')
+            .input('autorizador', sql.VarChar, usuario || 'Sistema')
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_CANCELACIONES] 
-                (ID_Cancelados, Ticket, Motivo_Cancelacion, Generado_el, Gestionado_por, Cancelacion_Correcta)
-                VALUES (@id, @ticket, @motivo, GETDATE(), @usuario, 'PENDIENTE')
+                (ID_Cancelados, Ticket, Motivo_Cancelacion, Autorizador_Cancelacion, Generado_el)
+                VALUES (@id, @ticket, @motivo, @autorizador, GETDATE())
             `);
             
-        res.status(201).json({ message: 'Cancelación registrada' });
+        res.status(201).json({ message: 'Cancelación registrada', id });
     } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// POST Approve Cancelacion
+// POST Gestionar Cancelacion (Approve = Cancelacion Correcta)
+router.post('/cancelaciones/:id/gestionar', async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { 
+            cancelacion_correcta, // 'Si' | 'No'
+            motivo_correcto,      // ID del motivo correcto (solo si cancelacion_correcta = 'No')
+            observacion,          // Observación del gestor
+            gestionado_por,       // Nombre del usuario que gestiona
+            asignado_a,           // A quién se asigna para seguimiento
+            asignado_por          // Quién asigna
+        } = req.body;
+        
+        const pool = await getDbConnection();
+        await pool.request()
+            .input('id', sql.VarChar, id)
+            .input('cancelacion_correcta', sql.VarChar, cancelacion_correcta)
+            .input('motivo_correcto', sql.VarChar, motivo_correcto || null)
+            .input('observacion', sql.VarChar, observacion || '')
+            .input('gestionado_por', sql.VarChar, gestionado_por || '')
+            .input('gestionado', sql.VarChar, 'Si')
+            .query(`
+                UPDATE [dbo].[GAC_APP_TB_CANCELACIONES] 
+                SET 
+                    Cancelacion_Correcta = @cancelacion_correcta,
+                    Motivo_Correcto = @motivo_correcto,
+                    Observacion_Gestionado = @observacion,
+                    Gestionado_por = @gestionado_por,
+                    Gestionado = @gestionado,
+                    Gestionado_el = GETDATE()
+                WHERE ID_Cancelados = @id
+            `);
+        res.json({ message: 'Cancelación gestionada correctamente' });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST Asignar Cancelacion
+router.post('/cancelaciones/:id/asignar', async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { asignado_a, asignado_por } = req.body;
+        
+        const pool = await getDbConnection();
+        await pool.request()
+            .input('id', sql.VarChar, id)
+            .input('asignado_a', sql.VarChar, asignado_a)
+            .input('asignado_por', sql.VarChar, asignado_por)
+            .query(`
+                UPDATE [dbo].[GAC_APP_TB_CANCELACIONES] 
+                SET 
+                    Asignado_a = @asignado_a,
+                    Asignado_por = @asignado_por,
+                    Asignado_el = GETDATE()
+                WHERE ID_Cancelados = @id
+            `);
+        res.json({ message: 'Cancelación asignada' });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Legacy approve/reject endpoints (mapped to gestionar)
 router.post('/cancelaciones/:id/approve', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -195,7 +337,7 @@ router.post('/cancelaciones/:id/approve', async (req: Request, res: Response) =>
             .input('id', sql.VarChar, id)
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_CANCELACIONES] 
-                SET Cancelacion_Correcta = 'SI', Gestionado_el = GETDATE()
+                SET Cancelacion_Correcta = 'Si', Gestionado = 'Si', Gestionado_el = GETDATE()
                 WHERE ID_Cancelados = @id
             `);
         res.json({ message: 'Cancelación aprobada' });
@@ -204,7 +346,6 @@ router.post('/cancelaciones/:id/approve', async (req: Request, res: Response) =>
     }
 });
 
-// POST Reject Cancelacion
 router.post('/cancelaciones/:id/reject', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -213,7 +354,7 @@ router.post('/cancelaciones/:id/reject', async (req: Request, res: Response) => 
             .input('id', sql.VarChar, id)
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_CANCELACIONES] 
-                SET Cancelacion_Correcta = 'NO', Gestionado_el = GETDATE()
+                SET Cancelacion_Correcta = 'No', Gestionado = 'Si', Gestionado_el = GETDATE()
                 WHERE ID_Cancelados = @id
             `);
         res.json({ message: 'Cancelación rechazada' });
