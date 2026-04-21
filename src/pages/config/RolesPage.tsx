@@ -165,7 +165,10 @@ export default function RolesPage() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-6 mt-2">
-                        {filteredRoles.map((role) => (
+                        {filteredRoles.map((role) => {
+                            const platformPermissions = role.permissions.filter(perm => availablePermissions.some(p => p.id === perm));
+                            
+                            return (
                             <div key={role.id} className="group bg-card rounded-[2rem] border border-border/50 shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:border-primary/20 transition-all duration-300 relative overflow-hidden flex flex-col h-full bg-card/50 backdrop-blur-sm">
                                 {/* Visual Accent */}
                                 <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
@@ -184,7 +187,7 @@ export default function RolesPage() {
                                                 </h3>
                                                 <p className="text-[10px] font-bold text-muted-foreground flex items-center gap-1.5 mt-0.5">
                                                     <ListChecks className="w-3 h-3 text-primary/60" />
-                                                    {role.permissions.length} Permisos autorizados
+                                                    {platformPermissions.length} Permisos autorizados
                                                 </p>
                                             </div>
                                         </div>
@@ -208,10 +211,10 @@ export default function RolesPage() {
                                     <div className="space-y-2">
                                         <p className="text-[9px] font-black text-muted-foreground tracking-widest pl-1 uppercase opacity-60">Vista rápida de facultades:</p>
                                         <div className="flex flex-wrap gap-1.5 max-h-[140px] overflow-y-auto pr-2 custom-scrollbar-thin">
-                                            {role.permissions.length === 0 ? (
+                                            {platformPermissions.length === 0 ? (
                                                 <span className="text-[10px] text-muted-foreground italic font-medium px-1">Sin facultades administrativas...</span>
                                             ) : (
-                                                role.permissions.slice(0, 15).map(perm => {
+                                                platformPermissions.slice(0, 15).map(perm => {
                                                     const label = availablePermissions.find(p => p.id === perm)?.label || perm;
                                                     return (
                                                         <span key={perm} className="px-2 py-0.5 rounded-lg text-[9px] font-black bg-muted/60 text-muted-foreground border border-border tracking-tight group-hover:bg-primary/5 group-hover:border-primary/10 group-hover:text-primary transition-all">
@@ -220,9 +223,9 @@ export default function RolesPage() {
                                                     );
                                                 })
                                             )}
-                                            {role.permissions.length > 15 && (
+                                            {platformPermissions.length > 15 && (
                                                 <span className="px-2 py-0.5 rounded-lg text-[9px] font-black bg-primary text-primary-foreground shadow-lg shadow-primary/20">
-                                                    +{role.permissions.length - 15} más
+                                                    +{platformPermissions.length - 15} más
                                                 </span>
                                             )}
                                         </div>
@@ -240,7 +243,7 @@ export default function RolesPage() {
                                     </button>
                                 </div>
                             </div>
-                        ))}
+                        )})}
                     </div>
                 )}
             </div>
