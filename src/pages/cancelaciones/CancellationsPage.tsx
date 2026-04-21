@@ -163,8 +163,7 @@ export const CancellationsPage = () => {
   const [formData, setFormData] = useState({
     tienda: '',
     ticket: '',
-    motivo: '',
-    observacion: ''
+    motivo: ''
   });
 
   const fetchData = async () => {
@@ -233,12 +232,7 @@ export const CancellationsPage = () => {
 
       setIsCreateModalOpen(false);
       fetchData();
-      setFormData({ 
-        tienda: '', 
-        ticket: '', 
-        motivo: '', 
-        observacion: '' 
-      });
+      setFormData({ tienda: '', ticket: '', motivo: '' });
     } catch (error) {
       console.error("Error creating cancellation", error);
       setIsCreateModalOpen(false);
@@ -254,8 +248,7 @@ export const CancellationsPage = () => {
       const ticketInfo = await ncService.getTicketDetails(formData.ticket);
       setFormData(prev => ({
         ...prev,
-        tienda: ticketInfo.cliente,
-        observacion: `Producto: ${ticketInfo.producto}\nAsunto: ${ticketInfo.asunto}\n${prev.observacion}`
+        tienda: ticketInfo.cliente
       }));
     } catch (error: any) {
       console.error("Lookup error:", error);
@@ -642,16 +635,7 @@ export const CancellationsPage = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Cliente / Tienda</label>
-            <input 
-              className={SIATC_THEME.COMPONENTS.INPUT}
-              value={formData.tienda}
-              onChange={(e) => setFormData({...formData, tienda: e.target.value})}
-              placeholder="Nombre del cliente o tienda"
-            />
-          </div>
-          <div>
-            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Ticket de Referencia (Opcional)</label>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Ticket de Referencia</label>
             <div className="flex gap-2">
               <input 
                 className={SIATC_THEME.COMPONENTS.INPUT}
@@ -673,6 +657,11 @@ export const CancellationsPage = () => {
                 className="w-12 h-10 flex-shrink-0"
               />
             </div>
+            {formData.tienda && (
+              <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-1.5 pl-4">
+                ✔ {formData.tienda}
+              </p>
+            )}
           </div>
           <div>
             <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Motivo</label>
@@ -686,16 +675,6 @@ export const CancellationsPage = () => {
                 <option key={m.id} value={m.id}>{m.motivo}</option>
               ))}
             </select>
-          </div>
-
-          <div>
-            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Observaciones</label>
-            <textarea 
-              className={`${SIATC_THEME.COMPONENTS.INPUT} h-20 pt-2 resize-none`}
-              value={formData.observacion}
-              onChange={(e) => setFormData({...formData, observacion: e.target.value})}
-              placeholder="Detalles adicionales opcionales..."
-            />
           </div>
         </div>
       </SIATCModalWrapper>
