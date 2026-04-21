@@ -17,7 +17,7 @@ const sqlConfig = {
     },
     options: {
         encrypt: true, // For Azure
-        trustServerCertificate: false // Change to true for local dev / self-signed certs
+        trustServerCertificate: true // Change to true for local dev / self-signed certs
     }
 };
 

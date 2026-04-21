@@ -10,23 +10,18 @@ import UsersPage from './pages/config/UsersPage';
 import RolesPage from './pages/config/RolesPage';
 import AuditLogPage from './pages/config/AuditLogPage';
 import ConfigLayout from './pages/config/ConfigLayout';
+import CostCentersPage from './pages/config/CostCentersPage';
+import AccountsPage from './pages/config/AccountsPage';
+import ManagementsPage from './pages/config/ManagementsPage';
+import ExchangeRatesPage from './pages/config/ExchangeRatesPage';
 import { RequirePermission } from './components/common/RequirePermission';
 
 // Placeholder Pages
 import { DashboardPage } from './pages/DashboardPage';
-const NotFound = () => <div className="p-4"><h1>404 Not Found</h1></div>;
-import CostCentersPage from './pages/config/CostCentersPage';
-// const CostCentersPage = () => <div className="p-4"><h1 className="text-xl font-bold">Centros de Coste</h1><p>Gestión de CeCos (Próximamente)</p></div>;
-import AccountsPage from './pages/config/AccountsPage';
-import ManagementsPage from './pages/config/ManagementsPage';
-import ExchangeRatesPage from './pages/config/ExchangeRatesPage';
-import { BudgetPage } from './pages/BudgetPage';
-import { FileUploadPage } from './pages/FileUploadPage';
-import { TrackingPage } from './pages/TrackingPage';
-import { SolpedPage } from './pages/SolpedPage';
-import { VendorsPage } from './pages/VendorsPage';
-import { BudgetVsRealPage } from './pages/BudgetVsRealPage';
+import { CancellationsPage } from './pages/cancelaciones/CancellationsPage';
+import { CxGNCPage } from './pages/cxg-nc/CxGNCPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { NotFound } from './pages/NotFound';
 
 // ... (lines 48-55 omitted)
 
@@ -101,26 +96,9 @@ function App() {
               </Route>
 
               {/* Other routes with RBAC */}
-              <Route element={<RequirePermission permission="budget.view" />}>
-                <Route path="/budget" element={<BudgetPage />} />
-                <Route path="/budget-vs-real" element={<BudgetVsRealPage />} />
-              </Route>
-
-              <Route element={<RequirePermission permission="solped.view" />}>
-                <Route path="/solped" element={<SolpedPage />} />
-              </Route>
-
-              <Route element={<RequirePermission permission="files.view" />}>
-                <Route path="/files" element={<FileUploadPage />} />
-              </Route>
-
-              <Route element={<RequirePermission permission="tracking.view" />}>
-                <Route path="/tracking" element={<TrackingPage />} />
-              </Route>
-
-              <Route element={<RequirePermission permission="expenses.view" />}>
-                <Route path="/vendors" element={<VendorsPage />} />
-              </Route>
+              {/* NC-CxG-Cancelaciones Routes */}
+              <Route path="/cancelaciones" element={<CancellationsPage />} />
+              <Route path="/cxg-nc" element={<CxGNCPage />} />
 
               <Route path="/profile" element={<ProfilePage />} />
             </Route>

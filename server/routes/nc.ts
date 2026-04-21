@@ -1,0 +1,256 @@
+import { Router, Request, Response } from 'express';
+import { getDbConnection } from '../db.js';
+import sql from 'mssql';
+
+const router = Router();
+
+// GET Ticket details (Lookup)
+router.get('/tickets/:id', async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const pool = await getDbConnection();
+        const result = await pool.request()
+            .input('ticketId', sql.VarChar, id)
+            .query(`
+                SELECT TOP 1
+                    Ticket as ticket,
+                    NombreCliente as cliente,
+                    NombreEquipo as producto,
+                    Asunto as asunto
+                FROM [SIATC].[Dashboard_FSM]
+                WHERE Ticket = @ticketId
+            `);
+
+        if (result.recordset.length === 0) {
+            return res.status(404).json({ error: 'Ticket no encontrado' });
+        }
+
+        res.json(result.recordset[0]);
+    } catch (error: any) {
+        console.error('Error lookup ticket:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+// GET all Cancelaciones (Paginated)
+router.get('/cancelaciones', async (req: Request, res: Response) => {
+    try {
+        const page = parseInt(req.query.page as string) || 1;
+        const pageSize = parseInt(req.query.pageSize as string) || 20;
+        const search = req.query.search as string || '';
+        const offset = (page - 1) * pageSize;
+
+        const pool = await getDbConnection();
+        
+        let whereClause = 'WHERE 1=1';
+        if (search) {
+            whereClause += ` AND (c.Ticket LIKE @search OR t.NombreCliente LIKE @search OR c.Motivo_Cancelacion LIKE @search)`;
+        }
+
+        // Get total count for pagination
+        const countResult = await pool.request()
+            .input('search', sql.VarChar, `%${search}%`)
+            .query(`
+                SELECT COUNT(*) as total 
+                FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
+                LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
+                ${whereClause}
+            `);
+        
+        const total = countResult.recordset[0].total;
+
+        const result = await pool.request()
+            .input('search', sql.VarChar, `%${search}%`)
+            .input('offset', sql.Int, offset)
+            .input('pageSize', sql.Int, pageSize)
+            .query(`
+                SELECT 
+                    c.ID_Cancelados as id,
+                    c.Ticket as correlativo,
+                    c.Generado_el as fecha_solicitud,
+                    ISNULL(t.NombreCliente, c.Gestionado_por) as cliente,
+                    c.Motivo_Cancelacion as motive,
+                    CASE 
+                        WHEN c.Cancelacion_Correcta = 'SI' THEN 'APROBADO'
+                        WHEN c.Cancelacion_Correcta = 'NO' THEN 'RECHAZADO'
+                        ELSE 'PENDIENTE'
+                    END as estado
+                FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
+                LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
+                ${whereClause}
+                ORDER BY c.Generado_el DESC
+                OFFSET @offset ROWS
+                FETCH NEXT @pageSize ROWS ONLY
+            `);
+
+        res.json({
+            data: result.recordset,
+            total,
+            page,
+            pageSize
+        });
+    } catch (error: any) {
+        console.error('Error fetching cancellations:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// GET all CxG/NC (Paginated)
+router.get('/cxg-nc', async (req: Request, res: Response) => {
+    try {
+        const page = parseInt(req.query.page as string) || 1;
+        const pageSize = parseInt(req.query.pageSize as string) || 20;
+        const search = req.query.search as string || '';
+        const offset = (page - 1) * pageSize;
+
+        const pool = await getDbConnection();
+
+        let whereClause = 'WHERE 1=1';
+        if (search) {
+            whereClause += ` AND (n.Ticket LIKE @search OR n.Tienda LIKE @search)`;
+        }
+
+        // Get total count
+        const countResult = await pool.request()
+            .input('search', sql.VarChar, `%${search}%`)
+            .query(`SELECT COUNT(*) as total FROM [dbo].[GAC_APP_TB_CXG_NC] n ${whereClause}`);
+        
+        const total = countResult.recordset[0].total;
+
+        const result = await pool.request()
+            .input('search', sql.VarChar, `%${search}%`)
+            .input('offset', sql.Int, offset)
+            .input('pageSize', sql.Int, pageSize)
+            .query(`
+                SELECT 
+                    n.ID_Apro_CxG_NC as id,
+                    n.Tipo as tipo,
+                    n.Ticket as correlativo,
+                    n.Creado_el as fecha,
+                    n.Tienda as cliente,
+                    CASE WHEN n.Procesado = 'SI' THEN 'PROCESADO' ELSE 'PENDIENTE' END as estado
+                FROM [dbo].[GAC_APP_TB_CXG_NC] n
+                ${whereClause}
+                ORDER BY n.Creado_el DESC
+                OFFSET @offset ROWS
+                FETCH NEXT @pageSize ROWS ONLY
+            `);
+
+        res.json({
+            data: result.recordset,
+            total,
+            page,
+            pageSize
+        });
+    } catch (error: any) {
+        console.error('Error fetching CxG/NC:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST Create Cancelacion
+router.post('/cancelaciones', async (req: Request, res: Response) => {
+    try {
+        const { cliente, motive, ticket } = req.body;
+        const pool = await getDbConnection();
+        
+        await pool.request()
+            .input('id', sql.VarChar, `CAN-${Date.now()}`)
+            .input('ticket', sql.VarChar, ticket || 'MT-TK-TEMP')
+            .input('motivo', sql.VarChar, motive)
+            .input('usuario', sql.VarChar, req.body.usuario || 'Sistema')
+            .query(`
+                INSERT INTO [dbo].[GAC_APP_TB_CANCELACIONES] 
+                (ID_Cancelados, Ticket, Motivo_Cancelacion, Generado_el, Gestionado_por, Cancelacion_Correcta)
+                VALUES (@id, @ticket, @motivo, GETDATE(), @usuario, 'PENDIENTE')
+            `);
+            
+        res.status(201).json({ message: 'Cancelación registrada' });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST Approve Cancelacion
+router.post('/cancelaciones/:id/approve', async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const pool = await getDbConnection();
+        await pool.request()
+            .input('id', sql.VarChar, id)
+            .query(`
+                UPDATE [dbo].[GAC_APP_TB_CANCELACIONES] 
+                SET Cancelacion_Correcta = 'SI', Gestionado_el = GETDATE()
+                WHERE ID_Cancelados = @id
+            `);
+        res.json({ message: 'Cancelación aprobada' });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST Reject Cancelacion
+router.post('/cancelaciones/:id/reject', async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const pool = await getDbConnection();
+        await pool.request()
+            .input('id', sql.VarChar, id)
+            .query(`
+                UPDATE [dbo].[GAC_APP_TB_CANCELACIONES] 
+                SET Cancelacion_Correcta = 'NO', Gestionado_el = GETDATE()
+                WHERE ID_Cancelados = @id
+            `);
+        res.json({ message: 'Cancelación rechazada' });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST Create CxG/NC
+router.post('/cxg-nc', async (req: Request, res: Response) => {
+    try {
+        const { tipo, cliente, ticket, observacion } = req.body;
+        const pool = await getDbConnection();
+        
+        await pool.request()
+            .input('id', sql.VarChar, `CNC-${Date.now()}`)
+            .input('ticket', sql.VarChar, ticket || 'MT-TK-TEMP')
+            .input('tipo', sql.VarChar, tipo)
+            .input('tienda', sql.VarChar, cliente)
+            .input('observacion', sql.VarChar, observacion || '')
+            .input('usuario', sql.VarChar, req.body.usuario || 'Sistema')
+            .query(`
+                INSERT INTO [dbo].[GAC_APP_TB_CXG_NC] 
+                (ID_Apro_CxG_NC, Ticket, Tipo, Tienda, Observacion, Creado_el, Creado_por, Procesado)
+                VALUES (@id, @ticket, @tipo, @tienda, @observacion, GETDATE(), @usuario, 'NO')
+            `);
+            
+        res.status(201).json({ message: 'Solicitud CxG/NC registrada' });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// PATCH Process CxG/NC
+router.patch('/cxg-nc/:id/status', async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { estado } = req.body;
+        const pool = await getDbConnection();
+        await pool.request()
+            .input('id', sql.VarChar, id)
+            .input('procesado', sql.VarChar, estado === 'PROCESADO' ? 'SI' : 'NO')
+            .query(`
+                UPDATE [dbo].[GAC_APP_TB_CXG_NC] 
+                SET Procesado = @procesado, Procesado_el = GETDATE()
+                WHERE ID_Apro_CxG_NC = @id
+            `);
+        res.json({ message: 'Estado actualizado' });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+export default router;

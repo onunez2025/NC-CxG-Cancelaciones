@@ -2,12 +2,8 @@ import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
     LayoutDashboard,
-    Wallet,
+    XCircle,
     FileText,
-    UploadCloud,
-    Activity,
-    Users,
-    BarChart3,
     LogOut,
     Globe,
     ChevronRight
@@ -15,6 +11,7 @@ import {
 import { cn } from '../../utils/cn';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
+import type { Permission } from '../../types';
 
 // SIATC DESIGN SYSTEM IMPORTS
 
@@ -27,14 +24,17 @@ export function Sidebar({ className }: { className?: string }) {
         i18n.changeLanguage(i18n.language === 'es' ? 'en' : 'es');
     };
 
-    const navItems = [
-        { to: '/dashboard', icon: LayoutDashboard, label: t('nav.dashboard') },
-        { to: '/budget', icon: Wallet, label: t('nav.budget'), permission: 'budget.view' as const },
-        { to: '/budget-vs-real', icon: BarChart3, label: 'Ppto vs Real', permission: 'budget.view' as const },
-        { to: '/solped', icon: FileText, label: t('nav.solped'), permission: 'solped.view' as const },
-        { to: '/tracking', icon: Activity, label: t('nav.tracking'), permission: 'tracking.view' as const },
-        { to: '/vendors', icon: Users, label: t('nav.vendors'), permission: 'expenses.view' as const },
-        { to: '/files', icon: UploadCloud, label: t('nav.files'), permission: 'files.view' as const },
+    interface NavItem {
+        to: string;
+        icon: React.ElementType;
+        label: string;
+        permission?: Permission;
+    }
+
+    const navItems: NavItem[] = [
+        { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+        { to: '/cancelaciones', icon: XCircle, label: 'Cancelaciones' },
+        { to: '/cxg-nc', icon: FileText, label: 'CxG & NC' },
     ];
 
     const filteredNavItems = navItems.filter(item =>
@@ -50,11 +50,11 @@ export function Sidebar({ className }: { className?: string }) {
             {/* Header / Logo: SIATC High Density */}
             <div className="p-6 flex items-center gap-4 border-b border-border/50 bg-gradient-to-br from-primary/5 to-transparent">
                 <div className="w-12 h-12 flex items-center justify-center shrink-0 overflow-hidden bg-white rounded-2xl shadow-lg shadow-primary/5 border border-primary/10 p-1.5 transition-transform hover:scale-105">
-                    <img src="/ebm-logo-.png" alt="EBM Logo" className="h-full w-full object-contain" />
+                    <img src="/nc-logo.png" alt="NC Logo" className="h-full w-full object-contain" />
                 </div>
                 <div className="flex flex-col">
-                    <h1 className="font-bold text-xl leading-none tracking-tight text-foreground uppercase">EBM</h1>
-                    <p className="text-[10px] font-black text-primary tracking-[0.2em] uppercase mt-1 opacity-70">Control Ppto</p>
+                    <h1 className="font-bold text-lg leading-none tracking-tight text-foreground uppercase">NC-CxG</h1>
+                    <p className="text-[10px] font-black text-primary tracking-[0.2em] uppercase mt-1 opacity-70">Cancelaciones</p>
                 </div>
             </div>
 

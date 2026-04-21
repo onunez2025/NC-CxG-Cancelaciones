@@ -20,6 +20,7 @@ import authRouter from './routes/auth.js';
 import budgetsRouter from './routes/budgets.js';
 import { sapRouter } from './routes/sap.js';
 import { crossReferenceRouter, prewarmCache } from './routes/crossReference.js';
+import ncRouter from './routes/nc.js';
 import { verifyToken, verifyPermission } from './middleware/auth.js';
 import { setupSapViews } from './setup_sap_views.js';
 
@@ -74,34 +75,7 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// API Routes
-app.use('/api/managements', verifyToken, managementsRouter);
-app.use('/api/cost-centers', verifyToken, costCentersRouter);
-app.use('/api/accounts', verifyToken, accountsRouter);
-app.use('/api/roles', verifyToken, verifyPermission('ebm.config.roles'), rolesRouter);
-app.use('/api/users', verifyToken, verifyPermission('ebm.config.users'), usersRouter);
-app.use('/api/auth', authRouter); // protect /me internally
-app.use('/api/budgets', verifyToken, budgetsRouter);
-app.use('/api/sap/uploads', verifyToken, verifyPermission('ebm.config.sap'), sapRouter);
-app.use('/api/sap/cross-reference', verifyToken, crossReferenceRouter);
-
-// Security Audit Logs
-app.get('/api/config/audit-logs', verifyToken, verifyPermission('ebm.config.users'), async (req: Request, res: Response) => {
-    try {
-        const pool = await getDbConnection();
-        const result = await pool.request().query(`
-            SELECT TOP 200 * 
-            FROM [dbo].[GAC_APP_TB_AUDIT_LOG] 
-            WHERE EntidadID LIKE 'ebm.%' OR Entidad LIKE '%EBM%'
-            ORDER BY Fecha DESC
-        `);
-        res.json(result.recordset);
-    } catch (error: any) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Main test route
+// Public Status Route (Health Check)
 app.get('/api/status', async (req: Request, res: Response) => {
     try {
         const pool = await getDbConnection();
@@ -127,6 +101,36 @@ app.get('/api/status', async (req: Request, res: Response) => {
         });
     }
 });
+
+// API Routes
+app.use('/api/managements', verifyToken, managementsRouter);
+app.use('/api/cost-centers', verifyToken, costCentersRouter);
+app.use('/api/accounts', verifyToken, accountsRouter);
+app.use('/api/roles', verifyToken, verifyPermission('ebm.config.roles'), rolesRouter);
+app.use('/api/users', verifyToken, verifyPermission('ebm.config.users'), usersRouter);
+app.use('/api/auth', authRouter); // protect /me internally
+app.use('/api/budgets', verifyToken, budgetsRouter);
+app.use('/api/sap/uploads', verifyToken, verifyPermission('ebm.config.sap'), sapRouter);
+app.use('/api/sap/cross-reference', verifyToken, crossReferenceRouter);
+app.use('/api', verifyToken, ncRouter);
+
+// Security Audit Logs
+app.get('/api/config/audit-logs', verifyToken, verifyPermission('ebm.config.users'), async (req: Request, res: Response) => {
+    try {
+        const pool = await getDbConnection();
+        const result = await pool.request().query(`
+            SELECT TOP 200 * 
+            FROM [dbo].[GAC_APP_TB_AUDIT_LOG] 
+            WHERE EntidadID LIKE 'ebm.%' OR Entidad LIKE '%EBM%'
+            ORDER BY Fecha DESC
+        `);
+        res.json(result.recordset);
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
 
 // Serve frontend in production (Docker image)
 if (process.env.NODE_ENV === 'production') {
