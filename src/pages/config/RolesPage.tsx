@@ -23,7 +23,7 @@ export default function RolesPage() {
     const [formData, setFormData] = useState<Omit<Role, 'id'>>({
         name: '',
         permissions: [],
-        apps: 'EBM'
+        apps: 'CXG'
     });
 
     const [isLoading, setIsLoading] = useState(true);
@@ -64,7 +64,7 @@ export default function RolesPage() {
         setFormData({
             name: '',
             permissions: [],
-            apps: 'EBM'
+            apps: 'CXG'
         });
         setExpandedGroup(null);
         setIsModalOpen(true);
@@ -75,7 +75,7 @@ export default function RolesPage() {
         setFormData({
             name: role.name,
             permissions: role.permissions,
-            apps: role.apps || 'EBM'
+            apps: role.apps || 'CXG'
         });
         setExpandedGroup(null);
         setIsModalOpen(true);
@@ -84,7 +84,7 @@ export default function RolesPage() {
     const handleDelete = (id: string) => {
         confirm({
             title: 'Eliminar Rol de Seguridad',
-            message: '¿Está seguro de eliminar este perfil? Esta acción afectará los permisos de todos los usuarios vinculados a este rol en EBM Central.',
+            message: '¿Está seguro de eliminar este perfil? Esta acción afectará los permisos de todos los usuarios vinculados a este rol en Gestor NC-CxG.',
             type: 'danger',
             confirmText: 'Eliminar Rol',
             onConfirm: async () => {
@@ -125,7 +125,7 @@ export default function RolesPage() {
         });
     };
 
-    const filteredRoles = roles.filter(role => (role.apps || 'EBM').split(',').some(a => a.trim().toUpperCase() === 'EBM'));
+    const filteredRoles = roles.filter(role => (role.apps || 'CXG').split(',').some(a => a.trim().toUpperCase() === 'CXG'));
 
     return (
         <div className={SIATC_THEME.LAYOUT.PAGE_WRAPPER}>
@@ -139,9 +139,9 @@ export default function RolesPage() {
                         <span className="text-foreground">Roles</span>
                     </div>
                     <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Gestión de Roles</h1>
-                    <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>Define las matrices de permisos y niveles de acceso para EBM Central</p>
+                    <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>Define las matrices de permisos y niveles de acceso para Gestor NC-CxG</p>
                 </div>
-                {hasPermission('ebm.config.roles') && (
+                {hasPermission('config.roles') && (
                     <SIATCButton 
                         onClick={handleCreate}
                         icon={Plus}
@@ -189,7 +189,7 @@ export default function RolesPage() {
                                             </div>
                                         </div>
                                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all -mr-1">
-                                            {hasPermission('ebm.config.roles') && (
+                                            {hasPermission('config.roles') && (
                                                 <>
                                                     <button onClick={() => handleEdit(role)} className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-lg transition-all" title="Editar Rol">
                                                         <Edit2 className="w-4 h-4" />
@@ -280,7 +280,8 @@ export default function RolesPage() {
                                 { id: 'FSM', label: 'Gestor FSM' },
                                 { id: 'TCtrl', label: 'Tablero' },
                                 { id: 'Liq', label: 'Liquidaciones' },
-                                { id: 'VAL', label: 'Valuaciones' }
+                                { id: 'VAL', label: 'Valuaciones' },
+                                { id: 'CXG', label: 'Gestor NC-CxG' }
                             ].map(app => {
                                 const isSelected = (formData.apps || '').split(',').map(a => a.trim()).includes(app.id);
                                 return (

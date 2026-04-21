@@ -33,8 +33,8 @@ export function Sidebar({ className }: { className?: string }) {
 
     const navItems: NavItem[] = [
         { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-        { to: '/cancelaciones', icon: XCircle, label: 'Cancelaciones' },
-        { to: '/cxg-nc', icon: FileText, label: 'CxG & NC' },
+        { to: '/cancelaciones', icon: XCircle, label: 'Cancelaciones', permission: 'cxg.cancelaciones.view' as const },
+        { to: '/cxg-nc', icon: FileText, label: 'CxG & NC', permission: 'cxg.cxg_nc.view' as const },
     ];
 
     const filteredNavItems = navItems.filter(item =>

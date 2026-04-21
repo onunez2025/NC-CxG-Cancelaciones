@@ -40,33 +40,21 @@ export class RolesService {
 
     static getAllPermissions(): { id: Permission; label: string; group: string }[] {
         return [
-            { group: 'Presupuesto', id: 'budget.view', label: 'Ver Presupuesto' },
-            { group: 'Presupuesto', id: 'budget.create', label: 'Crear Presupuesto' },
-            { group: 'Presupuesto', id: 'budget.edit', label: 'Editar Presupuesto' },
+            { group: 'Dashboard', id: 'dashboard.view', label: 'Ver Dashboard' },
+            
+            { group: 'Cancelaciones', id: 'cxg.cancelaciones.view', label: 'Ver Cancelaciones' },
+            { group: 'Cancelaciones', id: 'cxg.cancelaciones.create', label: 'Crear Cancelaciones' },
+            { group: 'Cancelaciones', id: 'cxg.cancelaciones.process', label: 'Procesar Cancelaciones' },
 
-            { group: 'Solped', id: 'solped.view', label: 'Ver Solicitudes' },
-            { group: 'Solped', id: 'solped.create', label: 'Crear Solicitudes' },
-            { group: 'Solped', id: 'solped.edit', label: 'Editar Solicitudes' },
+            { group: 'CxG y NC', id: 'cxg.cxg_nc.view', label: 'Ver CxG y NC' },
+            { group: 'CxG y NC', id: 'cxg.cxg_nc.create', label: 'Crear CxG y NC' },
+            { group: 'CxG y NC', id: 'cxg.cxg_nc.process', label: 'Procesar CxG y NC' },
 
-            { group: 'Archivos', id: 'files.upload', label: 'Cargar Archivos SAP' },
-            { group: 'Archivos', id: 'files.view', label: 'Ver Archivos Cargados' },
-            { group: 'Archivos', id: 'ebm.config.sap', label: 'Acceso Técnico SAP' },
-
-            { group: 'Seguimiento', id: 'tracking.view', label: 'Ver Seguimiento' },
-            { group: 'Seguimiento', id: 'tracking.export', label: 'Exportar Reportes' },
+            { group: 'Reportes', id: 'cxg.reportes.exportar', label: 'Exportar Reportes' },
 
             { group: 'Configuración', id: 'config.users', label: 'Gestionar Usuarios' },
-            { group: 'Configuración', id: 'ebm.config.users', label: 'Api: Usuarios' },
             { group: 'Configuración', id: 'config.roles', label: 'Gestionar Roles' },
-            { group: 'Configuración', id: 'ebm.config.roles', label: 'Api: Roles' },
-            { group: 'Configuración', id: 'config.cecos', label: 'Gestionar CeCos' },
-            { group: 'Configuración', id: 'config.accounts', label: 'Gestionar Cuentas' },
-            { group: 'Configuración', id: 'config.managements', label: 'Gestionar Gerencias' },
-            { group: 'Configuración', id: 'config.exchange_rates', label: 'Gestionar Tipos de Cambio' },
-            { group: 'Configuración', id: 'ebm.config.audit', label: 'Api: Auditoría' },
-
-            { group: 'Gastos', id: 'expenses.map', label: 'Mapear Gastos' },
-            { group: 'Gastos', id: 'expenses.view', label: 'Ver Gastos' },
+            { group: 'Configuración', id: 'config.audit', label: 'Ver Auditoría' }
         ];
     }
 }

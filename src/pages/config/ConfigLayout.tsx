@@ -11,13 +11,13 @@ export default function ConfigLayout() {
     const location = useLocation();
 
     const configItems = [
-        { to: '/config/users', icon: Users, label: 'Gestión de Usuarios', permission: 'ebm.config.users' as const },
-        { to: '/config/roles', icon: Shield, label: 'Perfiles y Permisos', permission: 'ebm.config.roles' as const },
+        { to: '/config/users', icon: Users, label: 'Gestión de Usuarios', permission: 'config.users' as const },
+        { to: '/config/roles', icon: Shield, label: 'Perfiles y Permisos', permission: 'config.roles' as const },
         { to: '/config/cecos', icon: Building2, label: 'Centros de Coste' },
         { to: '/config/accounts', icon: Wallet, label: 'Cuentas Contables' },
         { to: '/config/managements', icon: Briefcase, label: 'Gerencias' },
         { to: '/config/exchange-rates', icon: RefreshCw, label: 'Tipos de Cambio' },
-        { to: '/config/audit', icon: Terminal, label: 'Logs de Auditoría', permission: 'ebm.config.users' as const },
+        { to: '/config/audit', icon: Terminal, label: 'Logs de Auditoría', permission: 'config.audit' as const },
     ];
 
     const filteredItems = configItems.filter(item =>
@@ -88,7 +88,7 @@ export default function ConfigLayout() {
                                     Sistema SIATC
                                 </div>
                                 <p className="text-[10px] text-muted-foreground font-black tracking-widest leading-relaxed uppercase opacity-60">
-                                    EBM v3.5.0 • PILOT
+                                    NC-CXG v1.0.0 • PILOT
                                 </p>
                             </div>
                         </div>

@@ -28,13 +28,11 @@ export interface Role {
 }
 
 export type Permission =
-    | 'budget.view' | 'budget.create' | 'budget.edit'
-    | 'solped.view' | 'solped.create' | 'solped.edit'
-    | 'files.upload' | 'files.view'
-    | 'tracking.view' | 'tracking.export'
-    | 'config.users' | 'config.roles' | 'config.cecos' | 'config.accounts' | 'config.managements' | 'config.exchange_rates'
-    | 'ebm.config.users' | 'ebm.config.roles' | 'ebm.config.sap' | 'ebm.config.audit'
-    | 'expenses.map' | 'expenses.view';
+    | 'dashboard.view'
+    | 'cxg.cancelaciones.view' | 'cxg.cancelaciones.create' | 'cxg.cancelaciones.process'
+    | 'cxg.cxg_nc.view' | 'cxg.cxg_nc.create' | 'cxg.cxg_nc.process'
+    | 'cxg.reportes.exportar'
+    | 'config.users' | 'config.roles' | 'config.cecos' | 'config.accounts' | 'config.managements' | 'config.exchange_rates' | 'config.audit';
 
 export interface Management {
     id: string;

@@ -100,7 +100,7 @@ export default function UsersPage() {
     const handleDelete = async (id: string) => {
         confirm({
             title: 'Baja de Usuario',
-            message: '¿Está seguro de revocar el acceso a este usuario en EBM Central? Esta acción no afectará sus accesos en otras aplicaciones del ecosistema.',
+            message: '¿Está seguro de revocar el acceso a este usuario en Gestor NC-CxG? Esta acción no afectará sus accesos en otras aplicaciones del ecosistema.',
             type: 'danger',
             confirmText: 'Revocar Acceso',
             onConfirm: async () => {
@@ -115,7 +115,7 @@ export default function UsersPage() {
     };
 
     const openNew = () => {
-        setEditingUser({ full_name: '', username: '', email: '', role_id: '', management_id: '', is_active: true, apps: 'EBM', password_hash: '' });
+        setEditingUser({ full_name: '', username: '', email: '', role_id: '', management_id: '', is_active: true, apps: 'CXG', password_hash: '' });
         setError('');
         setIsModalOpen(true);
     };
@@ -154,7 +154,7 @@ export default function UsersPage() {
 
     const filtered = users
         .filter(u =>
-            ((u.apps || 'EBM').split(',').some(a => a.trim().toUpperCase() === 'EBM') || (u.apps || '').toUpperCase().includes('EBM')) &&
+            ((u.apps || 'CXG').split(',').some(a => a.trim().toUpperCase() === 'CXG') || (u.apps || '').toUpperCase().includes('CXG')) &&
             (u.full_name?.toLowerCase().includes(search.toLowerCase()) ||
             u.username?.toLowerCase().includes(search.toLowerCase()) ||
             u.email?.toLowerCase().includes(search.toLowerCase()))
@@ -183,9 +183,9 @@ export default function UsersPage() {
                         <span className="text-foreground">Gestión de Usuarios</span>
                     </div>
                     <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Gestión de Usuarios</h1>
-                    <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>Administra los accesos y perfiles autorizados para EBM Central</p>
+                    <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>Administra los accesos y perfiles autorizados para Gestor NC-CxG</p>
                 </div>
-                {hasPermission('ebm.config.users') && (
+                {hasPermission('config.users') && (
                     <SIATCButton onClick={openNew} icon={Plus}>
                         Nuevo Usuario
                     </SIATCButton>
@@ -290,7 +290,7 @@ export default function UsersPage() {
                                             </SIATCTableCell>
                                             <SIATCTableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    {hasPermission('ebm.config.users') && (
+                                                    {hasPermission('config.users') && (
                                                         <>
                                                             <button
                                                                 onClick={() => openEdit(user)}
@@ -398,7 +398,8 @@ export default function UsersPage() {
                                     { id: 'FSM', label: 'Gestor FSM' },
                                     { id: 'TCtrl', label: 'Tablero' },
                                     { id: 'Liq', label: 'Liquidaciones' },
-                                    { id: 'VAL', label: 'Valuaciones' }
+                                    { id: 'VAL', label: 'Valuaciones' },
+                                    { id: 'CXG', label: 'Gestor NC-CxG' }
                                 ].map(app => {
                                     const isSelected = (editingUser?.apps || '').split(',').map(a => a.trim()).includes(app.id);
                                     return (
