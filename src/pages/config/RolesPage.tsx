@@ -125,7 +125,7 @@ export default function RolesPage() {
         });
     };
 
-    const filteredRoles = roles.filter(role => (role.apps || 'CXG').split(',').some(a => a.trim().toUpperCase() === 'CXG'));
+    const filteredRoles = roles;
 
     return (
         <div className={SIATC_THEME.LAYOUT.PAGE_WRAPPER}>

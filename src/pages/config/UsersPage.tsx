@@ -154,7 +154,6 @@ export default function UsersPage() {
 
     const filtered = users
         .filter(u =>
-            ((u.apps || 'CXG').split(',').some(a => a.trim().toUpperCase() === 'CXG') || (u.apps || '').toUpperCase().includes('CXG')) &&
             (u.full_name?.toLowerCase().includes(search.toLowerCase()) ||
             u.username?.toLowerCase().includes(search.toLowerCase()) ||
             u.email?.toLowerCase().includes(search.toLowerCase()))
