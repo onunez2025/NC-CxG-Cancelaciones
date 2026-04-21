@@ -12,7 +12,7 @@ router.get('/', async (req: Request, res: Response) => {
     try {
         const pool = await getDbConnection();
         // We get roles and left join permissions to aggregate them
-            .query(`
+        const result = await pool.request().query(`
                 SELECT 
                     r.Id as id,
                     r.Name as name,
