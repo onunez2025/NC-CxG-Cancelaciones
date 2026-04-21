@@ -355,23 +355,6 @@ export const CancellationsPage = () => {
     }
   };
 
-  const handleQuickReject = async (item: Cancellation) => {
-    try {
-      await ncService.rejectCancellation(item.id);
-      await auditService.logAction({
-        UsuarioID: user?.id || '0',
-        UsuarioNombre: user?.username || 'Sistema',
-        Accion: 'REJECT',
-        Entidad: 'CANCELACIONES',
-        EntidadID: item.id,
-        Detalle: `Rechazo rápido por ${user?.username}`
-      });
-      fetchData();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const getEstadoBadgeVariant = (estado: string) => {
     switch (estado) {
       case 'APROBADO': return 'success';
@@ -554,24 +537,14 @@ export const CancellationsPage = () => {
                     <SIATCTableCell className="text-right" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                       <div className="flex justify-end gap-1">
                         {canProcess && item.estado === 'EN GESTIÓN' && (
-                          <>
-                            <SIATCButton 
-                              variant="ghost" 
-                              size="sm" 
-                              icon={CheckCircle2} 
-                              className="text-emerald-500 hover:bg-emerald-50"
-                              onClick={() => handleQuickApprove(item)}
-                              title="Aprobar rápido"
-                            />
-                            <SIATCButton 
-                              variant="ghost" 
-                              size="sm" 
-                              icon={XCircle} 
-                              className="text-rose-500 hover:bg-rose-50"
-                              onClick={() => handleQuickReject(item)}
-                              title="Rechazar rápido"
-                            />
-                          </>
+                          <SIATCButton 
+                            variant="ghost" 
+                            size="sm" 
+                            icon={CheckCircle2} 
+                            className="text-emerald-500 hover:bg-emerald-50"
+                            onClick={() => handleQuickApprove(item)}
+                            title="Aprobar rápido"
+                          />
                         )}
                         <ActionsMenu 
                           estado={item.estado}
@@ -783,7 +756,10 @@ export const CancellationsPage = () => {
               variant="primary" 
               onClick={handleGestionar} 
               isLoading={isGestionSubmitting}
-              disabled={!gestionForm.cancelacion_correcta}
+              disabled={
+                !gestionForm.cancelacion_correcta || 
+                (gestionForm.cancelacion_correcta === 'No' && (!gestionForm.observacion || !gestionForm.motivo_correcto))
+              }
             >
               Confirmar Gestión
             </SIATCButton>

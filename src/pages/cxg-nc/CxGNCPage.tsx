@@ -8,7 +8,8 @@ import {
   UserPlus,
   DollarSign,
   Calendar,
-  CheckCircle2
+  CheckCircle2,
+  XCircle
 } from 'lucide-react';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 import { SIATCButton } from '../../components/siatc/SIATCButton';
@@ -54,6 +55,7 @@ export const CxGNCPage = () => {
   // Gestión state
   const [isGestionModalOpen, setIsGestionModalOpen] = useState(false);
   const [gestiónObs, setGestiónObs] = useState('');
+  const [gestiónResultado, setGestiónResultado] = useState<'Si' | 'No' | ''>('');
 
   // Form state
   const [formData, setFormData] = useState({
@@ -180,25 +182,27 @@ export const CxGNCPage = () => {
   };
 
   const handleGestionar = async () => {
-    if (!selectedRecord) return;
+    if (!selectedRecord || !gestiónResultado) return;
     setIsSubmitting(true);
     try {
       await ncService.gestionarCxGNC(selectedRecord.id, {
         observacion: gestiónObs,
-        gestionado_por: user?.full_name || user?.username || 'Unknown'
+        gestionado_por: user?.full_name || user?.username || 'Unknown',
+        resultado: gestiónResultado as 'Si' | 'No'
       });
 
       await auditService.logAction({
         UsuarioID: user?.id || '0',
         UsuarioNombre: user?.username || 'Sistema',
-        Accion: 'PROCESS',
+        Accion: gestiónResultado === 'Si' ? 'PROCESS' : 'REJECT',
         Entidad: 'CXG_NC',
         EntidadID: selectedRecord.id,
-        Detalle: `Solicitud ${selectedRecord.correlativo} procesada en SAP/Sistema`
+        Detalle: `Solicitud ${selectedRecord.correlativo} ${gestiónResultado === 'Si' ? 'procesada' : 'rechazada'} en SAP/Sistema. Obs: ${gestiónObs}`
       });
 
       setIsGestionModalOpen(false);
       setGestiónObs('');
+      setGestiónResultado('');
       fetchData();
     } catch (error) {
       console.error(error);
@@ -555,7 +559,14 @@ export const CxGNCPage = () => {
         footer={
           <>
             <SIATCButton variant="ghost" onClick={() => setIsGestionModalOpen(false)}>Cancelar</SIATCButton>
-            <SIATCButton variant="primary" onClick={handleGestionar} isLoading={isSubmitting}>Marcar como Procesado</SIATCButton>
+            <SIATCButton 
+              variant="primary" 
+              onClick={handleGestionar} 
+              isLoading={isSubmitting}
+              disabled={!gestiónResultado || (gestiónResultado === 'No' && !gestiónObs)}
+            >
+              Confirmar Gestión
+            </SIATCButton>
           </>
         }
       >
@@ -565,11 +576,44 @@ export const CxGNCPage = () => {
             <p className="text-sm font-bold">{selectedRecord?.tipo} #{selectedRecord?.correlativo}</p>
             <p className="text-xs text-muted-foreground">Cliente: {selectedRecord?.cliente}</p>
           </div>
+
           <div>
-            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Observaciones Finales</label>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-3 block tracking-widest pl-4 font-bold">¿El documento es correcto?</label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setGestiónResultado('Si')}
+                className={`flex items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all font-bold text-sm ${
+                  gestiónResultado === 'Si'
+                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-lg shadow-emerald-500/10'
+                    : 'border-border text-muted-foreground hover:bg-muted/50'
+                }`}
+              >
+                <CheckCircle2 className="w-5 h-5" />
+                Sí, Procesar
+              </button>
+              <button
+                type="button"
+                onClick={() => setGestiónResultado('No')}
+                className={`flex items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all font-bold text-sm ${
+                  gestiónResultado === 'No'
+                    ? 'border-rose-500 bg-rose-50 text-rose-700 shadow-lg shadow-rose-500/10'
+                    : 'border-border text-muted-foreground hover:bg-muted/50'
+                }`}
+              >
+                <XCircle className="w-5 h-5" />
+                No, Rechazar
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">
+              Observaciones de Gestión {gestiónResultado === 'No' && <span className="text-rose-500 font-bold ml-1">(REQUERIDO)</span>}
+            </label>
             <textarea 
               className={`${SIATC_THEME.COMPONENTS.INPUT} h-24 pt-2 resize-none`}
-              placeholder="Detalle el resultado del proceso (ej: N° de Nota SAP, corrección aplicada...)"
+              placeholder={gestiónResultado === 'No' ? 'Explique el motivo del rechazo...' : 'Detalle el resultado del proceso (ej: N° de Nota SAP...)'}
               value={gestiónObs}
               onChange={(e) => setGestiónObs(e.target.value)}
             />

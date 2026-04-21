@@ -423,16 +423,17 @@ router.post('/cxg-nc/:id/asignar', async (req: Request, res: Response) => {
 router.post('/cxg-nc/:id/gestionar', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { observacion, gestionado_por } = req.body;
+        const { observacion, gestionado_por, resultado } = req.body;
         const pool = await getDbConnection();
         await pool.request()
             .input('id', sql.VarChar, id)
             .input('observacion', sql.VarChar, observacion || '')
             .input('gestionado_por', sql.VarChar, gestionado_por || '')
+            .input('resultado', sql.VarChar, resultado || 'Si')
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_CXG_NC] 
                 SET Procesado = 'SI', Procesado_el = GETDATE(), Procesado_por = @gestionado_por, 
-                    Observacion_Gestionado = @observacion, Gestionado = 'Si', Gestionado_el = GETDATE()
+                    Observacion_Gestionado = @observacion, Gestionado = @resultado, Gestionado_el = GETDATE()
                 WHERE ID_Apro_CxG_NC = @id
             `);
         res.json({ message: 'Solicitud procesada correctamente' });

@@ -170,7 +170,7 @@ export const ncService = {
         if (!response.ok) throw new Error('Error al asignar CxG/NC');
     },
 
-    async gestionarCxGNC(id: string, data: { observacion: string; gestionado_por: string }): Promise<void> {
+    async gestionarCxGNC(id: string, data: { observacion: string; gestionado_por: string; resultado?: 'Si' | 'No' }): Promise<void> {
         const response = await apiClient(`${API_BASE_URL}/cxg-nc/${id}/gestionar`, {
             method: 'POST',
             body: JSON.stringify(data)
