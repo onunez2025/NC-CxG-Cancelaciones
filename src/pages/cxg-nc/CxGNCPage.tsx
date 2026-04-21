@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { 
   Search, 
   RefreshCw, 
-  FileText,
   Loader2,
   FileSpreadsheet,
   UserPlus,
@@ -10,13 +9,7 @@ import {
   Calendar,
   CheckCircle2,
   XCircle,
-  Clock,
-  User,
-  Search,
-  MessageSquare,
   Eye,
-  MoreVertical,
-  AlertTriangle,
   UserCheck,
   ClipboardCheck
 } from 'lucide-react';
@@ -36,7 +29,7 @@ import type { CxGNC } from '../../services/ncService';
 import { auditService } from '../../services/auditService';
 import { useAuth } from '../../hooks/useAuth';
 import { UsersService } from '../../services/usersService';
-import type { User } from '../../types';
+import type { User as SystemUser } from '../../types';
 
 export const CxGNCPage = () => {
   const { user } = useAuth();
@@ -51,10 +44,10 @@ export const CxGNCPage = () => {
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [activeTab, setActiveTab] = useState<'TODOS' | 'NC' | 'CXG'>('TODOS');
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
-  const [statusFilter, setStatusFilter] = useState<'TODOS' | 'PENDIENTE' | 'EN GESTIÓN' | 'PROCESADO'>('TODOS');
+  const [statusFilter, setStatusFilter] = useState<'TODOS' | 'REGISTRADO' | 'APROBADO_SUP' | 'ASIGNADO' | 'VALIDADO' | 'CERRADO'>('TODOS');
 
   // Analysts for assignment
-  const [analysts, setAnalysts] = useState<User[]>([]);
+  const [analysts, setAnalysts] = useState<SystemUser[]>([]);
   
   // Assignment state
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
@@ -111,7 +104,7 @@ export const CxGNCPage = () => {
     const fetchAnalysts = async () => {
       try {
         const users = await UsersService.getUsers();
-        setAnalysts(users.filter((u: User) => u.is_active));
+        setAnalysts(users.filter((u: SystemUser) => u.is_active));
       } catch (error) {
         console.error('Error fetching analysts:', error);
       }
@@ -129,7 +122,7 @@ export const CxGNCPage = () => {
       await ncService.createCxGNC({
         tipo: formData.tipo,
         cliente: formData.cliente,
-        estado: 'PENDIENTE',
+        estado: 'REGISTRADO',
         ticket: formData.ticket
       });
       
@@ -249,13 +242,13 @@ export const CxGNCPage = () => {
   };
 
   const handleViewDetail = async (id: string) => {
-    setIsDetailOpen(true);
     setIsLoadingDetail(true);
     try {
-      const resp = await ncService.getCxGNCDetail(id);
-      setDetailData(resp);
+      const detail = await ncService.getCxGNCDetail(id);
+      setDetailData(detail);
+      setIsDetailOpen(true);
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching detail:', error);
     } finally {
       setIsLoadingDetail(false);
     }
@@ -440,9 +433,10 @@ export const CxGNCPage = () => {
                     </SIATCTableCell>
                     <SIATCTableCell>
                       <SIATCBadge variant={
-                        item.estado === 'CERRADO' || item.estado === 'PROCESADO' ? 'success' : 
-                        item.estado === 'RECHAZADO' ? 'danger' :
+                        item.estado === 'CERRADO' ? 'success' : 
                         item.estado === 'REGISTRADO' ? 'warning' :
+                        item.estado === 'VALIDADO' ? 'info' :
+                        item.estado === 'APROBADO_SUP' ? 'secondary' :
                         'info'
                       }>
                         {item.estado}
@@ -636,8 +630,8 @@ export const CxGNCPage = () => {
                 { key: 'VALIDADO', label: 'Validación', icon: ClipboardCheck },
                 { key: 'CERRADO', label: 'Cierre', icon: CheckCircle2 }
               ].map((step, idx) => {
-                const stepOrder = ['REGISTRADO', 'APROBADO_SUP', 'ASIGNADO', 'VALIDADO', 'CERRADO', 'PROCESADO'];
-                const currentIdx = stepOrder.indexOf(detailData.estado === 'PROCESADO' ? 'CERRADO' : detailData.estado);
+                const stepOrder = ['REGISTRADO', 'APROBADO_SUP', 'ASIGNADO', 'VALIDADO', 'CERRADO'];
+                const currentIdx = stepOrder.indexOf(detailData.estado);
                 const isCompleted = currentIdx >= idx;
                 const isActive = currentIdx === idx;
 
@@ -686,13 +680,13 @@ export const CxGNCPage = () => {
                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
                   <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">2. Auditoría de Proceso</h3>
                   <div className="space-y-2">
-                    <div className="text-[10px] uppercase text-muted-foreground font-bold">Estado Actual</div>
-                    <SIATCBadge className="w-full justify-center" variant={detailData.estado === 'PROCESADO' ? 'success' : 'info'}>{detailData.estado}</SIATCBadge>
+                    <div className="text-[10px] uppercase text-muted-foreground font-bold">Estado</div>
+                    <SIATCBadge className="w-full justify-center" variant={detailData.estado === 'CERRADO' ? 'success' : 'info'}>{detailData.estado}</SIATCBadge>
                     
                     <div className="mt-4 space-y-2">
                       <AuditStep label="Aprobación Sup." user={detailData.apro_por} date={detailData.apro_el} status={detailData.apro_solicitud} />
                       <AuditStep label="Validación Cliente" user={detailData.vali_por} date={detailData.vali_el} status={detailData.vali_cliente} />
-                      <AuditStep label="Cierre Final" user={detailData.gestionado_por} date={detailData.fecha_gestionado} status={detailData.resultado === 'Si' ? 'PROCESADO' : detailData.resultado === 'No' ? 'RECHAZADO' : null} />
+                      <AuditStep label="Cierre Final" user={detailData.gestionado_por} date={detailData.fecha_gestionado} status={detailData.resultado === 'Si' ? 'CERRADO' : detailData.resultado === 'No' ? 'RECHAZADO' : null} />
                     </div>
                   </div>
                 </div>

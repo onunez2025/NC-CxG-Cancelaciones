@@ -5,7 +5,7 @@ export interface AuditLogEntry {
     Fecha?: string;
     UsuarioID: string;
     UsuarioNombre: string;
-    Accion: 'CREATE' | 'UPDATE' | 'DELETE' | 'APPROVE' | 'REJECT' | 'PROCESS' | 'ASSIGN' | 'LOGIN' | 'LOGOUT' | 'ACCESO_DENEGADO';
+    Accion: 'CREATE' | 'UPDATE' | 'DELETE' | 'APPROVE' | 'REJECT' | 'PROCESS' | 'ASSIGN' | 'LOGIN' | 'LOGOUT' | 'ACCESO_DENEGADO' | 'VALIDATE' | 'EVALUATE';
     Entidad: string;
     EntidadID: string;
     Detalle: string;

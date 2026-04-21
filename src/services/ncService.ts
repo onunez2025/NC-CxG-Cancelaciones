@@ -37,22 +37,28 @@ export interface CancellationDetail extends Cancellation {
 
 export interface CxGNC {
     id: string;
-    tipo: 'CXG' | 'NC';
+    tipo: 'NC' | 'CXG';
     correlativo: string;
     fecha: string;
     cliente: string;
     estado: 'REGISTRADO' | 'APROBADO_SUP' | 'ASIGNADO' | 'VALIDADO' | 'CERRADO';
-    ticket?: string;
-    observacion?: string;
     asignado_a?: string;
     asignado_por?: string;
-    fecha_asignado?: string;
+    asignado_el?: string;
     gestionado?: string;
-    observacion_gestionado?: string;
-    vali_cliente?: 'REAL' | 'FALSA' | 'PENDIENTE';
+    observacion?: string;
+    vali_cliente?: string;
     vali_obs?: string;
     vali_por?: string;
     vali_el?: string;
+    apro_por?: string;
+    apro_el?: string;
+    apro_solicitud?: string;
+    apro_obs?: string;
+    gestionado_por?: string;
+    fecha_gestionado?: string;
+    resultado?: string;
+    ticket?: string;
 }
 
 export interface TicketInfo {
@@ -117,6 +123,12 @@ export const ncService = {
 
         const response = await apiClient(`${API_BASE_URL}/cxg-nc?${queryParams.toString()}`);
         if (!response.ok) throw new Error('Error al obtener CxG/NC');
+        return response.json();
+    },
+
+    async getCxGNCDetail(id: string): Promise<CxGNC> {
+        const response = await apiClient(`${API_BASE_URL}/cxg-nc/${id}`);
+        if (!response.ok) throw new Error('Error al obtener detalle de CxG/NC');
         return response.json();
     },
 
@@ -190,7 +202,7 @@ export const ncService = {
         if (!response.ok) throw new Error('Error al gestionar CxG/NC');
     },
 
-    async updateCxGNCStatus(id: string, estado: 'PENDIENTE' | 'PROCESADO'): Promise<void> {
+    async updateCxGNCStatus(id: string, estado: 'REGISTRADO' | 'APROBADO_SUP' | 'ASIGNADO' | 'VALIDADO' | 'CERRADO'): Promise<void> {
         const response = await apiClient(`${API_BASE_URL}/cxg-nc/${id}/status`, {
             method: 'PATCH',
             body: JSON.stringify({ estado })

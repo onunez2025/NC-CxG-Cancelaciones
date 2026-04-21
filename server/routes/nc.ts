@@ -162,7 +162,15 @@ router.get('/cancelaciones', async (req: Request, res: Response) => {
                     c.Asignado_por as asignado_por,
                     c.Asignado_el as fecha_asignado,
                     ISNULL(t.NombreCliente, '') as cliente,
-                    c.Estado_Proceso as estado
+                    c.Estado_Proceso as estado,
+                    c.Apro_Solicitud as apro_solicitud,
+                    c.Apro_Obs as apro_obs,
+                    c.Apro_Por as apro_por,
+                    c.Apro_El as apro_el,
+                    c.Vali_Cliente as vali_cliente,
+                    c.Vali_Obs as vali_obs,
+                    c.Vali_Por as vali_por,
+                    c.Vali_El as vali_el
                 FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
                 LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] m ON c.Motivo_Cancelacion = m.ID_Cancelados_motivo
@@ -221,8 +229,14 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
                     n.Asignado_por,
                     n.Asignado_el,
                     n.Gestionado,
-                    n.Observacion_Gestionado,
-                    n.Estado_Proceso as estado
+                    n.Observacion_Gestionado as observacion,
+                    n.Estado_Proceso as estado,
+                    n.Apro_Solicitud as apro_solicitud,
+                    n.Apro_Por as apro_por,
+                    n.Apro_El as apro_el,
+                    n.Vali_Cliente as vali_cliente,
+                    n.Vali_Por as vali_por,
+                    n.Vali_El as vali_el
                 FROM [dbo].[GAC_APP_TB_CXG_NC] n
                 ${whereClause}
                 ORDER BY n.Creado_el DESC
@@ -242,7 +256,97 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
     }
 });
 
-// POST Create Cancelacion
+// GET Cancellation Detail
+router.get('/cancelaciones/:id', async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const pool = await getDbConnection();
+        const result = await pool.request()
+            .input('id', sql.VarChar, id)
+            .query(`
+                SELECT 
+                    c.ID_Cancelados as id,
+                    c.Ticket as ticket,
+                    ISNULL(m.Motivo, c.Motivo_Cancelacion) as motivo,
+                    c.Autorizador_Cancelacion as autorizador,
+                    c.Generado_el as fecha_generado,
+                    c.Gestionado_por as gestionado_por,
+                    c.Cancelacion_Correcta as cancelacion_correcta,
+                    c.Gestionado as gestionado,
+                    c.Observacion_Gestionado as observacion,
+                    c.Gestionado_el as fecha_gestionado,
+                    c.Asignado_a as asignado_a,
+                    c.Asignado_por as asignado_por,
+                    c.Asignado_el as fecha_asignado,
+                    ISNULL(t.NombreCliente, '') as cliente,
+                    c.Estado_Proceso as estado,
+                    c.Apro_Solicitud as apro_solicitud,
+                    c.Apro_Obs as apro_obs,
+                    c.Apro_Por as apro_por,
+                    c.Apro_El as apro_el,
+                    c.Vali_Cliente as vali_cliente,
+                    c.Vali_Obs as vali_obs,
+                    c.Vali_Por as vali_por,
+                    c.Vali_El as vali_el
+                FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
+                LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
+                LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] m ON c.Motivo_Cancelacion = m.ID_Cancelados_motivo
+                WHERE c.ID_Cancelados = @id
+            `);
+        
+        if (result.recordset.length === 0) {
+            return res.status(404).json({ error: 'No se encontró la solicitud de cancelación' });
+        }
+        res.json(result.recordset[0]);
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// GET CxG/NC Detail
+router.get('/cxg-nc/:id', async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const pool = await getDbConnection();
+        const result = await pool.request()
+            .input('id', sql.VarChar, id)
+            .query(`
+                SELECT 
+                    n.ID_Apro_CxG_NC as id,
+                    n.Tipo as tipo,
+                    n.Ticket as correlativo,
+                    n.Creado_el as fecha,
+                    n.Tienda as cliente,
+                    n.Asignado_a,
+                    n.Asignado_por,
+                    n.Asignado_el,
+                    n.Gestionado,
+                    n.Observacion_Gestionado as observacion,
+                    n.Estado_Proceso as estado,
+                    n.Vali_Cliente as vali_cliente,
+                    n.Vali_Obs as vali_obs,
+                    n.Vali_Por as vali_por,
+                    n.Vali_El as vali_el,
+                    n.Apro_Solicitud as apro_solicitud,
+                    n.Apro_Obs as apro_obs,
+                    n.Apro_Por as apro_por,
+                    n.Apro_El as apro_el,
+                    n.Procesado_por as gestionado_por,
+                    n.Gestionado_el as fecha_gestionado,
+                    n.Gestionado as resultado,
+                    n.Ticket as ticket
+                FROM [dbo].[GAC_APP_TB_CXG_NC] n
+                WHERE n.ID_Apro_CxG_NC = @id
+            `);
+            
+        if (result.recordset.length === 0) {
+            return res.status(404).json({ error: 'No se encontró la solicitud CxG/NC' });
+        }
+        res.json(result.recordset[0]);
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
 router.post('/cancelaciones', async (req: Request, res: Response) => {
     try {
         const { cliente, motive, ticket, observacion, usuario } = req.body;

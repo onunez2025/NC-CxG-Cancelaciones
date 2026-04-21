@@ -44,8 +44,8 @@ export function DashboardPage() {
     }, []);
 
     const metrics = useMemo(() => {
-        const pendingCancels = cancellations.filter(c => c.estado === 'PENDIENTE');
-        const pendingDocs = cxgData.filter(d => d.estado === 'PENDIENTE');
+        const pendingCancels = cancellations.filter(c => c.estado === 'REGISTRADO');
+        const pendingDocs = cxgData.filter(d => d.estado === 'REGISTRADO');
         return {
             pendingCancels: pendingCancels.length,
             pendingDocs: pendingDocs.length,
@@ -123,7 +123,7 @@ export function DashboardPage() {
                             <div key={item.id} className="flex items-center gap-4 p-3 rounded-xl border border-border/40 hover:bg-muted/30 transition-colors">
                                 <div className={cn(
                                     "p-2 rounded-lg",
-                                    item.estado === 'PENDIENTE' ? "bg-amber-100 text-amber-600" : "bg-emerald-100 text-emerald-600"
+                                    item.estado === 'REGISTRADO' ? "bg-amber-100 text-amber-600" : "bg-emerald-100 text-emerald-600"
                                 )}>
                                     <AlertCircle className="w-4 h-4" />
                                 </div>
@@ -178,7 +178,7 @@ export function DashboardPage() {
                                 </div>
                                 <div className="text-right">
                                     <div className="flex items-center justify-end gap-1">
-                                         {item.estado === 'PROCESADO' ? <CheckCircle2 className="w-3 h-3 text-emerald-500" /> : <Clock className="w-3 h-3 text-amber-500" />}
+                                         {item.estado === 'CERRADO' ? <CheckCircle2 className="w-3 h-3 text-emerald-500" /> : <Clock className="w-3 h-3 text-amber-500" />}
                                          <span className="text-[10px] font-bold uppercase opacity-60">{item.estado}</span>
                                     </div>
                                 </div>

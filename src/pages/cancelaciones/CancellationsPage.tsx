@@ -13,8 +13,6 @@ import {
   UserCheck,
   ClipboardCheck,
   User,
-  Clock,
-  MessageSquare,
   AlertTriangle,
   UserPlus
 } from 'lucide-react';
@@ -148,11 +146,9 @@ const DetailRow = ({ icon: Icon, label, value, className }: { icon: any; label: 
 export const CancellationsPage = () => {
   const { user, hasPermission } = useAuth();
 
-  // RBAC permission checks
   const canCreate = hasPermission('cxg.cancelaciones.create');
   const canAssign = hasPermission('cxg.cancelaciones.assign');
   const canGestionar = hasPermission('cxg.cancelaciones.gestionar');
-  const canProcess = hasPermission('cxg.cancelaciones.process');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
@@ -387,6 +383,16 @@ export const CancellationsPage = () => {
         observacion: aprobarForm.observacion,
         usuario: user?.full_name || user?.username || 'Sistema'
       });
+      
+      await auditService.logAction({
+        UsuarioID: user?.id || '0',
+        UsuarioNombre: user?.username || 'Sistema',
+        Accion: aprobarForm.aprobado === 'APROBADO' ? 'APPROVE' : 'REJECT',
+        Entidad: 'CANCELACIONES',
+        EntidadID: aprobarSolicitudItem.id,
+        Detalle: `Solicitud ${aprobarForm.aprobado} por el supervisor. Obs: ${aprobarForm.observacion}`
+      });
+
       setIsAprobarSolicitudOpen(false);
       fetchData();
     } catch (error) {
@@ -405,29 +411,22 @@ export const CancellationsPage = () => {
         observacion: validarForm.observacion,
         usuario: user?.full_name || user?.username || 'Sistema'
       });
+
+      await auditService.logAction({
+        UsuarioID: user?.id || '0',
+        UsuarioNombre: user?.username || 'Sistema',
+        Accion: 'VALIDATE',
+        Entidad: 'CANCELACIONES',
+        EntidadID: validarClienteItem.id,
+        Detalle: `Validación con cliente completada: ${validarForm.resultado}. Obs: ${validarForm.observacion}`
+      });
+
       setIsValidarClienteOpen(false);
       fetchData();
     } catch (error) {
       console.error(error);
     } finally {
       setIsValidarSubmitting(false);
-    }
-  };
-
-  const handleQuickApprove = async (item: Cancellation) => {
-    try {
-      await ncService.approveCancellation(item.id);
-      await auditService.logAction({
-        UsuarioID: user?.id || '0',
-        UsuarioNombre: user?.username || 'Sistema',
-        Accion: 'APPROVE',
-        Entidad: 'CANCELACIONES',
-        EntidadID: item.id,
-        Detalle: `Aprobación rápida por ${user?.username}`
-      });
-      fetchData();
-    } catch (error) {
-      console.error(error);
     }
   };
 
@@ -441,7 +440,6 @@ export const CancellationsPage = () => {
       case 'VALIDADO':
       case 'EN GESTIÓN': return 'info';
       case 'REGISTRADO':
-      case 'PENDIENTE': 
       default: return 'warning';
     }
   };
