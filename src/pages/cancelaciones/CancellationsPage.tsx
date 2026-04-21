@@ -323,7 +323,6 @@ export const CancellationsPage = () => {
     if (!assignItem || !assignTo) return;
     setIsAssigning(true);
     try {
-      const selectedUser = systemUsers.find(u => u.full_name === assignTo);
       await ncService.asignarCancellation(assignItem.id, {
         asignado_a: assignTo,
         asignado_por: user?.full_name || user?.username || 'Sistema'
