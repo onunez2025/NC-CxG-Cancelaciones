@@ -71,13 +71,13 @@ export function LoginPage() {
                         <div className="w-12 h-12 flex items-center justify-center shrink-0 overflow-hidden">
                             <img src="/ebm-logo-.png" alt="EBM Logo" className="h-full w-full object-contain" />
                         </div>
-                        <span className="text-2xl font-bold tracking-tight">EBM</span>
+                        <span className="text-2xl font-bold tracking-tight">GAC</span>
                     </div>
                     <h1 className="text-5xl font-bold mb-4 leading-tight">
-                        Enterprise<br />Budget<br />Manager
+                        Cancelaciones,<br />CxG y<br />Notas de Crédito
                     </h1>
                     <div className="text-slate-400 text-lg max-w-md space-y-6">
-                        <p>Control integral de presupuesto, solicitudes y proveedores para gerencias de alto rendimiento.</p>
+                        <p>Plataforma integral para la gestión y seguimiento operativo de devoluciones, cambios por garantía y cancelaciones.</p>
                         <div className="flex flex-col w-fit gap-2">
                             <span className="text-2xl font-bold text-slate-100 tracking-tight">Gerencia de Atención al Cliente</span>
                             <img 

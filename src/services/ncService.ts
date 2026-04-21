@@ -112,5 +112,11 @@ export const ncService = {
         if (response.status === 404) throw new Error('Ticket no encontrado');
         if (!response.ok) throw new Error('Error al buscar el ticket');
         return response.json();
+    },
+
+    async getCancellationMotivos(): Promise<{ id: string; motivo: string }[]> {
+        const response = await apiClient(`${API_BASE_URL}/cancelaciones/motivos`);
+        if (!response.ok) throw new Error('Error al obtener motivos de cancelación');
+        return response.json();
     }
 };

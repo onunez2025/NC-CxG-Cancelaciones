@@ -38,6 +38,7 @@ export const CancellationsPage = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLookingUp, setIsLookingUp] = useState(false);
+  const [motivos, setMotivos] = useState<{ id: string; motivo: string }[]>([]);
   
   // Registration state
   const [formData, setFormData] = useState({
@@ -74,6 +75,19 @@ export const CancellationsPage = () => {
   useEffect(() => {
     if (currentPage !== 1) setCurrentPage(1);
   }, [searchTerm]);
+
+  const fetchMotivos = async () => {
+    try {
+      const data = await ncService.getCancellationMotivos();
+      setMotivos(data);
+    } catch (error) {
+      console.error('Error fetching motives:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchMotivos();
+  }, []);
 
   const handleCreate = async () => {
     setIsSubmitting(true);
@@ -230,7 +244,7 @@ export const CancellationsPage = () => {
             <input 
               type="text"
               placeholder="Buscar por ID, cliente o motivo..."
-              className={SIATC_THEME.COMPONENTS.INPUT}
+              className={`${SIATC_THEME.COMPONENTS.INPUT} pl-10`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -424,12 +438,16 @@ export const CancellationsPage = () => {
           </div>
           <div>
             <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Motivo</label>
-            <textarea 
-              className={`${SIATC_THEME.COMPONENTS.INPUT} h-24 pt-3 resize-none`}
+            <select 
+              className={SIATC_THEME.COMPONENTS.INPUT}
               value={formData.motivo}
               onChange={(e) => setFormData({...formData, motivo: e.target.value})}
-              placeholder="Detalle el motivo de la cancelación..."
-            />
+            >
+              <option value="">Seleccione un motivo...</option>
+              {motivos.map(m => (
+                <option key={m.id} value={m.motivo}>{m.motivo}</option>
+              ))}
+            </select>
           </div>
 
           <div>

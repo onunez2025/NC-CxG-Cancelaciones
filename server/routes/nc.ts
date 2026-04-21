@@ -31,7 +31,21 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
         res.status(500).json({ error: error.message });
     }
 });
-
+// GET Cancellation Motives
+router.get('/cancelaciones/motivos', async (req: Request, res: Response) => {
+    try {
+        const pool = await getDbConnection();
+        const result = await pool.request().query(`
+            SELECT ID_Cancelados_motivo as id, Motivo as motivo 
+            FROM [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS]
+            ORDER BY Motivo ASC
+        `);
+        res.json(result.recordset);
+    } catch (error: any) {
+        console.error('Error fetching motives:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
 
 // GET all Cancelaciones (Paginated)
 router.get('/cancelaciones', async (req: Request, res: Response) => {

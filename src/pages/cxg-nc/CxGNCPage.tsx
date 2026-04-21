@@ -234,7 +234,7 @@ export const CxGNCPage = () => {
               <input 
                 type="text"
                 placeholder="Buscar por cliente o N°..."
-                className={SIATC_THEME.COMPONENTS.INPUT}
+                className={`${SIATC_THEME.COMPONENTS.INPUT} pl-10`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />

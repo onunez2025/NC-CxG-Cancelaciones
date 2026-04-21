@@ -62,7 +62,7 @@ export const SIATC_THEME = {
         BUTTON_INFO: "inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-all active:scale-95 font-bold text-sm shadow-lg shadow-blue-500/25 border border-blue-500/20",
         BUTTON_GHOST: "inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-transparent text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-95 font-bold text-sm",
 
-        INPUT: "w-full pl-10 pr-4 py-2.5 h-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium shadow-sm hover:border-slate-300 dark:hover:border-slate-700",
+        INPUT: "w-full px-4 py-2.5 h-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm font-medium shadow-sm hover:border-slate-300 dark:hover:border-slate-700",
         MODAL_CONTENT: "bg-white dark:bg-slate-950 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-2xl p-8 overflow-hidden",
     },
 
