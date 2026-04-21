@@ -35,7 +35,6 @@ router.get('/', async (req: Request, res: Response) => {
                 FROM EBM.Users u
                 LEFT JOIN EBM.Roles r ON u.RoleId = r.Id
                 LEFT JOIN EBM.Managements m ON u.ManagementId = m.Id
-                WHERE u.Apps LIKE '%' + @app + '%'
             `);
         res.json(result.recordset);
     } catch (error: any) {

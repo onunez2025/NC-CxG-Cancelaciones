@@ -129,10 +129,10 @@ export function DashboardPage() {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-xs font-bold text-foreground truncate">{item.cliente}</p>
-                                    <p className="text-[10px] text-muted-foreground">{item.motive}</p>
+                                    <p className="text-[10px] text-muted-foreground">{item.motivo}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-[10px] text-muted-foreground">{new Date(item.fecha_solicitud).toLocaleDateString()}</p>
+                                    <p className="text-[10px] text-muted-foreground">{new Date(item.fecha_generado).toLocaleDateString()}</p>
                                 </div>
                             </div>
                         ))}

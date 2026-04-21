@@ -12,12 +12,10 @@ import {
   Eye,
   UserCheck,
   ClipboardCheck,
-  X,
   User,
   Clock,
   MessageSquare,
-  AlertTriangle,
-  ChevronRight
+  AlertTriangle
 } from 'lucide-react';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 import { SIATCButton } from '../../components/siatc/SIATCButton';
