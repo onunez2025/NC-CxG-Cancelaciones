@@ -3,17 +3,15 @@ import {
   Search, 
   RefreshCw, 
   FileText,
-  MoreVertical,
-  Calendar,
-  DollarSign,
-  CheckCircle2,
   Loader2,
-  FileSpreadsheet
+  FileSpreadsheet,
+  UserPlus
 } from 'lucide-react';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 import { SIATCButton } from '../../components/siatc/SIATCButton';
 import { SIATCBadge } from '../../components/siatc/SIATCBadge';
 import { SIATCModalWrapper } from '../../components/siatc/SIATCModalWrapper';
+import { SIATCActionDropdown } from '../../components/siatc/SIATCActionDropdown';
 import { 
   SIATCTable, 
   SIATCTableHeader, 
@@ -24,6 +22,8 @@ import { ncService } from '../../services/ncService';
 import type { CxGNC } from '../../services/ncService';
 import { auditService } from '../../services/auditService';
 import { useAuth } from '../../hooks/useAuth';
+import { userService } from '../../services/userService';
+import type { User } from '../../types';
 
 export const CxGNCPage = () => {
   const { user } = useAuth();
@@ -38,7 +38,19 @@ export const CxGNCPage = () => {
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [activeTab, setActiveTab] = useState<'TODOS' | 'NC' | 'CXG'>('TODOS');
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
-  const [statusFilter, setStatusFilter] = useState<'TODOS' | 'PENDIENTE' | 'PROCESADO'>('TODOS');
+  const [statusFilter, setStatusFilter] = useState<'TODOS' | 'PENDIENTE' | 'EN GESTIÓN' | 'PROCESADO'>('TODOS');
+
+  // Analysts for assignment
+  const [analysts, setAnalysts] = useState<User[]>([]);
+  
+  // Assignment state
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<CxGNC | null>(null);
+  const [targetAnalystId, setTargetAnalystId] = useState('');
+
+  // Gestión state
+  const [isGestionModalOpen, setIsGestionModalOpen] = useState(false);
+  const [gestiónObs, setGestiónObs] = useState('');
 
   // Form state
   const [formData, setFormData] = useState({
@@ -69,7 +81,19 @@ export const CxGNCPage = () => {
       fetchData();
     }, 500);
     return () => clearTimeout(timer);
-  }, [currentPage, searchTerm]);
+  }, [currentPage, searchTerm, activeTab, statusFilter]);
+
+  useEffect(() => {
+    const fetchAnalysts = async () => {
+      try {
+        const users = await userService.getUsers();
+        setAnalysts(users.filter(u => u.is_active));
+      } catch (error) {
+        console.error('Error fetching analysts:', error);
+      }
+    };
+    fetchAnalysts();
+  }, []);
 
   useEffect(() => {
     if (currentPage !== 1) setCurrentPage(1);
@@ -126,21 +150,63 @@ export const CxGNCPage = () => {
     }
   };
 
-  const handleProcess = async (id: string) => {
+  const handleAsignar = async () => {
+    if (!selectedRecord || !targetAnalystId) return;
+    setIsSubmitting(true);
     try {
-      await ncService.updateCxGNCStatus(id, 'PROCESADO');
+      await ncService.asignarCxGNC(selectedRecord.id, {
+        asignado_a: targetAnalystId,
+        asignado_por: user?.id || '0'
+      });
+
+      await auditService.logAction({
+        UsuarioID: user?.id || '0',
+        UsuarioNombre: user?.username || 'Sistema',
+        Accion: 'ASSIGN',
+        Entidad: 'CXG_NC',
+        EntidadID: selectedRecord.id,
+        Detalle: `Solicitud ${selectedRecord.correlativo} asignada a ${analysts.find(a => a.id === targetAnalystId)?.full_name}`
+      });
+
+      setIsAssignModalOpen(false);
+      fetchData();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGestionar = async () => {
+    if (!selectedRecord) return;
+    setIsSubmitting(true);
+    try {
+      await ncService.gestionarCxGNC(selectedRecord.id, {
+        observacion: gestiónObs,
+        gestionado_por: user?.full_name || user?.username || 'Unknown'
+      });
+
       await auditService.logAction({
         UsuarioID: user?.id || '0',
         UsuarioNombre: user?.username || 'Sistema',
         Accion: 'PROCESS',
         Entidad: 'CXG_NC',
-        EntidadID: id,
-        Detalle: `Documento procesado por ${user?.username}`
+        EntidadID: selectedRecord.id,
+        Detalle: `Solicitud ${selectedRecord.correlativo} procesada en SAP/Sistema`
       });
+
+      setIsGestionModalOpen(false);
+      setGestiónObs('');
       fetchData();
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  const hasPermission = (perm: string) => {
+    return user?.permissions?.includes(perm as any) || false;
   };
 
   // No longer needed due to server-side filtering
@@ -247,7 +313,8 @@ export const CxGNCPage = () => {
                 onChange={(e) => setStatusFilter(e.target.value as any)}
               >
                 <option value="TODOS">TODOS LOS ESTADOS</option>
-                <option value="PENDIENTE">PENDIENTE</option>
+                <option value="PENDIENTE">PENDIENTE por Asignar</option>
+                <option value="EN GESTIÓN">EN GESTIÓN (Analista)</option>
                 <option value="PROCESADO">PROCESADO</option>
               </select>
             </div>
@@ -314,23 +381,43 @@ export const CxGNCPage = () => {
                       </div>
                     </SIATCTableCell>
                     <SIATCTableCell>
-                      <SIATCBadge variant={item.estado === 'PROCESADO' ? 'success' : 'warning'}>
+                      <SIATCBadge variant={
+                        item.estado === 'PROCESADO' ? 'success' : 
+                        item.estado === 'EN GESTIÓN' ? 'info' : 
+                        'warning'
+                      }>
                         {item.estado}
                       </SIATCBadge>
                     </SIATCTableCell>
                     <SIATCTableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        {item.estado !== 'PROCESADO' && (
-                          <SIATCButton 
-                            variant="ghost" 
-                            size="sm" 
-                            icon={CheckCircle2} 
-                            className="text-emerald-500 hover:bg-emerald-50"
-                            onClick={() => handleProcess(item.id)}
-                          />
-                        )}
-                        <SIATCButton variant="ghost" size="sm" icon={FileText} />
-                        <SIATCButton variant="ghost" size="sm" icon={MoreVertical} />
+                      <div className="flex justify-end">
+                        <SIATCActionDropdown 
+                          actions={[
+                            {
+                              label: 'Asignar Analista',
+                              icon: UserPlus,
+                              onClick: () => {
+                                setSelectedRecord(item);
+                                setIsAssignModalOpen(true);
+                              },
+                              show: item.estado === 'PENDIENTE' && hasPermission('cxg.cxg_nc.assign')
+                            },
+                            {
+                              label: 'Gestionar Solicitud',
+                              icon: CheckCircle2,
+                              onClick: () => {
+                                setSelectedRecord(item);
+                                setIsGestionModalOpen(true);
+                              },
+                              show: item.estado === 'EN GESTIÓN' && hasPermission('cxg.cxg_nc.gestionar')
+                            },
+                            {
+                              label: 'Ver Detalle',
+                              icon: FileText,
+                              onClick: () => {}
+                            }
+                          ]}
+                        />
                       </div>
                     </SIATCTableCell>
                   </SIATCTableRow>
@@ -423,6 +510,67 @@ export const CxGNCPage = () => {
                 ✔ {formData.cliente}
               </p>
             )}
+          </div>
+        </div>
+      </SIATCModalWrapper>
+
+      {/* Asignar Modal */}
+      <SIATCModalWrapper
+        isOpen={isAssignModalOpen}
+        onClose={() => setIsAssignModalOpen(false)}
+        title="Asignar Solicitud"
+        subtitle={`Asigne un analista para procesar el ${selectedRecord?.tipo} de ${selectedRecord?.cliente}.`}
+        footer={
+          <>
+            <SIATCButton variant="ghost" onClick={() => setIsAssignModalOpen(false)}>Cancelar</SIATCButton>
+            <SIATCButton variant="primary" onClick={handleAsignar} isLoading={isSubmitting}>Confirmar Asignación</SIATCButton>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Analista Responsable</label>
+            <select 
+              className={SIATC_THEME.COMPONENTS.INPUT}
+              value={targetAnalystId}
+              onChange={(e) => setTargetAnalystId(e.target.value)}
+            >
+              <option value="">Seleccione analista...</option>
+              {analysts.map(a => (
+                <option key={a.id} value={a.id}>{a.full_name}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </SIATCModalWrapper>
+
+      {/* Gestionar Modal */}
+      <SIATCModalWrapper
+        isOpen={isGestionModalOpen}
+        onClose={() => setIsGestionModalOpen(false)}
+        title="Gestionar Solicitud CxG / NC"
+        subtitle={`Finalice el procesamiento de este documento.`}
+        footer={
+          <>
+            <SIATCButton variant="ghost" onClick={() => setIsGestionModalOpen(false)}>Cancelar</SIATCButton>
+            <SIATCButton variant="primary" onClick={handleGestionar} isLoading={isSubmitting}>Marcar como Procesado</SIATCButton>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div className="p-4 bg-muted/30 rounded-xl border border-border/50">
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Resumen del Documento</p>
+            <p className="text-sm font-bold">{selectedRecord?.tipo} #{selectedRecord?.correlativo}</p>
+            <p className="text-xs text-muted-foreground">Cliente: {selectedRecord?.cliente}</p>
+          </div>
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Observaciones Finales</label>
+            <textarea 
+              className={`${SIATC_THEME.COMPONENTS.INPUT} h-24 pt-2 resize-none`}
+              placeholder="Detalle el resultado del proceso (ej: N° de Nota SAP, corrección aplicada...)"
+              value={gestiónObs}
+              onChange={(e) => setGestiónObs(e.target.value)}
+            />
           </div>
         </div>
       </SIATCModalWrapper>

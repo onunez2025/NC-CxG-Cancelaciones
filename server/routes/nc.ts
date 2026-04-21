@@ -219,7 +219,16 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
                     n.Ticket as correlativo,
                     n.Creado_el as fecha,
                     n.Tienda as cliente,
-                    CASE WHEN n.Procesado = 'SI' THEN 'PROCESADO' ELSE 'PENDIENTE' END as estado
+                    n.Asignado_a,
+                    n.Asignado_por,
+                    n.Asignado_el,
+                    n.Gestionado,
+                    n.Observacion_Gestionado,
+                    CASE 
+                        WHEN n.Procesado = 'SI' THEN 'PROCESADO'
+                        WHEN n.Asignado_a IS NOT NULL THEN 'EN GESTIÓN'
+                        ELSE 'PENDIENTE' 
+                    END as estado
                 FROM [dbo].[GAC_APP_TB_CXG_NC] n
                 ${whereClause}
                 ORDER BY n.Creado_el DESC
@@ -389,21 +398,44 @@ router.post('/cxg-nc', async (req: Request, res: Response) => {
     }
 });
 
-// PATCH Process CxG/NC
-router.patch('/cxg-nc/:id/status', async (req: Request, res: Response) => {
+// POST Assign CxG/NC
+router.post('/cxg-nc/:id/asignar', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { estado } = req.body;
+        const { asignado_a, asignado_por } = req.body;
         const pool = await getDbConnection();
         await pool.request()
             .input('id', sql.VarChar, id)
-            .input('procesado', sql.VarChar, estado === 'PROCESADO' ? 'SI' : 'NO')
+            .input('asignado_a', sql.VarChar, asignado_a)
+            .input('asignado_por', sql.VarChar, asignado_por)
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_CXG_NC] 
-                SET Procesado = @procesado, Procesado_el = GETDATE()
+                SET Asignado_a = @asignado_a, Asignado_por = @asignado_por, Asignado_el = GETDATE(), Gestionado = 'No'
                 WHERE ID_Apro_CxG_NC = @id
             `);
-        res.json({ message: 'Estado actualizado' });
+        res.json({ message: 'Solicitud asignada correctamente' });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST Gestionar CxG/NC (Mark as Procesado)
+router.post('/cxg-nc/:id/gestionar', async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { observacion, gestionado_por } = req.body;
+        const pool = await getDbConnection();
+        await pool.request()
+            .input('id', sql.VarChar, id)
+            .input('observacion', sql.VarChar, observacion || '')
+            .input('gestionado_por', sql.VarChar, gestionado_por || '')
+            .query(`
+                UPDATE [dbo].[GAC_APP_TB_CXG_NC] 
+                SET Procesado = 'SI', Procesado_el = GETDATE(), Procesado_por = @gestionado_por, 
+                    Observacion_Gestionado = @observacion, Gestionado = 'Si', Gestionado_el = GETDATE()
+                WHERE ID_Apro_CxG_NC = @id
+            `);
+        res.json({ message: 'Solicitud procesada correctamente' });
     } catch (error: any) {
         res.status(500).json({ error: error.message });
     }

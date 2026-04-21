@@ -33,9 +33,14 @@ export interface CxGNC {
     correlativo: string;
     fecha: string;
     cliente: string;
-    estado: 'PENDIENTE' | 'PROCESADO';
+    estado: 'PENDIENTE' | 'EN GESTIÓN' | 'PROCESADO';
     ticket?: string;
     observacion?: string;
+    asignado_a?: string;
+    asignado_por?: string;
+    fecha_asignado?: string;
+    gestionado?: string;
+    observacion_gestionado?: string;
 }
 
 export interface TicketInfo {
@@ -155,6 +160,22 @@ export const ncService = {
         });
         if (!response.ok) throw new Error('Error al crear CxG/NC');
         return response.json();
+    },
+
+    async asignarCxGNC(id: string, data: AsignarData): Promise<void> {
+        const response = await apiClient(`${API_BASE_URL}/cxg-nc/${id}/asignar`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Error al asignar CxG/NC');
+    },
+
+    async gestionarCxGNC(id: string, data: { observacion: string; gestionado_por: string }): Promise<void> {
+        const response = await apiClient(`${API_BASE_URL}/cxg-nc/${id}/gestionar`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Error al gestionar CxG/NC');
     },
 
     async updateCxGNCStatus(id: string, estado: 'PENDIENTE' | 'PROCESADO'): Promise<void> {
