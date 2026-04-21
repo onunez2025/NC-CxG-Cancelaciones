@@ -29,6 +29,7 @@ export interface Role {
 
 export type Permission =
     | 'dashboard.view'
+    | 'budget.view' | 'budget.create' | 'budget.edit'
     | 'cxg.cancelaciones.view' | 'cxg.cancelaciones.create' | 'cxg.cancelaciones.process'
     | 'cxg.cxg_nc.view' | 'cxg.cxg_nc.create' | 'cxg.cxg_nc.process'
     | 'cxg.reportes.exportar'

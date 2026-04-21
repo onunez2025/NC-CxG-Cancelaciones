@@ -82,7 +82,7 @@ function App() {
               <Route path="/dashboard" element={<DashboardPage />} />
 
               {/* Config Routes */}
-              <Route element={<RequirePermission permission="ebm.config.users" />}>
+              <Route element={<RequirePermission permission="config.users" />}>
                 <Route path="/config" element={<ConfigLayout />}>
                   <Route index element={<Navigate to="users" replace />} />
                   <Route path="users" element={<UsersPage />} />

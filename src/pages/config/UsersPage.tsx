@@ -281,7 +281,7 @@ export default function UsersPage() {
                                             </SIATCTableCell>
                                             <SIATCTableCell>
                                                 <div className="flex flex-wrap gap-1">
-                                                    {(user.apps || 'EBM').split(',').map(app => (
+                                                    {(user.apps || 'CXG').split(',').map(app => (
                                                         <span key={app} className="px-2 py-0.5 rounded-lg text-[9px] font-black tracking-tighter border bg-primary/5 text-primary border-primary/10">
                                                             {app.trim()}
                                                         </span>
