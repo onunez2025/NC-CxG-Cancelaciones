@@ -44,6 +44,8 @@ export class RolesService {
             
             { group: 'Cancelaciones', id: 'cxg.cancelaciones.view', label: 'Ver Cancelaciones' },
             { group: 'Cancelaciones', id: 'cxg.cancelaciones.create', label: 'Crear Cancelaciones' },
+            { group: 'Cancelaciones', id: 'cxg.cancelaciones.assign', label: 'Asignar Cancelaciones' },
+            { group: 'Cancelaciones', id: 'cxg.cancelaciones.gestionar', label: 'Gestionar Cancelaciones' },
             { group: 'Cancelaciones', id: 'cxg.cancelaciones.process', label: 'Procesar Cancelaciones' },
 
             { group: 'CxG y NC', id: 'cxg.cxg_nc.view', label: 'Ver CxG y NC' },

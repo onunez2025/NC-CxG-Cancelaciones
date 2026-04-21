@@ -59,6 +59,11 @@ export interface GestionarData {
     gestionado_por: string;
 }
 
+export interface AsignarData {
+    asignado_a: string;
+    asignado_por: string;
+}
+
 export const ncService = {
     async getCancellations(params?: { 
         page?: number; 
@@ -104,6 +109,14 @@ export const ncService = {
             body: JSON.stringify(data)
         });
         if (!response.ok) throw new Error('Error al gestionar cancelación');
+    },
+
+    async asignarCancellation(id: string, data: AsignarData): Promise<void> {
+        const response = await apiClient(`${API_BASE_URL}/cancelaciones/${id}/asignar`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Error al asignar cancelación');
     },
 
     async approveCancellation(id: string): Promise<void> {

@@ -15,7 +15,8 @@ import {
   User,
   Clock,
   MessageSquare,
-  AlertTriangle
+  AlertTriangle,
+  UserPlus
 } from 'lucide-react';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 import { SIATCButton } from '../../components/siatc/SIATCButton';
@@ -31,16 +32,24 @@ import { ncService } from '../../services/ncService';
 import type { Cancellation, CancellationDetail } from '../../services/ncService';
 import { auditService } from '../../services/auditService';
 import { useAuth } from '../../hooks/useAuth';
+import { UsersService } from '../../services/usersService';
+import type { User as SystemUser } from '../../types';
 
 // ---- Dropdown Menu Component ----
 const ActionsMenu = ({ 
   onViewDetail, 
   onGestionar, 
-  estado 
+  onAsignar,
+  estado,
+  canAssign,
+  canGestionar
 }: { 
   onViewDetail: () => void; 
   onGestionar: () => void; 
+  onAsignar: () => void;
   estado: string;
+  canAssign: boolean;
+  canGestionar: boolean;
 }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -70,7 +79,16 @@ const ActionsMenu = ({
             <Eye className="w-4 h-4 text-blue-500" />
             Ver Detalle
           </button>
-          {(estado === 'PENDIENTE' || estado === 'EN GESTIÓN') && (
+          {canAssign && (estado === 'PENDIENTE') && (
+            <button 
+              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              onClick={() => { onAsignar(); setOpen(false); }}
+            >
+              <UserPlus className="w-4 h-4 text-violet-500" />
+              Asignar
+            </button>
+          )}
+          {canGestionar && (estado === 'PENDIENTE' || estado === 'EN GESTIÓN') && (
             <button 
               className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               onClick={() => { onGestionar(); setOpen(false); }}
@@ -99,7 +117,13 @@ const DetailRow = ({ icon: Icon, label, value, className }: { icon: any; label: 
 );
 
 export const CancellationsPage = () => {
-  const { user } = useAuth();
+  const { user, hasPermission } = useAuth();
+
+  // RBAC permission checks
+  const canCreate = hasPermission('cxg.cancelaciones.create');
+  const canAssign = hasPermission('cxg.cancelaciones.assign');
+  const canGestionar = hasPermission('cxg.cancelaciones.gestionar');
+  const canProcess = hasPermission('cxg.cancelaciones.process');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
@@ -127,6 +151,13 @@ export const CancellationsPage = () => {
     observacion: ''
   });
   const [isGestionSubmitting, setIsGestionSubmitting] = useState(false);
+
+  // Assignment modal state
+  const [isAssignOpen, setIsAssignOpen] = useState(false);
+  const [assignItem, setAssignItem] = useState<Cancellation | null>(null);
+  const [assignTo, setAssignTo] = useState('');
+  const [isAssigning, setIsAssigning] = useState(false);
+  const [systemUsers, setSystemUsers] = useState<SystemUser[]>([]);
 
   // Registration state
   const [formData, setFormData] = useState({
@@ -176,6 +207,8 @@ export const CancellationsPage = () => {
 
   useEffect(() => {
     fetchMotivos();
+    // Load system users for assignment dropdown
+    UsersService.getUsers().then(users => setSystemUsers(users.filter(u => u.is_active))).catch(console.error);
   }, []);
 
   const handleCreate = async () => {
@@ -279,6 +312,41 @@ export const CancellationsPage = () => {
     }
   };
 
+  // ---- Assignment Handler ----
+  const handleOpenAssign = (item: Cancellation) => {
+    setAssignItem(item);
+    setAssignTo('');
+    setIsAssignOpen(true);
+  };
+
+  const handleAssign = async () => {
+    if (!assignItem || !assignTo) return;
+    setIsAssigning(true);
+    try {
+      const selectedUser = systemUsers.find(u => u.full_name === assignTo);
+      await ncService.asignarCancellation(assignItem.id, {
+        asignado_a: assignTo,
+        asignado_por: user?.full_name || user?.username || 'Sistema'
+      });
+
+      await auditService.logAction({
+        UsuarioID: user?.id || '0',
+        UsuarioNombre: user?.username || 'Sistema',
+        Accion: 'ASSIGN',
+        Entidad: 'CANCELACIONES',
+        EntidadID: assignItem.id,
+        Detalle: `Cancelación asignada a ${assignTo} por ${user?.username}`
+      });
+
+      setIsAssignOpen(false);
+      fetchData();
+    } catch (error) {
+      console.error('Error assigning:', error);
+    } finally {
+      setIsAssigning(false);
+    }
+  };
+
   const handleQuickApprove = async (item: Cancellation) => {
     try {
       await ncService.approveCancellation(item.id);
@@ -374,13 +442,15 @@ export const CancellationsPage = () => {
           >
             Exportar
           </SIATCButton>
-          <SIATCButton 
-            variant="primary" 
-            icon={Plus}
-            onClick={() => setIsCreateModalOpen(true)}
-          >
-            Nueva Cancelación
-          </SIATCButton>
+          {canCreate && (
+            <SIATCButton 
+              variant="primary" 
+              icon={Plus}
+              onClick={() => setIsCreateModalOpen(true)}
+            >
+              Nueva Cancelación
+            </SIATCButton>
+          )}
         </div>
       </div>
 
@@ -492,7 +562,7 @@ export const CancellationsPage = () => {
                     </SIATCTableCell>
                     <SIATCTableCell className="text-right" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                       <div className="flex justify-end gap-1">
-                        {(item.estado === 'PENDIENTE' || item.estado === 'EN GESTIÓN') && (
+                        {canProcess && (item.estado === 'PENDIENTE' || item.estado === 'EN GESTIÓN') && (
                           <>
                             <SIATCButton 
                               variant="ghost" 
@@ -500,6 +570,7 @@ export const CancellationsPage = () => {
                               icon={CheckCircle2} 
                               className="text-emerald-500 hover:bg-emerald-50"
                               onClick={() => handleQuickApprove(item)}
+                              title="Aprobar rápido"
                             />
                             <SIATCButton 
                               variant="ghost" 
@@ -507,12 +578,16 @@ export const CancellationsPage = () => {
                               icon={XCircle} 
                               className="text-rose-500 hover:bg-rose-50"
                               onClick={() => handleQuickReject(item)}
+                              title="Rechazar rápido"
                             />
                           </>
                         )}
                         <ActionsMenu 
                           estado={item.estado}
+                          canAssign={canAssign}
+                          canGestionar={canGestionar}
                           onViewDetail={() => handleViewDetail(item.id)}
+                          onAsignar={() => handleOpenAssign(item)}
                           onGestionar={() => handleOpenGestionar(item)}
                         />
                       </div>
@@ -803,6 +878,63 @@ export const CancellationsPage = () => {
               placeholder="Detalle de las acciones realizadas (llamadas, reprogramaciones, etc.)"
             />
           </div>
+        </div>
+      </SIATCModalWrapper>
+
+      {/* ====== MODAL: Asignar Cancelación ====== */}
+      <SIATCModalWrapper
+        isOpen={isAssignOpen}
+        onClose={() => setIsAssignOpen(false)}
+        title="Asignar Cancelación"
+        subtitle={assignItem ? `Ticket #${assignItem.ticket} — ${assignItem.cliente}` : ''}
+        footer={
+          <>
+            <SIATCButton variant="ghost" onClick={() => setIsAssignOpen(false)}>Cancelar</SIATCButton>
+            <SIATCButton 
+              variant="primary" 
+              onClick={handleAssign} 
+              isLoading={isAssigning}
+              disabled={!assignTo}
+            >
+              Asignar Analista
+            </SIATCButton>
+          </>
+        }
+      >
+        <div className="space-y-5">
+          <div className="p-4 rounded-xl bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20">
+            <div className="flex items-center gap-3">
+              <UserPlus className="w-5 h-5 text-violet-500" />
+              <div>
+                <p className="text-sm font-bold text-violet-700 dark:text-violet-400">Asignación de Analista</p>
+                <p className="text-[10px] text-muted-foreground">Seleccione al analista que revisará y validará esta cancelación.</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">
+              Asignar a
+            </label>
+            <select 
+              className={SIATC_THEME.COMPONENTS.INPUT}
+              value={assignTo}
+              onChange={(e) => setAssignTo(e.target.value)}
+            >
+              <option value="">Seleccione un analista...</option>
+              {systemUsers.map(u => (
+                <option key={u.id} value={u.full_name}>{u.full_name} ({u.username})</option>
+              ))}
+            </select>
+          </div>
+
+          {assignItem?.asignado_a && (
+            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-border">
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Asignación Actual</p>
+              <p className="text-sm font-semibold text-foreground">{assignItem.asignado_a}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">por {assignItem.asignado_por} — {assignItem.fecha_asignado ? new Date(assignItem.fecha_asignado).toLocaleString() : ''}</p>
+            </div>
+          )}
         </div>
       </SIATCModalWrapper>
     </div>
