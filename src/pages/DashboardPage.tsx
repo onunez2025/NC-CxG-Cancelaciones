@@ -7,7 +7,6 @@ import {
     DollarSign,
     CheckCircle2,
     Clock,
-    TrendingUp,
     AlertCircle,
     ArrowRight
 } from 'lucide-react';
@@ -15,10 +14,6 @@ import { useAuth } from '../hooks/useAuth';
 import { cn } from '../utils/cn';
 import { ncService } from '../services/ncService';
 import type { Cancellation, CxGNC } from '../services/ncService';
-
-function formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(amount);
-}
 
 export function DashboardPage() {
     const navigate = useNavigate();
@@ -48,11 +43,23 @@ export function DashboardPage() {
         loadData();
     }, []);
 
+    const metrics = useMemo(() => {
+        const pendingCancels = cancellations.filter(c => c.estado === 'PENDIENTE');
+        const pendingDocs = cxgData.filter(d => d.estado === 'PENDIENTE');
         return {
             pendingCancels: pendingCancels.length,
             pendingDocs: pendingDocs.length,
             totalDocs: cancellations.length + cxgData.length
         };
+    }, [cancellations, cxgData]);
+
+    if (isLoading) {
+        return (
+            <div className="flex h-screen items-center justify-center bg-background text-primary">
+                <div className="w-8 h-8 border-4 border-current border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col h-full gap-6 animate-in fade-in duration-500 p-1">
