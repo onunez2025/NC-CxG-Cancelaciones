@@ -76,12 +76,15 @@ router.get('/cancelaciones/:id', async (req: Request, res: Response) => {
                     ISNULL(t.NombreCliente, '') as cliente,
                     ISNULL(t.NombreEquipo, '') as producto,
                     ISNULL(t.Asunto, '') as asunto,
-                    CASE 
-                        WHEN c.Gestionado = 'Si' AND c.Cancelacion_Correcta = 'Si' THEN 'APROBADO'
-                        WHEN c.Gestionado = 'Si' AND c.Cancelacion_Correcta = 'No' THEN 'RECHAZADO'
-                        WHEN c.Gestionado = 'No' OR c.Asignado_a IS NOT NULL THEN 'EN GESTIÓN'
-                        ELSE 'PENDIENTE'
-                    END as estado
+                    c.Apro_Solicitud,
+                    c.Apro_Obs,
+                    c.Apro_Por,
+                    c.Apro_El,
+                    c.Vali_Cliente,
+                    c.Vali_Obs,
+                    c.Vali_Por,
+                    c.Vali_El,
+                    c.Estado_Proceso as estado
                 FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
                 LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] m ON c.Motivo_Cancelacion = m.ID_Cancelados_motivo
@@ -159,12 +162,7 @@ router.get('/cancelaciones', async (req: Request, res: Response) => {
                     c.Asignado_por as asignado_por,
                     c.Asignado_el as fecha_asignado,
                     ISNULL(t.NombreCliente, '') as cliente,
-                    CASE 
-                        WHEN c.Gestionado = 'Si' AND c.Cancelacion_Correcta = 'Si' THEN 'APROBADO'
-                        WHEN c.Gestionado = 'Si' AND c.Cancelacion_Correcta = 'No' THEN 'RECHAZADO'
-                        WHEN c.Gestionado = 'No' OR c.Asignado_a IS NOT NULL THEN 'EN GESTIÓN'
-                        ELSE 'PENDIENTE'
-                    END as estado
+                    c.Estado_Proceso as estado
                 FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
                 LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] m ON c.Motivo_Cancelacion = m.ID_Cancelados_motivo
@@ -224,11 +222,7 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
                     n.Asignado_el,
                     n.Gestionado,
                     n.Observacion_Gestionado,
-                    CASE 
-                        WHEN n.Procesado = 'SI' THEN 'PROCESADO'
-                        WHEN n.Asignado_a IS NOT NULL THEN 'EN GESTIÓN'
-                        ELSE 'PENDIENTE' 
-                    END as estado
+                    n.Estado_Proceso as estado
                 FROM [dbo].[GAC_APP_TB_CXG_NC] n
                 ${whereClause}
                 ORDER BY n.Creado_el DESC
@@ -264,8 +258,8 @@ router.post('/cancelaciones', async (req: Request, res: Response) => {
             .input('autorizador', sql.VarChar, usuario || 'Sistema')
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_CANCELACIONES] 
-                (ID_Cancelados, Ticket, Motivo_Cancelacion, Autorizador_Cancelacion, Generado_el)
-                VALUES (@id, @ticket, @motivo, @autorizador, GETDATE())
+                (ID_Cancelados, Ticket, Motivo_Cancelacion, Autorizador_Cancelacion, Generado_el, Estado_Proceso)
+                VALUES (@id, @ticket, @motivo, @autorizador, GETDATE(), 'REGISTRADO')
             `);
             
         res.status(201).json({ message: 'Cancelación registrada', id });
@@ -303,7 +297,8 @@ router.post('/cancelaciones/:id/gestionar', async (req: Request, res: Response) 
                     Observacion_Gestionado = @observacion,
                     Gestionado_por = @gestionado_por,
                     Gestionado = @gestionado,
-                    Gestionado_el = GETDATE()
+                    Gestionado_el = GETDATE(),
+                    Estado_Proceso = 'CERRADO'
                 WHERE ID_Cancelados = @id
             `);
         res.json({ message: 'Cancelación gestionada correctamente' });
@@ -329,7 +324,8 @@ router.post('/cancelaciones/:id/asignar', async (req: Request, res: Response) =>
                     Asignado_a = @asignado_a,
                     Asignado_por = @asignado_por,
                     Asignado_el = GETDATE(),
-                    Gestionado = 'No'
+                    Gestionado = 'No',
+                    Estado_Proceso = 'ASIGNADO'
                 WHERE ID_Cancelados = @id
             `);
         res.json({ message: 'Cancelación asignada' });
@@ -437,6 +433,87 @@ router.post('/cxg-nc/:id/gestionar', async (req: Request, res: Response) => {
                 WHERE ID_Apro_CxG_NC = @id
             `);
         res.json({ message: 'Solicitud procesada correctamente' });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST Aprobar Solicitud (Supervisor)
+router.post('/cancelaciones/:id/aprobar-solicitud', async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { aprobado, observacion, usuario } = req.body;
+        const pool = await getDbConnection();
+        await pool.request()
+            .input('id', sql.VarChar, id)
+            .input('aprobado', sql.VarChar, aprobado)
+            .input('obs', sql.VarChar, observacion || '')
+            .input('por', sql.VarChar, usuario || '')
+            .query(`
+                UPDATE [dbo].[GAC_APP_TB_CANCELACIONES] 
+                SET 
+                    Apro_Solicitud = @aprobado,
+                    Apro_Obs = @obs,
+                    Apro_Por = @por,
+                    Apro_El = GETDATE(),
+                    Estado_Proceso = CASE WHEN @aprobado = 'APROBADO' THEN 'APROBADO_SUP' ELSE 'CERRADO' END
+                WHERE ID_Cancelados = @id
+            `);
+        res.json({ message: 'Solicitud evaluada correctamente' });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST Validar Cliente (Analista)
+router.post('/cancelaciones/:id/validar-cliente', async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { resultado, observacion, usuario } = req.body;
+        const pool = await getDbConnection();
+        await pool.request()
+            .input('id', sql.VarChar, id)
+            .input('resultado', sql.VarChar, resultado)
+            .input('obs', sql.VarChar, observacion || '')
+            .input('por', sql.VarChar, usuario || '')
+            .query(`
+                UPDATE [dbo].[GAC_APP_TB_CANCELACIONES] 
+                SET 
+                    Vali_Cliente = @resultado,
+                    Vali_Obs = @obs,
+                    Vali_Por = @por,
+                    Vali_El = GETDATE(),
+                    Estado_Proceso = 'VALIDADO'
+                WHERE ID_Cancelados = @id
+            `);
+        res.json({ message: 'Validación de cliente registrada' });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST Validar Cliente CxG-NC
+router.post('/cxg-nc/:id/validar-cliente', async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { resultado, observacion, usuario } = req.body;
+        const pool = await getDbConnection();
+        await pool.request()
+            .input('id', sql.VarChar, id)
+            .input('resultado', sql.VarChar, resultado)
+            .input('obs', sql.VarChar, observacion || '')
+            .input('por', sql.VarChar, usuario || '')
+            .query(`
+                UPDATE [dbo].[GAC_APP_TB_CXG_NC] 
+                SET 
+                    Vali_Cliente = @resultado,
+                    Vali_Obs = @obs,
+                    Vali_Por = @por,
+                    Vali_El = GETDATE(),
+                    Estado_Proceso = 'VALIDADO'
+                WHERE ID_Apro_CxG_NC = @id
+            `);
+        res.json({ message: 'Validación de cliente registrada' });
     } catch (error: any) {
         res.status(500).json({ error: error.message });
     }

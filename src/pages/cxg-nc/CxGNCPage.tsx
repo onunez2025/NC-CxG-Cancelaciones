@@ -9,7 +9,16 @@ import {
   DollarSign,
   Calendar,
   CheckCircle2,
-  XCircle
+  XCircle,
+  Clock,
+  User,
+  Search,
+  MessageSquare,
+  Eye,
+  MoreVertical,
+  AlertTriangle,
+  UserCheck,
+  ClipboardCheck
 } from 'lucide-react';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 import { SIATCButton } from '../../components/siatc/SIATCButton';
@@ -56,6 +65,16 @@ export const CxGNCPage = () => {
   const [isGestionModalOpen, setIsGestionModalOpen] = useState(false);
   const [gestiónObs, setGestiónObs] = useState('');
   const [gestiónResultado, setGestiónResultado] = useState<'Si' | 'No' | ''>('');
+
+  // Detail state
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [detailData, setDetailData] = useState<CxGNC | null>(null);
+  const [isLoadingDetail, setIsLoadingDetail] = useState(false);
+
+  // Validation state
+  const [isValidarClienteOpen, setIsValidarClienteOpen] = useState(false);
+  const [validarForm, setValidarForm] = useState({ resultado: '' as 'REAL' | 'FALSA' | '', observacion: '' });
+  const [isValidarSubmitting, setIsValidarSubmitting] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -211,6 +230,37 @@ export const CxGNCPage = () => {
     }
   };
 
+  const handleValidarCliente = async () => {
+    if (!selectedRecord || !validarForm.resultado) return;
+    setIsValidarSubmitting(true);
+    try {
+      await ncService.validarClienteCxGNC(selectedRecord.id, {
+        resultado: validarForm.resultado as 'REAL' | 'FALSA',
+        observacion: validarForm.observacion,
+        usuario: user?.full_name || user?.username || 'Sistema'
+      });
+      setIsValidarClienteOpen(false);
+      fetchData();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsValidarSubmitting(false);
+    }
+  };
+
+  const handleViewDetail = async (id: string) => {
+    setIsDetailOpen(true);
+    setIsLoadingDetail(true);
+    try {
+      const resp = await ncService.getCxGNCDetail(id);
+      setDetailData(resp);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoadingDetail(false);
+    }
+  };
+
   const hasPermission = (perm: string) => {
     return user?.permissions?.includes(perm as any) || false;
   };
@@ -319,9 +369,11 @@ export const CxGNCPage = () => {
                 onChange={(e) => setStatusFilter(e.target.value as any)}
               >
                 <option value="TODOS">TODOS LOS ESTADOS</option>
-                <option value="PENDIENTE">PENDIENTE por Asignar</option>
-                <option value="EN GESTIÓN">EN GESTIÓN (Analista)</option>
-                <option value="PROCESADO">PROCESADO</option>
+                <option value="REGISTRADO">REGISTRADO</option>
+                <option value="APROBADO_SUP">APROBADO POR SUP.</option>
+                <option value="ASIGNADO">ASIGNADO</option>
+                <option value="VALIDADO">VALIDADO CLIENTE</option>
+                <option value="CERRADO">CERRADO</option>
               </select>
             </div>
             
@@ -388,9 +440,10 @@ export const CxGNCPage = () => {
                     </SIATCTableCell>
                     <SIATCTableCell>
                       <SIATCBadge variant={
-                        item.estado === 'PROCESADO' ? 'success' : 
-                        item.estado === 'EN GESTIÓN' ? 'info' : 
-                        'warning'
+                        item.estado === 'CERRADO' || item.estado === 'PROCESADO' ? 'success' : 
+                        item.estado === 'RECHAZADO' ? 'danger' :
+                        item.estado === 'REGISTRADO' ? 'warning' :
+                        'info'
                       }>
                         {item.estado}
                       </SIATCBadge>
@@ -400,13 +453,28 @@ export const CxGNCPage = () => {
                         <SIATCActionDropdown 
                           actions={[
                             {
+                              label: 'Ver Detalle',
+                              icon: Eye,
+                              onClick: () => handleViewDetail(item.id)
+                            },
+                            {
                               label: 'Asignar Analista',
                               icon: UserPlus,
                               onClick: () => {
                                 setSelectedRecord(item);
                                 setIsAssignModalOpen(true);
                               },
-                              show: item.estado === 'PENDIENTE' && hasPermission('cxg.cxg_nc.assign')
+                              show: item.estado === 'APROBADO_SUP' && hasPermission('cxg.cxg_nc.assign')
+                            },
+                            {
+                              label: 'Validar Cliente',
+                              icon: ClipboardCheck,
+                              onClick: () => {
+                                setSelectedRecord(item);
+                                setValidarForm({ resultado: '', observacion: '' });
+                                setIsValidarClienteOpen(true);
+                              },
+                              show: item.estado === 'ASIGNADO' && hasPermission('cxg.cxg_nc.gestionar')
                             },
                             {
                               label: 'Gestionar Solicitud',
@@ -415,12 +483,7 @@ export const CxGNCPage = () => {
                                 setSelectedRecord(item);
                                 setIsGestionModalOpen(true);
                               },
-                              show: item.estado === 'EN GESTIÓN' && hasPermission('cxg.cxg_nc.gestionar')
-                            },
-                            {
-                              label: 'Ver Detalle',
-                              icon: FileText,
-                              onClick: () => {}
+                              show: item.estado === 'VALIDADO' && hasPermission('cxg.cxg_nc.gestionar')
                             }
                           ]}
                         />
@@ -550,6 +613,194 @@ export const CxGNCPage = () => {
         </div>
       </SIATCModalWrapper>
 
+      <SIATCModalWrapper
+        isOpen={isDetailOpen}
+        onClose={() => { setIsDetailOpen(false); setDetailData(null); }}
+        title="Detalle de Solicitud"
+        subtitle={detailData ? `${detailData.tipo} #${detailData.correlativo}` : 'Cargando...'}
+        size="lg"
+      >
+        {isLoadingDetail ? (
+          <div className="h-48 flex flex-col items-center justify-center gap-3">
+            <Loader2 className="w-8 h-8 text-primary animate-spin" />
+            <p className="text-sm text-muted-foreground">Cargando información...</p>
+          </div>
+        ) : detailData ? (
+          <div className="space-y-6">
+             {/* Process Timeline */}
+             <div className="grid grid-cols-5 gap-2 px-2">
+              {[
+                { key: 'REGISTRADO', label: 'Registro', icon: DollarSign },
+                { key: 'APROBADO_SUP', label: 'Aprobación', icon: UserCheck },
+                { key: 'ASIGNADO', label: 'Asignación', icon: UserPlus },
+                { key: 'VALIDADO', label: 'Validación', icon: ClipboardCheck },
+                { key: 'CERRADO', label: 'Cierre', icon: CheckCircle2 }
+              ].map((step, idx) => {
+                const stepOrder = ['REGISTRADO', 'APROBADO_SUP', 'ASIGNADO', 'VALIDADO', 'CERRADO', 'PROCESADO'];
+                const currentIdx = stepOrder.indexOf(detailData.estado === 'PROCESADO' ? 'CERRADO' : detailData.estado);
+                const isCompleted = currentIdx >= idx;
+                const isActive = currentIdx === idx;
+
+                return (
+                  <div key={step.key} className="flex flex-col items-center gap-2">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${
+                      isCompleted ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 
+                      'bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-800 dark:border-slate-700'
+                    } ${isActive ? 'ring-4 ring-primary/10 scale-110' : ''}`}>
+                      <step.icon className="w-4 h-4" />
+                    </div>
+                    <span className={`text-[9px] font-black uppercase tracking-tighter text-center leading-none ${
+                       isCompleted ? 'text-primary' : 'text-slate-400'
+                    }`}>
+                      {step.label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">1. Registro & Ticket</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase">Tipo</span>
+                      <SIATCBadge variant={detailData.tipo === 'NC' ? 'warning' : 'info'}>{detailData.tipo}</SIATCBadge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase">Ticket Referencia</span>
+                      <span className="text-xs font-black">#{detailData.ticket}</span>
+                    </div>
+                    <div className="flex justify-between items-start">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase">Cliente</span>
+                      <span className="text-xs font-bold text-right italic">{detailData.cliente}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase">Fecha Registro</span>
+                      <span className="text-xs">{new Date(detailData.fecha).toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">2. Auditoría de Proceso</h3>
+                  <div className="space-y-2">
+                    <div className="text-[10px] uppercase text-muted-foreground font-bold">Estado Actual</div>
+                    <SIATCBadge className="w-full justify-center" variant={detailData.estado === 'PROCESADO' ? 'success' : 'info'}>{detailData.estado}</SIATCBadge>
+                    
+                    <div className="mt-4 space-y-2">
+                      <AuditStep label="Aprobación Sup." user={detailData.apro_por} date={detailData.apro_el} status={detailData.apro_solicitud} />
+                      <AuditStep label="Validación Cliente" user={detailData.vali_por} date={detailData.vali_el} status={detailData.vali_cliente} />
+                      <AuditStep label="Cierre Final" user={detailData.gestionado_por} date={detailData.fecha_gestionado} status={detailData.resultado === 'Si' ? 'PROCESADO' : detailData.resultado === 'No' ? 'RECHAZADO' : null} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 h-full">
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">3. Observaciones de Gestión</h3>
+                  <div className="space-y-4">
+                    {detailData.apro_obs && (
+                      <div>
+                        <div className="text-[9px] font-black uppercase text-amber-600 mb-1">Obs. Aprobación</div>
+                        <p className="text-xs p-3 bg-amber-50 rounded-lg border border-amber-100 italic">"{detailData.apro_obs}"</p>
+                      </div>
+                    )}
+                    {detailData.vali_obs && (
+                      <div>
+                        <div className="text-[9px] font-black uppercase text-blue-600 mb-1">Obs. Validación Cliente</div>
+                        <p className="text-xs p-3 bg-blue-50 rounded-lg border border-blue-100 italic">"{detailData.vali_obs}"</p>
+                      </div>
+                    )}
+                    {detailData.observacion && (
+                      <div>
+                        <div className="text-[9px] font-black uppercase text-emerald-600 mb-1">Obs. Cierre</div>
+                        <p className="text-xs p-3 bg-emerald-50 rounded-lg border border-emerald-100 italic">"{detailData.observacion}"</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="h-48 flex items-center justify-center">
+            <p className="text-sm text-muted-foreground font-bold">No se pudo cargar el detalle.</p>
+          </div>
+        )}
+      </SIATCModalWrapper>
+
+       {/* Validar Cliente Modal */}
+       <SIATCModalWrapper
+        isOpen={isValidarClienteOpen}
+        onClose={() => setIsValidarClienteOpen(false)}
+        title="Validación con Cliente"
+        subtitle={`Confirme si el motivo de la solicitud es real conversando con el cliente.`}
+        footer={
+          <>
+            <SIATCButton variant="ghost" onClick={() => setIsValidarClienteOpen(false)}>Cancelar</SIATCButton>
+            <SIATCButton 
+              variant="primary" 
+              onClick={handleValidarCliente} 
+              isLoading={isValidarSubmitting}
+              disabled={!validarForm.resultado}
+            >
+              Confirmar Validación
+            </SIATCButton>
+          </>
+        }
+      >
+        <div className="space-y-4">
+           <div className="p-4 bg-muted/30 rounded-xl border border-border/50">
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Resumen del Documento</p>
+            <p className="text-sm font-bold">{selectedRecord?.tipo} #{selectedRecord?.correlativo}</p>
+            <p className="text-xs text-muted-foreground">Cliente: {selectedRecord?.cliente}</p>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-3 block tracking-widest pl-4 font-bold">¿El cliente confirma el motivo?</label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setValidarForm({ ...validarForm, resultado: 'REAL' })}
+                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all font-bold text-sm ${
+                  validarForm.resultado === 'REAL'
+                    ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-lg shadow-blue-500/10'
+                    : 'border-border text-muted-foreground hover:bg-muted/50'
+                }`}
+              >
+                <CheckCircle2 className="w-5 h-5" />
+                SÍ, MOTIVO REAL
+              </button>
+              <button
+                type="button"
+                onClick={() => setValidarForm({ ...validarForm, resultado: 'FALSA' })}
+                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all font-bold text-sm ${
+                  validarForm.resultado === 'FALSA'
+                    ? 'border-rose-500 bg-rose-50 text-rose-700 shadow-lg shadow-rose-500/10'
+                    : 'border-border text-muted-foreground hover:bg-muted/50'
+                }`}
+              >
+                <XCircle className="w-5 h-5" />
+                MOTIVO NO REAL
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Notas de la llamada</label>
+            <textarea 
+              className={`${SIATC_THEME.COMPONENTS.INPUT} h-24 pt-2 resize-none`}
+              placeholder="Detalle de lo conversado con el cliente..."
+              value={validarForm.observacion}
+              onChange={(e) => setValidarForm({...validarForm, observacion: e.target.value})}
+            />
+          </div>
+        </div>
+      </SIATCModalWrapper>
+
       {/* Gestionar Modal */}
       <SIATCModalWrapper
         isOpen={isGestionModalOpen}
@@ -620,6 +871,21 @@ export const CxGNCPage = () => {
           </div>
         </div>
       </SIATCModalWrapper>
+    </div>
+  );
+};
+
+const AuditStep = ({ label, user, date, status }: { label: string, user?: string | null, date?: string | null, status?: string | null }) => {
+  if (!user && !status) return <div className="p-2 rounded border border-dashed border-border/50 text-[10px] text-muted-foreground text-center font-bold">{label} - Pendiente</div>;
+  
+  return (
+    <div className="p-2 bg-white dark:bg-slate-900 border border-border shadow-sm rounded-lg flex items-center justify-between">
+      <div>
+        <div className="text-[9px] font-black uppercase text-primary leading-none mb-1">{label}</div>
+        <div className="text-[10px] font-bold text-foreground">{user || '—'}</div>
+        <div className="text-[9px] text-muted-foreground italic">{date ? new Date(date).toLocaleString() : ''}</div>
+      </div>
+      <SIATCBadge variant={status === 'RECHAZADO' || status === 'FALSA' ? 'danger' : 'success'} className="text-[8px] h-5 px-1.5">{status}</SIATCBadge>
     </div>
   );
 };

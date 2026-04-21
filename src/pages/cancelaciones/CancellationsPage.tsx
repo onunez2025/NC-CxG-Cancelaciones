@@ -38,18 +38,25 @@ import type { User as SystemUser } from '../../types';
 // ---- Dropdown Menu Component ----
 const ActionsMenu = ({ 
   onViewDetail, 
-  onGestionar, 
+  onEvaluar,
   onAsignar,
+  onValidar,
+  onGestionar, 
   estado,
-  canAssign,
-  canGestionar
+  permissions
 }: { 
   onViewDetail: () => void; 
-  onGestionar: () => void; 
+  onEvaluar: () => void;
   onAsignar: () => void;
+  onValidar: () => void;
+  onGestionar: () => void; 
   estado: string;
-  canAssign: boolean;
-  canGestionar: boolean;
+  permissions: {
+    canEvaluar: boolean;
+    canAssign: boolean;
+    canValidar: boolean;
+    canGestionar: boolean;
+  };
 }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -79,22 +86,44 @@ const ActionsMenu = ({
             <Eye className="w-4 h-4 text-blue-500" />
             Ver Detalle
           </button>
-          {canAssign && (estado === 'PENDIENTE') && (
+          
+          {permissions.canEvaluar && estado === 'REGISTRADO' && (
+            <button 
+              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              onClick={() => { onEvaluar(); setOpen(false); }}
+            >
+              <UserCheck className="w-4 h-4 text-emerald-500" />
+              Evaluar Solicitud
+            </button>
+          )}
+
+          {permissions.canAssign && estado === 'APROBADO_SUP' && (
             <button 
               className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               onClick={() => { onAsignar(); setOpen(false); }}
             >
               <UserPlus className="w-4 h-4 text-violet-500" />
-              Asignar
+              Asignar Analista
             </button>
           )}
-          {canGestionar && (estado === 'EN GESTIÓN') && (
+
+          {permissions.canValidar && estado === 'ASIGNADO' && (
+            <button 
+              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              onClick={() => { onValidar(); setOpen(false); }}
+            >
+              <ClipboardCheck className="w-4 h-4 text-blue-500" />
+              Validar Cliente
+            </button>
+          )}
+
+          {permissions.canGestionar && estado === 'VALIDADO' && (
             <button 
               className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               onClick={() => { onGestionar(); setOpen(false); }}
             >
-              <ClipboardCheck className="w-4 h-4 text-amber-500" />
-              Gestionar
+              <CheckCircle2 className="w-4 h-4 text-amber-500" />
+              Gestionar Cierre
             </button>
           )}
         </div>
@@ -158,6 +187,17 @@ export const CancellationsPage = () => {
   const [assignTo, setAssignTo] = useState('');
   const [isAssigning, setIsAssigning] = useState(false);
   const [systemUsers, setSystemUsers] = useState<SystemUser[]>([]);
+
+  // NEW MODALS
+  const [isAprobarSolicitudOpen, setIsAprobarSolicitudOpen] = useState(false);
+  const [aprobarSolicitudItem, setAprobarSolicitudItem] = useState<Cancellation | null>(null);
+  const [aprobarForm, setAprobarForm] = useState({ aprobado: '' as 'APROBADO' | 'RECHAZADO' | '', observacion: '' });
+  const [isAprobarSubmitting, setIsAprobarSubmitting] = useState(false);
+
+  const [isValidarClienteOpen, setIsValidarClienteOpen] = useState(false);
+  const [validarClienteItem, setValidarClienteItem] = useState<Cancellation | null>(null);
+  const [validarForm, setValidarForm] = useState({ resultado: '' as 'REAL' | 'FALSA' | '', observacion: '' });
+  const [isValidarSubmitting, setIsValidarSubmitting] = useState(false);
 
   // Registration state
   const [formData, setFormData] = useState({
@@ -338,6 +378,42 @@ export const CancellationsPage = () => {
     }
   };
 
+  const handleAprobarSolicitud = async () => {
+    if (!aprobarSolicitudItem || !aprobarForm.aprobado) return;
+    setIsAprobarSubmitting(true);
+    try {
+      await ncService.aprobarSolicitudCancellation(aprobarSolicitudItem.id, {
+        aprobado: aprobarForm.aprobado as 'APROBADO' | 'RECHAZADO',
+        observacion: aprobarForm.observacion,
+        usuario: user?.full_name || user?.username || 'Sistema'
+      });
+      setIsAprobarSolicitudOpen(false);
+      fetchData();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsAprobarSubmitting(false);
+    }
+  };
+
+  const handleValidarCliente = async () => {
+    if (!validarClienteItem || !validarForm.resultado) return;
+    setIsValidarSubmitting(true);
+    try {
+      await ncService.validarClienteCancellation(validarClienteItem.id, {
+        resultado: validarForm.resultado as 'REAL' | 'FALSA',
+        observacion: validarForm.observacion,
+        usuario: user?.full_name || user?.username || 'Sistema'
+      });
+      setIsValidarClienteOpen(false);
+      fetchData();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsValidarSubmitting(false);
+    }
+  };
+
   const handleQuickApprove = async (item: Cancellation) => {
     try {
       await ncService.approveCancellation(item.id);
@@ -357,9 +433,14 @@ export const CancellationsPage = () => {
 
   const getEstadoBadgeVariant = (estado: string) => {
     switch (estado) {
+      case 'CERRADO':
       case 'APROBADO': return 'success';
       case 'RECHAZADO': return 'danger';
+      case 'APROBADO_SUP':
+      case 'ASIGNADO':
+      case 'VALIDADO':
       case 'EN GESTIÓN': return 'info';
+      case 'REGISTRADO':
       case 'PENDIENTE': 
       default: return 'warning';
     }
@@ -451,10 +532,11 @@ export const CancellationsPage = () => {
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
                 <option value="TODOS">TODOS LOS ESTADOS</option>
-                <option value="PENDIENTE">PENDIENTE</option>
-                <option value="EN GESTION">EN GESTIÓN</option>
-                <option value="APROBADO">APROBADO</option>
-                <option value="RECHAZADO">RECHAZADO</option>
+                <option value="REGISTRADO">REGISTRADO</option>
+                <option value="APROBADO_SUP">APROBADO POR SUP.</option>
+                <option value="ASIGNADO">ASIGNADO</option>
+                <option value="VALIDADO">VALIDADO CLIENTE</option>
+                <option value="CERRADO">CERRADO</option>
               </select>
             </div>
             
@@ -536,22 +618,26 @@ export const CancellationsPage = () => {
                     </SIATCTableCell>
                     <SIATCTableCell className="text-right" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                       <div className="flex justify-end gap-1">
-                        {canProcess && item.estado === 'EN GESTIÓN' && (
-                          <SIATCButton 
-                            variant="ghost" 
-                            size="sm" 
-                            icon={CheckCircle2} 
-                            className="text-emerald-500 hover:bg-emerald-50"
-                            onClick={() => handleQuickApprove(item)}
-                            title="Aprobar rápido"
-                          />
-                        )}
                         <ActionsMenu 
                           estado={item.estado}
-                          canAssign={canAssign}
-                          canGestionar={canGestionar}
+                          permissions={{
+                            canEvaluar: canAssign, // Supervisors usually
+                            canAssign: canAssign,
+                            canValidar: canGestionar, // Analysts
+                            canGestionar: canGestionar
+                          }}
                           onViewDetail={() => handleViewDetail(item.id)}
+                          onEvaluar={() => {
+                            setAprobarSolicitudItem(item);
+                            setAprobarForm({ aprobado: '', observacion: '' });
+                            setIsAprobarSolicitudOpen(true);
+                          }}
                           onAsignar={() => handleOpenAssign(item)}
+                          onValidar={() => {
+                            setValidarClienteItem(item);
+                            setValidarForm({ resultado: '', observacion: '' });
+                            setIsValidarClienteOpen(true);
+                          }}
                           onGestionar={() => handleOpenGestionar(item)}
                         />
                       </div>
@@ -665,82 +751,261 @@ export const CancellationsPage = () => {
             <p className="text-sm text-muted-foreground">Cargando información...</p>
           </div>
         ) : detailData ? (
-          <div className="space-y-1">
+          <div className="space-y-6">
+            {/* Process Timeline / Status Banner */}
+            <div className="grid grid-cols-5 gap-2 px-2">
+              {[
+                { key: 'REGISTRADO', label: 'Registro', icon: Plus },
+                { key: 'APROBADO_SUP', label: 'Aprobación', icon: UserCheck },
+                { key: 'ASIGNADO', label: 'Asignación', icon: UserPlus },
+                { key: 'VALIDADO', label: 'Validación', icon: ClipboardCheck },
+                { key: 'CERRADO', label: 'Cierre', icon: CheckCircle2 }
+              ].map((step, idx) => {
+                const stepOrder = ['REGISTRADO', 'APROBADO_SUP', 'ASIGNADO', 'VALIDADO', 'CERRADO'];
+                const currentIdx = stepOrder.indexOf(detailData.estado);
+                const isCompleted = currentIdx >= idx;
+                const isActive = currentIdx === idx;
+
+                return (
+                  <div key={step.key} className="flex flex-col items-center gap-2">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${
+                      isCompleted ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 
+                      'bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-800 dark:border-slate-700'
+                    } ${isActive ? 'ring-4 ring-primary/10 scale-110' : ''}`}>
+                      <step.icon className="w-4 h-4" />
+                    </div>
+                    <span className={`text-[9px] font-black uppercase tracking-tighter text-center leading-none ${
+                       isCompleted ? 'text-primary' : 'text-slate-400'
+                    }`}>
+                      {step.label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
             {/* Status Banner */}
             <div className={`flex items-center justify-between p-4 rounded-xl border ${
-              detailData.estado === 'APROBADO' ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20' :
+              detailData.estado === 'CERRADO' ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20' :
               detailData.estado === 'RECHAZADO' ? 'bg-rose-50 border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/20' :
-              detailData.estado === 'EN GESTIÓN' ? 'bg-blue-50 border-blue-200 dark:bg-blue-500/10 dark:border-blue-500/20' :
-              'bg-amber-50 border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/20'
+              'bg-blue-50 border-blue-200 dark:bg-blue-500/10 dark:border-blue-500/20'
             }`}>
               <div className="flex items-center gap-3">
-                {detailData.estado === 'APROBADO' ? <CheckCircle2 className="w-5 h-5 text-emerald-500" /> :
+                {detailData.estado === 'CERRADO' ? <CheckCircle2 className="w-5 h-5 text-emerald-500" /> :
                  detailData.estado === 'RECHAZADO' ? <XCircle className="w-5 h-5 text-rose-500" /> :
-                 detailData.estado === 'EN GESTIÓN' ? <Loader2 className="w-5 h-5 text-blue-500" /> :
-                 <AlertTriangle className="w-5 h-5 text-amber-500" />}
+                 <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />}
                 <div>
                   <p className="text-sm font-bold">{detailData.estado}</p>
                   <p className="text-[10px] text-muted-foreground">
-                    {detailData.cancelacion_correcta === 'Si' ? 'Cancelación validada como correcta' : 
-                     detailData.cancelacion_correcta === 'No' ? 'Cancelación marcada como incorrecta' :
-                     'Pendiente de revisión'}
+                    {detailData.estado === 'CERRADO' ? 'Gestión finalizada correctamente' : 
+                     detailData.estado === 'REGISTRADO' ? 'Pendiente de aprobación inicial' :
+                     'En proceso de gestión operativa'}
                   </p>
                 </div>
               </div>
               <SIATCBadge variant={getEstadoBadgeVariant(detailData.estado)}>{detailData.estado}</SIATCBadge>
             </div>
 
-            {/* Info Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 divide-y md:divide-y-0 divide-border/50">
-              <div className="space-y-0 divide-y divide-border/30">
-                <DetailRow icon={Search} label="Ticket FSM" value={detailData.ticket} />
-                <DetailRow icon={User} label="Cliente" value={detailData.cliente} />
-                <DetailRow icon={AlertTriangle} label="Motivo de Cancelación" value={detailData.motivo_cancelacion_texto} />
-                <DetailRow icon={UserCheck} label="Autorizador" value={detailData.autorizador} />
-                <DetailRow icon={Clock} label="Fecha de Creación" value={detailData.fecha_generado ? new Date(detailData.fecha_generado).toLocaleString() : null} />
+            {/* Info Grid - Modern 3 Columns for larger view */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Sección: Datos de Solicitud */}
+              <div className="space-y-4">
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">1. Registro & Aprobación</h3>
+                  <div className="space-y-1 divide-y divide-slate-100 dark:divide-slate-800">
+                    <DetailRow icon={Search} label="Ticket FSM" value={detailData.ticket} />
+                    <DetailRow icon={User} label="Cliente" value={detailData.cliente} />
+                    <DetailRow icon={AlertTriangle} label="Motivo Inicial" value={detailData.motivo_cancelacion_texto} />
+                    <DetailRow icon={UserCheck} label="Registrado Por" value={`${detailData.autorizador} (${detailData.fecha_generado ? new Date(detailData.fecha_generado).toLocaleString() : ''})`} />
+                    <DetailRow icon={CheckCircle2} label="Aprobación Sup." value={detailData.apro_solicitud} />
+                    {detailData.apro_por && (
+                      <DetailRow icon={User} label="Evaluado Por" value={`${detailData.apro_por} (${detailData.apro_el ? new Date(detailData.apro_el).toLocaleString() : ''})`} />
+                    )}
+                  </div>
+                </div>
+
+                {/* Sección: Asignación & Validación */}
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">2. Operación & Validación</h3>
+                  <div className="space-y-1 divide-y divide-slate-100 dark:divide-slate-800">
+                    <DetailRow icon={UserPlus} label="Asignado A" value={detailData.asignado_a} />
+                    <DetailRow icon={UserCheck} label="Asignado Por" value={`${detailData.asignado_por} (${detailData.fecha_asignado ? new Date(detailData.fecha_asignado).toLocaleString() : ''})`} />
+                    <DetailRow icon={ClipboardCheck} label="Validación Cliente" value={detailData.vali_cliente} />
+                    {detailData.vali_por && (
+                      <DetailRow icon={User} label="Validado Por" value={`${detailData.vali_por} (${detailData.vali_el ? new Date(detailData.vali_el).toLocaleString() : ''})`} />
+                    )}
+                  </div>
+                </div>
               </div>
-              <div className="space-y-0 divide-y divide-border/30">
-                <DetailRow icon={User} label="Asignado a" value={detailData.asignado_a} />
-                <DetailRow icon={UserCheck} label="Asignado por" value={detailData.asignado_por} />
-                <DetailRow icon={Clock} label="Fecha Asignación" value={detailData.fecha_asignado ? new Date(detailData.fecha_asignado).toLocaleString() : null} />
-                <DetailRow icon={User} label="Gestionado por" value={detailData.gestionado_por} />
-                <DetailRow icon={Clock} label="Fecha Gestión" value={detailData.fecha_gestionado ? new Date(detailData.fecha_gestionado).toLocaleString() : null} />
+
+              {/* Sección: Cierre & Notas */}
+              <div className="space-y-4">
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">3. Cierre & Resultado</h3>
+                  <div className="space-y-1 divide-y divide-slate-100 dark:divide-slate-800">
+                    <DetailRow icon={CheckCircle2} label="Resultado" value={detailData.cancelacion_correcta === 'Si' ? 'PROCEDE' : 'NO PROCEDE'} />
+                    <DetailRow icon={User} label="Cerrado Por" value={`${detailData.gestionado_por || '—'} (${detailData.fecha_gestionado ? new Date(detailData.fecha_gestionado).toLocaleString() : ''})`} />
+                    {detailData.motivo_correcto_texto && (
+                      <DetailRow icon={AlertTriangle} label="Motivo Real" value={detailData.motivo_correcto_texto} className="text-rose-600" />
+                    )}
+                  </div>
+                </div>
+
+                {/* Observaciones Agrupadas */}
+                <div className="space-y-3">
+                  {detailData.apro_obs && (
+                    <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-500/5 border border-amber-200/50">
+                      <p className="text-[9px] font-black uppercase tracking-wider text-amber-600 mb-1">OBS. APROBACIÓN</p>
+                      <p className="text-xs font-medium">{detailData.apro_obs}</p>
+                    </div>
+                  )}
+                  {detailData.vali_obs && (
+                    <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-500/5 border border-blue-200/50">
+                      <p className="text-[9px] font-black uppercase tracking-wider text-blue-600 mb-1">OBS. VALIDACIÓN CLIENTE</p>
+                      <p className="text-xs font-medium">{detailData.vali_obs}</p>
+                    </div>
+                  )}
+                  {detailData.observacion && (
+                    <div className="p-4 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                      <p className="text-[9px] font-black uppercase tracking-wider text-slate-500 mb-1">OBS. CIERRE FINAL</p>
+                      <p className="text-xs font-medium">{detailData.observacion}</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-
-            {/* Motivo Correcto (si fue rechazado) */}
-            {detailData.motivo_correcto_texto && (
-              <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20">
-                <p className="text-[10px] font-black uppercase tracking-widest text-rose-600 dark:text-rose-400 mb-1">Motivo Correcto (Corrección)</p>
-                <p className="text-sm font-semibold text-rose-700 dark:text-rose-300">{detailData.motivo_correcto_texto}</p>
-              </div>
-            )}
-
-            {/* Observación */}
-            {detailData.observacion && (
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-border">
-                <div className="flex items-center gap-2 mb-2">
-                  <MessageSquare className="w-4 h-4 text-muted-foreground" />
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Observación de Gestión</p>
-                </div>
-                <p className="text-sm font-medium text-foreground whitespace-pre-wrap">{detailData.observacion}</p>
-              </div>
-            )}
-
-            {/* Producto / Asunto del Ticket */}
-            {(detailData.producto || detailData.asunto) && (
-              <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20">
-                <p className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-2">Información del Ticket FSM</p>
-                {detailData.producto && <p className="text-sm font-medium text-foreground">Producto: {detailData.producto}</p>}
-                {detailData.asunto && <p className="text-sm font-medium text-muted-foreground mt-1">Asunto: {detailData.asunto}</p>}
-              </div>
-            )}
           </div>
         ) : (
           <div className="h-48 flex items-center justify-center">
             <p className="text-sm text-muted-foreground">No se pudo cargar la información.</p>
           </div>
         )}
+      </SIATCModalWrapper>
+
+      {/* ====== MODAL: Aprobar Solicitud (Supervisor) ====== */}
+      <SIATCModalWrapper
+        isOpen={isAprobarSolicitudOpen}
+        onClose={() => setIsAprobarSolicitudOpen(false)}
+        title="Evaluación de Solicitud"
+        subtitle={aprobarSolicitudItem ? `Ticket #${aprobarSolicitudItem.ticket} — ${aprobarSolicitudItem.cliente}` : ''}
+        footer={
+          <>
+            <SIATCButton variant="ghost" onClick={() => setIsAprobarSolicitudOpen(false)}>Cancelar</SIATCButton>
+            <SIATCButton 
+              variant="primary" 
+              onClick={handleAprobarSolicitud} 
+              isLoading={isAprobarSubmitting}
+              disabled={!aprobarForm.aprobado}
+            >
+              Confirmar Evaluación
+            </SIATCButton>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-3 block tracking-widest pl-4">¿La solicitud de cancelación procede?</label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setAprobarForm({ ...aprobarForm, aprobado: 'APROBADO' })}
+                className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                  aprobarForm.aprobado === 'APROBADO'
+                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10'
+                    : 'border-slate-100 dark:border-slate-800 text-slate-400'
+                }`}
+              >
+                <CheckCircle2 className="w-6 h-6" />
+                <span className="text-xs font-bold">APROBAR</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setAprobarForm({ ...aprobarForm, aprobado: 'RECHAZADO' })}
+                className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                  aprobarForm.aprobado === 'RECHAZADO'
+                    ? 'border-rose-500 bg-rose-50 text-rose-700 dark:bg-rose-500/10'
+                    : 'border-slate-100 dark:border-slate-800 text-slate-400'
+                }`}
+              >
+                <XCircle className="w-6 h-6" />
+                <span className="text-xs font-bold">RECHAZAR</span>
+              </button>
+            </div>
+          </div>
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Observaciones</label>
+            <textarea 
+              className={SIATC_THEME.COMPONENTS.INPUT}
+              rows={3}
+              placeholder="¿Por qué se aprueba o rechaza esta solicitud? (Temas varios, error humano, etc.)"
+              value={aprobarForm.observacion}
+              onChange={(e) => setAprobarForm({...aprobarForm, observacion: e.target.value})}
+            />
+          </div>
+        </div>
+      </SIATCModalWrapper>
+
+      {/* ====== MODAL: Validar Cliente (Analista) ====== */}
+      <SIATCModalWrapper
+        isOpen={isValidarClienteOpen}
+        onClose={() => setIsValidarClienteOpen(false)}
+        title="Validación con Cliente"
+        subtitle={validarClienteItem ? `Ticket #${validarClienteItem.ticket} — ${validarClienteItem.cliente}` : ''}
+        footer={
+          <>
+            <SIATCButton variant="ghost" onClick={() => setIsValidarClienteOpen(false)}>Cancelar</SIATCButton>
+            <SIATCButton 
+              variant="primary" 
+              onClick={handleValidarCliente} 
+              isLoading={isValidarSubmitting}
+              disabled={!validarForm.resultado}
+            >
+              Guardar Validación
+            </SIATCButton>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-3 block tracking-widest pl-4">¿El cliente confirma el motivo?</label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setValidarForm({ ...validarForm, resultado: 'REAL' })}
+                className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                  validarForm.resultado === 'REAL'
+                    ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-500/10'
+                    : 'border-slate-100 dark:border-slate-800 text-slate-400'
+                }`}
+              >
+                <CheckCircle2 className="w-6 h-6" />
+                <span className="text-xs font-bold">MOTIVO REAL</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setValidarForm({ ...validarForm, resultado: 'FALSA' })}
+                className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                  validarForm.resultado === 'FALSA'
+                    ? 'border-rose-500 bg-rose-50 text-rose-700 dark:bg-rose-500/10'
+                    : 'border-slate-100 dark:border-slate-800 text-slate-400'
+                }`}
+              >
+                <XCircle className="w-6 h-6" />
+                <span className="text-xs font-bold">MOTIVO FALSO</span>
+              </button>
+            </div>
+          </div>
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Notas de la llamada</label>
+            <textarea 
+              className={SIATC_THEME.COMPONENTS.INPUT}
+              rows={3}
+              placeholder="Detalle de lo conversado con el cliente..."
+              value={validarForm.observacion}
+              onChange={(e) => setValidarForm({...validarForm, observacion: e.target.value})}
+            />
+          </div>
+        </div>
       </SIATCModalWrapper>
 
       {/* ====== MODAL: Gestionar Cancelación ====== */}

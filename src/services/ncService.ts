@@ -16,7 +16,15 @@ export interface Cancellation {
     asignado_por: string;
     fecha_asignado: string | null;
     cliente: string;
-    estado: 'PENDIENTE' | 'EN GESTIÓN' | 'APROBADO' | 'RECHAZADO';
+    estado: 'REGISTRADO' | 'APROBADO_SUP' | 'ASIGNADO' | 'VALIDADO' | 'CERRADO' | 'RECHAZADO';
+    apro_solicitud?: 'APROBADO' | 'RECHAZADO' | 'PENDIENTE';
+    apro_obs?: string;
+    apro_por?: string;
+    apro_el?: string;
+    vali_cliente?: 'REAL' | 'FALSA' | 'PENDIENTE';
+    vali_obs?: string;
+    vali_por?: string;
+    vali_el?: string;
 }
 
 export interface CancellationDetail extends Cancellation {
@@ -33,7 +41,7 @@ export interface CxGNC {
     correlativo: string;
     fecha: string;
     cliente: string;
-    estado: 'PENDIENTE' | 'EN GESTIÓN' | 'PROCESADO';
+    estado: 'REGISTRADO' | 'APROBADO_SUP' | 'ASIGNADO' | 'VALIDADO' | 'CERRADO';
     ticket?: string;
     observacion?: string;
     asignado_a?: string;
@@ -41,6 +49,10 @@ export interface CxGNC {
     fecha_asignado?: string;
     gestionado?: string;
     observacion_gestionado?: string;
+    vali_cliente?: 'REAL' | 'FALSA' | 'PENDIENTE';
+    vali_obs?: string;
+    vali_por?: string;
+    vali_el?: string;
 }
 
 export interface TicketInfo {
@@ -197,5 +209,29 @@ export const ncService = {
         const response = await apiClient(`${API_BASE_URL}/cancelaciones/motivos`);
         if (!response.ok) throw new Error('Error al obtener motivos de cancelación');
         return response.json();
+    },
+
+    async aprobarSolicitudCancellation(id: string, data: { aprobado: 'APROBADO' | 'RECHAZADO'; observacion: string; usuario: string }): Promise<void> {
+        const response = await apiClient(`${API_BASE_URL}/cancelaciones/${id}/aprobar-solicitud`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Error al evaluar solicitud');
+    },
+
+    async validarClienteCancellation(id: string, data: { resultado: 'REAL' | 'FALSA'; observacion: string; usuario: string }): Promise<void> {
+        const response = await apiClient(`${API_BASE_URL}/cancelaciones/${id}/validar-cliente`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Error al validar cliente');
+    },
+
+    async validarClienteCxGNC(id: string, data: { resultado: 'REAL' | 'FALSA'; observacion: string; usuario: string }): Promise<void> {
+        const response = await apiClient(`${API_BASE_URL}/cxg-nc/${id}/validar-cliente`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Error al validar cliente');
     }
 };
