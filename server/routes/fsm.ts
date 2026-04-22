@@ -66,9 +66,11 @@ router.get('/tracking', async (req: Request, res: Response) => {
                 t.Celular1 as celular1,
                 t.Celular2 as celular2,
                 t.ComentarioProgramador as coment_prog,
-                t.ComentarioTecnico as coment_tecnico
+                t.ComentarioTecnico as coment_tecnico,
+                ts.Descripcion as tipo_servicio
             FROM [SIATC].[Dashboard_FSM] t
             LEFT JOIN LatestRango lr ON TRIM(t.Ticket) = TRIM(lr.ID_Ticket) AND lr.rn = 1
+            LEFT JOIN [SIATC].[FSM_TipoServicio] ts ON t.IdServicio = ts.Id
             ${whereClause}
             ORDER BY 
                 t.FechaVisita DESC, 

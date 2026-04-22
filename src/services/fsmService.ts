@@ -25,6 +25,7 @@ export interface FSMTracking {
     celular2: string | null;
     coment_prog: string | null;
     coment_tecnico: string | null;
+    tipo_servicio: string | null;
 }
 
 export const fsmService = {

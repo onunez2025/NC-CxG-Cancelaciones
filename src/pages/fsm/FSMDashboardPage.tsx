@@ -231,10 +231,15 @@ export const FSMDashboardPage = () => {
                   >
                     <SIATCTableCell>
                       <div className="flex flex-col">
-                        <span className={`${SIATC_THEME.TYPOGRAPHY.TINY_MONO} group-hover:text-primary transition-colors`}>#{item.ticket}</span>
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <Calendar className="w-3 h-3 text-muted-foreground" />
-                          <span className="text-[10px] font-bold text-muted-foreground">
+                        <span className={`${SIATC_THEME.TYPOGRAPHY.TINY_MONO} group-hover:text-primary transition-colors font-black`}>#{item.ticket}</span>
+                        {item.tipo_servicio && (
+                          <span className="text-[9px] font-black text-primary/80 uppercase truncate max-w-[120px] leading-tight">
+                            {item.tipo_servicio}
+                          </span>
+                        )}
+                        <div className="flex items-center gap-1.5 mt-1 border-t border-slate-100 pt-1">
+                          <Calendar className="w-3 h-3 text-muted-foreground/60" />
+                          <span className="text-[10px] font-bold text-muted-foreground/80">
                             {new Date(item.fecha_visita).toLocaleDateString()}
                           </span>
                         </div>

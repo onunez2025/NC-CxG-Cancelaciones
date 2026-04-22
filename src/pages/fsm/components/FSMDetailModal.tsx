@@ -100,6 +100,7 @@ export const FSMDetailModal: React.FC<FSMDetailModalProps> = ({
               <InfoItem label="Cód. Externo" value={ticket.cod_equipo} />
               <InfoItem label="ID FSM" value={ticket.id_equipo} />
             </div>
+            <InfoItem label="Tipo de Servicio" value={ticket.tipo_servicio} icon={Settings} />
             <div className="flex flex-col">
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Estado de Servicio</span>
               <SIATCBadge variant={
