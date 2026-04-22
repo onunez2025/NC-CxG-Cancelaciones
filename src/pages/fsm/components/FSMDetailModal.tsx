@@ -5,7 +5,6 @@ import {
   Settings, 
   MessageSquare, 
   Clock, 
-  Calendar,
   Phone,
   Mail,
   Box,
@@ -18,7 +17,6 @@ import {
 } from 'lucide-react';
 import { SIATCDrawer } from '../../../components/siatc/SIATCDrawer';
 import { SIATCBadge } from '../../../components/siatc/SIATCBadge';
-import { SIATC_THEME } from '../../../utils/siatc-theme';
 import type { FSMTracking } from '../../../services/fsmService';
 import { cn } from '../../../utils/cn';
 
