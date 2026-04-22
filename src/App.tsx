@@ -98,9 +98,15 @@ function App() {
 
               {/* Other routes with RBAC */}
               {/* NC-CxG-Cancelaciones Routes */}
-              <Route path="/cancelaciones" element={<CancellationsPage />} />
-              <Route path="/cxg-nc" element={<CxGNCPage />} />
-              <Route path="/fsm-tracking" element={<FSMDashboardPage />} />
+              <Route element={<RequirePermission permission="cxg.cancelaciones.view" />}>
+                <Route path="/cancelaciones" element={<CancellationsPage />} />
+              </Route>
+              <Route element={<RequirePermission permission="cxg.cxg_nc.view" />}>
+                <Route path="/cxg-nc" element={<CxGNCPage />} />
+              </Route>
+              <Route element={<RequirePermission permission="cxg.fsm.view" />}>
+                <Route path="/fsm-tracking" element={<FSMDashboardPage />} />
+              </Route>
 
               <Route path="/profile" element={<ProfilePage />} />
             </Route>

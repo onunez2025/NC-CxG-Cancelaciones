@@ -51,6 +51,7 @@ export class RolesService {
             { group: 'CxG y NC', id: 'cxg.cxg_nc.view', label: 'Ver CxG y NC' },
             { group: 'CxG y NC', id: 'cxg.cxg_nc.create', label: 'Crear CxG y NC' },
             { group: 'CxG y NC', id: 'cxg.cxg_nc.process', label: 'Procesar CxG y NC' },
+            { group: 'CxG y NC', id: 'cxg.fsm.view', label: 'Ver Tracking FSM' },
 
             { group: 'Reportes', id: 'cxg.reportes.exportar', label: 'Exportar Reportes' },
 
