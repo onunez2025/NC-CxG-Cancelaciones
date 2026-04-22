@@ -20,6 +20,7 @@ import { RequirePermission } from './components/common/RequirePermission';
 import { DashboardPage } from './pages/DashboardPage';
 import { CancellationsPage } from './pages/cancelaciones/CancellationsPage';
 import { CxGNCPage } from './pages/cxg-nc/CxGNCPage';
+import { FSMDashboardPage } from './pages/fsm/FSMDashboardPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { NotFound } from './pages/NotFound';
 
@@ -99,6 +100,7 @@ function App() {
               {/* NC-CxG-Cancelaciones Routes */}
               <Route path="/cancelaciones" element={<CancellationsPage />} />
               <Route path="/cxg-nc" element={<CxGNCPage />} />
+              <Route path="/fsm-tracking" element={<FSMDashboardPage />} />
 
               <Route path="/profile" element={<ProfilePage />} />
             </Route>

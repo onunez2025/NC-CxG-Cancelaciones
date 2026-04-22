@@ -7,7 +7,6 @@ import {
   Clock,
   User,
   MapPin,
-  ClipboardList,
   ChevronRight
 } from 'lucide-react';
 import { SIATC_THEME } from '../../utils/siatc-theme';
