@@ -27,7 +27,7 @@ router.get('/tracking', async (req: Request, res: Response) => {
             whereClause = "WHERE 1=1";
             if (ticket) whereClause += " AND t.Ticket LIKE @ticket";
             if (cliente) whereClause += " AND t.NombreCliente LIKE @cliente";
-            if (documento) whereClause += " AND t.Idexternocliente LIKE @documento";
+            if (documento) whereClause += " AND t.CodigoExternoCliente LIKE @documento";
             if (tecnico) whereClause += " AND (t.NombreTecnico LIKE @tecnico OR t.ApellidoTecnico LIKE @tecnico)";
         }
 
@@ -45,7 +45,7 @@ router.get('/tracking', async (req: Request, res: Response) => {
             SELECT TOP (@limit)
                 t.Ticket as ticket,
                 t.NombreCliente as cliente,
-                t.Idexternocliente as doc_cliente,
+                t.CodigoExternoCliente as doc_cliente,
                 t.Distrito as distrito,
                 t.Ciudad as ciudad,
                 ISNULL(t.NombreTecnico, '') + ' ' + ISNULL(t.ApellidoTecnico, '') as tecnico,
