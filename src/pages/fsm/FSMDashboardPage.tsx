@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   Search, 
   RefreshCw, 
@@ -7,7 +7,9 @@ import {
   Clock,
   User,
   MapPin,
-  ChevronRight
+  ChevronRight,
+  FileText,
+  UserCheck
 } from 'lucide-react';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 import { SIATCButton } from '../../components/siatc/SIATCButton';
@@ -24,27 +26,42 @@ import type { FSMTracking } from '../../services/fsmService';
 export const FSMDashboardPage = () => {
   const [data, setData] = useState<FSMTracking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Separate Filters
+  const [filterTicket, setFilterTicket] = useState('');
+  const [filterCliente, setFilterCliente] = useState('');
+  const [filterDocumento, setFilterDocumento] = useState('');
+  const [filterTecnico, setFilterTecnico] = useState('');
+  
   const [limit, setLimit] = useState(100);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const result = await fsmService.getTracking({ search: searchTerm, limit });
+      const result = await fsmService.getTracking({ 
+        ticket: filterTicket,
+        cliente: filterCliente,
+        documento: filterDocumento,
+        tecnico: filterTecnico,
+        limit 
+      });
       setData(result);
     } catch (error) {
       console.error('Error fetching FSM data:', error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [filterTicket, filterCliente, filterDocumento, filterTecnico, limit]);
 
+  // Initial load only
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchData();
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchTerm, limit]);
+    fetchData();
+  }, []);
+
+  const handleFilter = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchData();
+  };
 
   return (
     <div className={SIATC_THEME.LAYOUT.PAGE_WRAPPER}>
@@ -53,7 +70,7 @@ export const FSMDashboardPage = () => {
         <div>
           <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Seguimiento Técnico FSM</h1>
           <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>
-            Control de horarios y programación de visitas técnicas.
+            Control de horarios y programación de visitas técnicas. (Búsqueda manual activada)
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -69,31 +86,102 @@ export const FSMDashboardPage = () => {
       </div>
 
       <div className={SIATC_THEME.LAYOUT.CONTENT_CONTAINER}>
-        {/* Filters */}
-        <div className="px-6 py-4 border-b border-border flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input 
-              type="text"
-              placeholder="Buscar por ticket, cliente o técnico..."
-              className={`${SIATC_THEME.COMPONENTS.INPUT} pl-10`}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[9px] font-black uppercase text-muted-foreground tracking-tighter">Mostrar:</span>
-            <select 
-              className="bg-transparent border-none text-xs font-bold text-foreground focus:ring-0 cursor-pointer"
-              value={limit}
-              onChange={(e) => setLimit(Number(e.target.value))}
-            >
-              <option value={50}>50 registros</option>
-              <option value={100}>100 registros</option>
-              <option value={200}>200 registros</option>
-              <option value={500}>500 registros</option>
-            </select>
-          </div>
+        {/* Advanced Filters */}
+        <div className="px-6 py-5 border-b border-border bg-slate-50/50">
+          <form onSubmit={handleFilter} className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Ticket Filter */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Ticket</label>
+                <div className="relative">
+                  <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/60" />
+                  <input 
+                    type="text"
+                    placeholder="Ej: 123456"
+                    className={`${SIATC_THEME.COMPONENTS.INPUT} pl-9 h-9 text-xs`}
+                    value={filterTicket}
+                    onChange={(e) => setFilterTicket(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Cliente Filter */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Nombre Cliente</label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/60" />
+                  <input 
+                    type="text"
+                    placeholder="Nombre o apellido..."
+                    className={`${SIATC_THEME.COMPONENTS.INPUT} pl-9 h-9 text-xs`}
+                    value={filterCliente}
+                    onChange={(e) => setFilterCliente(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Documento Filter */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Documento (DNI/RUC)</label>
+                <div className="relative">
+                  <UserCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/60" />
+                  <input 
+                    type="text"
+                    placeholder="Nro identificación..."
+                    className={`${SIATC_THEME.COMPONENTS.INPUT} pl-9 h-9 text-xs`}
+                    value={filterDocumento}
+                    onChange={(e) => setFilterDocumento(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Tecnico Filter */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Técnico</label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/60" />
+                  <input 
+                    type="text"
+                    placeholder="Nombre del técnico..."
+                    className={`${SIATC_THEME.COMPONENTS.INPUT} pl-9 h-9 text-xs`}
+                    value={filterTecnico}
+                    onChange={(e) => setFilterTecnico(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/60">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-black uppercase text-muted-foreground tracking-tighter">Muestra:</span>
+                  <select 
+                    className="bg-transparent border-none text-xs font-bold text-foreground focus:ring-0 cursor-pointer p-0 h-auto"
+                    value={limit}
+                    onChange={(e) => setLimit(Number(e.target.value))}
+                  >
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                    <option value={200}>200</option>
+                  </select>
+                </div>
+                <div className="h-4 w-px bg-slate-200" />
+                <span className="text-[9px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 uppercase">
+                  Filtro por defecto: HOY
+                </span>
+              </div>
+              
+              <SIATCButton 
+                type="submit"
+                variant="primary" 
+                icon={Search}
+                size="sm"
+                isLoading={isLoading}
+              >
+                Filtrar Resultados
+              </SIATCButton>
+            </div>
+          </form>
         </div>
 
         {/* Table Area */}
@@ -108,7 +196,7 @@ export const FSMDashboardPage = () => {
               <thead>
                 <tr className={SIATC_THEME.TABLE.HEADER_ROW}>
                   <SIATCTableHeader>TICKET</SIATCTableHeader>
-                  <SIATCTableHeader>CLIENTE / ASUNTO</SIATCTableHeader>
+                  <SIATCTableHeader>CLIENTE / DOCUMENTO</SIATCTableHeader>
                   <SIATCTableHeader>UBICACIÓN</SIATCTableHeader>
                   <SIATCTableHeader>TÉCNICO</SIATCTableHeader>
                   <SIATCTableHeader>BLOQUE ORIGINAL</SIATCTableHeader>
@@ -139,8 +227,11 @@ export const FSMDashboardPage = () => {
                     </SIATCTableCell>
                     <SIATCTableCell>
                       <div className="flex flex-col max-w-[250px]">
-                        <span className="font-bold text-foreground truncate">{item.cliente}</span>
-                        <span className="text-[10px] text-muted-foreground truncate">{item.asunto}</span>
+                        <span className="font-bold text-foreground truncate uppercase">{item.cliente}</span>
+                        <div className="flex items-center gap-1 mt-0.5">
+                            <span className="text-[8px] bg-slate-100 text-slate-500 font-black px-1 rounded">ID</span>
+                            <span className="text-[10px] text-muted-foreground font-mono">{item.doc_cliente || 'SIN DOC'}</span>
+                        </div>
                       </div>
                     </SIATCTableCell>
                     <SIATCTableCell>
@@ -157,7 +248,7 @@ export const FSMDashboardPage = () => {
                         <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
                           <User className="w-3.5 h-3.5 text-primary" />
                         </div>
-                        <span className="text-xs font-medium text-slate-700">{item.tecnico || 'NO ASIGNADO'}</span>
+                        <span className="text-xs font-medium text-slate-700 uppercase">{item.tecnico || 'NO ASIGNADO'}</span>
                       </div>
                     </SIATCTableCell>
                     <SIATCTableCell>

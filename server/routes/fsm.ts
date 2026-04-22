@@ -11,13 +11,24 @@ const router = Router();
 router.get('/tracking', async (req: Request, res: Response) => {
     try {
         const pool = await getDbConnection();
-        const search = req.query.search as string || '';
+        const ticket = req.query.ticket as string || '';
+        const cliente = req.query.cliente as string || '';
+        const documento = req.query.documento as string || '';
+        const tecnico = req.query.tecnico as string || '';
         const limit = parseInt(req.query.limit as string) || 100;
 
-        // Filter: Today until 7 days ago
-        let whereClause = "WHERE t.FechaVisita >= CAST(DATEADD(day, -7, GETDATE()) AS DATE) AND t.FechaVisita <= CAST(GETDATE() AS DATE)"; 
-        if (search) {
-            whereClause += " AND (t.Ticket LIKE @search OR t.NombreCliente LIKE @search OR t.NombreTecnico LIKE @search)";
+        // Default Filter: Strictly TODAY
+        let whereClause = "WHERE CAST(t.FechaVisita AS DATE) = CAST(GETDATE() AS DATE)"; 
+        
+        // If filters are provided, we allow searching regardless of the "Today" restriction 
+        // OR we can make them cumulative. Usually user wants to find a specific ticket even if it's not today.
+        // Let's make it: if there's any specific filter (ticket/doc/etc), remove the Today restriction to allow lookup.
+        if (ticket || cliente || documento || tecnico) {
+            whereClause = "WHERE 1=1";
+            if (ticket) whereClause += " AND t.Ticket LIKE @ticket";
+            if (cliente) whereClause += " AND t.NombreCliente LIKE @cliente";
+            if (documento) whereClause += " AND t.Idexternocliente LIKE @documento";
+            if (tecnico) whereClause += " AND (t.NombreTecnico LIKE @tecnico OR t.ApellidoTecnico LIKE @tecnico)";
         }
 
         const query = `
@@ -34,7 +45,7 @@ router.get('/tracking', async (req: Request, res: Response) => {
             SELECT TOP (@limit)
                 t.Ticket as ticket,
                 t.NombreCliente as cliente,
-                t.Asunto as asunto,
+                t.Idexternocliente as doc_cliente,
                 t.Distrito as distrito,
                 t.Ciudad as ciudad,
                 ISNULL(t.NombreTecnico, '') + ' ' + ISNULL(t.ApellidoTecnico, '') as tecnico,
@@ -51,9 +62,10 @@ router.get('/tracking', async (req: Request, res: Response) => {
         `;
 
         const request = pool.request();
-        if (search) {
-            request.input('search', sql.VarChar, `%${search}%`);
-        }
+        if (ticket) request.input('ticket', sql.VarChar, `%${ticket}%`);
+        if (cliente) request.input('cliente', sql.VarChar, `%${cliente}%`);
+        if (documento) request.input('documento', sql.VarChar, `%${documento}%`);
+        if (tecnico) request.input('tecnico', sql.VarChar, `%${tecnico}%`);
         request.input('limit', sql.Int, limit);
 
         const result = await request.query(query);

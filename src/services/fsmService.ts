@@ -3,7 +3,7 @@ import { apiClient, API_BASE_URL } from './apiClient';
 export interface FSMTracking {
     ticket: string;
     cliente: string;
-    asunto: string;
+    doc_cliente: string;
     distrito: string;
     ciudad: string;
     tecnico: string;
@@ -16,9 +16,18 @@ export interface FSMTracking {
 }
 
 export const fsmService = {
-    getTracking: async (params?: { search?: string; limit?: number }): Promise<FSMTracking[]> => {
+    getTracking: async (params?: { 
+        ticket?: string; 
+        cliente?: string; 
+        documento?: string; 
+        tecnico?: string; 
+        limit?: number 
+    }): Promise<FSMTracking[]> => {
         const queryParams = new URLSearchParams();
-        if (params?.search) queryParams.append('search', params.search);
+        if (params?.ticket) queryParams.append('ticket', params.ticket);
+        if (params?.cliente) queryParams.append('cliente', params.cliente);
+        if (params?.documento) queryParams.append('documento', params.documento);
+        if (params?.tecnico) queryParams.append('tecnico', params.tecnico);
         if (params?.limit) queryParams.append('limit', params.limit.toString());
         
         const response = await apiClient(`${API_BASE_URL}/fsm/tracking?${queryParams.toString()}`);
