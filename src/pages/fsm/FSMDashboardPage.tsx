@@ -33,7 +33,7 @@ export const FSMDashboardPage = () => {
   const [filterDocumento, setFilterDocumento] = useState('');
   const [filterTecnico, setFilterTecnico] = useState('');
   
-  const [limit, setLimit] = useState(100);
+  const [limit, setLimit] = useState(1000);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -163,6 +163,9 @@ export const FSMDashboardPage = () => {
                     <option value={50}>50</option>
                     <option value={100}>100</option>
                     <option value={200}>200</option>
+                    <option value={500}>500</option>
+                    <option value={1000}>1000</option>
+                    <option value={2000}>2000</option>
                   </select>
                 </div>
                 <div className="h-4 w-px bg-slate-200" />
