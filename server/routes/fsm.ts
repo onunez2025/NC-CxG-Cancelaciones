@@ -14,7 +14,8 @@ router.get('/tracking', async (req: Request, res: Response) => {
         const search = req.query.search as string || '';
         const limit = parseInt(req.query.limit as string) || 100;
 
-        let whereClause = "WHERE t.FechaVisita >= DATEADD(day, -7, GETDATE())"; // Default to last 7 days for performance
+        // Filter: Today until 7 days ago
+        let whereClause = "WHERE t.FechaVisita >= CAST(DATEADD(day, -7, GETDATE()) AS DATE) AND t.FechaVisita <= CAST(GETDATE() AS DATE)"; 
         if (search) {
             whereClause += " AND (t.Ticket LIKE @search OR t.NombreCliente LIKE @search OR t.NombreTecnico LIKE @search)";
         }
