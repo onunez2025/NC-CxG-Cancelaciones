@@ -56,9 +56,13 @@ router.get('/tracking', async (req: Request, res: Response) => {
                 t.FechaVisita as fecha_visita,
                 t.Estado as estado
             FROM [SIATC].[Dashboard_FSM] t
-            LEFT JOIN LatestRango lr ON t.Ticket = lr.ID_Ticket AND lr.rn = 1
+            LEFT JOIN LatestRango lr ON TRIM(t.Ticket) = TRIM(lr.ID_Ticket) AND lr.rn = 1
             ${whereClause}
-            ORDER BY t.FechaVisita DESC, lr.Orden_atención ASC
+            ORDER BY 
+                t.FechaVisita DESC, 
+                CASE WHEN lr.Rango_horario IS NULL THEN 1 ELSE 0 END,
+                ISNULL(lr.Orden_atención, 99999) ASC,
+                t.Ticket DESC
         `;
 
         const request = pool.request();

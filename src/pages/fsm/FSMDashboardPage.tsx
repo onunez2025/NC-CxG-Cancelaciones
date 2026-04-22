@@ -33,7 +33,7 @@ export const FSMDashboardPage = () => {
   const [filterDocumento, setFilterDocumento] = useState('');
   const [filterTecnico, setFilterTecnico] = useState('');
   
-  const [limit, setLimit] = useState(1000);
+  const [limit, setLimit] = useState(2000);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
