@@ -54,7 +54,19 @@ router.get('/tracking', async (req: Request, res: Response) => {
                 lr.Orden_atención as orden,
                 lr.Comentario as comentario_horario,
                 t.FechaVisita as fecha_visita,
-                t.Estado as estado
+                t.Estado as estado,
+                -- New detail fields
+                t.Calle as calle,
+                t.NumeroCalle as numero_calle,
+                t.Referencia as referencia,
+                t.NombreEquipo as equipo,
+                t.CodigoExternoEquipo as cod_equipo,
+                t.IdEquipo as id_equipo,
+                t.Email as email,
+                t.Celular1 as celular1,
+                t.Celular2 as celular2,
+                t.ComentarioProgramador as coment_prog,
+                t.ComentarioTecnico as coment_tecnico
             FROM [SIATC].[Dashboard_FSM] t
             LEFT JOIN LatestRango lr ON TRIM(t.Ticket) = TRIM(lr.ID_Ticket) AND lr.rn = 1
             ${whereClause}

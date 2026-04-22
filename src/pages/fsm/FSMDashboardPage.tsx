@@ -22,10 +22,13 @@ import {
 } from '../../components/siatc/table/SIATCTable';
 import { fsmService } from '../../services/fsmService';
 import type { FSMTracking } from '../../services/fsmService';
+import { FSMDetailModal } from './components/FSMDetailModal';
 
 export const FSMDashboardPage = () => {
   const [data, setData] = useState<FSMTracking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedTicket, setSelectedTicket] = useState<FSMTracking | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   
   // Separate Filters
   const [filterTicket, setFilterTicket] = useState('');
@@ -61,6 +64,11 @@ export const FSMDashboardPage = () => {
   const handleFilter = (e: React.FormEvent) => {
     e.preventDefault();
     fetchData();
+  };
+
+  const handleRowClick = (ticket: FSMTracking) => {
+    setSelectedTicket(ticket);
+    setIsDetailModalOpen(true);
   };
 
   return (
@@ -216,10 +224,14 @@ export const FSMDashboardPage = () => {
                         </td>
                     </tr>
                 ) : data.map((item, idx) => (
-                  <SIATCTableRow key={`${item.ticket}-${idx}`}>
+                  <SIATCTableRow 
+                    key={`${item.ticket}-${idx}`}
+                    onClick={() => handleRowClick(item)}
+                    className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors group"
+                  >
                     <SIATCTableCell>
                       <div className="flex flex-col">
-                        <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>#{item.ticket}</span>
+                        <span className={`${SIATC_THEME.TYPOGRAPHY.TINY_MONO} group-hover:text-primary transition-colors`}>#{item.ticket}</span>
                         <div className="flex items-center gap-1.5 mt-1">
                           <Calendar className="w-3 h-3 text-muted-foreground" />
                           <span className="text-[10px] font-bold text-muted-foreground">
@@ -310,6 +322,13 @@ export const FSMDashboardPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Detail Modal */}
+      <FSMDetailModal 
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        ticket={selectedTicket}
+      />
     </div>
   );
 };

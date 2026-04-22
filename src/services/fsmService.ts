@@ -13,6 +13,18 @@ export interface FSMTracking {
     comentario_horario: string | null;
     fecha_visita: string;
     estado: string;
+    // New detail fields
+    calle: string | null;
+    numero_calle: string | null;
+    referencia: string | null;
+    equipo: string | null;
+    cod_equipo: string | null;
+    id_equipo: string | null;
+    email: string | null;
+    celular1: string | null;
+    celular2: string | null;
+    coment_prog: string | null;
+    coment_tecnico: string | null;
 }
 
 export const fsmService = {
