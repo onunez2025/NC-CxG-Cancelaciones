@@ -192,7 +192,7 @@ export const CancellationsPage = () => {
 
   const [isValidarClienteOpen, setIsValidarClienteOpen] = useState(false);
   const [validarClienteItem, setValidarClienteItem] = useState<Cancellation | null>(null);
-  const [validarForm, setValidarForm] = useState({ resultado: '' as 'REAL' | 'FALSA' | '', observacion: '' });
+  const [validarForm, setValidarForm] = useState({ resultado: '' as 'REAL' | 'FALSA' | '', observacion: '', motivo_real: '' });
   const [isValidarSubmitting, setIsValidarSubmitting] = useState(false);
 
   // Registration state
@@ -409,7 +409,8 @@ export const CancellationsPage = () => {
       await ncService.validarClienteCancellation(validarClienteItem.id, {
         resultado: validarForm.resultado as 'REAL' | 'FALSA',
         observacion: validarForm.observacion,
-        usuario: user?.full_name || user?.username || 'Sistema'
+        usuario: user?.full_name || user?.username || 'Sistema',
+        motivo_real: validarForm.resultado === 'FALSA' ? validarForm.motivo_real : undefined
       });
 
       await auditService.logAction({
@@ -577,6 +578,7 @@ export const CancellationsPage = () => {
                   <SIATCTableHeader>AUTORIZADOR</SIATCTableHeader>
                   <SIATCTableHeader>FECHA</SIATCTableHeader>
                   <SIATCTableHeader>ESTADO</SIATCTableHeader>
+                  <SIATCTableHeader>MOTIVO REAL</SIATCTableHeader>
                   <SIATCTableHeader>ASIGNADO A</SIATCTableHeader>
                   <SIATCTableHeader className="text-right">ACCIONES</SIATCTableHeader>
                 </tr>
@@ -612,6 +614,9 @@ export const CancellationsPage = () => {
                       </SIATCBadge>
                     </SIATCTableCell>
                     <SIATCTableCell>
+                      <span className="text-xs font-bold text-rose-500 whitespace-nowrap">{item.vali_motivo_real || '—'}</span>
+                    </SIATCTableCell>
+                    <SIATCTableCell>
                       <span className="text-xs text-muted-foreground">{item.asignado_a || '—'}</span>
                     </SIATCTableCell>
                     <SIATCTableCell className="text-right" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
@@ -633,7 +638,7 @@ export const CancellationsPage = () => {
                           onAsignar={() => handleOpenAssign(item)}
                           onValidar={() => {
                             setValidarClienteItem(item);
-                            setValidarForm({ resultado: '', observacion: '' });
+                            setValidarForm({ resultado: '', observacion: '', motivo_real: '' });
                             setIsValidarClienteOpen(true);
                           }}
                           onGestionar={() => handleOpenGestionar(item)}
@@ -830,7 +835,12 @@ export const CancellationsPage = () => {
                     <DetailRow icon={UserCheck} label="Asignado Por" value={`${detailData.asignado_por} (${detailData.fecha_asignado ? new Date(detailData.fecha_asignado).toLocaleString() : ''})`} />
                     <DetailRow icon={ClipboardCheck} label="Validación Cliente" value={detailData.vali_cliente} />
                     {detailData.vali_por && (
-                      <DetailRow icon={User} label="Validado Por" value={`${detailData.vali_por} (${detailData.vali_el ? new Date(detailData.vali_el).toLocaleString() : ''})`} />
+                      <>
+                        <DetailRow icon={User} label="Validado Por" value={`${detailData.vali_por} (${detailData.vali_el ? new Date(detailData.vali_el).toLocaleString() : ''})`} />
+                        {detailData.vali_motivo_real && (
+                          <DetailRow icon={AlertTriangle} label="Motivo Detectado" value={detailData.vali_motivo_real} className="text-rose-600 bg-rose-50 dark:bg-rose-500/10 rounded-lg px-2 mt-1" />
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -956,7 +966,7 @@ export const CancellationsPage = () => {
               variant="primary" 
               onClick={handleValidarCliente} 
               isLoading={isValidarSubmitting}
-              disabled={!validarForm.resultado}
+              disabled={!validarForm.resultado || (validarForm.resultado === 'FALSA' && !validarForm.motivo_real)}
             >
               Guardar Validación
             </SIATCButton>
@@ -993,6 +1003,22 @@ export const CancellationsPage = () => {
               </button>
             </div>
           </div>
+
+          {validarForm.resultado === 'FALSA' && (
+            <div className="animate-in slide-in-from-top-2 duration-200">
+              <label className="text-[10px] font-black uppercase text-rose-500 mb-1.5 block tracking-widest pl-4">¿Cuál es el Motivo Real?</label>
+              <select 
+                className={`${SIATC_THEME.COMPONENTS.INPUT} border-rose-200 bg-rose-50/50 text-rose-700 font-bold`}
+                value={validarForm.motivo_real}
+                onChange={(e) => setValidarForm({ ...validarForm, motivo_real: e.target.value })}
+              >
+                <option value="">Seleccione el motivo real...</option>
+                {motivos.map(m => (
+                  <option key={m.id} value={m.motivo}>{m.motivo}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <div>
             <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Notas de la llamada</label>
             <textarea 

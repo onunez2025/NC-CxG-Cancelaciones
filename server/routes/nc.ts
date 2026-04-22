@@ -4,7 +4,10 @@ import sql from 'mssql';
 
 const router = Router();
 
-// GET Ticket details (Lookup)
+// ─────────────────────────────────────────────
+// SHARED: Ticket Lookup
+// ─────────────────────────────────────────────
+
 router.get('/tickets/:id', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -32,7 +35,10 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
     }
 });
 
-// GET Cancellation Motives
+// ─────────────────────────────────────────────
+// CANCELACIONES: Motivos (must be before :id)
+// ─────────────────────────────────────────────
+
 router.get('/cancelaciones/motivos', async (req: Request, res: Response) => {
     try {
         const pool = await getDbConnection();
@@ -48,7 +54,10 @@ router.get('/cancelaciones/motivos', async (req: Request, res: Response) => {
     }
 });
 
-// GET single Cancelacion detail
+// ─────────────────────────────────────────────
+// CANCELACIONES: Detail
+// ─────────────────────────────────────────────
+
 router.get('/cancelaciones/:id', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -84,6 +93,7 @@ router.get('/cancelaciones/:id', async (req: Request, res: Response) => {
                     c.Vali_Obs,
                     c.Vali_Por,
                     c.Vali_El,
+                    c.Vali_Motivo_Real as vali_motivo_real,
                     c.Estado_Proceso as estado
                 FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
@@ -103,7 +113,10 @@ router.get('/cancelaciones/:id', async (req: Request, res: Response) => {
     }
 });
 
-// GET all Cancelaciones (Paginated)
+// ─────────────────────────────────────────────
+// CANCELACIONES: List (Paginated)
+// ─────────────────────────────────────────────
+
 router.get('/cancelaciones', async (req: Request, res: Response) => {
     try {
         const page = parseInt(req.query.page as string) || 1;
@@ -170,7 +183,8 @@ router.get('/cancelaciones', async (req: Request, res: Response) => {
                     c.Vali_Cliente as vali_cliente,
                     c.Vali_Obs as vali_obs,
                     c.Vali_Por as vali_por,
-                    c.Vali_El as vali_el
+                    c.Vali_El as vali_el,
+                    c.Vali_Motivo_Real as vali_motivo_real
                 FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
                 LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] m ON c.Motivo_Cancelacion = m.ID_Cancelados_motivo
@@ -192,7 +206,29 @@ router.get('/cancelaciones', async (req: Request, res: Response) => {
     }
 });
 
-// GET all CxG/NC (Paginated)
+// ─────────────────────────────────────────────
+// CXG/NC: Motivos (must be before :id routes)
+// ─────────────────────────────────────────────
+
+router.get('/cxg-nc/motivos', async (req: Request, res: Response) => {
+    try {
+        const pool = await getDbConnection();
+        const result = await pool.request().query(`
+            SELECT ID_motivo_CxG_NC as id, Tipo as motivo 
+            FROM [dbo].[GAC_APP_TB_HISTOTIAL_APROB_CXG_NC_MOTIVOS]
+            ORDER BY Tipo ASC
+        `);
+        res.json(result.recordset);
+    } catch (error: any) {
+        console.error('Error fetching CxG/NC motives:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ─────────────────────────────────────────────
+// CXG/NC: List (Paginated)
+// ─────────────────────────────────────────────
+
 router.get('/cxg-nc', async (req: Request, res: Response) => {
     try {
         const page = parseInt(req.query.page as string) || 1;
@@ -234,9 +270,16 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
                     n.Apro_Solicitud as apro_solicitud,
                     n.Apro_Por as apro_por,
                     n.Apro_El as apro_el,
+                    n.Apro_Obs as apro_obs,
                     n.Vali_Cliente as vali_cliente,
                     n.Vali_Por as vali_por,
-                    n.Vali_El as vali_el
+                    n.Vali_El as vali_el,
+                    n.Vali_Motivo_Real as vali_motivo_real,
+                    n.Aprobado as aprobado,
+                    n.Aprobado_motivo as aprobado_motivo,
+                    n.Aprobado_observacion as aprobado_observacion,
+                    n.Aprobado_el as aprobado_el,
+                    n.Aprobado_por as aprobado_por
                 FROM [dbo].[GAC_APP_TB_CXG_NC] n
                 ${whereClause}
                 ORDER BY n.Creado_el DESC
@@ -256,54 +299,39 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
     }
 });
 
-// GET Cancellation Detail
-router.get('/cancelaciones/:id', async (req: Request, res: Response) => {
+// ─────────────────────────────────────────────
+// CXG/NC: Historial for a solicitud
+// ─────────────────────────────────────────────
+
+router.get('/cxg-nc/:id/historial', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const pool = await getDbConnection();
         const result = await pool.request()
-            .input('id', sql.VarChar, id)
+            .input('solicitud', sql.VarChar, id)
             .query(`
                 SELECT 
-                    c.ID_Cancelados as id,
-                    c.Ticket as ticket,
-                    ISNULL(m.Motivo, c.Motivo_Cancelacion) as motivo,
-                    c.Autorizador_Cancelacion as autorizador,
-                    c.Generado_el as fecha_generado,
-                    c.Gestionado_por as gestionado_por,
-                    c.Cancelacion_Correcta as cancelacion_correcta,
-                    c.Gestionado as gestionado,
-                    c.Observacion_Gestionado as observacion,
-                    c.Gestionado_el as fecha_gestionado,
-                    c.Asignado_a as asignado_a,
-                    c.Asignado_por as asignado_por,
-                    c.Asignado_el as fecha_asignado,
-                    ISNULL(t.NombreCliente, '') as cliente,
-                    c.Estado_Proceso as estado,
-                    c.Apro_Solicitud as apro_solicitud,
-                    c.Apro_Obs as apro_obs,
-                    c.Apro_Por as apro_por,
-                    c.Apro_El as apro_el,
-                    c.Vali_Cliente as vali_cliente,
-                    c.Vali_Obs as vali_obs,
-                    c.Vali_Por as vali_por,
-                    c.Vali_El as vali_el
-                FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
-                LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
-                LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] m ON c.Motivo_Cancelacion = m.ID_Cancelados_motivo
-                WHERE c.ID_Cancelados = @id
+                    ID_Historial_Apro_CxG_NC as id,
+                    Solicitud as solicitud,
+                    Tipo as tipo,
+                    Observacion as observacion,
+                    Creado_el as fecha,
+                    Creado_por as usuario
+                FROM [dbo].[GAC_APP_TB_HISTOTIAL_APROB_CXG_NC]
+                WHERE Solicitud = @solicitud
+                ORDER BY Creado_el ASC
             `);
-        
-        if (result.recordset.length === 0) {
-            return res.status(404).json({ error: 'No se encontró la solicitud de cancelación' });
-        }
-        res.json(result.recordset[0]);
+        res.json(result.recordset);
     } catch (error: any) {
+        console.error('Error fetching historial:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// GET CxG/NC Detail
+// ─────────────────────────────────────────────
+// CXG/NC: Detail
+// ─────────────────────────────────────────────
+
 router.get('/cxg-nc/:id', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -316,7 +344,9 @@ router.get('/cxg-nc/:id', async (req: Request, res: Response) => {
                     n.Tipo as tipo,
                     n.Ticket as correlativo,
                     n.Creado_el as fecha,
+                    n.Creado_por as creado_por,
                     n.Tienda as cliente,
+                    n.Observacion as observacion_inicial,
                     n.Asignado_a,
                     n.Asignado_por,
                     n.Asignado_el,
@@ -331,9 +361,19 @@ router.get('/cxg-nc/:id', async (req: Request, res: Response) => {
                     n.Apro_Obs as apro_obs,
                     n.Apro_Por as apro_por,
                     n.Apro_El as apro_el,
-                    n.Procesado_por as gestionado_por,
+                    n.Vali_Motivo_Real as vali_motivo_real,
+                    n.Aprobado as aprobado,
+                    n.Aprobado_motivo as aprobado_motivo,
+                    n.Aprobado_observacion as aprobado_observacion,
+                    n.Aprobado_el as aprobado_el,
+                    n.Aprobado_por as aprobado_por,
+                    n.Procesado as procesado,
+                    n.Procesado_motivo as procesado_motivo,
+                    n.Procesado_observacion as procesado_observacion,
+                    n.Procesado_el as procesado_el,
+                    n.Procesado_por as procesado_por,
+                    n.Ticket_desinstalacion as ticket_desinstalacion,
                     n.Gestionado_el as fecha_gestionado,
-                    n.Gestionado as resultado,
                     n.Ticket as ticket
                 FROM [dbo].[GAC_APP_TB_CXG_NC] n
                 WHERE n.ID_Apro_CxG_NC = @id
@@ -347,6 +387,11 @@ router.get('/cxg-nc/:id', async (req: Request, res: Response) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+// ─────────────────────────────────────────────
+// CANCELACIONES: Create
+// ─────────────────────────────────────────────
+
 router.post('/cancelaciones', async (req: Request, res: Response) => {
     try {
         const { cliente, motive, ticket, observacion, usuario } = req.body;
@@ -372,17 +417,18 @@ router.post('/cancelaciones', async (req: Request, res: Response) => {
     }
 });
 
-// POST Gestionar Cancelacion (Approve = Cancelacion Correcta)
+// ─────────────────────────────────────────────
+// CANCELACIONES: Gestionar
+// ─────────────────────────────────────────────
+
 router.post('/cancelaciones/:id/gestionar', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { 
-            cancelacion_correcta, // 'Si' | 'No'
-            motivo_correcto,      // ID del motivo correcto (solo si cancelacion_correcta = 'No')
-            observacion,          // Observación del gestor
-            gestionado_por,       // Nombre del usuario que gestiona
-            asignado_a,           // A quién se asigna para seguimiento
-            asignado_por          // Quién asigna
+            cancelacion_correcta,
+            motivo_correcto,
+            observacion,
+            gestionado_por,
         } = req.body;
         
         const pool = await getDbConnection();
@@ -411,7 +457,10 @@ router.post('/cancelaciones/:id/gestionar', async (req: Request, res: Response) 
     }
 });
 
-// POST Asignar Cancelacion
+// ─────────────────────────────────────────────
+// CANCELACIONES: Asignar
+// ─────────────────────────────────────────────
+
 router.post('/cancelaciones/:id/asignar', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -473,14 +522,19 @@ router.post('/cancelaciones/:id/reject', async (req: Request, res: Response) => 
     }
 });
 
-// POST Create CxG/NC
+// ─────────────────────────────────────────────
+// CXG/NC: Create + History entry
+// ─────────────────────────────────────────────
+
 router.post('/cxg-nc', async (req: Request, res: Response) => {
     try {
         const { tipo, cliente, ticket, observacion } = req.body;
         const pool = await getDbConnection();
+        const solicitudId = `CNC-${Date.now()}`;
+        const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
         
         await pool.request()
-            .input('id', sql.VarChar, `CNC-${Date.now()}`)
+            .input('id', sql.VarChar, solicitudId)
             .input('ticket', sql.VarChar, ticket || 'MT-TK-TEMP')
             .input('tipo', sql.VarChar, tipo)
             .input('tienda', sql.VarChar, cliente)
@@ -488,43 +542,134 @@ router.post('/cxg-nc', async (req: Request, res: Response) => {
             .input('usuario', sql.VarChar, req.body.usuario || 'Sistema')
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_CXG_NC] 
-                (ID_Apro_CxG_NC, Ticket, Tipo, Tienda, Observacion, Creado_el, Creado_por, Procesado)
-                VALUES (@id, @ticket, @tipo, @tienda, @observacion, GETDATE(), @usuario, 'NO')
+                (ID_Apro_CxG_NC, Ticket, Tipo, Tienda, Observacion, Creado_el, Creado_por, Procesado, Estado_Proceso)
+                VALUES (@id, @ticket, @tipo, @tienda, @observacion, GETDATE(), @usuario, 'NO', 'REGISTRADO')
+            `);
+
+        // Insert history entry
+        await pool.request()
+            .input('histId', sql.VarChar, histId)
+            .input('solicitud', sql.VarChar, solicitudId)
+            .input('tipo', sql.VarChar, 'Registro')
+            .input('obs', sql.VarChar, observacion || `Solicitud de ${tipo} registrada para ${cliente}`)
+            .input('usuario', sql.VarChar, req.body.usuario || 'Sistema')
+            .query(`
+                INSERT INTO [dbo].[GAC_APP_TB_HISTOTIAL_APROB_CXG_NC]
+                (ID_Historial_Apro_CxG_NC, Solicitud, Tipo, Observacion, Creado_el, Creado_por)
+                VALUES (@histId, @solicitud, @tipo, @obs, GETDATE(), @usuario)
             `);
             
-        res.status(201).json({ message: 'Solicitud CxG/NC registrada' });
+        res.status(201).json({ message: 'Solicitud CxG/NC registrada', id: solicitudId });
     } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// POST Assign CxG/NC
+// ─────────────────────────────────────────────
+// CXG/NC: Aprobar Solicitud (Supervisor) + History
+// ─────────────────────────────────────────────
+
+router.post('/cxg-nc/:id/aprobar-solicitud', async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { aprobado, motivo, observacion, usuario } = req.body;
+        const pool = await getDbConnection();
+        const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
+
+        // Update main table
+        await pool.request()
+            .input('id', sql.VarChar, id)
+            .input('aprobado', sql.VarChar, aprobado) // 'APROBADO' | 'RECHAZADO'
+            .input('motivo', sql.VarChar, motivo || null)
+            .input('obs', sql.VarChar, observacion || '')
+            .input('por', sql.VarChar, usuario || '')
+            .query(`
+                UPDATE [dbo].[GAC_APP_TB_CXG_NC] 
+                SET 
+                    Apro_Solicitud = @aprobado,
+                    Apro_Obs = @obs,
+                    Apro_Por = @por,
+                    Apro_El = GETDATE(),
+                    Aprobado = @aprobado,
+                    Aprobado_motivo = @motivo,
+                    Aprobado_observacion = @obs,
+                    Aprobado_por = @por,
+                    Aprobado_el = GETDATE(),
+                    Estado_Proceso = CASE WHEN @aprobado = 'APROBADO' THEN 'APROBADO_SUP' ELSE 'RECHAZADO' END
+                WHERE ID_Apro_CxG_NC = @id
+            `);
+
+        // Insert history entry
+        await pool.request()
+            .input('histId', sql.VarChar, histId)
+            .input('solicitud', sql.VarChar, id)
+            .input('tipo', sql.VarChar, 'Aprobación')
+            .input('obs', sql.VarChar, `${aprobado}${motivo ? ' — Motivo: ' + motivo : ''}${observacion ? ' — ' + observacion : ''}`)
+            .input('usuario', sql.VarChar, usuario || '')
+            .query(`
+                INSERT INTO [dbo].[GAC_APP_TB_HISTOTIAL_APROB_CXG_NC]
+                (ID_Historial_Apro_CxG_NC, Solicitud, Tipo, Observacion, Creado_el, Creado_por)
+                VALUES (@histId, @solicitud, @tipo, @obs, GETDATE(), @usuario)
+            `);
+
+        res.json({ message: 'Solicitud evaluada correctamente' });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ─────────────────────────────────────────────
+// CXG/NC: Asignar + History
+// ─────────────────────────────────────────────
+
 router.post('/cxg-nc/:id/asignar', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { asignado_a, asignado_por } = req.body;
+        const { asignado_a, asignado_por, asignado_nombre } = req.body;
         const pool = await getDbConnection();
+        const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
+
         await pool.request()
             .input('id', sql.VarChar, id)
             .input('asignado_a', sql.VarChar, asignado_a)
             .input('asignado_por', sql.VarChar, asignado_por)
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_CXG_NC] 
-                SET Asignado_a = @asignado_a, Asignado_por = @asignado_por, Asignado_el = GETDATE(), Gestionado = 'No'
+                SET Asignado_a = @asignado_a, Asignado_por = @asignado_por, Asignado_el = GETDATE(), 
+                    Gestionado = 'No', Estado_Proceso = 'ASIGNADO'
                 WHERE ID_Apro_CxG_NC = @id
             `);
+
+        // Insert history entry
+        await pool.request()
+            .input('histId', sql.VarChar, histId)
+            .input('solicitud', sql.VarChar, id)
+            .input('tipo', sql.VarChar, 'Asignación')
+            .input('obs', sql.VarChar, `Asignado a: ${asignado_nombre || asignado_a}`)
+            .input('usuario', sql.VarChar, asignado_por || '')
+            .query(`
+                INSERT INTO [dbo].[GAC_APP_TB_HISTOTIAL_APROB_CXG_NC]
+                (ID_Historial_Apro_CxG_NC, Solicitud, Tipo, Observacion, Creado_el, Creado_por)
+                VALUES (@histId, @solicitud, @tipo, @obs, GETDATE(), @usuario)
+            `);
+
         res.json({ message: 'Solicitud asignada correctamente' });
     } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// POST Gestionar CxG/NC (Mark as Procesado)
+// ─────────────────────────────────────────────
+// CXG/NC: Gestionar (Cierre) + History
+// ─────────────────────────────────────────────
+
 router.post('/cxg-nc/:id/gestionar', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { observacion, gestionado_por, resultado } = req.body;
         const pool = await getDbConnection();
+        const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
+
         await pool.request()
             .input('id', sql.VarChar, id)
             .input('observacion', sql.VarChar, observacion || '')
@@ -533,16 +678,35 @@ router.post('/cxg-nc/:id/gestionar', async (req: Request, res: Response) => {
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_CXG_NC] 
                 SET Procesado = 'SI', Procesado_el = GETDATE(), Procesado_por = @gestionado_por, 
-                    Observacion_Gestionado = @observacion, Gestionado = @resultado, Gestionado_el = GETDATE()
+                    Procesado_observacion = @observacion,
+                    Observacion_Gestionado = @observacion, Gestionado = @resultado, Gestionado_el = GETDATE(),
+                    Estado_Proceso = CASE WHEN @resultado = 'Si' THEN 'CERRADO' ELSE 'RECHAZADO' END
                 WHERE ID_Apro_CxG_NC = @id
             `);
+
+        // Insert history entry
+        await pool.request()
+            .input('histId', sql.VarChar, histId)
+            .input('solicitud', sql.VarChar, id)
+            .input('tipo', sql.VarChar, 'Gestión')
+            .input('obs', sql.VarChar, `${resultado === 'Si' ? 'PROCESADO' : 'RECHAZADO'} — ${observacion || ''}`)
+            .input('usuario', sql.VarChar, gestionado_por || '')
+            .query(`
+                INSERT INTO [dbo].[GAC_APP_TB_HISTOTIAL_APROB_CXG_NC]
+                (ID_Historial_Apro_CxG_NC, Solicitud, Tipo, Observacion, Creado_el, Creado_por)
+                VALUES (@histId, @solicitud, @tipo, @obs, GETDATE(), @usuario)
+            `);
+
         res.json({ message: 'Solicitud procesada correctamente' });
     } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// POST Aprobar Solicitud (Supervisor)
+// ─────────────────────────────────────────────
+// CANCELACIONES: Aprobar Solicitud (Supervisor)
+// ─────────────────────────────────────────────
+
 router.post('/cancelaciones/:id/aprobar-solicitud', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -569,17 +733,21 @@ router.post('/cancelaciones/:id/aprobar-solicitud', async (req: Request, res: Re
     }
 });
 
-// POST Validar Cliente (Analista)
+// ─────────────────────────────────────────────
+// CANCELACIONES: Validar Cliente
+// ─────────────────────────────────────────────
+
 router.post('/cancelaciones/:id/validar-cliente', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { resultado, observacion, usuario } = req.body;
+        const { resultado, observacion, usuario, motivo_real } = req.body;
         const pool = await getDbConnection();
         await pool.request()
             .input('id', sql.VarChar, id)
             .input('resultado', sql.VarChar, resultado)
             .input('obs', sql.VarChar, observacion || '')
             .input('por', sql.VarChar, usuario || '')
+            .input('motivo_real', sql.VarChar, motivo_real || null)
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_CANCELACIONES] 
                 SET 
@@ -587,6 +755,7 @@ router.post('/cancelaciones/:id/validar-cliente', async (req: Request, res: Resp
                     Vali_Obs = @obs,
                     Vali_Por = @por,
                     Vali_El = GETDATE(),
+                    Vali_Motivo_Real = @motivo_real,
                     Estado_Proceso = 'VALIDADO'
                 WHERE ID_Cancelados = @id
             `);
@@ -596,17 +765,23 @@ router.post('/cancelaciones/:id/validar-cliente', async (req: Request, res: Resp
     }
 });
 
-// POST Validar Cliente CxG-NC
+// ─────────────────────────────────────────────
+// CXG/NC: Validar Cliente + History
+// ─────────────────────────────────────────────
+
 router.post('/cxg-nc/:id/validar-cliente', async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { resultado, observacion, usuario } = req.body;
+        const { resultado, observacion, usuario, motivo_real } = req.body;
         const pool = await getDbConnection();
+        const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
+
         await pool.request()
             .input('id', sql.VarChar, id)
             .input('resultado', sql.VarChar, resultado)
             .input('obs', sql.VarChar, observacion || '')
             .input('por', sql.VarChar, usuario || '')
+            .input('motivo_real', sql.VarChar, motivo_real || null)
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_CXG_NC] 
                 SET 
@@ -614,9 +789,24 @@ router.post('/cxg-nc/:id/validar-cliente', async (req: Request, res: Response) =
                     Vali_Obs = @obs,
                     Vali_Por = @por,
                     Vali_El = GETDATE(),
+                    Vali_Motivo_Real = @motivo_real,
                     Estado_Proceso = 'VALIDADO'
                 WHERE ID_Apro_CxG_NC = @id
             `);
+
+        // Insert history entry
+        await pool.request()
+            .input('histId', sql.VarChar, histId)
+            .input('solicitud', sql.VarChar, id)
+            .input('tipo', sql.VarChar, 'Validación')
+            .input('obs', sql.VarChar, `${resultado}${motivo_real ? ' — Motivo Real: ' + motivo_real : ''}${observacion ? ' — ' + observacion : ''}`)
+            .input('usuario', sql.VarChar, usuario || '')
+            .query(`
+                INSERT INTO [dbo].[GAC_APP_TB_HISTOTIAL_APROB_CXG_NC]
+                (ID_Historial_Apro_CxG_NC, Solicitud, Tipo, Observacion, Creado_el, Creado_por)
+                VALUES (@histId, @solicitud, @tipo, @obs, GETDATE(), @usuario)
+            `);
+
         res.json({ message: 'Validación de cliente registrada' });
     } catch (error: any) {
         res.status(500).json({ error: error.message });

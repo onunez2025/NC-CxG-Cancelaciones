@@ -25,6 +25,7 @@ export interface Cancellation {
     vali_obs?: string;
     vali_por?: string;
     vali_el?: string;
+    vali_motivo_real?: string;
 }
 
 export interface CancellationDetail extends Cancellation {
@@ -40,25 +41,55 @@ export interface CxGNC {
     tipo: 'NC' | 'CXG';
     correlativo: string;
     fecha: string;
+    creado_por?: string;
     cliente: string;
-    estado: 'REGISTRADO' | 'APROBADO_SUP' | 'ASIGNADO' | 'VALIDADO' | 'CERRADO';
+    estado: 'REGISTRADO' | 'APROBADO_SUP' | 'ASIGNADO' | 'VALIDADO' | 'CERRADO' | 'RECHAZADO';
     asignado_a?: string;
     asignado_por?: string;
     asignado_el?: string;
     gestionado?: string;
     observacion?: string;
+    observacion_inicial?: string;
     vali_cliente?: string;
     vali_obs?: string;
     vali_por?: string;
     vali_el?: string;
+    vali_motivo_real?: string;
     apro_por?: string;
     apro_el?: string;
     apro_solicitud?: string;
     apro_obs?: string;
+    // Native approval fields from GAC_APP_TB_CXG_NC
+    aprobado?: string;
+    aprobado_motivo?: string;
+    aprobado_observacion?: string;
+    aprobado_el?: string;
+    aprobado_por?: string;
+    // Processing fields
+    procesado?: string;
+    procesado_motivo?: string;
+    procesado_observacion?: string;
+    procesado_el?: string;
+    procesado_por?: string;
+    ticket_desinstalacion?: string;
     gestionado_por?: string;
     fecha_gestionado?: string;
     resultado?: string;
     ticket?: string;
+}
+
+export interface HistorialEntry {
+    id: string;
+    solicitud: string;
+    tipo: string;       // 'Registro' | 'Aprobación' | 'Asignación' | 'Validación' | 'Gestión' | 'Llamada'
+    observacion: string;
+    fecha: string;
+    usuario: string;
+}
+
+export interface CxGNCMotivo {
+    id: string;
+    motivo: string;
 }
 
 export interface TicketInfo {
@@ -85,6 +116,7 @@ export interface GestionarData {
 export interface AsignarData {
     asignado_a: string;
     asignado_por: string;
+    asignado_nombre?: string;
 }
 
 export const ncService = {
@@ -129,6 +161,18 @@ export const ncService = {
     async getCxGNCDetail(id: string): Promise<CxGNC> {
         const response = await apiClient(`${API_BASE_URL}/cxg-nc/${id}`);
         if (!response.ok) throw new Error('Error al obtener detalle de CxG/NC');
+        return response.json();
+    },
+
+    async getCxGNCHistorial(id: string): Promise<HistorialEntry[]> {
+        const response = await apiClient(`${API_BASE_URL}/cxg-nc/${id}/historial`);
+        if (!response.ok) throw new Error('Error al obtener historial de CxG/NC');
+        return response.json();
+    },
+
+    async getCxGNCMotivos(): Promise<CxGNCMotivo[]> {
+        const response = await apiClient(`${API_BASE_URL}/cxg-nc/motivos`);
+        if (!response.ok) throw new Error('Error al obtener motivos de CxG/NC');
         return response.json();
     },
 
@@ -231,7 +275,15 @@ export const ncService = {
         if (!response.ok) throw new Error('Error al evaluar solicitud');
     },
 
-    async validarClienteCancellation(id: string, data: { resultado: 'REAL' | 'FALSA'; observacion: string; usuario: string }): Promise<void> {
+    async aprobarSolicitudCxGNC(id: string, data: { aprobado: 'APROBADO' | 'RECHAZADO'; motivo?: string; observacion: string; usuario: string }): Promise<void> {
+        const response = await apiClient(`${API_BASE_URL}/cxg-nc/${id}/aprobar-solicitud`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Error al evaluar solicitud CxG/NC');
+    },
+
+    async validarClienteCancellation(id: string, data: { resultado: 'REAL' | 'FALSA'; observacion: string; usuario: string; motivo_real?: string }): Promise<void> {
         const response = await apiClient(`${API_BASE_URL}/cancelaciones/${id}/validar-cliente`, {
             method: 'POST',
             body: JSON.stringify(data)
@@ -239,7 +291,7 @@ export const ncService = {
         if (!response.ok) throw new Error('Error al validar cliente');
     },
 
-    async validarClienteCxGNC(id: string, data: { resultado: 'REAL' | 'FALSA'; observacion: string; usuario: string }): Promise<void> {
+    async validarClienteCxGNC(id: string, data: { resultado: 'REAL' | 'FALSA'; observacion: string; usuario: string; motivo_real?: string }): Promise<void> {
         const response = await apiClient(`${API_BASE_URL}/cxg-nc/${id}/validar-cliente`, {
             method: 'POST',
             body: JSON.stringify(data)

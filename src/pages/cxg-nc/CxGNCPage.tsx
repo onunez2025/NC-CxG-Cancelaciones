@@ -10,8 +10,10 @@ import {
   CheckCircle2,
   XCircle,
   Eye,
-  UserCheck,
-  ClipboardCheck
+  ClipboardCheck,
+  ShieldCheck,
+  Clock,
+  MessageSquare
 } from 'lucide-react';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 import { SIATCButton } from '../../components/siatc/SIATCButton';
@@ -25,7 +27,7 @@ import {
   SIATCTableCell 
 } from '../../components/siatc/table/SIATCTable';
 import { ncService } from '../../services/ncService';
-import type { CxGNC } from '../../services/ncService';
+import type { CxGNC, HistorialEntry, CxGNCMotivo } from '../../services/ncService';
 import { auditService } from '../../services/auditService';
 import { useAuth } from '../../hooks/useAuth';
 import { UsersService } from '../../services/usersService';
@@ -63,11 +65,19 @@ export const CxGNCPage = () => {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [detailData, setDetailData] = useState<CxGNC | null>(null);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
+  const [detailHistorial, setDetailHistorial] = useState<HistorialEntry[]>([]);
 
   // Validation state
   const [isValidarClienteOpen, setIsValidarClienteOpen] = useState(false);
-  const [validarForm, setValidarForm] = useState({ resultado: '' as 'REAL' | 'FALSA' | '', observacion: '' });
+  const [validarForm, setValidarForm] = useState({ resultado: '' as 'REAL' | 'FALSA' | '', observacion: '', motivo_real: '' });
   const [isValidarSubmitting, setIsValidarSubmitting] = useState(false);
+  const [motivos, setMotivos] = useState<{ id: string; motivo: string }[]>([]);
+
+  // Approval state (Supervisor)
+  const [isAprobarOpen, setIsAprobarOpen] = useState(false);
+  const [aprobarForm, setAprobarForm] = useState({ aprobado: '' as 'APROBADO' | 'RECHAZADO' | '', motivo: '', observacion: '' });
+  const [isAprobarSubmitting, setIsAprobarSubmitting] = useState(false);
+  const [cxgMotivos, setCxgMotivos] = useState<CxGNCMotivo[]>([]);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -93,6 +103,15 @@ export const CxGNCPage = () => {
     }
   };
 
+  const fetchAnalysts = async () => {
+    try {
+      const users = await UsersService.getUsers();
+      setAnalysts(users);
+    } catch (error) {
+      console.error('Error fetching analysts:', error);
+    }
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchData();
@@ -101,15 +120,20 @@ export const CxGNCPage = () => {
   }, [currentPage, searchTerm, activeTab, statusFilter]);
 
   useEffect(() => {
-    const fetchAnalysts = async () => {
+    const fetchInitialData = async () => {
       try {
-        const users = await UsersService.getUsers();
-        setAnalysts(users.filter((u: SystemUser) => u.is_active));
+        const [cancelMotivos, cxgMot] = await Promise.all([
+          ncService.getCancellationMotivos(),
+          ncService.getCxGNCMotivos()
+        ]);
+        setMotivos(cancelMotivos);
+        setCxgMotivos(cxgMot);
       } catch (error) {
-        console.error('Error fetching analysts:', error);
+        console.error('Error fetching motives:', error);
       }
     };
     fetchAnalysts();
+    fetchInitialData();
   }, []);
 
   useEffect(() => {
@@ -166,13 +190,45 @@ export const CxGNCPage = () => {
     }
   };
 
+  const handleAprobar = async () => {
+    if (!selectedRecord || !aprobarForm.aprobado) return;
+    setIsAprobarSubmitting(true);
+    try {
+      await ncService.aprobarSolicitudCxGNC(selectedRecord.id, {
+        aprobado: aprobarForm.aprobado,
+        motivo: aprobarForm.motivo,
+        observacion: aprobarForm.observacion,
+        usuario: user?.full_name || user?.username || 'Sistema'
+      });
+
+      await auditService.logAction({
+        UsuarioID: user?.id || '0',
+        UsuarioNombre: user?.username || 'Sistema',
+        Accion: aprobarForm.aprobado === 'APROBADO' ? 'APPROVE' : 'REJECT',
+        Entidad: 'CXG_NC',
+        EntidadID: selectedRecord.id,
+        Detalle: `Solicitud ${selectedRecord.correlativo} ${aprobarForm.aprobado}. Motivo: ${aprobarForm.motivo || 'N/A'}`
+      });
+
+      setIsAprobarOpen(false);
+      setAprobarForm({ aprobado: '', motivo: '', observacion: '' });
+      fetchData();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsAprobarSubmitting(false);
+    }
+  };
+
   const handleAsignar = async () => {
     if (!selectedRecord || !targetAnalystId) return;
     setIsSubmitting(true);
     try {
+      const targetAnalyst = analysts.find(a => a.id === targetAnalystId);
       await ncService.asignarCxGNC(selectedRecord.id, {
         asignado_a: targetAnalystId,
-        asignado_por: user?.id || '0'
+        asignado_por: user?.id || '0',
+        asignado_nombre: targetAnalyst?.full_name || targetAnalystId
       });
 
       await auditService.logAction({
@@ -181,7 +237,7 @@ export const CxGNCPage = () => {
         Accion: 'ASSIGN',
         Entidad: 'CXG_NC',
         EntidadID: selectedRecord.id,
-        Detalle: `Solicitud ${selectedRecord.correlativo} asignada a ${analysts.find(a => a.id === targetAnalystId)?.full_name}`
+        Detalle: `Solicitud ${selectedRecord.correlativo} asignada a ${targetAnalyst?.full_name}`
       });
 
       setIsAssignModalOpen(false);
@@ -230,7 +286,8 @@ export const CxGNCPage = () => {
       await ncService.validarClienteCxGNC(selectedRecord.id, {
         resultado: validarForm.resultado as 'REAL' | 'FALSA',
         observacion: validarForm.observacion,
-        usuario: user?.full_name || user?.username || 'Sistema'
+        usuario: user?.full_name || user?.username || 'Sistema',
+        motivo_real: validarForm.resultado === 'FALSA' ? validarForm.motivo_real : undefined
       });
       setIsValidarClienteOpen(false);
       fetchData();
@@ -243,9 +300,14 @@ export const CxGNCPage = () => {
 
   const handleViewDetail = async (id: string) => {
     setIsLoadingDetail(true);
+    setDetailHistorial([]);
     try {
-      const detail = await ncService.getCxGNCDetail(id);
+      const [detail, historial] = await Promise.all([
+        ncService.getCxGNCDetail(id),
+        ncService.getCxGNCHistorial(id)
+      ]);
       setDetailData(detail);
+      setDetailHistorial(historial);
       setIsDetailOpen(true);
     } catch (error) {
       console.error('Error fetching detail:', error);
@@ -258,8 +320,32 @@ export const CxGNCPage = () => {
     return user?.permissions?.includes(perm as any) || false;
   };
 
-  // No longer needed due to server-side filtering
   const displayedData = data;
+
+  // Helper: icon for history type
+  const getHistoryIcon = (tipo: string) => {
+    switch (tipo) {
+      case 'Registro': return DollarSign;
+      case 'Aprobación': return ShieldCheck;
+      case 'Asignación': return UserPlus;
+      case 'Validación': return ClipboardCheck;
+      case 'Gestión': return CheckCircle2;
+      case 'Llamada': return MessageSquare;
+      default: return Clock;
+    }
+  };
+
+  const getHistoryColor = (tipo: string) => {
+    switch (tipo) {
+      case 'Registro': return 'text-slate-500 bg-slate-100 border-slate-200';
+      case 'Aprobación': return 'text-amber-600 bg-amber-50 border-amber-200';
+      case 'Asignación': return 'text-blue-600 bg-blue-50 border-blue-200';
+      case 'Validación': return 'text-purple-600 bg-purple-50 border-purple-200';
+      case 'Gestión': return 'text-emerald-600 bg-emerald-50 border-emerald-200';
+      case 'Llamada': return 'text-cyan-600 bg-cyan-50 border-cyan-200';
+      default: return 'text-gray-500 bg-gray-50 border-gray-200';
+    }
+  };
 
   return (
     <div className={SIATC_THEME.LAYOUT.PAGE_WRAPPER}>
@@ -407,6 +493,7 @@ export const CxGNCPage = () => {
                   <SIATCTableHeader>DOCUMENTO</SIATCTableHeader>
                   <SIATCTableHeader>CLIENTE</SIATCTableHeader>
                   <SIATCTableHeader>FECHA</SIATCTableHeader>
+                  <SIATCTableHeader>MOTIVO REAL</SIATCTableHeader>
                   <SIATCTableHeader>ESTADO</SIATCTableHeader>
                   <SIATCTableHeader className="text-right">ACCIONES</SIATCTableHeader>
                 </tr>
@@ -432,11 +519,15 @@ export const CxGNCPage = () => {
                       </div>
                     </SIATCTableCell>
                     <SIATCTableCell>
+                      <span className="text-xs font-bold text-rose-500">{item.vali_motivo_real || '—'}</span>
+                    </SIATCTableCell>
+                    <SIATCTableCell>
                       <SIATCBadge variant={
                         item.estado === 'CERRADO' ? 'success' : 
                         item.estado === 'REGISTRADO' ? 'warning' :
                         item.estado === 'VALIDADO' ? 'info' :
                         item.estado === 'APROBADO_SUP' ? 'secondary' :
+                        item.estado === 'RECHAZADO' ? 'danger' :
                         'info'
                       }>
                         {item.estado}
@@ -452,6 +543,16 @@ export const CxGNCPage = () => {
                               onClick: () => handleViewDetail(item.id)
                             },
                             {
+                              label: 'Evaluar Solicitud',
+                              icon: ShieldCheck,
+                              onClick: () => {
+                                setSelectedRecord(item);
+                                setAprobarForm({ aprobado: '', motivo: '', observacion: '' });
+                                setIsAprobarOpen(true);
+                              },
+                              show: item.estado === 'REGISTRADO' && hasPermission('cxg.cxg_nc.approve')
+                            },
+                            {
                               label: 'Asignar Analista',
                               icon: UserPlus,
                               onClick: () => {
@@ -465,7 +566,7 @@ export const CxGNCPage = () => {
                               icon: ClipboardCheck,
                               onClick: () => {
                                 setSelectedRecord(item);
-                                setValidarForm({ resultado: '', observacion: '' });
+                                setValidarForm({ resultado: '', observacion: '', motivo_real: '' });
                                 setIsValidarClienteOpen(true);
                               },
                               show: item.estado === 'ASIGNADO' && hasPermission('cxg.cxg_nc.gestionar')
@@ -519,7 +620,9 @@ export const CxGNCPage = () => {
         </div>
       </div>
 
+      {/* ─────────────────────────────────────────── */}
       {/* Create Modal */}
+      {/* ─────────────────────────────────────────── */}
       <SIATCModalWrapper
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -577,7 +680,96 @@ export const CxGNCPage = () => {
         </div>
       </SIATCModalWrapper>
 
+      {/* ─────────────────────────────────────────── */}
+      {/* Evaluar Solicitud Modal (Supervisor) */}
+      {/* ─────────────────────────────────────────── */}
+      <SIATCModalWrapper
+        isOpen={isAprobarOpen}
+        onClose={() => setIsAprobarOpen(false)}
+        title="Evaluar Solicitud"
+        subtitle={selectedRecord ? `${selectedRecord.tipo} #${selectedRecord.correlativo} — ${selectedRecord.cliente}` : ''}
+        footer={
+          <>
+            <SIATCButton variant="ghost" onClick={() => setIsAprobarOpen(false)}>Cancelar</SIATCButton>
+            <SIATCButton 
+              variant="primary" 
+              onClick={handleAprobar} 
+              isLoading={isAprobarSubmitting}
+              disabled={!aprobarForm.aprobado || (aprobarForm.aprobado === 'RECHAZADO' && !aprobarForm.observacion)}
+            >
+              Confirmar Evaluación
+            </SIATCButton>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div className="p-4 bg-muted/30 rounded-xl border border-border/50">
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Resumen del Documento</p>
+            <p className="text-sm font-bold">{selectedRecord?.tipo} #{selectedRecord?.correlativo}</p>
+            <p className="text-xs text-muted-foreground">Cliente: {selectedRecord?.cliente}</p>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-3 block tracking-widest pl-4">¿Aprueba esta solicitud?</label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setAprobarForm({ ...aprobarForm, aprobado: 'APROBADO' })}
+                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all font-bold text-sm ${
+                  aprobarForm.aprobado === 'APROBADO'
+                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-lg shadow-emerald-500/10'
+                    : 'border-border text-muted-foreground hover:bg-muted/50'
+                }`}
+              >
+                <CheckCircle2 className="w-5 h-5" />
+                APROBAR
+              </button>
+              <button
+                type="button"
+                onClick={() => setAprobarForm({ ...aprobarForm, aprobado: 'RECHAZADO' })}
+                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all font-bold text-sm ${
+                  aprobarForm.aprobado === 'RECHAZADO'
+                    ? 'border-rose-500 bg-rose-50 text-rose-700 shadow-lg shadow-rose-500/10'
+                    : 'border-border text-muted-foreground hover:bg-muted/50'
+                }`}
+              >
+                <XCircle className="w-5 h-5" />
+                RECHAZAR
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Motivo</label>
+            <select
+              className={SIATC_THEME.COMPONENTS.INPUT}
+              value={aprobarForm.motivo}
+              onChange={(e) => setAprobarForm({ ...aprobarForm, motivo: e.target.value })}
+            >
+              <option value="">Seleccione un motivo...</option>
+              {cxgMotivos.map(m => (
+                <option key={m.id} value={m.motivo}>{m.motivo}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">
+              Observaciones {aprobarForm.aprobado === 'RECHAZADO' && <span className="text-rose-500 font-bold ml-1">(REQUERIDO)</span>}
+            </label>
+            <textarea 
+              className={`${SIATC_THEME.COMPONENTS.INPUT} h-24 pt-2 resize-none`}
+              placeholder={aprobarForm.aprobado === 'RECHAZADO' ? 'Explique el motivo del rechazo...' : 'Observaciones adicionales...'}
+              value={aprobarForm.observacion}
+              onChange={(e) => setAprobarForm({...aprobarForm, observacion: e.target.value})}
+            />
+          </div>
+        </div>
+      </SIATCModalWrapper>
+
+      {/* ─────────────────────────────────────────── */}
       {/* Asignar Modal */}
+      {/* ─────────────────────────────────────────── */}
       <SIATCModalWrapper
         isOpen={isAssignModalOpen}
         onClose={() => setIsAssignModalOpen(false)}
@@ -607,9 +799,12 @@ export const CxGNCPage = () => {
         </div>
       </SIATCModalWrapper>
 
+      {/* ─────────────────────────────────────────── */}
+      {/* Detail Modal with Dynamic Timeline */}
+      {/* ─────────────────────────────────────────── */}
       <SIATCModalWrapper
         isOpen={isDetailOpen}
-        onClose={() => { setIsDetailOpen(false); setDetailData(null); }}
+        onClose={() => { setIsDetailOpen(false); setDetailData(null); setDetailHistorial([]); }}
         title="Detalle de Solicitud"
         subtitle={detailData ? `${detailData.tipo} #${detailData.correlativo}` : 'Cargando...'}
         size="lg"
@@ -621,32 +816,35 @@ export const CxGNCPage = () => {
           </div>
         ) : detailData ? (
           <div className="space-y-6">
-             {/* Process Timeline */}
+             {/* Process Timeline Steps */}
              <div className="grid grid-cols-5 gap-2 px-2">
               {[
                 { key: 'REGISTRADO', label: 'Registro', icon: DollarSign },
-                { key: 'APROBADO_SUP', label: 'Aprobación', icon: UserCheck },
+                { key: 'APROBADO_SUP', label: 'Aprobación', icon: ShieldCheck },
                 { key: 'ASIGNADO', label: 'Asignación', icon: UserPlus },
                 { key: 'VALIDADO', label: 'Validación', icon: ClipboardCheck },
                 { key: 'CERRADO', label: 'Cierre', icon: CheckCircle2 }
               ].map((step, idx) => {
                 const stepOrder = ['REGISTRADO', 'APROBADO_SUP', 'ASIGNADO', 'VALIDADO', 'CERRADO'];
-                const currentIdx = stepOrder.indexOf(detailData.estado);
+                const currentIdx = stepOrder.indexOf(detailData.estado === 'RECHAZADO' ? 'REGISTRADO' : detailData.estado);
                 const isCompleted = currentIdx >= idx;
                 const isActive = currentIdx === idx;
+                const isRejected = detailData.estado === 'RECHAZADO' && idx === 1;
 
                 return (
                   <div key={step.key} className="flex flex-col items-center gap-2">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${
+                      isRejected ? 'bg-rose-500 border-rose-500 text-white' :
                       isCompleted ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 
                       'bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-800 dark:border-slate-700'
                     } ${isActive ? 'ring-4 ring-primary/10 scale-110' : ''}`}>
-                      <step.icon className="w-4 h-4" />
+                      {isRejected ? <XCircle className="w-4 h-4" /> : <step.icon className="w-4 h-4" />}
                     </div>
                     <span className={`text-[9px] font-black uppercase tracking-tighter text-center leading-none ${
+                       isRejected ? 'text-rose-500' :
                        isCompleted ? 'text-primary' : 'text-slate-400'
                     }`}>
-                      {step.label}
+                      {isRejected ? 'Rechazado' : step.label}
                     </span>
                   </div>
                 );
@@ -654,9 +852,10 @@ export const CxGNCPage = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Left column: Registration & Audit */}
               <div className="space-y-4">
                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                  <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">1. Registro & Ticket</h3>
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">Datos del Registro</h3>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-[10px] font-bold text-muted-foreground uppercase">Tipo</span>
@@ -671,53 +870,120 @@ export const CxGNCPage = () => {
                       <span className="text-xs font-bold text-right italic">{detailData.cliente}</span>
                     </div>
                     <div className="flex justify-between items-center">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase">Registrado por</span>
+                      <span className="text-xs font-semibold">{detailData.creado_por || '—'}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
                       <span className="text-[10px] font-bold text-muted-foreground uppercase">Fecha Registro</span>
                       <span className="text-xs">{new Date(detailData.fecha).toLocaleString()}</span>
                     </div>
+                    {detailData.ticket_desinstalacion && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase">Ticket Desinstalación</span>
+                        <span className="text-xs font-black text-amber-600">#{detailData.ticket_desinstalacion}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
+                {/* Audit Steps Summary */}
                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                  <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">2. Auditoría de Proceso</h3>
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">Trazabilidad de Proceso</h3>
                   <div className="space-y-2">
-                    <div className="text-[10px] uppercase text-muted-foreground font-bold">Estado</div>
-                    <SIATCBadge className="w-full justify-center" variant={detailData.estado === 'CERRADO' ? 'success' : 'info'}>{detailData.estado}</SIATCBadge>
-                    
-                    <div className="mt-4 space-y-2">
-                      <AuditStep label="Aprobación Sup." user={detailData.apro_por} date={detailData.apro_el} status={detailData.apro_solicitud} />
-                      <AuditStep label="Validación Cliente" user={detailData.vali_por} date={detailData.vali_el} status={detailData.vali_cliente} />
-                      <AuditStep label="Cierre Final" user={detailData.gestionado_por} date={detailData.fecha_gestionado} status={detailData.resultado === 'Si' ? 'CERRADO' : detailData.resultado === 'No' ? 'RECHAZADO' : null} />
-                    </div>
+                    <AuditStep 
+                      label="Aprobación Sup." 
+                      user={detailData.apro_por || detailData.aprobado_por} 
+                      date={detailData.apro_el || detailData.aprobado_el} 
+                      status={detailData.apro_solicitud || detailData.aprobado} 
+                    />
+                    {detailData.asignado_a && (
+                      <AuditStep 
+                        label="Asignación" 
+                        user={detailData.asignado_por} 
+                        date={detailData.asignado_el} 
+                        status="ASIGNADO" 
+                      />
+                    )}
+                    <AuditStep 
+                      label="Validación Cliente" 
+                      user={detailData.vali_por} 
+                      date={detailData.vali_el} 
+                      status={detailData.vali_cliente} 
+                    />
+                    <AuditStep 
+                      label="Cierre Final" 
+                      user={detailData.procesado_por || detailData.gestionado_por} 
+                      date={detailData.procesado_el || detailData.fecha_gestionado} 
+                      status={detailData.gestionado === 'Si' ? 'CERRADO' : detailData.gestionado === 'No' ? 'RECHAZADO' : null} 
+                    />
                   </div>
                 </div>
               </div>
 
+              {/* Right column: Dynamic History Timeline */}
               <div className="space-y-4">
                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 h-full">
-                  <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">3. Observaciones de Gestión</h3>
-                  <div className="space-y-4">
-                    {detailData.apro_obs && (
-                      <div>
-                        <div className="text-[9px] font-black uppercase text-amber-600 mb-1">Obs. Aprobación</div>
-                        <p className="text-xs p-3 bg-amber-50 rounded-lg border border-amber-100 italic">"{detailData.apro_obs}"</p>
-                      </div>
-                    )}
-                    {detailData.vali_obs && (
-                      <div>
-                        <div className="text-[9px] font-black uppercase text-blue-600 mb-1">Obs. Validación Cliente</div>
-                        <p className="text-xs p-3 bg-blue-50 rounded-lg border border-blue-100 italic">"{detailData.vali_obs}"</p>
-                      </div>
-                    )}
-                    {detailData.observacion && (
-                      <div>
-                        <div className="text-[9px] font-black uppercase text-emerald-600 mb-1">Obs. Cierre</div>
-                        <p className="text-xs p-3 bg-emerald-50 rounded-lg border border-emerald-100 italic">"{detailData.observacion}"</p>
-                      </div>
-                    )}
-                  </div>
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">
+                    Historial de Acciones ({detailHistorial.length})
+                  </h3>
+                  
+                  {detailHistorial.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Clock className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
+                      <p className="text-xs text-muted-foreground italic">Sin registros de historial</p>
+                    </div>
+                  ) : (
+                    <div className="relative space-y-0">
+                      {/* Timeline line */}
+                      <div className="absolute left-[15px] top-4 bottom-4 w-[2px] bg-border/50" />
+                      
+                      {detailHistorial.map((entry, idx) => {
+                        const Icon = getHistoryIcon(entry.tipo);
+                        const colorClass = getHistoryColor(entry.tipo);
+                        
+                        return (
+                          <div key={entry.id || idx} className="relative pl-10 pb-4 last:pb-0">
+                            {/* Timeline dot */}
+                            <div className={`absolute left-[7px] top-1 w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center ${colorClass}`}>
+                              <Icon className="w-2.5 h-2.5" />
+                            </div>
+                            
+                            <div className="bg-white dark:bg-slate-900 border border-border/50 rounded-lg p-3 shadow-sm">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${colorClass}`}>
+                                  {entry.tipo}
+                                </span>
+                                <span className="text-[9px] text-muted-foreground italic">
+                                  {entry.fecha ? new Date(entry.fecha).toLocaleString() : ''}
+                                </span>
+                              </div>
+                              {entry.usuario && (
+                                <div className="text-[10px] font-bold text-foreground mb-0.5">
+                                  {entry.usuario}
+                                </div>
+                              )}
+                              {entry.observacion && (
+                                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                                  {entry.observacion}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
+
+            {/* Motivo Real Alert */}
+            {detailData.vali_motivo_real && (
+              <div className="p-3 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800 rounded-xl">
+                <div className="text-[9px] font-black uppercase text-rose-600 mb-1">⚠ Motivo Real Detectado</div>
+                <p className="text-sm font-bold text-rose-700 dark:text-rose-400">{detailData.vali_motivo_real}</p>
+              </div>
+            )}
           </div>
         ) : (
           <div className="h-48 flex items-center justify-center">
@@ -726,7 +992,9 @@ export const CxGNCPage = () => {
         )}
       </SIATCModalWrapper>
 
-       {/* Validar Cliente Modal */}
+      {/* ─────────────────────────────────────────── */}
+      {/* Validar Cliente Modal */}
+      {/* ─────────────────────────────────────────── */}
        <SIATCModalWrapper
         isOpen={isValidarClienteOpen}
         onClose={() => setIsValidarClienteOpen(false)}
@@ -739,7 +1007,7 @@ export const CxGNCPage = () => {
               variant="primary" 
               onClick={handleValidarCliente} 
               isLoading={isValidarSubmitting}
-              disabled={!validarForm.resultado}
+              disabled={!validarForm.resultado || (validarForm.resultado === 'FALSA' && !validarForm.motivo_real)}
             >
               Confirmar Validación
             </SIATCButton>
@@ -783,6 +1051,22 @@ export const CxGNCPage = () => {
             </div>
           </div>
 
+          {validarForm.resultado === 'FALSA' && (
+            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+              <label className="text-[10px] font-black uppercase text-rose-500 mb-1.5 block tracking-widest pl-4">¿Cuál es el Motivo Real?</label>
+              <select
+                className={`${SIATC_THEME.COMPONENTS.INPUT} font-bold text-rose-600 border-rose-200 bg-rose-50/30`}
+                value={validarForm.motivo_real}
+                onChange={(e) => setValidarForm({ ...validarForm, motivo_real: e.target.value })}
+              >
+                <option value="">Seleccione el motivo real...</option>
+                {motivos.map(m => (
+                  <option key={m.id} value={m.motivo}>{m.motivo}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div>
             <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Notas de la llamada</label>
             <textarea 
@@ -795,7 +1079,9 @@ export const CxGNCPage = () => {
         </div>
       </SIATCModalWrapper>
 
+      {/* ─────────────────────────────────────────── */}
       {/* Gestionar Modal */}
+      {/* ─────────────────────────────────────────── */}
       <SIATCModalWrapper
         isOpen={isGestionModalOpen}
         onClose={() => setIsGestionModalOpen(false)}
