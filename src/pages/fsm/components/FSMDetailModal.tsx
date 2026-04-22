@@ -13,7 +13,6 @@ import {
 } from 'lucide-react';
 import { SIATCModalWrapper } from '../../../components/siatc/SIATCModalWrapper';
 import { SIATCBadge } from '../../../components/siatc/SIATCBadge';
-import { SIATC_THEME } from '../../../utils/siatc-theme';
 import type { FSMTracking } from '../../../services/fsmService';
 
 interface FSMDetailModalProps {
