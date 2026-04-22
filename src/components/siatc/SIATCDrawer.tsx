@@ -55,57 +55,61 @@ export const SIATCDrawer: React.FC<SIATCDrawerProps> = ({
 
     const content = (
         <div className="fixed inset-0 z-[9999] flex justify-end overflow-hidden focus:outline-none">
-            {/* Backdrop con contraste premium y profundo blur - Cubre TODO el viewport */}
+            {/* Backdrop Ultra-Traslúcido con Blur Profundo */}
             <div 
-                className="absolute inset-0 bg-slate-950/90 backdrop-blur-2xl animate-in fade-in duration-500 ease-out"
+                className="absolute inset-0 bg-slate-950/25 backdrop-blur-[2px] animate-in fade-in duration-500 ease-out"
                 onClick={onClose}
                 aria-hidden="true"
             />
             
-            {/* Contenedor del Panel */}
+            {/* Contenedor del Panel - Glassmorphism Extremo */}
             <div 
                 role="dialog"
                 aria-modal="true"
                 className={cn(
-                    "relative h-full w-full bg-white dark:bg-slate-950 shadow-[0_0_50px_rgba(0,0,0,0.5)] border-l border-white/10 flex flex-col",
+                    "relative h-full w-full bg-white/70 dark:bg-slate-900/40 backdrop-blur-[40px] shadow-[0_0_50px_rgba(0,0,0,0.5)] border-l border-white/20 flex flex-col",
                     "animate-in slide-in-from-right duration-700 cubic-bezier(0.16, 1, 0.3, 1)",
                     widthClass,
                     className
                 )}
             >
-                {/* Accent line for depth */}
-                <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
+                {/* Glow Perimetral sutil en el borde izquierdo */}
+                <div className="absolute inset-y-0 left-0 w-[2px] bg-gradient-to-b from-primary/0 via-primary/50 to-primary/0 shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]" />
 
-                {/* Header Premium - Con más aire arriba */}
-                <div className="flex items-start justify-between p-10 pb-8 border-b border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/10 shrink-0">
+                {/* Header Premium - Glassy & Airy */}
+                <div className="flex items-start justify-between p-10 pb-8 border-b border-white/10 bg-white/10 dark:bg-black/20 shrink-0 backdrop-blur-md">
                     <div className="flex-1 pr-6 pt-2">
-                        <h2 className={cn(SIATC_THEME.TYPOGRAPHY.PAGE_TITLE, "text-3xl tracking-tight leading-tight uppercase font-black")}>
+                        <div className="flex items-center gap-2 mb-2">
+                            <div className="w-8 h-1 bg-primary rounded-full" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Detalle de Gestión</span>
+                        </div>
+                        <h2 className={cn(SIATC_THEME.TYPOGRAPHY.PAGE_TITLE, "text-4xl tracking-tighter leading-none uppercase font-black bg-gradient-to-br from-slate-900 to-slate-500 dark:from-white dark:to-slate-400 bg-clip-text text-transparent")}>
                           {title}
                         </h2>
                         {subtitle && (
-                            <p className={cn(SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE, "mt-2 leading-relaxed text-slate-500 max-w-lg font-medium")}>
+                            <p className={cn(SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE, "mt-3 leading-relaxed text-slate-500 dark:text-slate-400 max-w-lg font-bold opacity-80")}>
                                 {subtitle}
                             </p>
                         )}
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-4 -mr-2 text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all shadow-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 active:scale-90"
+                        className="p-4 -mr-2 text-muted-foreground hover:text-foreground hover:bg-white/20 dark:hover:bg-white/5 rounded-2xl transition-all shadow-sm bg-white/40 dark:bg-slate-800/40 border border-white/20 dark:border-white/10 active:scale-90 backdrop-blur-xl"
                     >
                         <X className="w-6 h-6" />
                     </button>
                 </div>
 
                 {/* Cuerpo con Scroll Custom */}
-                <div className="flex-1 overflow-y-auto px-10 py-8 custom-scrollbar">
-                    <div className="space-y-10 pb-12">
+                <div className="flex-1 overflow-y-auto px-10 py-8 custom-scrollbar bg-white/5 dark:bg-black/5">
+                    <div className="space-y-12 pb-16">
                         {children}
                     </div>
                 </div>
 
                 {/* Footer si aplica */}
                 {footer && (
-                    <div className="p-10 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 shrink-0">
+                    <div className="p-10 border-t border-white/10 bg-white/20 dark:bg-black/40 shrink-0 backdrop-blur-xl">
                         {footer}
                     </div>
                 )}
