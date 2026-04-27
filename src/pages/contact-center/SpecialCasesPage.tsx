@@ -3,15 +3,12 @@ import {
   Search, 
   RefreshCw, 
   Loader2,
-  FileSpreadsheet,
-  AlertCircle,
   CheckCircle2,
   XCircle,
   Eye,
   Plus,
   Calendar,
-  User,
-  MessageSquare
+  User
 } from 'lucide-react';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 import { SIATCButton } from '../../components/siatc/SIATCButton';
@@ -164,7 +161,7 @@ export const SpecialCasesPage = () => {
       await auditService.logAction({
         UsuarioID: user?.id || '0',
         UsuarioNombre: user?.username || 'Sistema',
-        Accion: approveForm.estado,
+        Accion: approveForm.estado === 'APROBADO' ? 'APPROVE' : 'REJECT',
         Entidad: 'CASOS_ESPECIALES',
         EntidadID: selectedCase.id,
         Detalle: `Caso especial ${selectedCase.ticket} marcado como ${approveForm.estado}`
