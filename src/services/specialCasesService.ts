@@ -1,5 +1,4 @@
 import { apiClient, API_BASE_URL } from './apiClient';
-import type { SpecialCase, SpecialCaseMotivo } from '../types';
 
 export const specialCasesService = {
     getSpecialCases: async (params: { page?: number; pageSize?: number; search?: string } = {}) => {
