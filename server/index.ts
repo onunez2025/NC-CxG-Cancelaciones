@@ -22,6 +22,7 @@ import { sapRouter } from './routes/sap.js';
 import { crossReferenceRouter, prewarmCache } from './routes/crossReference.js';
 import ncRouter from './routes/nc.js';
 import fsmRouter from './routes/fsm.js';
+import specialCasesRouter from './routes/specialCases.js';
 import { verifyToken, verifyPermission } from './middleware/auth.js';
 import { setupSapViews } from './setup_sap_views.js';
 
@@ -108,6 +109,7 @@ app.use('/api/sap/uploads', verifyToken, verifyPermission('ebm.config.sap'), sap
 app.use('/api/sap/cross-reference', verifyToken, crossReferenceRouter);
 app.use('/api', verifyToken, ncRouter);
 app.use('/api/fsm', verifyToken, fsmRouter);
+app.use('/api/special-cases', verifyToken, specialCasesRouter);
 
 // Security Audit Logs
 app.get('/api/config/audit-logs', verifyToken, verifyPermission('ebm.config.users'), async (req: Request, res: Response) => {

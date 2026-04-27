@@ -22,6 +22,7 @@ import { CancellationsPage } from './pages/cancelaciones/CancellationsPage';
 import { CxGNCPage } from './pages/cxg-nc/CxGNCPage';
 import { FSMDashboardPage } from './pages/fsm/FSMDashboardPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { SpecialCasesPage } from './pages/contact-center/SpecialCasesPage';
 import { NotFound } from './pages/NotFound';
 
 // ... (lines 48-55 omitted)
@@ -106,6 +107,9 @@ function App() {
               </Route>
               <Route element={<RequirePermission permission="cxg.fsm.view" />}>
                 <Route path="/fsm-tracking" element={<FSMDashboardPage />} />
+              </Route>
+              <Route element={<RequirePermission permission="cxg.casos_especiales.view" />}>
+                <Route path="/contact-center/casos-especiales" element={<SpecialCasesPage />} />
               </Route>
 
               <Route path="/profile" element={<ProfilePage />} />

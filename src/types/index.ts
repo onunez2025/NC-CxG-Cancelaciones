@@ -33,8 +33,28 @@ export type Permission =
     | 'cxg.cancelaciones.view' | 'cxg.cancelaciones.create' | 'cxg.cancelaciones.assign' | 'cxg.cancelaciones.gestionar' | 'cxg.cancelaciones.process'
     | 'cxg.cxg_nc.view' | 'cxg.cxg_nc.create' | 'cxg.cxg_nc.approve' | 'cxg.cxg_nc.assign' | 'cxg.cxg_nc.gestionar' | 'cxg.cxg_nc.process'
     | 'cxg.fsm.view'
+    | 'cxg.casos_especiales.view' | 'cxg.casos_especiales.create' | 'cxg.casos_especiales.gestionar'
     | 'cxg.reportes.exportar'
     | 'config.users' | 'config.roles' | 'config.cecos' | 'config.accounts' | 'config.managements' | 'config.exchange_rates' | 'config.audit';
+
+export interface SpecialCase {
+    id: string;
+    ticket: string;
+    motivo: string;
+    comentario: string;
+    fecha: string;
+    creado_por: string;
+    estado: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO';
+    revisado_el?: string;
+    revisado_por?: string;
+    motivo_rechazo?: string;
+}
+
+export interface SpecialCaseMotivo {
+    id: string;
+    motivo: string;
+    tipo_usuario: string;
+}
 
 export interface Management {
     id: string;
