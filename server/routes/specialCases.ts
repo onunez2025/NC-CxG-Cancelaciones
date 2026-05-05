@@ -56,19 +56,21 @@ router.get('/', async (req: Request, res: Response) => {
             .input('pageSize', sql.Int, pageSize)
             .query(`
                 SELECT 
-                    ID_Casos_Especiales as id,
-                    Ticket as ticket,
-                    Motivo_solicitud as motivo,
-                    Comentario as comentario,
-                    Creado_el as fecha,
-                    Creado_por as creado_por,
-                    Estado as estado,
-                    Reviisado_el as revisado_el,
-                    Revisado_por as revisado_por,
-                    Motivo_Rechazo as motivo_rechazo
-                FROM [dbo].[GAC_APP_TB_CASOS_ESPECIALES]
+                    n.ID_Casos_Especiales as id,
+                    n.Ticket as ticket,
+                    n.Motivo_solicitud as motivo,
+                    n.Comentario as comentario,
+                    n.Creado_el as fecha,
+                    n.Creado_por as creado_por,
+                    n.Estado as estado,
+                    n.Reviisado_el as revisado_el,
+                    n.Revisado_por as revisado_por,
+                    n.Motivo_Rechazo as motivo_rechazo,
+                    t.FechaVisita as fecha_visita
+                FROM [dbo].[GAC_APP_TB_CASOS_ESPECIALES] n
+                LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
                 ${whereClause}
-                ORDER BY Creado_el DESC
+                ORDER BY n.Creado_el DESC
                 OFFSET @offset ROWS
                 FETCH NEXT @pageSize ROWS ONLY
             `);

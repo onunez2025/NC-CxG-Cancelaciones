@@ -104,6 +104,7 @@ export interface TicketInfo {
   estado?: string;
   motivo_elevacion?: string;
   lugar_compra_id?: string;
+  fecha_visita?: string;
 }
 
 export interface PaginatedResponse<T> {

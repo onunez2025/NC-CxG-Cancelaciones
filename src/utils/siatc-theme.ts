@@ -34,7 +34,7 @@ export const SIATC_THEME = {
         TABLE_HEADER: "px-6 py-4 font-black text-[13px] uppercase tracking-wider text-muted-foreground",
         BADGE_TEXT: "text-[10px] font-black tracking-widest uppercase",
         FOOTER_STATS: "text-[10px] font-black text-muted-foreground tracking-[0.2em] uppercase opacity-60",
-        TINY_MONO: "text-[10px] font-mono font-black tracking-tight",
+        TINY_MONO: "text-[12px] font-mono font-black tracking-tight",
     },
 
     // 3. TABLAS (DENSIDAD Y ESTILOS PLATINUM)

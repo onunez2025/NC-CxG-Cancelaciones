@@ -49,7 +49,8 @@ export const SpecialCasesPage = () => {
     ticket: '',
     motivo: '',
     comentario: '',
-    cliente_temp: '' // For lookup feedback
+    cliente_temp: '', // For lookup feedback
+    fecha_visita_temp: '' // For lookup feedback
   });
 
   // Approval state
@@ -103,7 +104,8 @@ export const SpecialCasesPage = () => {
       const ticketInfo = await ncService.getTicketDetails(formData.ticket);
       setFormData(prev => ({
         ...prev,
-        cliente_temp: ticketInfo.cliente
+        cliente_temp: ticketInfo.cliente,
+        fecha_visita_temp: ticketInfo.fecha_visita || ''
       }));
     } catch (error: any) {
       console.error("Lookup error:", error);
@@ -115,6 +117,25 @@ export const SpecialCasesPage = () => {
 
   const handleCreate = async () => {
     if (!formData.ticket || !formData.motivo) return;
+
+    // Business Rule: Posterior a las 10:30 no permite registrar casos para posterior a 48 horas.
+    if (formData.fecha_visita_temp) {
+      const now = new Date();
+      const cutoff = new Date();
+      cutoff.setHours(10, 30, 0, 0);
+
+      if (now > cutoff) {
+        const visitDate = new Date(formData.fecha_visita_temp);
+        const diffTime = visitDate.getTime() - now.getTime();
+        const diffHours = diffTime / (1000 * 60 * 60);
+
+        if (diffHours > 48) {
+          alert('No es posible registrar casos con fecha de visita superior a 48 horas después de las 10:30 AM.');
+          return;
+        }
+      }
+    }
+
     setIsSubmitting(true);
     try {
       await specialCasesService.createSpecialCase({
@@ -139,7 +160,8 @@ export const SpecialCasesPage = () => {
         ticket: '', 
         motivo: '', 
         comentario: '',
-        cliente_temp: ''
+        cliente_temp: '',
+        fecha_visita_temp: ''
       });
     } catch (error) {
       console.error(error);
@@ -236,7 +258,8 @@ export const SpecialCasesPage = () => {
                   <SIATCTableHeader>TICKET</SIATCTableHeader>
                   <SIATCTableHeader>MOTIVO</SIATCTableHeader>
                   <SIATCTableHeader>CREADO POR</SIATCTableHeader>
-                  <SIATCTableHeader>FECHA</SIATCTableHeader>
+                  <SIATCTableHeader>FECHA REGISTRO</SIATCTableHeader>
+                  <SIATCTableHeader>FECHA VISITA</SIATCTableHeader>
                   <SIATCTableHeader>ESTADO</SIATCTableHeader>
                   <SIATCTableHeader className="text-right">ACCIONES</SIATCTableHeader>
                 </tr>
@@ -260,6 +283,14 @@ export const SpecialCasesPage = () => {
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <Calendar className="w-3.5 h-3.5" />
                         <span className="text-xs">{new Date(item.fecha).toLocaleDateString()}</span>
+                      </div>
+                    </SIATCTableCell>
+                    <SIATCTableCell>
+                      <div className="flex items-center gap-2 text-primary font-bold">
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span className="text-xs">
+                          {item.fecha_visita ? new Date(item.fecha_visita).toLocaleDateString() : 'N/A'}
+                        </span>
                       </div>
                     </SIATCTableCell>
                     <SIATCTableCell>
@@ -290,7 +321,9 @@ export const SpecialCasesPage = () => {
                               setApproveForm({ estado: '', motivo_rechazo: '' });
                               setIsApproveModalOpen(true);
                             },
-                            show: item.estado === 'PENDIENTE' && hasPermission('cxg.casos_especiales.gestionar')
+                            show: item.estado === 'PENDIENTE' && 
+                                   hasPermission('cxg.casos_especiales.gestionar') && 
+                                   user?.role_name !== 'Contact Center'
                           }
                         ]}
                       />
@@ -380,9 +413,16 @@ export const SpecialCasesPage = () => {
               />
             </div>
             {formData.cliente_temp && (
-              <p className={`text-[10px] font-bold mt-1.5 pl-4 ${formData.cliente_temp === 'Ticket no encontrado' ? 'text-rose-500' : 'text-emerald-500'}`}>
-                {formData.cliente_temp === 'Ticket no encontrado' ? '⚠' : '✔'} {formData.cliente_temp}
-              </p>
+              <div className="mt-1.5 pl-4 space-y-1">
+                <p className={`text-[10px] font-bold ${formData.cliente_temp === 'Ticket no encontrado' ? 'text-rose-500' : 'text-emerald-500'}`}>
+                  {formData.cliente_temp === 'Ticket no encontrado' ? '⚠' : '✔'} Cliente: {formData.cliente_temp}
+                </p>
+                {formData.fecha_visita_temp && (
+                  <p className="text-[10px] font-bold text-primary">
+                    📅 Fecha Visita: {new Date(formData.fecha_visita_temp).toLocaleString()}
+                  </p>
+                )}
+              </div>
             )}
           </div>
 

@@ -48,6 +48,7 @@ export interface SpecialCase {
     revisado_el?: string;
     revisado_por?: string;
     motivo_rechazo?: string;
+    fecha_visita?: string;
 }
 
 export interface SpecialCaseMotivo {

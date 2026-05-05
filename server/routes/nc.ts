@@ -22,7 +22,8 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
                     Asunto as asunto,
                     Estado as estado,
                     ComentarioProgramador as motivo_elevacion,
-                    IDEmpresa as lugar_compra_id
+                    IDEmpresa as lugar_compra_id,
+                    FechaVisita as fecha_visita
                 FROM [SIATC].[Dashboard_FSM]
                 WHERE Ticket = @ticketId
             `);
