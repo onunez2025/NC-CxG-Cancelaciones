@@ -32,9 +32,11 @@ import { auditService } from '../../services/auditService';
 import { useAuth } from '../../hooks/useAuth';
 import { UsersService } from '../../services/usersService';
 import type { User as SystemUser } from '../../types';
+import { useDialog } from '../../context/DialogContext';
 
 export const CxGNCPage = () => {
   const { user } = useAuth();
+  const dialog = useDialog();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
@@ -80,7 +82,7 @@ export const CxGNCPage = () => {
   const [cxgMotivos, setCxgMotivos] = useState<CxGNCMotivo[]>([]);
 
   // Form state
-  const [formData, setFormData] = useState<Partial<NCRecord>>({
+  const [formData, setFormData] = useState<Partial<CxGNC>>({
     tipo: 'CXG',
     ticket: '',
     cliente: '',
@@ -181,7 +183,11 @@ export const CxGNCPage = () => {
     try {
       const ticketInfo = await ncService.getTicketDetails(formData.ticket);
       if (ticketInfo.estado !== 'Closed') {
-        toast.error(`El ticket #${formData.ticket} no está CERRADO. Estado actual: ${ticketInfo.estado || 'Desconocido'}`);
+        dialog.alert({ 
+          title: 'Ticket No Válido',
+          message: `El ticket #${formData.ticket} no está CERRADO. Estado actual: ${ticketInfo.estado || 'Desconocido'}`,
+          type: 'error'
+        });
         return;
       }
 
@@ -190,10 +196,18 @@ export const CxGNCPage = () => {
         cliente: ticketInfo.cliente,
         observacion: `Motivo: ${ticketInfo.motivo_elevacion || 'N/A'} — Lugar: ${ticketInfo.lugar_compra_id || 'N/A'}`
       });
-      toast.success("Ticket encontrado y válido");
+      dialog.alert({ 
+        title: 'Éxito',
+        message: "Ticket encontrado y válido",
+        type: 'success'
+      });
     } catch (error: any) {
       console.error("Lookup error:", error);
-      toast.error("El ticket es incorrecto o no existe");
+      dialog.alert({ 
+        title: 'Error de Búsqueda',
+        message: "El ticket es incorrecto o no existe",
+        type: 'error'
+      });
     } finally {
       setIsLookingUp(false);
     }

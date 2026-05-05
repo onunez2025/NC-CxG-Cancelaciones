@@ -76,6 +76,10 @@ export interface CxGNC {
     fecha_gestionado?: string;
     resultado?: string;
     ticket?: string;
+    // Extended fields for detail view
+    fsm_cliente?: string;
+    fsm_lugar_compra?: string;
+    fsm_motivo_elevacion?: string;
 }
 
 export interface HistorialEntry {
