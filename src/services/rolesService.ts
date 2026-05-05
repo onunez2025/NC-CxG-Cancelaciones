@@ -54,7 +54,7 @@ export class RolesService {
             { group: 'CxG y NC', id: 'cxg.cxg_nc.assign', label: 'Asignar CxG y NC' },
             { group: 'CxG y NC', id: 'cxg.cxg_nc.gestionar', label: 'Gestionar CxG y NC' },
             { group: 'CxG y NC', id: 'cxg.cxg_nc.process', label: 'Procesar CxG y NC' },
-            { group: 'CxG y NC', id: 'cxg.fsm.view', label: 'Ver Tracking FSM' },
+            { group: 'CxG y NC', id: 'cxg.fsm.view', label: 'Ver Horarios Visitas' },
             
             { group: 'Contact Center', id: 'cxg.casos_especiales.view', label: 'Ver Casos Especiales' },
             { group: 'Contact Center', id: 'cxg.casos_especiales.create', label: 'Registrar Casos Especiales' },

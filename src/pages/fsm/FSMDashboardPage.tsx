@@ -9,7 +9,8 @@ import {
   MapPin,
   ChevronRight,
   FileText,
-  UserCheck
+  UserCheck,
+  Phone
 } from 'lucide-react';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 import { SIATCButton } from '../../components/siatc/SIATCButton';
@@ -35,6 +36,7 @@ export const FSMDashboardPage = () => {
   const [filterCliente, setFilterCliente] = useState('');
   const [filterDocumento, setFilterDocumento] = useState('');
   const [filterTecnico, setFilterTecnico] = useState('');
+  const [filterCelular, setFilterCelular] = useState('');
   
   const [limit, setLimit] = useState(2000);
 
@@ -46,6 +48,7 @@ export const FSMDashboardPage = () => {
         cliente: filterCliente,
         documento: filterDocumento,
         tecnico: filterTecnico,
+        celular: filterCelular,
         limit 
       });
       setData(result);
@@ -54,7 +57,7 @@ export const FSMDashboardPage = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [filterTicket, filterCliente, filterDocumento, filterTecnico, limit]);
+  }, [filterTicket, filterCliente, filterDocumento, filterTecnico, filterCelular, limit]);
 
   // Initial load only
   useEffect(() => {
@@ -76,9 +79,9 @@ export const FSMDashboardPage = () => {
       {/* Header */}
       <div className={SIATC_THEME.LAYOUT.HEADER_WRAPPER}>
         <div>
-          <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Seguimiento Técnico FSM</h1>
+          <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Horarios Visitas</h1>
           <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>
-            Control de horarios y programación de visitas técnicas. (Búsqueda manual activada)
+            Control de horarios y programación de visitas técnicas. (Filtro por defecto: HOY)
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -97,7 +100,7 @@ export const FSMDashboardPage = () => {
         {/* Advanced Filters */}
         <div className="px-6 py-5 border-b border-border bg-slate-50/50">
           <form onSubmit={handleFilter} className="flex flex-col gap-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               {/* Ticket Filter */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Ticket</label>
@@ -157,6 +160,21 @@ export const FSMDashboardPage = () => {
                   />
                 </div>
               </div>
+
+              {/* Celular Filter */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Celular</label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/60" />
+                  <input 
+                    type="text"
+                    placeholder="999888777"
+                    className={`${SIATC_THEME.COMPONENTS.INPUT} pl-9 h-9 text-xs`}
+                    value={filterCelular}
+                    onChange={(e) => setFilterCelular(e.target.value)}
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/60">
@@ -209,7 +227,7 @@ export const FSMDashboardPage = () => {
                   <SIATCTableHeader>TICKET</SIATCTableHeader>
                   <SIATCTableHeader>CLIENTE / DOCUMENTO</SIATCTableHeader>
                   <SIATCTableHeader>UBICACIÓN</SIATCTableHeader>
-                  <SIATCTableHeader>TÉCNICO</SIATCTableHeader>
+                  <SIATCTableHeader>TÉCNICO / SUPERVISOR</SIATCTableHeader>
                   <SIATCTableHeader>BLOQUE ORIGINAL</SIATCTableHeader>
                   <SIATCTableHeader>RANGO ASIGNADO</SIATCTableHeader>
                   <SIATCTableHeader>ORDEN</SIATCTableHeader>
@@ -231,7 +249,7 @@ export const FSMDashboardPage = () => {
                   >
                     <SIATCTableCell>
                       <div className="flex flex-col">
-                        <span className={`${SIATC_THEME.TYPOGRAPHY.TINY_MONO} group-hover:text-primary transition-colors font-black`}>#{item.ticket}</span>
+                        <span className="text-[13px] font-black group-hover:text-primary transition-colors">#{item.ticket}</span>
                         {item.tipo_servicio && (
                           <span className="text-[9px] font-black text-primary/80 uppercase truncate max-w-[120px] leading-tight">
                             {item.tipo_servicio}
@@ -250,7 +268,7 @@ export const FSMDashboardPage = () => {
                         <span className="font-bold text-foreground truncate uppercase">{item.cliente}</span>
                         <div className="flex items-center gap-1 mt-0.5">
                             <span className="text-[8px] bg-slate-100 text-slate-500 font-black px-1 rounded">ID</span>
-                            <span className="text-[10px] text-muted-foreground font-mono">{item.doc_cliente || 'SIN DOC'}</span>
+                            <span className="text-[12px] text-foreground font-bold font-mono">{item.doc_cliente || 'SIN DOC'}</span>
                         </div>
                       </div>
                     </SIATCTableCell>
@@ -264,11 +282,19 @@ export const FSMDashboardPage = () => {
                       </div>
                     </SIATCTableCell>
                     <SIATCTableCell>
-                      <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
-                          <User className="w-3.5 h-3.5 text-primary" />
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
+                            <User className="w-3.5 h-3.5 text-primary" />
+                          </div>
+                          <span className="text-xs font-bold text-slate-700 uppercase">{item.tecnico || 'NO ASIGNADO'}</span>
                         </div>
-                        <span className="text-xs font-medium text-slate-700 uppercase">{item.tecnico || 'NO ASIGNADO'}</span>
+                        {item.supervisor && (
+                          <div className="flex items-center gap-1.5 pl-1 border-l-2 border-slate-100 ml-3.5">
+                            <span className="text-[9px] font-black text-muted-foreground/60 uppercase">Sup:</span>
+                            <span className="text-[10px] font-bold text-muted-foreground italic truncate max-w-[150px]">{item.supervisor}</span>
+                          </div>
+                        )}
                       </div>
                     </SIATCTableCell>
                     <SIATCTableCell>

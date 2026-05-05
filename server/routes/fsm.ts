@@ -15,21 +15,22 @@ router.get('/tracking', async (req: Request, res: Response) => {
         const cliente = req.query.cliente as string || '';
         const documento = req.query.documento as string || '';
         const tecnico = req.query.tecnico as string || '';
+        const celular = req.query.celular as string || '';
         const limit = parseInt(req.query.limit as string) || 100;
 
-        // Default Filter: Strictly TODAY
+        // Logic: if specific ID filters (ticket/doc) are provided, allow historical search.
+        // If technician, client or phone are used, keep the "Today" restriction as per user request.
         let whereClause = "WHERE CAST(t.FechaVisita AS DATE) = CAST(GETDATE() AS DATE)"; 
         
-        // If filters are provided, we allow searching regardless of the "Today" restriction 
-        // OR we can make them cumulative. Usually user wants to find a specific ticket even if it's not today.
-        // Let's make it: if there's any specific filter (ticket/doc/etc), remove the Today restriction to allow lookup.
-        if (ticket || cliente || documento || tecnico) {
+        if (ticket || documento) {
             whereClause = "WHERE 1=1";
-            if (ticket) whereClause += " AND t.Ticket LIKE @ticket";
-            if (cliente) whereClause += " AND t.NombreCliente LIKE @cliente";
-            if (documento) whereClause += " AND t.CodigoExternoCliente LIKE @documento";
-            if (tecnico) whereClause += " AND (t.NombreTecnico LIKE @tecnico OR t.ApellidoTecnico LIKE @tecnico)";
         }
+
+        if (ticket) whereClause += " AND t.Ticket LIKE @ticket";
+        if (cliente) whereClause += " AND t.NombreCliente LIKE @cliente";
+        if (documento) whereClause += " AND t.CodigoExternoCliente LIKE @documento";
+        if (tecnico) whereClause += " AND (t.NombreTecnico LIKE @tecnico OR t.ApellidoTecnico LIKE @tecnico)";
+        if (celular) whereClause += " AND (t.Celular1 LIKE @celular OR t.Celular2 LIKE @celular)";
 
         const query = `
             WITH LatestRango AS (
@@ -67,10 +68,17 @@ router.get('/tracking', async (req: Request, res: Response) => {
                 t.Celular2 as celular2,
                 t.ComentarioProgramador as coment_prog,
                 t.ComentarioTecnico as coment_tecnico,
-                ts.Descripcion as tipo_servicio
+                ts.Descripcion as tipo_servicio,
+                e.DsSupervisor as supervisor
             FROM [SIATC].[Dashboard_FSM] t
             LEFT JOIN LatestRango lr ON TRIM(t.Ticket) = TRIM(lr.ID_Ticket) AND lr.rn = 1
             LEFT JOIN [SIATC].[FSM_TipoServicio] ts ON t.IdServicio = ts.Id
+            OUTER APPLY (
+                SELECT TOP 1 DsSupervisor 
+                FROM [SAP].[FSM_TBL_EMPRESA] 
+                WHERE (ISNULL(t.NombreTecnico, '') + ' ' + ISNULL(t.ApellidoTecnico, '')) LIKE DsPrefijoTecnico + '%'
+                AND DsPrefijoTecnico != ''
+            ) e
             ${whereClause}
             ORDER BY 
                 t.FechaVisita DESC, 
@@ -84,6 +92,7 @@ router.get('/tracking', async (req: Request, res: Response) => {
         if (cliente) request.input('cliente', sql.VarChar, `%${cliente}%`);
         if (documento) request.input('documento', sql.VarChar, `%${documento}%`);
         if (tecnico) request.input('tecnico', sql.VarChar, `%${tecnico}%`);
+        if (celular) request.input('celular', sql.VarChar, `%${celular}%`);
         request.input('limit', sql.Int, limit);
 
         const result = await request.query(query);

@@ -19,7 +19,10 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
                     Ticket as ticket,
                     NombreCliente as cliente,
                     NombreEquipo as producto,
-                    Asunto as asunto
+                    Asunto as asunto,
+                    Estado as estado,
+                    ComentarioProgramador as motivo_elevacion,
+                    IDEmpresa as lugar_compra_id
                 FROM [SIATC].[Dashboard_FSM]
                 WHERE Ticket = @ticketId
             `);
@@ -374,8 +377,12 @@ router.get('/cxg-nc/:id', async (req: Request, res: Response) => {
                     n.Procesado_por as procesado_por,
                     n.Ticket_desinstalacion as ticket_desinstalacion,
                     n.Gestionado_el as fecha_gestionado,
-                    n.Ticket as ticket
+                    n.Ticket as ticket,
+                    t.NombreCliente as fsm_cliente,
+                    t.ComentarioProgramador as fsm_motivo_elevacion,
+                    t.IDEmpresa as fsm_lugar_compra
                 FROM [dbo].[GAC_APP_TB_CXG_NC] n
+                LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
                 WHERE n.ID_Apro_CxG_NC = @id
             `);
             

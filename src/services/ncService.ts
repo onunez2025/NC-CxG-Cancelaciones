@@ -93,10 +93,13 @@ export interface CxGNCMotivo {
 }
 
 export interface TicketInfo {
-    ticket: string;
-    cliente: string;
-    producto: string;
-    asunto: string;
+  ticket: string;
+  cliente: string;
+  producto: string;
+  asunto: string;
+  estado?: string;
+  motivo_elevacion?: string;
+  lugar_compra_id?: string;
 }
 
 export interface PaginatedResponse<T> {

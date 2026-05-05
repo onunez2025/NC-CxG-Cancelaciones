@@ -80,10 +80,11 @@ export const CxGNCPage = () => {
   const [cxgMotivos, setCxgMotivos] = useState<CxGNCMotivo[]>([]);
 
   // Form state
-  const [formData, setFormData] = useState({
-    tipo: 'NC' as 'NC' | 'CXG',
+  const [formData, setFormData] = useState<Partial<NCRecord>>({
+    tipo: 'CXG',
+    ticket: '',
     cliente: '',
-    ticket: ''
+    observacion: ''
   });
 
   const fetchData = async () => {
@@ -179,12 +180,20 @@ export const CxGNCPage = () => {
     setIsLookingUp(true);
     try {
       const ticketInfo = await ncService.getTicketDetails(formData.ticket);
-      setFormData(prev => ({
-        ...prev,
-        cliente: ticketInfo.cliente
-      }));
+      if (ticketInfo.estado !== 'Closed') {
+        toast.error(`El ticket #${formData.ticket} no está CERRADO. Estado actual: ${ticketInfo.estado || 'Desconocido'}`);
+        return;
+      }
+
+      setFormData({
+        ...formData,
+        cliente: ticketInfo.cliente,
+        observacion: `Motivo: ${ticketInfo.motivo_elevacion || 'N/A'} — Lugar: ${ticketInfo.lugar_compra_id || 'N/A'}`
+      });
+      toast.success("Ticket encontrado y válido");
     } catch (error: any) {
       console.error("Lookup error:", error);
+      toast.error("El ticket es incorrecto o no existe");
     } finally {
       setIsLookingUp(false);
     }
@@ -637,14 +646,14 @@ export const CxGNCPage = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Tipo de Documento</label>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Tipo de Solicitud</label>
             <select 
               className={SIATC_THEME.COMPONENTS.INPUT}
               value={formData.tipo}
               onChange={(e) => setFormData({...formData, tipo: e.target.value as 'NC' | 'CXG'})}
             >
+              <option value="CXG">Cambio por garantía</option>
               <option value="NC">Nota de Crédito</option>
-              <option value="CXG">Cargo x Generar</option>
             </select>
           </div>
           
@@ -844,7 +853,7 @@ export const CxGNCPage = () => {
                        isRejected ? 'text-rose-500' :
                        isCompleted ? 'text-primary' : 'text-slate-400'
                     }`}>
-                      {isRejected ? 'Rechazado' : step.label}
+                      {isRejected ? 'Rechazado' : (step.key === 'APROBADO_SUP' && detailData.estado === 'APROBADO_SUP' ? 'Pendiente ST' : step.label)}
                     </span>
                   </div>
                 );
@@ -886,15 +895,38 @@ export const CxGNCPage = () => {
                   </div>
                 </div>
 
+                {/* FSM Ticket Context */}
+                <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-800">
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-amber-700 dark:text-amber-400 mb-4 flex items-center gap-2">
+                    <Search className="w-3 h-3" /> Información del Ticket FSM
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[9px] font-bold text-amber-600/70 uppercase">Cliente Original</span>
+                      <span className="text-xs font-black text-amber-900 dark:text-amber-200">{detailData.fsm_cliente || 'No disponible'}</span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[9px] font-bold text-amber-600/70 uppercase">Lugar de Compra</span>
+                      <span className="text-xs font-bold text-amber-800 dark:text-amber-300 italic">{detailData.fsm_lugar_compra || 'No identificado'}</span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[9px] font-bold text-amber-600/70 uppercase">Motivo de Elevación</span>
+                      <p className="text-xs text-amber-800/80 dark:text-amber-400/80 leading-tight">{detailData.fsm_motivo_elevacion || 'Sin comentarios'}</p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Audit Steps Summary */}
                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
                   <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">Trazabilidad de Proceso</h3>
                   <div className="space-y-2">
                     <AuditStep 
-                      label="Aprobación Sup." 
-                      user={detailData.apro_por || detailData.aprobado_por} 
-                      date={detailData.apro_el || detailData.aprobado_el} 
-                      status={detailData.apro_solicitud || detailData.aprobado} 
+                      label="Aprobación Supervisor" 
+                      user={detailData.aprobado_por} 
+                      date={detailData.aprobado_el} 
+                      status={detailData.aprobado}
+                      reason={detailData.aprobado_motivo}
+                      obs={detailData.aprobado_observacion}
                     />
                     {detailData.asignado_a && (
                       <AuditStep 
@@ -1155,17 +1187,25 @@ export const CxGNCPage = () => {
   );
 };
 
-const AuditStep = ({ label, user, date, status }: { label: string, user?: string | null, date?: string | null, status?: string | null }) => {
+const AuditStep = ({ label, user, date, status, reason, obs }: { label: string, user?: string | null, date?: string | null, status?: string | null, reason?: string | null, obs?: string | null }) => {
   if (!user && !status) return <div className="p-2 rounded border border-dashed border-border/50 text-[10px] text-muted-foreground text-center font-bold">{label} - Pendiente</div>;
   
   return (
-    <div className="p-2 bg-white dark:bg-slate-900 border border-border shadow-sm rounded-lg flex items-center justify-between">
-      <div>
-        <div className="text-[9px] font-black uppercase text-primary leading-none mb-1">{label}</div>
-        <div className="text-[10px] font-bold text-foreground">{user || '—'}</div>
-        <div className="text-[9px] text-muted-foreground italic">{date ? new Date(date).toLocaleString() : ''}</div>
+    <div className="p-2 bg-white dark:bg-slate-900 border border-border shadow-sm rounded-lg flex flex-col gap-2">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-[9px] font-black uppercase text-primary leading-none mb-1">{label}</div>
+          <div className="text-[10px] font-bold text-foreground">{user || '—'}</div>
+          <div className="text-[9px] text-muted-foreground italic">{date ? new Date(date).toLocaleString() : ''}</div>
+        </div>
+        <SIATCBadge variant={status === 'RECHAZADO' || status === 'FALSA' ? 'danger' : 'success'} className="text-[8px] h-5 px-1.5">{status}</SIATCBadge>
       </div>
-      <SIATCBadge variant={status === 'RECHAZADO' || status === 'FALSA' ? 'danger' : 'success'} className="text-[8px] h-5 px-1.5">{status}</SIATCBadge>
+      {(reason || obs) && (
+        <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
+          {reason && <p className="text-[9px] font-black text-rose-500 uppercase leading-none mb-1">Motivo: <span className="text-foreground">{reason}</span></p>}
+          {obs && <p className="text-[10px] text-muted-foreground leading-tight italic">"{obs}"</p>}
+        </div>
+      )}
     </div>
   );
 };
