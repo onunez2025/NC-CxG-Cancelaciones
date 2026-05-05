@@ -30,6 +30,10 @@ export interface FSMTracking {
 }
 
 export const fsmService = {
+    getTracking: async (params?: {
+        ticket?: string;
+        cliente?: string;
+        documento?: string;
         tecnico?: string; 
         celular?: string;
         limit?: number 
