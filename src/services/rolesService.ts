@@ -60,6 +60,11 @@ export class RolesService {
             { group: 'Contact Center', id: 'cxg.casos_especiales.create', label: 'Registrar Casos Especiales' },
             { group: 'Contact Center', id: 'cxg.casos_especiales.gestionar', label: 'Gestionar Casos Especiales' },
 
+            { group: 'Emergencias', id: 'cxg.emergencias.view', label: 'Ver Emergencias' },
+            { group: 'Emergencias', id: 'cxg.emergencias.create', label: 'Asignar Técnico' },
+            { group: 'Emergencias', id: 'cxg.emergencias.verify', label: 'Verificar Emergencia' },
+            { group: 'Emergencias', id: 'cxg.emergencias.process', label: 'Procesar/Cerrar Emergencia' },
+
             { group: 'Reportes', id: 'cxg.reportes.exportar', label: 'Exportar Reportes' },
 
             { group: 'Configuración', id: 'config.users', label: 'Gestionar Usuarios' },

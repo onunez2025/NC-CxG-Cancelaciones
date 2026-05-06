@@ -34,7 +34,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 
 export const EmergenciasPage = () => {
-  const { user } = useAuth();
+  const { user, hasPermission } = useAuth();
   const { t } = useTranslation();
   
   const [searchTerm, setSearchTerm] = useState('');
@@ -99,15 +99,30 @@ export const EmergenciasPage = () => {
   };
 
   useEffect(() => {
+    if (!hasPermission('cxg.emergencias.view')) return;
+
     const timer = setTimeout(() => {
       fetchData();
     }, 500);
+    
     return () => clearTimeout(timer);
-  }, [currentPage, searchTerm]);
+  }, [currentPage, searchTerm, hasPermission]);
 
   useEffect(() => {
-    fetchCatalogs();
-  }, []);
+    if (hasPermission('cxg.emergencias.view')) {
+      fetchCatalogs();
+    }
+  }, [hasPermission]);
+
+  if (!hasPermission('cxg.emergencias.view')) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] text-center p-12">
+        <AlertTriangle className="w-16 h-16 text-amber-500 mb-4 opacity-20" />
+        <h2 className="text-xl font-bold text-foreground">Acceso Restringido</h2>
+        <p className="text-muted-foreground mt-2 max-w-xs">No tienes los permisos necesarios para visualizar el módulo de Emergencias.</p>
+      </div>
+    );
+  }
 
   const handleRegister = async () => {
     setIsSubmitting(true);
