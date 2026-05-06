@@ -219,9 +219,6 @@ export const EmergenciasPage = () => {
     }
   };
 
-  const hasPermission = (perm: string) => {
-    return user?.permissions?.includes(perm as any) || false;
-  };
 
   return (
     <div className={SIATC_THEME.LAYOUT.PAGE_WRAPPER}>
