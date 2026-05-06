@@ -335,22 +335,26 @@ export const EmergenciasPage = () => {
                             icon: Eye,
                             onClick: () => { setSelectedEmergency(item); setIsDetailOpen(true); }
                           },
-                          ...(hasPermission('cxg.emergencias.create') ? [{
-                            label: t('emergencias.modals.assign_tech'),
-                            icon: UserPlus,
-                            onClick: () => { setSelectedEmergency(item); setAssignForm({ tecnico: item.tecnico_asignado || '' }); setIsAssignOpen(true); }
-                          }] : []),
-                          ...(hasPermission('cxg.emergencias.verify') && item.tecnico_asignado ? [{
+                          // 1. Verificación siempre disponible al inicio (si no está verificado)
+                          ...(!item.verificacion ? [{
                             label: t('emergencias.modals.verify'),
                             icon: ClipboardCheck,
                             onClick: () => { setSelectedEmergency(item); setIsVerifyOpen(true); }
                           }] : []),
-                          ...(hasPermission('cxg.emergencias.verify') ? [{
+                          // 2. Asignación solo si ya se verificó y no tiene técnico
+                          ...(hasPermission('cxg.emergencias.create') && item.verificacion && !item.tecnico_asignado ? [{
+                            label: t('emergencias.modals.assign_tech'),
+                            icon: UserPlus,
+                            onClick: () => { setSelectedEmergency(item); setAssignForm({ tecnico: item.tecnico_asignado || '' }); setIsAssignOpen(true); }
+                          }] : []),
+                          // 3. Repuestos disponibles tras verificación
+                          ...(hasPermission('cxg.emergencias.verify') && item.verificacion ? [{
                             label: t('emergencias.modals.spare_parts'),
                             icon: Package,
                             onClick: () => openSpareParts(item)
                           }] : []),
-                          ...(hasPermission('cxg.emergencias.process') && item.verificacion ? [{
+                          // 4. Procesado solo tras tener técnico asignado y no estar procesado
+                          ...(hasPermission('cxg.emergencias.process') && item.tecnico_asignado && !item.procesado ? [{
                             label: t('emergencias.modals.process'),
                             icon: CheckCircle2,
                             onClick: () => { setSelectedEmergency(item); setIsProcessOpen(true); }
