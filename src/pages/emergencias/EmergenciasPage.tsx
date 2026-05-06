@@ -538,7 +538,7 @@ export const EmergenciasPage = () => {
             >
               <option value="">Seleccione motivo...</option>
               {verificationCatalogs.motives
-                .filter(m => m.ref_id === verificationCatalogs.statuses.find(s => s.label === verifyForm.verificacion)?.id)
+                .filter(m => m.ref_id === verifyForm.verificacion)
                 .map(m => (
                   <option key={m.id} value={m.motivo}>{m.motivo}</option>
                 ))}
@@ -642,7 +642,7 @@ export const EmergenciasPage = () => {
             >
               <option value="">Seleccione motivo...</option>
               {processingCatalogs.motives
-                .filter(m => m.ref_id === processingCatalogs.statuses.find(s => s.label === processForm.procesado)?.id)
+                .filter(m => m.ref_id === processForm.procesado)
                 .map(m => (
                   <option key={m.id} value={m.motivo}>{m.motivo}</option>
                 ))}
