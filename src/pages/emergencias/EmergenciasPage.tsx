@@ -532,7 +532,7 @@ export const EmergenciasPage = () => {
             >
               <option value="">Seleccione estado...</option>
               {verificationCatalogs.statuses.map(s => (
-                <option key={s.id} value={s.label}>{s.label}</option>
+                <option key={s.id} value={s.id}>{s.label}</option>
               ))}
             </select>
           </div>
@@ -640,19 +640,14 @@ export const EmergenciasPage = () => {
             </select>
           </div>
           <div>
-            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1 block pl-4">{t('emergencias.fields.motivo')}</label>
-            <select 
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1 block pl-4">NRO. TICKET GENERADO</label>
+            <input 
+              type="text"
               className={SIATC_THEME.COMPONENTS.INPUT}
+              placeholder="Ingrese el número de ticket..."
               value={processForm.motivo}
               onChange={(e) => setProcessForm({ ...processForm, motivo: e.target.value })}
-            >
-              <option value="">{processForm.procesado ? 'Seleccione motivo...' : 'Primero seleccione estado'}</option>
-              {processingCatalogs.motives
-                .filter(m => m.ref_id?.trim().toLowerCase() === processForm.procesado?.trim().toLowerCase())
-                .map(m => (
-                  <option key={m.id} value={m.motivo}>{m.motivo}</option>
-                ))}
-            </select>
+            />
           </div>
         </div>
       </SIATCModalWrapper>
