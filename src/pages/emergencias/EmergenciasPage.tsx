@@ -124,6 +124,14 @@ export const EmergenciasPage = () => {
     );
   }
 
+  useEffect(() => {
+    setVerifyForm(prev => ({ ...prev, motivo: '' }));
+  }, [verifyForm.verificacion]);
+
+  useEffect(() => {
+    setProcessForm(prev => ({ ...prev, motivo: '' }));
+  }, [processForm.procesado]);
+
   const handleRegister = async () => {
     setIsSubmitting(true);
     try {
@@ -533,12 +541,11 @@ export const EmergenciasPage = () => {
             <select 
               className={SIATC_THEME.COMPONENTS.INPUT}
               value={verifyForm.motivo}
-              onChange={(e) => setVerifyForm({...verifyForm, motivo: e.target.value})}
-              disabled={!verifyForm.verificacion}
+              onChange={(e) => setVerifyForm({ ...verifyForm, motivo: e.target.value })}
             >
-              <option value="">Seleccione motivo...</option>
+              <option value="">{verifyForm.verificacion ? 'Seleccione motivo...' : 'Primero seleccione estado'}</option>
               {verificationCatalogs.motives
-                .filter(m => m.ref_id === verifyForm.verificacion)
+                .filter(m => m.ref_id?.toLowerCase() === verifyForm.verificacion?.toLowerCase())
                 .map(m => (
                   <option key={m.id} value={m.motivo}>{m.motivo}</option>
                 ))}
@@ -637,12 +644,11 @@ export const EmergenciasPage = () => {
             <select 
               className={SIATC_THEME.COMPONENTS.INPUT}
               value={processForm.motivo}
-              onChange={(e) => setProcessForm({...processForm, motivo: e.target.value})}
-              disabled={!processForm.procesado}
+              onChange={(e) => setProcessForm({ ...processForm, motivo: e.target.value })}
             >
-              <option value="">Seleccione motivo...</option>
+              <option value="">{processForm.procesado ? 'Seleccione motivo...' : 'Primero seleccione estado'}</option>
               {processingCatalogs.motives
-                .filter(m => m.ref_id === processForm.procesado)
+                .filter(m => m.ref_id?.toLowerCase() === processForm.procesado?.toLowerCase())
                 .map(m => (
                   <option key={m.id} value={m.motivo}>{m.motivo}</option>
                 ))}
