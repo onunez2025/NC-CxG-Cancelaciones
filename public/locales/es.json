@@ -38,7 +38,8 @@
         "light_mode": "Modo Claro",
         "dark_mode": "Modo Oscuro",
         "app_subtitle": "Gestor de Cancelaciones, CxG y NC",
-        "role_admin": "Administrador"
+        "role_admin": "Administrador",
+        "emergencias": "Emergencias"
     },
     "profile": {
         "title": "Mi Perfil",
@@ -388,6 +389,46 @@
                 "label": "ME5A - Lista Solicitudes",
                 "desc": "Listado general de solicitudes."
             }
+        }
+    },
+    "emergencias": {
+        "title": "Bandeja de Emergencias",
+        "subtitle": "Gestión de incidentes críticos y atención técnica prioritaria.",
+        "search_placeholder": "Buscar por Ticket, Cliente o Técnico...",
+        "new": "Nueva Emergencia",
+        "table": {
+            "ticket": "TICKET",
+            "tipo": "TIPO",
+            "cliente": "CLIENTE",
+            "tecnico": "TÉCNICO",
+            "verificacion": "VERIF.",
+            "procesado": "PROC.",
+            "fecha": "FECHA"
+        },
+        "status": {
+            "pending": "Pendiente",
+            "verified": "Verificado",
+            "processed": "Procesado"
+        },
+        "modals": {
+            "register": "Registrar Emergencia",
+            "verify": "Verificar Emergencia",
+            "process": "Procesar Emergencia",
+            "spare_parts": "Solicitud de Repuestos",
+            "assign_tech": "Asignar Técnico"
+        },
+        "fields": {
+            "ticket": "Número de Ticket",
+            "tipo": "Tipo de Emergencia",
+            "producto": "Producto",
+            "cliente": "Nombre del Cliente",
+            "telefono": "Teléfono",
+            "direccion": "Dirección",
+            "referencia": "Referencia",
+            "observacion": "Observaciones",
+            "motivo": "Motivo",
+            "material": "Material",
+            "cantidad": "Cantidad"
         }
     }
 }

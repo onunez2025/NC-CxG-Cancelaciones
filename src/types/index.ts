@@ -34,6 +34,7 @@ export type Permission =
     | 'cxg.cxg_nc.view' | 'cxg.cxg_nc.create' | 'cxg.cxg_nc.approve' | 'cxg.cxg_nc.assign' | 'cxg.cxg_nc.gestionar' | 'cxg.cxg_nc.process'
     | 'cxg.fsm.view'
     | 'cxg.casos_especiales.view' | 'cxg.casos_especiales.create' | 'cxg.casos_especiales.gestionar'
+    | 'cxg.emergencias.view' | 'cxg.emergencias.create' | 'cxg.emergencias.verify' | 'cxg.emergencias.process'
     | 'cxg.reportes.exportar'
     | 'config.users' | 'config.roles' | 'config.cecos' | 'config.accounts' | 'config.managements' | 'config.exchange_rates' | 'config.audit';
 
@@ -116,3 +117,53 @@ export interface SAPTransactionData {
     uploaded_by: string;
     data: any[]; // Raw parsed data
 }
+
+// ─────────────────────────────────────────────
+// EMERGENCIAS
+// ─────────────────────────────────────────────
+
+export interface Emergency {
+    id: string;
+    ticket: string;
+    observacion: string;
+    verificacion?: string;
+    verificacion_motivo?: string;
+    verificado_el?: string;
+    verificado_por?: string;
+    procesado?: string;
+    procesado_motivo?: string;
+    proceso_el?: string;
+    procesado_por?: string;
+    creado_el: string;
+    creado_por: string;
+    tipo: string;
+    producto: string;
+    asesor_cc?: string;
+    tecnico_asignado?: string;
+    cliente: string;
+    telefono_1: string;
+    telefono_2?: string;
+    direccion: string;
+    direccion_referencia?: string;
+    solicitud_repuestos?: string;
+}
+
+export interface EmergencyMotive {
+    id: string;
+    motivo: string;
+    ref_id?: string; // Links to Verificacion or Procesado status ID
+}
+
+export interface EmergencyStatus {
+    id: string;
+    label: string;
+}
+
+export interface EmergencySparePart {
+    id: string;
+    material_id: string;
+    cantidad: string;
+    emergencia_id: string;
+    material_nombre?: string;
+}
+
