@@ -119,18 +119,23 @@ export const SpecialCasesPage = () => {
     if (!formData.ticket || !formData.motivo) return;
 
     // Business Rule: Posterior a las 10:30 no permite registrar casos para posterior a 48 horas.
+    // Usamos la zona horaria de Lima, Perú
     if (formData.fecha_visita_temp) {
       const now = new Date();
-      const cutoff = new Date();
-      cutoff.setHours(10, 30, 0, 0);
+      // Obtener hora actual en formato de Lima para comparar
+      const limaTimeStr = now.toLocaleString("en-US", { timeZone: "America/Lima", hour12: false });
+      const currentLimaHour = parseInt(limaTimeStr.split(', ')[1].split(':')[0]);
+      const currentLimaMinute = parseInt(limaTimeStr.split(', ')[1].split(':')[1]);
+      
+      const isAfterCutoff = currentLimaHour > 10 || (currentLimaHour === 10 && currentLimaMinute >= 30);
 
-      if (now > cutoff) {
+      if (isAfterCutoff) {
         const visitDate = new Date(formData.fecha_visita_temp);
         const diffTime = visitDate.getTime() - now.getTime();
         const diffHours = diffTime / (1000 * 60 * 60);
 
         if (diffHours > 48) {
-          alert('No es posible registrar casos con fecha de visita superior a 48 horas después de las 10:30 AM.');
+          alert('No es posible registrar casos con fecha de visita superior a 48 horas después de las 10:30 AM (Hora Lima).');
           return;
         }
       }
