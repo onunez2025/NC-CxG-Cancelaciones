@@ -20,6 +20,8 @@
         "yes": "Sí",
         "no": "No",
         "view": "Ver",
+        "view_details": "Ver Detalles",
+        "sync": "Sincronizar",
         "clear_filters": "Limpiar Filtros",
         "pagination": "Mostrando {{start}} a {{end}} de {{total}} resultados",
         "rows_per_page": "Filas por página",
