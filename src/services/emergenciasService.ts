@@ -1,5 +1,5 @@
 import { apiClient, API_BASE_URL } from './apiClient';
-import type { Emergency, EmergencyMotive, EmergencySparePart } from '../types';
+import { type Emergency, type EmergencyMotive, type EmergencySparePart } from '../types';
 
 interface PaginatedEmergencies {
     data: Emergency[];

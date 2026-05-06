@@ -29,7 +29,7 @@ import {
   SIATCTableCell 
 } from '../../components/siatc/table/SIATCTable';
 import { emergenciasService } from '../../services/emergenciasService';
-import type { Emergency, EmergencyMotive, EmergencySparePart } from '../../types';
+import { type Emergency, type EmergencyMotive, type EmergencySparePart } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 
@@ -220,15 +220,15 @@ export const EmergenciasPage = () => {
           <SIATCButton variant="secondary" icon={RefreshCw} onClick={fetchData} isLoading={isLoading}>
             {t('common.sync')}
           </SIATCButton>
-          {hasPermission('cxg.emergencias.create') && (
-            <SIATCButton 
-              variant="primary" 
-              icon={Plus} 
-              onClick={() => setIsRegisterOpen(true)}
-            >
-              {t('emergencias.new')}
-            </SIATCButton>
-          )}
+            {hasPermission('cxg.emergencias.create') && (
+              <SIATCButton 
+                variant="primary" 
+                icon={Plus} 
+                onClick={() => setIsRegisterOpen(true)}
+              >
+                {t('emergencias.new')}
+              </SIATCButton>
+            )}
         </div>
       </div>
 
@@ -321,30 +321,26 @@ export const EmergenciasPage = () => {
                             icon: Eye,
                             onClick: () => { setSelectedEmergency(item); setIsDetailOpen(true); }
                           },
-                          {
+                          ...(hasPermission('cxg.emergencias.create') ? [{
                             label: t('emergencias.modals.assign_tech'),
                             icon: UserPlus,
-                            onClick: () => { setSelectedEmergency(item); setAssignForm({ tecnico: item.tecnico_asignado || '' }); setIsAssignOpen(true); },
-                            show: hasPermission('cxg.emergencias.create')
-                          },
-                          {
+                            onClick: () => { setSelectedEmergency(item); setAssignForm({ tecnico: item.tecnico_asignado || '' }); setIsAssignOpen(true); }
+                          }] : []),
+                          ...(hasPermission('cxg.emergencias.verify') && item.tecnico_asignado ? [{
                             label: t('emergencias.modals.verify'),
                             icon: ClipboardCheck,
-                            onClick: () => { setSelectedEmergency(item); setIsVerifyOpen(true); },
-                            show: hasPermission('cxg.emergencias.verify') && !!item.tecnico_asignado
-                          },
-                          {
+                            onClick: () => { setSelectedEmergency(item); setIsVerifyOpen(true); }
+                          }] : []),
+                          ...(hasPermission('cxg.emergencias.verify') ? [{
                             label: t('emergencias.modals.spare_parts'),
                             icon: Package,
-                            onClick: () => openSpareParts(item),
-                            show: hasPermission('cxg.emergencias.verify')
-                          },
-                          {
+                            onClick: () => openSpareParts(item)
+                          }] : []),
+                          ...(hasPermission('cxg.emergencias.process') && item.verificacion ? [{
                             label: t('emergencias.modals.process'),
                             icon: CheckCircle2,
-                            onClick: () => { setSelectedEmergency(item); setIsProcessOpen(true); },
-                            show: hasPermission('cxg.emergencias.process') && !!item.verificacion
-                          }
+                            onClick: () => { setSelectedEmergency(item); setIsProcessOpen(true); }
+                          }] : [])
                         ]}
                       />
                     </SIATCTableCell>
