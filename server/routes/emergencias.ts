@@ -11,15 +11,13 @@ const router = Router();
 router.get('/catalogos/verificacion', async (req: Request, res: Response) => {
     try {
         const pool = await getDbConnection();
-        const statuses = await pool.request().query(`
+        const results = await pool.request().query(`
             SELECT ID_Emergencia_Verificacion as id, Verificacion as label 
-            FROM [dbo].[GAC_APP_TB_EMERGENCIA_VERIFICACION]
-        `);
-        const motives = await pool.request().query(`
+            FROM [dbo].[GAC_APP_TB_EMERGENCIA_VERIFICACION];
             SELECT ID_Emergencia_verificacion_motivo as id, Motivo as motivo, Ref_Verificacion as ref_id
-            FROM [dbo].[GAC_APP_TB_EMERGENCIA_VERIFICACION_MOTIVO]
+            FROM [dbo].[GAC_APP_TB_EMERGENCIA_VERIFICACION_MOTIVO];
         `);
-        res.json({ statuses: statuses.recordset, motives: motives.recordset });
+        res.json({ statuses: results.recordsets[0], motives: results.recordsets[1] });
     } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
@@ -28,15 +26,13 @@ router.get('/catalogos/verificacion', async (req: Request, res: Response) => {
 router.get('/catalogos/procesado', async (req: Request, res: Response) => {
     try {
         const pool = await getDbConnection();
-        const statuses = await pool.request().query(`
+        const results = await pool.request().query(`
             SELECT ID_Emergencia_Procesado as id, Procesado as label 
-            FROM [dbo].[GAC_APP_TB_EMERGENCIA_PROCESADO]
+            FROM [dbo].[GAC_APP_TB_EMERGENCIA_PROCESADO];
+            SELECT ID_Emergencia_procesado_motivo as id, Motivo as motivo, Ref_Procesado as ref_id
+            FROM [dbo].[GAC_APP_TB_EMERGENCIA_PROCESADO_MOTIVO];
         `);
-        const motives = await pool.request().query(`
-            SELECT ID_Emergencia_procesado_motivo as id, Motivo as motivo, Procesado as ref_id
-            FROM [dbo].[GAC_APP_TB_EMERGENCIA_PROCESADO_MOTIVO]
-        `);
-        res.json({ statuses: statuses.recordset, motives: motives.recordset });
+        res.json({ statuses: results.recordsets[0], motives: results.recordsets[1] });
     } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
