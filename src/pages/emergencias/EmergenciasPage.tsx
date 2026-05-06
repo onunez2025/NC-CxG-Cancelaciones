@@ -284,15 +284,15 @@ export const EmergenciasPage = () => {
                 {data.map((item) => (
                   <SIATCTableRow key={item.id}>
                     <SIATCTableCell>
-                      <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>#{item.ticket}</span>
+                      <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>#{item.ticket || '—'}</span>
                     </SIATCTableCell>
                     <SIATCTableCell>
-                      <SIATCBadge variant="info">{item.tipo}</SIATCBadge>
+                      <SIATCBadge variant="info">{item.tipo || 'General'}</SIATCBadge>
                     </SIATCTableCell>
                     <SIATCTableCell>
-                      <div className="font-bold text-foreground">{item.cliente}</div>
+                      <div className="font-bold text-foreground">{item.cliente || '—'}</div>
                       <div className="text-[10px] text-muted-foreground flex items-center gap-1">
-                        <Phone className="w-3 h-3" /> {item.telefono_1}
+                        <Phone className="w-3 h-3" /> {item.telefono_1 || '—'}
                       </div>
                     </SIATCTableCell>
                     <SIATCTableCell>
@@ -322,7 +322,9 @@ export const EmergenciasPage = () => {
                     <SIATCTableCell>
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <Calendar className="w-3.5 h-3.5" />
-                        <span className="text-xs">{new Date(item.creado_el).toLocaleDateString()}</span>
+                        <span className="text-xs">
+                          {item.creado_el ? new Date(item.creado_el).toLocaleDateString() : '—'}
+                        </span>
                       </div>
                     </SIATCTableCell>
                     <SIATCTableCell className="text-right">

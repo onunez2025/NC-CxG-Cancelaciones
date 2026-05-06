@@ -74,28 +74,28 @@ router.get('/', async (req: Request, res: Response) => {
             .query(`
                 SELECT 
                     e.ID_Emergencia as id,
-                    e.Ticket,
-                    e.Observacion,
-                    e.Verificacion,
-                    e.Verificacion_motivo,
-                    e.Verificado_el,
-                    e.Verificado_por,
-                    e.Procesado,
-                    e.Procesado_motivo,
-                    e.Proceso_el,
-                    e.Procesado_por,
-                    e.Creado_el,
-                    e.Creado_por,
-                    e.Tipo,
-                    e.Producto,
-                    e.Asesor_CC,
-                    e.Tecnico_asignado,
-                    e.Cliente,
-                    e.Telefono_1,
-                    e.Telefono_2,
-                    e.Direccion,
-                    e.Direccion_referencia,
-                    e.Solicitud_repuestos
+                    e.Ticket as ticket,
+                    e.Observacion as observacion,
+                    e.Verificacion as verificacion,
+                    e.Verificacion_motivo as verificacion_motivo,
+                    e.Verificado_el as verificado_el,
+                    e.Verificado_por as verificado_por,
+                    e.Procesado as procesado,
+                    e.Procesado_motivo as procesado_motivo,
+                    e.Proceso_el as proceso_el,
+                    e.Procesado_por as procesado_por,
+                    e.Creado_el as creado_el,
+                    e.Creado_por as creado_por,
+                    e.Tipo as tipo,
+                    e.Producto as producto,
+                    e.Asesor_CC as asesor_cc,
+                    e.Tecnico_asignado as tecnico_asignado,
+                    e.Cliente as cliente,
+                    e.Telefono_1 as telefono_1,
+                    e.Telefono_2 as telefono_2,
+                    e.Direccion as direccion,
+                    e.Direccion_referencia as direccion_referencia,
+                    e.Solicitud_repuestos as solicitud_repuestos
                 FROM [dbo].[GAC_APP_TB_EMERGENCIAS] e
                 ${whereClause}
                 ORDER BY e.Creado_el DESC
@@ -126,7 +126,20 @@ router.get('/:id', async (req: Request, res: Response) => {
         const result = await pool.request()
             .input('id', sql.VarChar, id)
             .query(`
-                SELECT * FROM [dbo].[GAC_APP_TB_EMERGENCIAS] WHERE ID_Emergencia = @id
+                SELECT 
+                    ID_Emergencia as id, Ticket as ticket, Observacion as observacion,
+                    Verificacion as verificacion, Verificacion_motivo as verificacion_motivo,
+                    Verificado_el as verificado_el, Verificado_por as verificado_por,
+                    Procesado as procesado, Procesado_motivo as procesado_motivo,
+                    Proceso_el as proceso_el, Procesado_por as procesado_por,
+                    Creado_el as creado_el, Creado_por as creado_por,
+                    Tipo as tipo, Producto as producto, Asesor_CC as asesor_cc,
+                    Tecnico_asignado as tecnico_asignado, Cliente as cliente,
+                    Telefono_1 as telefono_1, Telefono_2 as telefono_2,
+                    Direccion as direccion, Direccion_referencia as direccion_referencia,
+                    Solicitud_repuestos as solicitud_repuestos
+                FROM [dbo].[GAC_APP_TB_EMERGENCIAS] 
+                WHERE ID_Emergencia = @id
             `);
             
         if (result.recordset.length === 0) {
