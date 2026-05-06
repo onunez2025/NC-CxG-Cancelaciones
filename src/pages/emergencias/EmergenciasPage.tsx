@@ -28,15 +28,13 @@ import {
   SIATCTableRow, 
   SIATCTableCell 
 } from '../../components/siatc/table/SIATCTable';
-import emergenciasService from '../../services/emergenciasService';
-import { Emergency, EmergencyMotive, EmergencySparePart } from '../../types';
+import { emergenciasService } from '../../services/emergenciasService';
+import type { Emergency, EmergencyMotive, EmergencySparePart } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
-import { useDialog } from '../../context/DialogContext';
 import { useTranslation } from 'react-i18next';
 
 export const EmergenciasPage = () => {
   const { user } = useAuth();
-  const dialog = useDialog();
   const { t } = useTranslation();
   
   const [searchTerm, setSearchTerm] = useState('');
@@ -222,14 +220,15 @@ export const EmergenciasPage = () => {
           <SIATCButton variant="secondary" icon={RefreshCw} onClick={fetchData} isLoading={isLoading}>
             {t('common.sync')}
           </SIATCButton>
-          <SIATCButton 
-            variant="primary" 
-            icon={Plus} 
-            onClick={() => setIsRegisterOpen(true)}
-            show={hasPermission('cxg.emergencias.create')}
-          >
-            {t('emergencias.new')}
-          </SIATCButton>
+          {hasPermission('cxg.emergencias.create') && (
+            <SIATCButton 
+              variant="primary" 
+              icon={Plus} 
+              onClick={() => setIsRegisterOpen(true)}
+            >
+              {t('emergencias.new')}
+            </SIATCButton>
+          )}
         </div>
       </div>
 
@@ -539,7 +538,7 @@ export const EmergenciasPage = () => {
         isOpen={isSparePartsOpen}
         onClose={() => setIsSparePartsOpen(false)}
         title={t('emergencias.modals.spare_parts')}
-        maxWidth="max-w-2xl"
+        size="lg"
       >
         <div className="space-y-6">
           <div className="grid grid-cols-3 gap-3 items-end p-4 bg-muted/30 rounded-xl border border-border/50">
@@ -629,7 +628,7 @@ export const EmergenciasPage = () => {
             >
               <option value="">Seleccione motivo...</option>
               {processingCatalogs.motives
-                .filter(m => m.ref_id === processForm.procesado)
+                .filter(m => m.ref_id === processingCatalogs.statuses.find(s => s.label === processForm.procesado)?.id)
                 .map(m => (
                   <option key={m.id} value={m.motivo}>{m.motivo}</option>
                 ))}
@@ -643,7 +642,7 @@ export const EmergenciasPage = () => {
         isOpen={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
         title="Detalle de Emergencia"
-        maxWidth="max-w-3xl"
+        size="xl"
       >
         {selectedEmergency && (
           <div className="grid grid-cols-2 gap-6">
