@@ -29,7 +29,7 @@ router.get('/catalogos/procesado', async (req: Request, res: Response) => {
         const results = await pool.request().query(`
             SELECT ID_Emergencia_Procesado as id, Procesado as label 
             FROM [dbo].[GAC_APP_TB_EMERGENCIA_PROCESADO];
-            SELECT ID_Emergencia_procesado_motivo as id, Motivo as motivo, Ref_Procesado as ref_id
+            SELECT ID_Emergencia_procesado_motivo as id, Motivo as motivo, Procesado as ref_id
             FROM [dbo].[GAC_APP_TB_EMERGENCIA_PROCESADO_MOTIVO];
         `);
         res.json({ statuses: results.recordsets[0], motives: results.recordsets[1] });
