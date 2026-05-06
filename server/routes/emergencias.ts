@@ -76,11 +76,11 @@ router.get('/', async (req: Request, res: Response) => {
                     e.ID_Emergencia as id,
                     e.Ticket as ticket,
                     e.Observacion as observacion,
-                    e.Verificacion as verificacion,
+                    ev.Verificacion as verificacion,
                     e.Verificacion_motivo as verificacion_motivo,
                     e.Verificado_el as verificado_el,
                     e.Verificado_por as verificado_por,
-                    e.Procesado as procesado,
+                    ep.Procesado as procesado,
                     e.Procesado_motivo as procesado_motivo,
                     e.Proceso_el as proceso_el,
                     e.Procesado_por as procesado_por,
@@ -97,6 +97,8 @@ router.get('/', async (req: Request, res: Response) => {
                     e.Direccion_referencia as direccion_referencia,
                     e.Solicitud_repuestos as solicitud_repuestos
                 FROM [dbo].[GAC_APP_TB_EMERGENCIAS] e
+                LEFT JOIN [dbo].[GAC_APP_TB_EMERGENCIA_VERIFICACION] ev ON e.Verificacion = ev.ID_Emergencia_Verificacion
+                LEFT JOIN [dbo].[GAC_APP_TB_EMERGENCIA_PROCESADO] ep ON e.Procesado = ep.ID_Emergencia_Procesado
                 ${whereClause}
                 ORDER BY e.Creado_el DESC
                 OFFSET @offset ROWS
