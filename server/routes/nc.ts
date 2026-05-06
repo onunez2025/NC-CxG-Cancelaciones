@@ -16,16 +16,22 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
             .input('ticketId', sql.VarChar, id)
             .query(`
                 SELECT TOP 1
-                    Ticket as ticket,
-                    NombreCliente as cliente,
-                    NombreEquipo as producto,
-                    Asunto as asunto,
-                    Estado as estado,
-                    ComentarioProgramador as motivo_elevacion,
-                    IDEmpresa as lugar_compra_id,
-                    FechaVisita as fecha_visita
-                FROM [SIATC].[Dashboard_FSM]
-                WHERE Ticket = @ticketId
+                    t.Ticket as ticket,
+                    t.NombreCliente as cliente,
+                    t.NombreEquipo as producto,
+                    t.Asunto as asunto,
+                    t.Estado as estado,
+                    t.ComentarioProgramador as motivo_elevacion,
+                    t.IDEmpresa as lugar_compra_id,
+                    t.FechaVisita as fecha_visita,
+                    COALESCE(sup_cas.Nombre_Empleado, sup_emp.Nombre_Empleado) as supervisor_nombre
+                FROM [SIATC].[Dashboard_FSM] t
+                LEFT JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas ON 
+                    cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
+                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_cas ON cas.Supervisor = sup_cas.ID_empleado
+                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] info ON t.CodigoTecnico = info.Empleado
+                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_emp ON info.Jefe_directo = sup_emp.ID_empleado
+                WHERE t.Ticket = @ticketId
             `);
 
         if (result.recordset.length === 0) {
@@ -381,9 +387,15 @@ router.get('/cxg-nc/:id', async (req: Request, res: Response) => {
                     n.Ticket as ticket,
                     t.NombreCliente as fsm_cliente,
                     t.ComentarioProgramador as fsm_motivo_elevacion,
-                    t.IDEmpresa as fsm_lugar_compra
+                    t.IDEmpresa as fsm_lugar_compra,
+                    COALESCE(sup_cas.Nombre_Empleado, sup_emp.Nombre_Empleado) as supervisor_asignado
                 FROM [dbo].[GAC_APP_TB_CXG_NC] n
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
+                LEFT JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas ON 
+                    cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
+                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_cas ON cas.Supervisor = sup_cas.ID_empleado
+                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] info ON t.CodigoTecnico = info.Empleado
+                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_emp ON info.Jefe_directo = sup_emp.ID_empleado
                 WHERE n.ID_Apro_CxG_NC = @id
             `);
             

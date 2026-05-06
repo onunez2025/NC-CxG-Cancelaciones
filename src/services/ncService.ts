@@ -80,6 +80,7 @@ export interface CxGNC {
     fsm_cliente?: string;
     fsm_lugar_compra?: string;
     fsm_motivo_elevacion?: string;
+    supervisor_asignado?: string;
 }
 
 export interface HistorialEntry {
@@ -105,6 +106,7 @@ export interface TicketInfo {
   motivo_elevacion?: string;
   lugar_compra_id?: string;
   fecha_visita?: string;
+  supervisor_nombre?: string;
 }
 
 export interface PaginatedResponse<T> {

@@ -194,7 +194,8 @@ export const CxGNCPage = () => {
       setFormData({
         ...formData,
         cliente: ticketInfo.cliente,
-        observacion: `Motivo: ${ticketInfo.motivo_elevacion || 'N/A'} — Lugar: ${ticketInfo.lugar_compra_id || 'N/A'}`
+        observacion: `Motivo: ${ticketInfo.motivo_elevacion || 'N/A'} — Lugar: ${ticketInfo.lugar_compra_id || 'N/A'}`,
+        supervisor_asignado: ticketInfo.supervisor_nombre
       });
       dialog.alert({ 
         title: 'Éxito',
@@ -922,6 +923,10 @@ export const CxGNCPage = () => {
                     <div className="flex flex-col gap-1">
                       <span className="text-[9px] font-bold text-amber-600/70 uppercase">Lugar de Compra</span>
                       <span className="text-xs font-bold text-amber-800 dark:text-amber-300 italic">{detailData.fsm_lugar_compra || 'No identificado'}</span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[9px] font-bold text-amber-600/70 uppercase">Supervisor Asignado</span>
+                      <span className="text-xs font-black text-amber-900 dark:text-amber-100">{detailData.supervisor_asignado || 'No asignado'}</span>
                     </div>
                     <div className="flex flex-col gap-1">
                       <span className="text-[9px] font-bold text-amber-600/70 uppercase">Motivo de Elevación</span>
