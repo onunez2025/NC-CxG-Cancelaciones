@@ -545,7 +545,7 @@ export const EmergenciasPage = () => {
             >
               <option value="">{verifyForm.verificacion ? 'Seleccione motivo...' : 'Primero seleccione estado'}</option>
               {verificationCatalogs.motives
-                .filter(m => m.ref_id?.toLowerCase() === verifyForm.verificacion?.toLowerCase())
+                .filter(m => m.ref_id?.trim().toLowerCase() === verifyForm.verificacion?.trim().toLowerCase())
                 .map(m => (
                   <option key={m.id} value={m.motivo}>{m.motivo}</option>
                 ))}
@@ -648,7 +648,7 @@ export const EmergenciasPage = () => {
             >
               <option value="">{processForm.procesado ? 'Seleccione motivo...' : 'Primero seleccione estado'}</option>
               {processingCatalogs.motives
-                .filter(m => m.ref_id?.toLowerCase() === processForm.procesado?.toLowerCase())
+                .filter(m => m.ref_id?.trim().toLowerCase() === processForm.procesado?.trim().toLowerCase())
                 .map(m => (
                   <option key={m.id} value={m.motivo}>{m.motivo}</option>
                 ))}
