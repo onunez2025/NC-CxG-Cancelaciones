@@ -536,6 +536,7 @@ export const CxGNCPage = () => {
                   <SIATCTableHeader>TIPO</SIATCTableHeader>
                   <SIATCTableHeader>DOCUMENTO</SIATCTableHeader>
                   <SIATCTableHeader>CLIENTE</SIATCTableHeader>
+                  <SIATCTableHeader>SUPERVISOR</SIATCTableHeader>
                   <SIATCTableHeader>FECHA</SIATCTableHeader>
                   <SIATCTableHeader>MOTIVO REAL</SIATCTableHeader>
                   <SIATCTableHeader>ESTADO</SIATCTableHeader>
@@ -546,7 +547,7 @@ export const CxGNCPage = () => {
                 {displayedData.map((item) => (
                   <SIATCTableRow key={item.id}>
                     <SIATCTableCell>
-                      <SIATCBadge variant={item.tipo === 'NC' ? 'warning' : 'info'}>
+                      <SIATCBadge variant={(item.tipo === 'NC' || item.tipo === 'Nota de Credito') ? 'warning' : 'info'}>
                         {item.tipo}
                       </SIATCBadge>
                     </SIATCTableCell>
@@ -555,6 +556,11 @@ export const CxGNCPage = () => {
                     </SIATCTableCell>
                     <SIATCTableCell>
                       <div className="font-bold text-foreground italic">{item.cliente}</div>
+                    </SIATCTableCell>
+                    <SIATCTableCell>
+                      <div className="text-[10px] font-black uppercase text-primary/80 truncate max-w-[120px]">
+                        {item.supervisor || '—'}
+                      </div>
                     </SIATCTableCell>
                     <SIATCTableCell>
                       <div className="flex items-center gap-2 text-muted-foreground">

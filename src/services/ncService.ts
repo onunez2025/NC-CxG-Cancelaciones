@@ -85,6 +85,7 @@ export interface CxGNC {
     motivo_elevacion?: string;
     lugar_compra?: string;
     supervisor_fsm?: string;
+    supervisor?: string;
 }
 
 export interface HistorialEntry {

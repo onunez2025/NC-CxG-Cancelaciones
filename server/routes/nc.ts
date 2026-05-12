@@ -260,11 +260,19 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
 
         let whereClause = 'WHERE 1=1';
         if (search) {
-            whereClause += ` AND (n.Ticket LIKE @search OR n.Tienda LIKE @search)`;
+            whereClause += ` AND (n.Ticket LIKE @search OR n.Tienda LIKE @search OR t.NombreCliente LIKE @search)`;
         }
+        
         if (tipo !== 'TODOS') {
-            whereClause += ` AND n.Tipo = @tipo`;
+            if (tipo === 'NC') {
+                whereClause += ` AND (n.Tipo = 'NC' OR n.Tipo = 'Nota de Credito')`;
+            } else if (tipo === 'CXG') {
+                whereClause += ` AND (n.Tipo = 'CXG' OR n.Tipo = 'Cambio por Garantia')`;
+            } else {
+                whereClause += ` AND n.Tipo = @tipo`;
+            }
         }
+
         if (estado !== 'TODOS') {
             whereClause += ` AND n.Estado_Proceso = @estado`;
         }
@@ -272,10 +280,15 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
         // Get total count
         const countRequest = pool.request();
         countRequest.input('search', sql.VarChar, `%${search}%`);
-        if (tipo !== 'TODOS') countRequest.input('tipo', sql.VarChar, tipo);
+        if (tipo !== 'TODOS' && tipo !== 'NC' && tipo !== 'CXG') countRequest.input('tipo', sql.VarChar, tipo);
         if (estado !== 'TODOS') countRequest.input('estado', sql.VarChar, estado);
 
-        const countResult = await countRequest.query(`SELECT COUNT(*) as total FROM [dbo].[GAC_APP_TB_CXG_NC] n ${whereClause}`);
+        const countResult = await countRequest.query(`
+            SELECT COUNT(*) as total 
+            FROM [dbo].[GAC_APP_TB_CXG_NC] n 
+            LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
+            ${whereClause}
+        `);
         
         const total = countResult.recordset[0].total;
 
@@ -283,7 +296,7 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
         dataRequest.input('search', sql.VarChar, `%${search}%`);
         dataRequest.input('offset', sql.Int, offset);
         dataRequest.input('pageSize', sql.Int, pageSize);
-        if (tipo !== 'TODOS') dataRequest.input('tipo', sql.VarChar, tipo);
+        if (tipo !== 'TODOS' && tipo !== 'NC' && tipo !== 'CXG') dataRequest.input('tipo', sql.VarChar, tipo);
         if (estado !== 'TODOS') dataRequest.input('estado', sql.VarChar, estado);
 
         const result = await dataRequest.query(`
@@ -292,7 +305,7 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
                 n.Tipo as tipo,
                 n.Ticket as correlativo,
                 n.Creado_el as fecha,
-                n.Tienda as cliente,
+                COALESCE(t.NombreCliente, n.Tienda) as cliente,
                 n.Asignado_a,
                 n.Asignado_por,
                 n.Asignado_el,
@@ -311,8 +324,22 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
                 n.Aprobado_motivo as aprobado_motivo,
                 n.Aprobado_observacion as aprobado_observacion,
                 n.Aprobado_el as aprobado_el,
-                n.Aprobado_por as aprobado_por
+                n.Aprobado_por as aprobado_por,
+                COALESCE(n.Supervisor_FSM, sup_cas_emp.Nombre_Empleado, sup_sole_emp.Nombre_Empleado) as supervisor
             FROM [dbo].[GAC_APP_TB_CXG_NC] n
+            LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
+            LEFT JOIN [dbo].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = emp.IdEmpresa
+            -- CAS Logic
+            LEFT JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas ON 
+                cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
+            LEFT JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] sup_cas_hist ON 
+                cas.Id_colaborar = sup_cas_hist.Id_colaborar AND (sup_cas_hist.Fecha_fin IS NULL OR sup_cas_hist.Fecha_fin >= GETDATE())
+            LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_cas_emp ON sup_cas_hist.Supervisor = sup_cas_emp.ID_empleado
+            -- SOLE Logic
+            LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] emp_da ON 
+                (t.NombreTecnico + ' ' + t.ApellidoTecnico) = emp_da.[Nombre SAP]
+            LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] info ON emp_da.Empleado = info.Empleado
+            LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_sole_emp ON info.Jefe_directo = sup_sole_emp.ID_empleado
             ${whereClause}
             ORDER BY n.Creado_el DESC
             OFFSET @offset ROWS
@@ -377,7 +404,7 @@ router.get('/cxg-nc/:id', async (req: Request, res: Response) => {
                     n.Ticket as correlativo,
                     n.Creado_el as fecha,
                     n.Creado_por as creado_por,
-                    n.Tienda as cliente,
+                    COALESCE(t.NombreCliente, n.Tienda) as cliente,
                     n.Observacion as observacion_inicial,
                     n.Asignado_a,
                     n.Asignado_por,
