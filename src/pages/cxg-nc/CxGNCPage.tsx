@@ -547,7 +547,7 @@ export const CxGNCPage = () => {
                 {displayedData.map((item) => (
                   <SIATCTableRow key={item.id}>
                     <SIATCTableCell>
-                      <SIATCBadge variant={(item.tipo === 'NC' || item.tipo === 'Nota de Credito') ? 'warning' : 'info'}>
+                      <SIATCBadge variant={((item.tipo as string) === 'NC' || (item.tipo as string) === 'Nota de Credito') ? 'warning' : 'info'}>
                         {item.tipo}
                       </SIATCBadge>
                     </SIATCTableCell>
