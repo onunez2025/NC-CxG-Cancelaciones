@@ -98,7 +98,9 @@ export const CxGNCPage = () => {
       const response = await ncService.getCxGNC({ 
         page: currentPage, 
         pageSize, 
-        search: searchTerm 
+        search: searchTerm,
+        tipo: activeTab,
+        estado: statusFilter
       });
       setData(response.data);
       setTotalRecords(response.total);
@@ -334,8 +336,10 @@ export const CxGNCPage = () => {
   };
 
   const handleViewDetail = async (id: string) => {
+    setIsDetailOpen(true);
     setIsLoadingDetail(true);
     setDetailHistorial([]);
+    setDetailData(null);
     try {
       const [detail, historial] = await Promise.all([
         ncService.getCxGNCDetail(id),
@@ -343,9 +347,14 @@ export const CxGNCPage = () => {
       ]);
       setDetailData(detail);
       setDetailHistorial(historial);
-      setIsDetailOpen(true);
     } catch (error) {
       console.error('Error fetching detail:', error);
+      dialog.alert({
+        title: 'Error de Conexión',
+        message: 'No se pudo cargar la información detallada de la solicitud.',
+        type: 'error'
+      });
+      setIsDetailOpen(false);
     } finally {
       setIsLoadingDetail(false);
     }

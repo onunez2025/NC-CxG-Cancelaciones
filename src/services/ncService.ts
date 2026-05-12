@@ -162,11 +162,15 @@ export const ncService = {
         page?: number; 
         pageSize?: number; 
         search?: string; 
+        tipo?: string;
+        estado?: string;
     }): Promise<PaginatedResponse<CxGNC>> {
         const queryParams = new URLSearchParams();
         if (params?.page) queryParams.append('page', params.page.toString());
         if (params?.pageSize) queryParams.append('pageSize', params.pageSize.toString());
         if (params?.search) queryParams.append('search', params.search);
+        if (params?.tipo && params.tipo !== 'TODOS') queryParams.append('tipo', params.tipo);
+        if (params?.estado && params.estado !== 'TODOS') queryParams.append('estado', params.estado);
 
         const response = await apiClient(`${API_BASE_URL}/cxg-nc?${queryParams.toString()}`);
         if (!response.ok) throw new Error('Error al obtener CxG/NC');

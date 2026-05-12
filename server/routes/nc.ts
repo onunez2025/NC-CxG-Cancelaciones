@@ -25,14 +25,20 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
                     t.IDEmpresa as lugar_compra_id,
                     emp.DsEmpresa as lugar_compra,
                     t.FechaVisita as fecha_visita,
-                    COALESCE(sup_cas.Nombre_Empleado, sup_emp.Nombre_Empleado) as supervisor_nombre
+                    COALESCE(sup_cas_emp.Nombre_Empleado, sup_sole_emp.Nombre_Empleado) as supervisor_nombre
                 FROM [SIATC].[Dashboard_FSM] t
                 LEFT JOIN [dbo].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = emp.IdEmpresa
+                -- CAS Logic
                 LEFT JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas ON 
                     cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
-                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_cas ON cas.Supervisor = sup_cas.ID_empleado
-                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] info ON t.CodigoTecnico = info.Empleado
-                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_emp ON info.Jefe_directo = sup_emp.ID_empleado
+                LEFT JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] sup_cas_hist ON 
+                    cas.Id_colaborar = sup_cas_hist.Id_colaborar AND (sup_cas_hist.Fecha_fin IS NULL OR sup_cas_hist.Fecha_fin >= GETDATE())
+                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_cas_emp ON sup_cas_hist.Supervisor = sup_cas_emp.ID_empleado
+                -- SOLE Logic
+                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] emp_da ON 
+                    (t.NombreTecnico + ' ' + t.ApellidoTecnico) = emp_da.[Nombre SAP]
+                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] info ON emp_da.Empleado = info.Empleado
+                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_sole_emp ON info.Jefe_directo = sup_sole_emp.ID_empleado
                 WHERE t.Ticket = @ticketId
             `);
 
@@ -246,6 +252,8 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
         const page = parseInt(req.query.page as string) || 1;
         const pageSize = parseInt(req.query.pageSize as string) || 20;
         const search = req.query.search as string || '';
+        const tipo = req.query.tipo as string || 'TODOS';
+        const estado = req.query.estado as string || 'TODOS';
         const offset = (page - 1) * pageSize;
 
         const pool = await getDbConnection();
@@ -254,50 +262,62 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
         if (search) {
             whereClause += ` AND (n.Ticket LIKE @search OR n.Tienda LIKE @search)`;
         }
+        if (tipo !== 'TODOS') {
+            whereClause += ` AND n.Tipo = @tipo`;
+        }
+        if (estado !== 'TODOS') {
+            whereClause += ` AND n.Estado_Proceso = @estado`;
+        }
 
         // Get total count
-        const countResult = await pool.request()
-            .input('search', sql.VarChar, `%${search}%`)
-            .query(`SELECT COUNT(*) as total FROM [dbo].[GAC_APP_TB_CXG_NC] n ${whereClause}`);
+        const countRequest = pool.request();
+        countRequest.input('search', sql.VarChar, `%${search}%`);
+        if (tipo !== 'TODOS') countRequest.input('tipo', sql.VarChar, tipo);
+        if (estado !== 'TODOS') countRequest.input('estado', sql.VarChar, estado);
+
+        const countResult = await countRequest.query(`SELECT COUNT(*) as total FROM [dbo].[GAC_APP_TB_CXG_NC] n ${whereClause}`);
         
         const total = countResult.recordset[0].total;
 
-        const result = await pool.request()
-            .input('search', sql.VarChar, `%${search}%`)
-            .input('offset', sql.Int, offset)
-            .input('pageSize', sql.Int, pageSize)
-            .query(`
-                SELECT 
-                    n.ID_Apro_CxG_NC as id,
-                    n.Tipo as tipo,
-                    n.Ticket as correlativo,
-                    n.Creado_el as fecha,
-                    n.Tienda as cliente,
-                    n.Asignado_a,
-                    n.Asignado_por,
-                    n.Asignado_el,
-                    n.Gestionado,
-                    n.Observacion_Gestionado as observacion,
-                    n.Estado_Proceso as estado,
-                    n.Apro_Solicitud as apro_solicitud,
-                    n.Apro_Por as apro_por,
-                    n.Apro_El as apro_el,
-                    n.Apro_Obs as apro_obs,
-                    n.Vali_Cliente as vali_cliente,
-                    n.Vali_Por as vali_por,
-                    n.Vali_El as vali_el,
-                    n.Vali_Motivo_Real as vali_motivo_real,
-                    n.Aprobado as aprobado,
-                    n.Aprobado_motivo as aprobado_motivo,
-                    n.Aprobado_observacion as aprobado_observacion,
-                    n.Aprobado_el as aprobado_el,
-                    n.Aprobado_por as aprobado_por
-                FROM [dbo].[GAC_APP_TB_CXG_NC] n
-                ${whereClause}
-                ORDER BY n.Creado_el DESC
-                OFFSET @offset ROWS
-                FETCH NEXT @pageSize ROWS ONLY
-            `);
+        const dataRequest = pool.request();
+        dataRequest.input('search', sql.VarChar, `%${search}%`);
+        dataRequest.input('offset', sql.Int, offset);
+        dataRequest.input('pageSize', sql.Int, pageSize);
+        if (tipo !== 'TODOS') dataRequest.input('tipo', sql.VarChar, tipo);
+        if (estado !== 'TODOS') dataRequest.input('estado', sql.VarChar, estado);
+
+        const result = await dataRequest.query(`
+            SELECT 
+                n.ID_Apro_CxG_NC as id,
+                n.Tipo as tipo,
+                n.Ticket as correlativo,
+                n.Creado_el as fecha,
+                n.Tienda as cliente,
+                n.Asignado_a,
+                n.Asignado_por,
+                n.Asignado_el,
+                n.Gestionado,
+                n.Observacion_Gestionado as observacion,
+                n.Estado_Proceso as estado,
+                n.Apro_Solicitud as apro_solicitud,
+                n.Apro_Por as apro_por,
+                n.Apro_El as apro_el,
+                n.Apro_Obs as apro_obs,
+                n.Vali_Cliente as vali_cliente,
+                n.Vali_Por as vali_por,
+                n.Vali_El as vali_el,
+                n.Vali_Motivo_Real as vali_motivo_real,
+                n.Aprobado as aprobado,
+                n.Aprobado_motivo as aprobado_motivo,
+                n.Aprobado_observacion as aprobado_observacion,
+                n.Aprobado_el as aprobado_el,
+                n.Aprobado_por as aprobado_por
+            FROM [dbo].[GAC_APP_TB_CXG_NC] n
+            ${whereClause}
+            ORDER BY n.Creado_el DESC
+            OFFSET @offset ROWS
+            FETCH NEXT @pageSize ROWS ONLY
+        `);
 
         res.json({
             data: result.recordset,
@@ -389,16 +409,22 @@ router.get('/cxg-nc/:id', async (req: Request, res: Response) => {
                     n.Ticket as ticket,
                     COALESCE(n.Motivo_Elevacion, t.ComentarioProgramador) as fsm_motivo_elevacion,
                     COALESCE(n.Lugar_Compra, emp.DsEmpresa, CAST(t.IDEmpresa as VARCHAR)) as fsm_lugar_compra,
-                    COALESCE(n.Supervisor_FSM, sup_cas.Nombre_Empleado, sup_emp.Nombre_Empleado) as supervisor_asignado,
+                    COALESCE(n.Supervisor_FSM, sup_cas_emp.Nombre_Empleado, sup_sole_emp.Nombre_Empleado) as supervisor_asignado,
                     t.NombreCliente as fsm_cliente
                 FROM [dbo].[GAC_APP_TB_CXG_NC] n
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
                 LEFT JOIN [dbo].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = emp.IdEmpresa
+                -- CAS Logic
                 LEFT JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas ON 
                     cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
-                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_cas ON cas.Supervisor = sup_cas.ID_empleado
-                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] info ON t.CodigoTecnico = info.Empleado
-                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_emp ON info.Jefe_directo = sup_emp.ID_empleado
+                LEFT JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] sup_cas_hist ON 
+                    cas.Id_colaborar = sup_cas_hist.Id_colaborar AND (sup_cas_hist.Fecha_fin IS NULL OR sup_cas_hist.Fecha_fin >= GETDATE())
+                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_cas_emp ON sup_cas_hist.Supervisor = sup_cas_emp.ID_empleado
+                -- SOLE Logic
+                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] emp_da ON 
+                    (t.NombreTecnico + ' ' + t.ApellidoTecnico) = emp_da.[Nombre SAP]
+                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] info ON emp_da.Empleado = info.Empleado
+                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_sole_emp ON info.Jefe_directo = sup_sole_emp.ID_empleado
                 WHERE n.ID_Apro_CxG_NC = @id
             `);
             
