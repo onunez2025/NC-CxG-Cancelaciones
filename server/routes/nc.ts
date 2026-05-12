@@ -25,20 +25,28 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
                     t.IDEmpresa as lugar_compra_id,
                     emp.DsEmpresa as lugar_compra,
                     t.FechaVisita as fecha_visita,
-                    COALESCE(sup_cas_emp.Nombre_Empleado, sup_sole_emp.Nombre_Empleado) as supervisor_nombre
+                    COALESCE(sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor_nombre
                 FROM [SIATC].[Dashboard_FSM] t
                 LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as VARCHAR)
-                -- CAS Logic
-                LEFT JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas ON 
-                    cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
-                LEFT JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] sup_cas_hist ON 
-                    cas.Id_colaborar = sup_cas_hist.Id_colaborar AND (sup_cas_hist.Fecha_fin IS NULL OR sup_cas_hist.Fecha_fin >= GETDATE())
-                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_cas_emp ON sup_cas_hist.Supervisor = sup_cas_emp.ID_empleado
-                -- SOLE Logic
-                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] emp_da ON 
-                    (t.NombreTecnico + ' ' + t.ApellidoTecnico) = emp_da.[Nombre SAP]
-                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] info ON emp_da.Empleado = info.Empleado
-                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_sole_emp ON info.Jefe_directo = sup_sole_emp.ID_empleado
+                -- CAS Supervisor (OUTER APPLY TOP 1 to avoid fan-out)
+                OUTER APPLY (
+                    SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
+                    FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas
+                    INNER JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] h 
+                        ON cas.Id_colaborar = h.Id_colaborar 
+                        AND (h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE())
+                    INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON h.Supervisor = e.ID_empleado
+                    WHERE cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
+                      AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
+                ) sup_cas
+                -- SOLE Supervisor (OUTER APPLY TOP 1 to avoid fan-out)
+                OUTER APPLY (
+                    SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
+                    FROM [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] da
+                    INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] ia ON da.Empleado = ia.Empleado
+                    INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON ia.Jefe_directo = e.ID_empleado
+                    WHERE (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
+                ) sup_sole
                 WHERE t.Ticket = @ticketId
             `);
 
@@ -325,21 +333,28 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
                 n.Aprobado_observacion as aprobado_observacion,
                 n.Aprobado_el as aprobado_el,
                 n.Aprobado_por as aprobado_por,
-                COALESCE(n.Supervisor_FSM, sup_cas_emp.Nombre_Empleado, sup_sole_emp.Nombre_Empleado) as supervisor
+                COALESCE(n.Supervisor_FSM, sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor
             FROM [dbo].[GAC_APP_TB_CXG_NC] n
             LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
-            LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as VARCHAR)
-            -- CAS Logic
-            LEFT JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas ON 
-                cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
-            LEFT JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] sup_cas_hist ON 
-                cas.Id_colaborar = sup_cas_hist.Id_colaborar AND (sup_cas_hist.Fecha_fin IS NULL OR sup_cas_hist.Fecha_fin >= GETDATE())
-            LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_cas_emp ON sup_cas_hist.Supervisor = sup_cas_emp.ID_empleado
-            -- SOLE Logic
-            LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] emp_da ON 
-                (t.NombreTecnico + ' ' + t.ApellidoTecnico) = emp_da.[Nombre SAP]
-            LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] info ON emp_da.Empleado = info.Empleado
-            LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_sole_emp ON info.Jefe_directo = sup_sole_emp.ID_empleado
+            -- CAS Supervisor (OUTER APPLY TOP 1 to avoid fan-out)
+            OUTER APPLY (
+                SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
+                FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas
+                INNER JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] h 
+                    ON cas.Id_colaborar = h.Id_colaborar 
+                    AND (h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE())
+                INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON h.Supervisor = e.ID_empleado
+                WHERE cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
+                  AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
+            ) sup_cas
+            -- SOLE Supervisor (OUTER APPLY TOP 1 to avoid fan-out)
+            OUTER APPLY (
+                SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
+                FROM [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] da
+                INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] ia ON da.Empleado = ia.Empleado
+                INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON ia.Jefe_directo = e.ID_empleado
+                WHERE (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
+            ) sup_sole
             ${whereClause}
             ORDER BY n.Creado_el DESC
             OFFSET @offset ROWS
@@ -436,22 +451,30 @@ router.get('/cxg-nc/:id', async (req: Request, res: Response) => {
                     n.Ticket as ticket,
                     COALESCE(n.Motivo_Elevacion, t.ComentarioProgramador) as fsm_motivo_elevacion,
                     COALESCE(n.Lugar_Compra, emp.DsEmpresa, CAST(t.IDEmpresa as VARCHAR)) as fsm_lugar_compra,
-                    COALESCE(n.Supervisor_FSM, sup_cas_emp.Nombre_Empleado, sup_sole_emp.Nombre_Empleado) as supervisor_asignado,
+                    COALESCE(n.Supervisor_FSM, sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor_asignado,
                     t.NombreCliente as fsm_cliente
                 FROM [dbo].[GAC_APP_TB_CXG_NC] n
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
                 LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as VARCHAR)
-                -- CAS Logic
-                LEFT JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas ON 
-                    cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
-                LEFT JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] sup_cas_hist ON 
-                    cas.Id_colaborar = sup_cas_hist.Id_colaborar AND (sup_cas_hist.Fecha_fin IS NULL OR sup_cas_hist.Fecha_fin >= GETDATE())
-                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_cas_emp ON sup_cas_hist.Supervisor = sup_cas_emp.ID_empleado
-                -- SOLE Logic
-                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] emp_da ON 
-                    (t.NombreTecnico + ' ' + t.ApellidoTecnico) = emp_da.[Nombre SAP]
-                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] info ON emp_da.Empleado = info.Empleado
-                LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_sole_emp ON info.Jefe_directo = sup_sole_emp.ID_empleado
+                -- CAS Supervisor (OUTER APPLY TOP 1 to avoid fan-out)
+                OUTER APPLY (
+                    SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
+                    FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas
+                    INNER JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] h 
+                        ON cas.Id_colaborar = h.Id_colaborar 
+                        AND (h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE())
+                    INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON h.Supervisor = e.ID_empleado
+                    WHERE cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
+                      AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
+                ) sup_cas
+                -- SOLE Supervisor (OUTER APPLY TOP 1 to avoid fan-out)
+                OUTER APPLY (
+                    SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
+                    FROM [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] da
+                    INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] ia ON da.Empleado = ia.Empleado
+                    INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON ia.Jefe_directo = e.ID_empleado
+                    WHERE (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
+                ) sup_sole
                 WHERE n.ID_Apro_CxG_NC = @id
             `);
             
