@@ -12,7 +12,8 @@ import {
     ShieldCheck,
     ChevronRight,
     Activity,
-    Check
+    Check,
+    Filter
 } from 'lucide-react';
 import { Modal } from '../../components/common/Modal';
 import { useDialog } from '../../context/DialogContext';
@@ -51,6 +52,11 @@ export default function UsersPage() {
     const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('ASC');
     const [error, setError] = useState('');
 
+    // Specific filters
+    const [userFilter, setUserFilter] = useState('');
+    const [roleFilter, setRoleFilter] = useState('');
+    const [openFilter, setOpenFilter] = useState<'usuario' | 'rol' | null>(null);
+
     // Pagination State (SIATC Standard)
     const [currentPage, setCurrentPage] = useState(1);
     const recordsPerPage = 10;
@@ -64,6 +70,14 @@ export default function UsersPage() {
     });
 
     useEffect(() => { loadData(); }, []);
+
+    useEffect(() => {
+        const handleClickOutside = () => setOpenFilter(null);
+        if (openFilter) {
+            document.addEventListener('click', handleClickOutside);
+            return () => document.removeEventListener('click', handleClickOutside);
+        }
+    }, [openFilter]);
 
     const loadData = async () => {
         setIsLoading(true);
@@ -158,6 +172,20 @@ export default function UsersPage() {
             u.username?.toLowerCase().includes(search.toLowerCase()) ||
             u.email?.toLowerCase().includes(search.toLowerCase()))
         )
+        .filter(u => {
+            if (userFilter) {
+                const uf = userFilter.toLowerCase();
+                if (!(u.full_name?.toLowerCase().includes(uf) || u.username?.toLowerCase().includes(uf))) {
+                    return false;
+                }
+            }
+            if (roleFilter) {
+                if (u.role_id !== roleFilter && u.role_name !== roleFilter) {
+                    return false;
+                }
+            }
+            return true;
+        })
         .sort((a, b) => {
             const factor = sortOrder === 'ASC' ? 1 : -1;
             if (sortBy === 'username') return (a.username || '').localeCompare(b.username || '') * factor;
@@ -219,9 +247,28 @@ export default function UsersPage() {
                             <thead className={SIATC_THEME.TABLE.HEADER_ROW}>
                                 <tr className="border-b border-border">
                                     <ResizableHeader columnId="usuario" width={widths.usuario} onResizeStart={onResizeStart} className="px-6 py-4">
-                                        <div className="flex items-center justify-between gap-2 group/header cursor-pointer" onClick={() => handleSort('username')}>
-                                            <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Responsable / ID</span>
-                                            <SortIcon column="username" />
+                                        <div className="flex items-center justify-between gap-2 group/header">
+                                            <div className="flex items-center gap-2 cursor-pointer flex-1" onClick={() => handleSort('username')}>
+                                                <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Responsable / ID</span>
+                                                <SortIcon column="username" />
+                                            </div>
+                                            <div className="relative" onClick={e => e.stopPropagation()}>
+                                                <button onClick={() => setOpenFilter(openFilter === 'usuario' ? null : 'usuario')} className={cn("p-1.5 rounded-md transition-all shadow-sm", userFilter ? 'text-primary bg-primary/10 border-primary/20 border' : 'text-muted-foreground/40 hover:text-foreground hover:bg-muted border border-transparent')}>
+                                                    <Filter className="w-3.5 h-3.5" />
+                                                </button>
+                                                {openFilter === 'usuario' && (
+                                                    <div className="absolute top-full left-0 mt-1 w-56 bg-background border border-border shadow-xl rounded-xl p-2 z-50 animate-in fade-in slide-in-from-top-2">
+                                                        <input 
+                                                            type="text" 
+                                                            autoFocus
+                                                            placeholder="Buscar ID o nombre..." 
+                                                            className="w-full text-xs px-3 py-2 bg-muted/30 border border-border rounded-lg outline-none focus:border-primary transition-colors font-medium placeholder:text-muted-foreground/50"
+                                                            value={userFilter}
+                                                            onChange={e => { setUserFilter(e.target.value); setCurrentPage(1); }}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </ResizableHeader>
                                     <ResizableHeader columnId="email" width={widths.email} onResizeStart={onResizeStart} className="px-6 py-4">
@@ -231,9 +278,31 @@ export default function UsersPage() {
                                         </div>
                                     </ResizableHeader>
                                     <ResizableHeader columnId="rol" width={widths.rol} onResizeStart={onResizeStart} className="px-6 py-4">
-                                        <div className="flex items-center justify-between gap-2 group/header cursor-pointer" onClick={() => handleSort('rol')}>
-                                            <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Perfil de Seguridad</span>
-                                            <SortIcon column="rol" />
+                                        <div className="flex items-center justify-between gap-2 group/header">
+                                            <div className="flex items-center gap-2 cursor-pointer flex-1" onClick={() => handleSort('rol')}>
+                                                <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Perfil de Seguridad</span>
+                                                <SortIcon column="rol" />
+                                            </div>
+                                            <div className="relative" onClick={e => e.stopPropagation()}>
+                                                <button onClick={() => setOpenFilter(openFilter === 'rol' ? null : 'rol')} className={cn("p-1.5 rounded-md transition-all shadow-sm", roleFilter ? 'text-primary bg-primary/10 border-primary/20 border' : 'text-muted-foreground/40 hover:text-foreground hover:bg-muted border border-transparent')}>
+                                                    <Filter className="w-3.5 h-3.5" />
+                                                </button>
+                                                {openFilter === 'rol' && (
+                                                    <div className="absolute top-full left-0 mt-1 w-48 bg-background border border-border shadow-xl rounded-xl p-2 z-50 animate-in fade-in slide-in-from-top-2">
+                                                        <select 
+                                                            autoFocus
+                                                            className="w-full text-xs px-3 py-2 bg-muted/30 border border-border rounded-lg outline-none focus:border-primary transition-colors appearance-none cursor-pointer font-bold text-foreground"
+                                                            value={roleFilter}
+                                                            onChange={e => { setRoleFilter(e.target.value); setCurrentPage(1); }}
+                                                        >
+                                                            <option value="" className="font-medium text-muted-foreground">Todos los perfiles</option>
+                                                            {roles.map(r => (
+                                                                <option key={r.id} value={r.id} className="font-bold text-foreground">{r.name}</option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </ResizableHeader>
                                     <ResizableHeader columnId="apps" width={widths.apps} onResizeStart={onResizeStart} className="px-6 py-4 text-center">
