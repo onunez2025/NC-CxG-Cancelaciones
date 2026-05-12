@@ -25,7 +25,7 @@ export function ResizableHeader({
       style={{ ...style, width: width ? `${width}px` : undefined, minWidth: width ? '50px' : undefined }}
       className={cn("relative group/resizer select-none", className)}
     >
-      <div className="flex items-center h-full w-full gap-1 overflow-hidden">
+      <div className="flex items-center h-full w-full gap-1">
         {children}
       </div>
       
