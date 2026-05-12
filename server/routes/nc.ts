@@ -27,7 +27,7 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
                     t.FechaVisita as fecha_visita,
                     COALESCE(sup_cas_emp.Nombre_Empleado, sup_sole_emp.Nombre_Empleado) as supervisor_nombre
                 FROM [SIATC].[Dashboard_FSM] t
-                LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = emp.IdEmpresa
+                LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as VARCHAR)
                 -- CAS Logic
                 LEFT JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas ON 
                     cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
@@ -328,7 +328,7 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
                 COALESCE(n.Supervisor_FSM, sup_cas_emp.Nombre_Empleado, sup_sole_emp.Nombre_Empleado) as supervisor
             FROM [dbo].[GAC_APP_TB_CXG_NC] n
             LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
-            LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = emp.IdEmpresa
+            LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as VARCHAR)
             -- CAS Logic
             LEFT JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas ON 
                 cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
@@ -440,7 +440,7 @@ router.get('/cxg-nc/:id', async (req: Request, res: Response) => {
                     t.NombreCliente as fsm_cliente
                 FROM [dbo].[GAC_APP_TB_CXG_NC] n
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
-                LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = emp.IdEmpresa
+                LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as VARCHAR)
                 -- CAS Logic
                 LEFT JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas ON 
                     cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
