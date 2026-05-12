@@ -242,8 +242,11 @@ export const CancellationsPage = () => {
 
   useEffect(() => {
     fetchMotivos();
-    // Load system users for assignment dropdown
-    UsersService.getUsers().then(users => setSystemUsers(users.filter(u => u.is_active))).catch(console.error);
+    // Only load system users for assignment dropdown if user has permission
+    // Asesor CC users don't have 'ebm.config.users' so GET /api/users returns 403
+    if (canAssign) {
+      UsersService.getUsers().then(users => setSystemUsers(users.filter(u => u.is_active))).catch(console.error);
+    }
   }, []);
 
   const handleCreate = async () => {

@@ -140,7 +140,11 @@ export const CxGNCPage = () => {
         console.error('Error fetching motives:', error);
       }
     };
-    fetchAnalysts();
+    // Only fetch users list if current user has permission to assign analysts
+    // Asesor CC users don't have 'ebm.config.users' so GET /api/users returns 403
+    if (hasPermission('cxg.cxg_nc.assign')) {
+      fetchAnalysts();
+    }
     fetchInitialData();
   }, []);
 
