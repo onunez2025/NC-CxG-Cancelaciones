@@ -11,16 +11,16 @@ const router = Router();
 router.get('/tracking', async (req: Request, res: Response) => {
     try {
         const pool = await getDbConnection();
-        const ticket = req.query.ticket as string || '';
-        const cliente = req.query.cliente as string || '';
-        const documento = req.query.documento as string || '';
-        const tecnico = req.query.tecnico as string || '';
-        const celular = req.query.celular as string || '';
+        const ticket = (req.query.ticket as string || '').trim();
+        const cliente = (req.query.cliente as string || '').trim();
+        const documento = (req.query.documento as string || '').trim();
+        const tecnico = (req.query.tecnico as string || '').trim();
+        const celular = (req.query.celular as string || '').trim();
         const limit = parseInt(req.query.limit as string) || 100;
 
         // Logic: if specific ID filters (ticket/doc) are provided, allow historical search.
-        // If technician, client or phone are used, keep the "Today" restriction as per user request.
-        let whereClause = "WHERE CAST(t.FechaVisita AS DATE) = CAST(GETDATE() AS DATE)"; 
+        // If technician, client or phone are used, keep the "Today" (Peru Time) restriction.
+        let whereClause = "WHERE CAST(t.FechaVisita AT TIME ZONE 'UTC' AT TIME ZONE 'SA Pacific Standard Time' AS DATE) = CAST(SYSDATETIMEOFFSET() AT TIME ZONE 'SA Pacific Standard Time' AS DATE)"; 
         
         if (ticket || documento) {
             whereClause = "WHERE 1=1";

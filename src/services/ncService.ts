@@ -81,6 +81,10 @@ export interface CxGNC {
     fsm_lugar_compra?: string;
     fsm_motivo_elevacion?: string;
     supervisor_asignado?: string;
+    // Persisted FSM fields
+    motivo_elevacion?: string;
+    lugar_compra?: string;
+    supervisor_fsm?: string;
 }
 
 export interface HistorialEntry {
@@ -105,6 +109,7 @@ export interface TicketInfo {
   estado?: string;
   motivo_elevacion?: string;
   lugar_compra_id?: string;
+  lugar_compra?: string;
   fecha_visita?: string;
   supervisor_nombre?: string;
 }

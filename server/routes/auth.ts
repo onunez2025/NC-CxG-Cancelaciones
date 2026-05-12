@@ -35,7 +35,8 @@ router.post('/login', async (req: Request, res: Response) => {
                     u.CreatedAt as created_at,
                     u.Language as language,
                     u.Theme as theme,
-                    u.AvatarUrl as avatar_url
+                    u.AvatarUrl as avatar_url,
+                    u.Apps as apps
                 FROM EBM.Users u
                 LEFT JOIN EBM.Roles r ON u.RoleId = r.Id
                 LEFT JOIN EBM.Managements m ON u.ManagementId = m.Id
@@ -77,7 +78,8 @@ router.post('/login', async (req: Request, res: Response) => {
                 role_name: user.role_name,
                 management_id: user.management_id,
                 username: user.username,
-                permissions: user.permissions
+                permissions: user.permissions,
+                apps: user.apps
             },
             JWT_SECRET,
             { expiresIn: '24h' }
@@ -122,7 +124,8 @@ router.get('/me', verifyToken, async (req: Request, res: Response) => {
             u.CreatedAt as created_at,
             u.Language as language,
             u.Theme as theme,
-            u.AvatarUrl as avatar_url
+            u.AvatarUrl as avatar_url,
+            u.Apps as apps
                 FROM EBM.Users u
                 LEFT JOIN EBM.Roles r ON u.RoleId = r.Id
                 LEFT JOIN EBM.Managements m ON u.ManagementId = m.Id

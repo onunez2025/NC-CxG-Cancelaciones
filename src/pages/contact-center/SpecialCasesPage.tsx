@@ -134,8 +134,9 @@ export const SpecialCasesPage = () => {
         const diffTime = visitDate.getTime() - now.getTime();
         const diffHours = diffTime / (1000 * 60 * 60);
 
-        if (diffHours > 48) {
-          alert('No es posible registrar casos con fecha de visita superior a 48 horas después de las 10:30 AM (Hora Lima).');
+        // Si es después de las 10:30, no permite para las próximas 48 horas (demasiado pronto para planificar)
+        if (diffHours > 0 && diffHours < 48) {
+          alert('No es posible registrar casos con fecha de visita dentro de las próximas 48 horas después de las 10:30 AM (Hora Lima).');
           return;
         }
       }
@@ -265,7 +266,8 @@ export const SpecialCasesPage = () => {
                   <SIATCTableHeader>CREADO POR</SIATCTableHeader>
                   <SIATCTableHeader>FECHA REGISTRO</SIATCTableHeader>
                   <SIATCTableHeader>FECHA VISITA</SIATCTableHeader>
-                  <SIATCTableHeader>ESTADO</SIATCTableHeader>
+                  <SIATCTableHeader>ESTADO SOLICITUD</SIATCTableHeader>
+                  <SIATCTableHeader>ESTADO SERVICIO</SIATCTableHeader>
                   <SIATCTableHeader className="text-right">ACCIONES</SIATCTableHeader>
                 </tr>
               </thead>
@@ -273,7 +275,7 @@ export const SpecialCasesPage = () => {
                 {data.map((item) => (
                   <SIATCTableRow key={item.id}>
                     <SIATCTableCell>
-                      <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>#{item.ticket}</span>
+                      <span className="text-[13px] font-mono font-black tracking-tight text-primary">#{item.ticket}</span>
                     </SIATCTableCell>
                     <SIATCTableCell>
                       <div className="font-bold text-foreground line-clamp-1">{item.motivo}</div>
@@ -305,6 +307,19 @@ export const SpecialCasesPage = () => {
                         'danger'
                       }>
                         {item.estado}
+                      </SIATCBadge>
+                    </SIATCTableCell>
+                    <SIATCTableCell>
+                      <SIATCBadge variant={
+                        item.service_status === 'Cancelled' ? 'danger' :
+                        item.service_status === 'Ready to plan' ? 'primary' :
+                        item.service_status === 'Closed' ? 'success' :
+                        'info'
+                      }>
+                        {item.service_status === 'Cancelled' ? 'CANCELADO' :
+                         item.service_status === 'Ready to plan' ? 'POR PLANIFICAR' :
+                         item.service_status === 'Closed' ? 'CERRADO' :
+                         item.service_status?.toUpperCase() || 'N/A'}
                       </SIATCBadge>
                     </SIATCTableCell>
                     <SIATCTableCell className="text-right">

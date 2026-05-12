@@ -23,9 +23,11 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
                     t.Estado as estado,
                     t.ComentarioProgramador as motivo_elevacion,
                     t.IDEmpresa as lugar_compra_id,
+                    emp.DsEmpresa as lugar_compra,
                     t.FechaVisita as fecha_visita,
                     COALESCE(sup_cas.Nombre_Empleado, sup_emp.Nombre_Empleado) as supervisor_nombre
                 FROM [SIATC].[Dashboard_FSM] t
+                LEFT JOIN [dbo].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = emp.IdEmpresa
                 LEFT JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas ON 
                     cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
                 LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_cas ON cas.Supervisor = sup_cas.ID_empleado
@@ -385,12 +387,13 @@ router.get('/cxg-nc/:id', async (req: Request, res: Response) => {
                     n.Ticket_desinstalacion as ticket_desinstalacion,
                     n.Gestionado_el as fecha_gestionado,
                     n.Ticket as ticket,
-                    t.NombreCliente as fsm_cliente,
-                    t.ComentarioProgramador as fsm_motivo_elevacion,
-                    t.IDEmpresa as fsm_lugar_compra,
-                    COALESCE(sup_cas.Nombre_Empleado, sup_emp.Nombre_Empleado) as supervisor_asignado
+                    COALESCE(n.Motivo_Elevacion, t.ComentarioProgramador) as fsm_motivo_elevacion,
+                    COALESCE(n.Lugar_Compra, emp.DsEmpresa, CAST(t.IDEmpresa as VARCHAR)) as fsm_lugar_compra,
+                    COALESCE(n.Supervisor_FSM, sup_cas.Nombre_Empleado, sup_emp.Nombre_Empleado) as supervisor_asignado,
+                    t.NombreCliente as fsm_cliente
                 FROM [dbo].[GAC_APP_TB_CXG_NC] n
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
+                LEFT JOIN [dbo].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = emp.IdEmpresa
                 LEFT JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas ON 
                     cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
                 LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] sup_cas ON cas.Supervisor = sup_cas.ID_empleado
@@ -548,7 +551,7 @@ router.post('/cancelaciones/:id/reject', async (req: Request, res: Response) => 
 
 router.post('/cxg-nc', async (req: Request, res: Response) => {
     try {
-        const { tipo, cliente, ticket, observacion } = req.body;
+        const { tipo, cliente, ticket, observacion, motivo_elevacion, lugar_compra, supervisor_fsm } = req.body;
         const pool = await getDbConnection();
         const solicitudId = `CNC-${Date.now()}`;
         const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
@@ -560,10 +563,13 @@ router.post('/cxg-nc', async (req: Request, res: Response) => {
             .input('tienda', sql.VarChar, cliente)
             .input('observacion', sql.VarChar, observacion || '')
             .input('usuario', sql.VarChar, req.body.usuario || 'Sistema')
+            .input('motivo_elevacion', sql.NVarChar, motivo_elevacion || null)
+            .input('lugar_compra', sql.NVarChar, lugar_compra || null)
+            .input('supervisor_fsm', sql.NVarChar, supervisor_fsm || null)
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_CXG_NC] 
-                (ID_Apro_CxG_NC, Ticket, Tipo, Tienda, Observacion, Creado_el, Creado_por, Procesado, Estado_Proceso)
-                VALUES (@id, @ticket, @tipo, @tienda, @observacion, GETDATE(), @usuario, 'NO', 'REGISTRADO')
+                (ID_Apro_CxG_NC, Ticket, Tipo, Tienda, Observacion, Creado_el, Creado_por, Procesado, Estado_Proceso, Motivo_Elevacion, Lugar_Compra, Supervisor_FSM)
+                VALUES (@id, @ticket, @tipo, @tienda, @observacion, GETDATE(), @usuario, 'NO', 'REGISTRADO', @motivo_elevacion, @lugar_compra, @supervisor_fsm)
             `);
 
         // Insert history entry

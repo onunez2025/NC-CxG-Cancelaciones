@@ -50,6 +50,7 @@ export interface SpecialCase {
     revisado_por?: string;
     motivo_rechazo?: string;
     fecha_visita?: string;
+    service_status?: string;
 }
 
 export interface SpecialCaseMotivo {

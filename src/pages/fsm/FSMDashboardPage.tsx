@@ -226,6 +226,7 @@ export const FSMDashboardPage = () => {
                 <tr className={SIATC_THEME.TABLE.HEADER_ROW}>
                   <SIATCTableHeader>TICKET</SIATCTableHeader>
                   <SIATCTableHeader>CLIENTE / DOCUMENTO</SIATCTableHeader>
+                  <SIATCTableHeader>CONTACTO / CELULAR</SIATCTableHeader>
                   <SIATCTableHeader>UBICACIÓN</SIATCTableHeader>
                   <SIATCTableHeader>TÉCNICO / SUPERVISOR</SIATCTableHeader>
                   <SIATCTableHeader>BLOQUE ORIGINAL</SIATCTableHeader>
@@ -237,7 +238,7 @@ export const FSMDashboardPage = () => {
               <tbody>
                 {data.length === 0 ? (
                     <tr>
-                        <td colSpan={8} className="text-center py-12 text-muted-foreground italic text-sm">
+                        <td colSpan={9} className="text-center py-12 text-muted-foreground italic text-sm">
                             No se encontraron registros para los criterios seleccionados.
                         </td>
                     </tr>
@@ -249,9 +250,9 @@ export const FSMDashboardPage = () => {
                   >
                     <SIATCTableCell>
                       <div className="flex flex-col">
-                        <span className="text-[13px] font-black group-hover:text-primary transition-colors">#{item.ticket}</span>
+                        <span className="text-[14px] font-black group-hover:text-primary transition-colors">#{item.ticket}</span>
                         {item.tipo_servicio && (
-                          <span className="text-[9px] font-black text-primary/80 uppercase truncate max-w-[120px] leading-tight">
+                          <span className="text-[10px] font-black text-primary/80 uppercase truncate max-w-[120px] leading-tight">
                             {item.tipo_servicio}
                           </span>
                         )}
@@ -264,12 +265,25 @@ export const FSMDashboardPage = () => {
                       </div>
                     </SIATCTableCell>
                     <SIATCTableCell>
-                      <div className="flex flex-col max-w-[250px]">
-                        <span className="font-bold text-foreground truncate uppercase">{item.cliente}</span>
+                      <div className="flex flex-col max-w-[200px]">
+                        <span className="font-bold text-[13px] text-foreground truncate uppercase">{item.cliente}</span>
                         <div className="flex items-center gap-1 mt-0.5">
-                            <span className="text-[8px] bg-slate-100 text-slate-500 font-black px-1 rounded">ID</span>
-                            <span className="text-[12px] text-foreground font-bold font-mono">{item.doc_cliente || 'SIN DOC'}</span>
+                            <span className="text-[8px] bg-slate-100 text-slate-500 font-black px-1 rounded uppercase tracking-tighter">Doc</span>
+                            <span className="text-[13px] text-foreground font-black font-mono">{item.doc_cliente || 'SIN DOC'}</span>
                         </div>
+                      </div>
+                    </SIATCTableCell>
+                    <SIATCTableCell>
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-1.5">
+                          <Phone className="w-3 h-3 text-primary" />
+                          <span className="text-[12px] font-bold text-slate-700">{item.celular1 || '—'}</span>
+                        </div>
+                        {item.celular2 && (
+                          <div className="flex items-center gap-1.5 pl-4 opacity-70">
+                            <span className="text-[11px] font-medium text-slate-600">{item.celular2}</span>
+                          </div>
+                        )}
                       </div>
                     </SIATCTableCell>
                     <SIATCTableCell>

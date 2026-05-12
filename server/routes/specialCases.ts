@@ -40,14 +40,18 @@ router.get('/', async (req: Request, res: Response) => {
         const request = pool.request();
         
         if (search) {
-            whereClause += ` AND (Ticket LIKE @search OR Motivo_solicitud LIKE @search OR Comentario LIKE @search OR Creado_por LIKE @search)`;
+            whereClause += ` AND (n.Ticket LIKE @search OR n.Motivo_solicitud LIKE @search OR n.Comentario LIKE @search OR n.Creado_por LIKE @search)`;
             request.input('search', sql.VarChar, `%${search}%`);
         }
 
         // Get total count
         const countResult = await pool.request()
             .input('search', sql.VarChar, `%${search}%`)
-            .query(`SELECT COUNT(*) as total FROM [dbo].[GAC_APP_TB_CASOS_ESPECIALES] ${whereClause}`);
+            .query(`
+                SELECT COUNT(*) as total 
+                FROM [dbo].[GAC_APP_TB_CASOS_ESPECIALES] n
+                ${whereClause}
+            `);
         
         const total = countResult.recordset[0].total;
 
@@ -66,7 +70,8 @@ router.get('/', async (req: Request, res: Response) => {
                     n.Reviisado_el as revisado_el,
                     n.Revisado_por as revisado_por,
                     n.Motivo_Rechazo as motivo_rechazo,
-                    t.FechaVisita as fecha_visita
+                    t.FechaVisita as fecha_visita,
+                    t.Estado as service_status
                 FROM [dbo].[GAC_APP_TB_CASOS_ESPECIALES] n
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
                 ${whereClause}

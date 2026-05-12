@@ -86,7 +86,10 @@ export const CxGNCPage = () => {
     tipo: 'CXG',
     ticket: '',
     cliente: '',
-    observacion: ''
+    observacion: '',
+    motivo_elevacion: '',
+    lugar_compra: '',
+    supervisor_fsm: ''
   });
 
   const fetchData = async () => {
@@ -150,7 +153,10 @@ export const CxGNCPage = () => {
         tipo: formData.tipo,
         cliente: formData.cliente,
         estado: 'REGISTRADO',
-        ticket: formData.ticket
+        ticket: formData.ticket,
+        motivo_elevacion: formData.motivo_elevacion,
+        lugar_compra: formData.lugar_compra,
+        supervisor_fsm: formData.supervisor_fsm
       });
       
       await auditService.logAction({
@@ -165,9 +171,13 @@ export const CxGNCPage = () => {
       setIsModalOpen(false);
       fetchData();
       setFormData({ 
-        tipo: 'NC', 
+        tipo: 'CXG', 
         cliente: '', 
-        ticket: ''
+        ticket: '',
+        observacion: '',
+        motivo_elevacion: '',
+        lugar_compra: '',
+        supervisor_fsm: ''
       });
     } catch (error) {
       console.error(error);
@@ -194,8 +204,9 @@ export const CxGNCPage = () => {
       setFormData({
         ...formData,
         cliente: ticketInfo.cliente,
-        observacion: `Motivo: ${ticketInfo.motivo_elevacion || 'N/A'} — Lugar: ${ticketInfo.lugar_compra_id || 'N/A'}`,
-        supervisor_asignado: ticketInfo.supervisor_nombre
+        motivo_elevacion: ticketInfo.motivo_elevacion,
+        lugar_compra: ticketInfo.lugar_compra,
+        supervisor_fsm: ticketInfo.supervisor_nombre
       });
       dialog.alert({ 
         title: 'Éxito',
@@ -696,9 +707,27 @@ export const CxGNCPage = () => {
               />
             </div>
             {formData.cliente && (
-              <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-1.5 pl-4">
-                ✔ {formData.cliente}
-              </p>
+              <div className="mt-4 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                <p className="text-[10px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-400">Información Capturada</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-[9px] font-bold text-emerald-600/70 uppercase block">Cliente</span>
+                    <span className="text-xs font-black text-emerald-900 dark:text-emerald-200">{formData.cliente}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] font-bold text-emerald-600/70 uppercase block">Lugar de Compra</span>
+                    <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300 italic">{formData.lugar_compra || 'No identificado'}</span>
+                  </div>
+                </div>
+                <div>
+                  <span className="text-[9px] font-bold text-emerald-600/70 uppercase block">Supervisor FSM</span>
+                  <span className="text-xs font-black text-emerald-900 dark:text-emerald-100">{formData.supervisor_fsm || 'No asignado'}</span>
+                </div>
+                <div>
+                  <span className="text-[9px] font-bold text-emerald-600/70 uppercase block">Motivo de Elevación</span>
+                  <p className="text-xs text-emerald-800/80 dark:text-emerald-400/80 leading-tight italic line-clamp-2">{formData.motivo_elevacion || 'Sin comentarios'}</p>
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -913,24 +942,24 @@ export const CxGNCPage = () => {
                 {/* FSM Ticket Context */}
                 <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-800">
                   <h3 className="text-[10px] font-black uppercase tracking-widest text-amber-700 dark:text-amber-400 mb-4 flex items-center gap-2">
-                    <Search className="w-3 h-3" /> Información del Ticket FSM
+                    <Search className="w-3 h-3" /> Contexto del Ticket FSM
                   </h3>
                   <div className="space-y-3">
                     <div className="flex flex-col gap-1">
                       <span className="text-[9px] font-bold text-amber-600/70 uppercase">Cliente Original</span>
-                      <span className="text-xs font-black text-amber-900 dark:text-amber-200">{detailData.fsm_cliente || 'No disponible'}</span>
+                      <span className="text-xs font-black text-amber-900 dark:text-amber-200">{detailData.fsm_cliente || detailData.cliente || 'No disponible'}</span>
                     </div>
                     <div className="flex flex-col gap-1">
                       <span className="text-[9px] font-bold text-amber-600/70 uppercase">Lugar de Compra</span>
-                      <span className="text-xs font-bold text-amber-800 dark:text-amber-300 italic">{detailData.fsm_lugar_compra || 'No identificado'}</span>
+                      <span className="text-xs font-bold text-amber-800 dark:text-amber-300 italic">{detailData.lugar_compra || detailData.fsm_lugar_compra || 'No identificado'}</span>
                     </div>
                     <div className="flex flex-col gap-1">
-                      <span className="text-[9px] font-bold text-amber-600/70 uppercase">Supervisor Asignado</span>
-                      <span className="text-xs font-black text-amber-900 dark:text-amber-100">{detailData.supervisor_asignado || 'No asignado'}</span>
+                      <span className="text-[9px] font-bold text-amber-600/70 uppercase">Supervisor FSM</span>
+                      <span className="text-xs font-black text-amber-900 dark:text-amber-100">{detailData.supervisor_fsm || detailData.supervisor_asignado || 'No asignado'}</span>
                     </div>
                     <div className="flex flex-col gap-1">
                       <span className="text-[9px] font-bold text-amber-600/70 uppercase">Motivo de Elevación</span>
-                      <p className="text-xs text-amber-800/80 dark:text-amber-400/80 leading-tight">{detailData.fsm_motivo_elevacion || 'Sin comentarios'}</p>
+                      <p className="text-xs text-amber-800/80 dark:text-amber-400/80 leading-tight italic">{detailData.motivo_elevacion || detailData.fsm_motivo_elevacion || 'Sin comentarios'}</p>
                     </div>
                   </div>
                 </div>
