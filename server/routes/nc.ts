@@ -173,7 +173,7 @@ router.get('/cancelaciones', async (req: Request, res: Response) => {
             .query(`
                 SELECT COUNT(*) as total 
                 FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
-                LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
+                ${search ? 'LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket' : ''}
                 LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] m ON c.Motivo_Cancelacion = m.ID_Cancelados_motivo
                 ${whereClause}
             `);
@@ -294,7 +294,7 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
         const countResult = await countRequest.query(`
             SELECT COUNT(*) as total 
             FROM [dbo].[GAC_APP_TB_CXG_NC] n 
-            LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
+            ${search ? 'LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket' : ''}
             ${whereClause}
         `);
         
