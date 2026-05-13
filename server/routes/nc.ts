@@ -629,6 +629,22 @@ router.post('/cxg-nc', async (req: Request, res: Response) => {
     try {
         const { tipo, cliente, ticket, observacion, motivo_elevacion, lugar_compra, supervisor_fsm } = req.body;
         const pool = await getDbConnection();
+
+        // 1. Check if ticket already exists in an active state
+        const existingCheck = await pool.request()
+            .input('ticket', sql.VarChar, ticket)
+            .query(`
+                SELECT TOP 1 ID_Apro_CxG_NC, Estado_Proceso
+                FROM [dbo].[GAC_APP_TB_CXG_NC]
+                WHERE Ticket = @ticket AND Estado_Proceso NOT IN ('CERRADO', 'RECHAZADO')
+            `);
+
+        if (existingCheck.recordset.length > 0) {
+            return res.status(400).json({ 
+                error: `El ticket #${ticket} ya tiene una solicitud activa en estado: ${existingCheck.recordset[0].Estado_Proceso}` 
+            });
+        }
+
         const solicitudId = `CNC-${Date.now()}`;
         const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
         

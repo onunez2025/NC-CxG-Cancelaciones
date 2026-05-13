@@ -194,9 +194,13 @@ export const CxGNCPage = () => {
         lugar_compra: '',
         supervisor_fsm: ''
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      setIsModalOpen(false);
+      dialog.alert({
+        title: 'Error al Registrar',
+        message: error.response?.data?.error || 'No se pudo registrar la solicitud. Verifique que el ticket no haya sido registrado previamente.',
+        type: 'error'
+      });
     } finally {
       setIsSubmitting(false);
     }
