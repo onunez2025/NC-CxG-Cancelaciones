@@ -13,7 +13,8 @@ import {
   ClipboardCheck,
   ShieldCheck,
   Clock,
-  MessageSquare
+  MessageSquare,
+  Eraser
 } from 'lucide-react';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 import { SIATCButton } from '../../components/siatc/SIATCButton';
@@ -118,6 +119,14 @@ export const CxGNCPage = () => {
     } catch (error) {
       console.error('Error fetching analysts:', error);
     }
+  };
+
+  const handleClearFilters = () => {
+    setSearchTerm('');
+    setActiveTab('TODOS');
+    setDateRange({ start: '', end: '' });
+    setStatusFilter('TODOS');
+    setCurrentPage(1);
   };
 
   useEffect(() => {
@@ -453,7 +462,7 @@ export const CxGNCPage = () => {
 
       <div className={SIATC_THEME.LAYOUT.CONTENT_CONTAINER}>
         {/* Tabs, Search & Filters */}
-        <div className="px-6 py-4 border-b border-border flex flex-col gap-4">
+        <div className="px-6 py-4 border-b border-border flex flex-col gap-4 sticky top-0 z-20 bg-card/95 backdrop-blur-md">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex bg-muted/50 p-1 rounded-lg w-fit border border-border/50">
               <button 
@@ -523,6 +532,18 @@ export const CxGNCPage = () => {
                 onChange={(e) => setDateRange({...dateRange, end: e.target.value})}
               />
             </div>
+
+            {(searchTerm !== '' || activeTab !== 'TODOS' || dateRange.start !== '' || dateRange.end !== '' || statusFilter !== 'TODOS') && (
+              <SIATCButton 
+                variant="ghost" 
+                size="sm" 
+                icon={Eraser}
+                onClick={handleClearFilters}
+                className="ml-auto h-7 text-[10px] uppercase font-black tracking-tighter"
+              >
+                Limpiar Filtros
+              </SIATCButton>
+            )}
           </div>
         </div>
 
