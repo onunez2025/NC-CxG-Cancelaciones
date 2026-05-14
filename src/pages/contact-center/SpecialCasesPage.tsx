@@ -118,25 +118,44 @@ export const SpecialCasesPage = () => {
   const handleCreate = async () => {
     if (!formData.ticket || !formData.motivo) return;
 
-    // Business Rule: Posterior a las 10:30 no permite registrar casos para posterior a 48 horas.
-    // Usamos la zona horaria de Lima, Perú
+    // Regla de Negocio:
+    // 1. Antes de las 10:30 AM: Solo permite fecha de visita de Mañana (Hoy + 1) en adelante.
+    // 2. Después de las 10:30 AM: Solo permite fecha de visita de Pasado Mañana (Hoy + 2) en adelante.
     if (formData.fecha_visita_temp) {
       const now = new Date();
-      // Obtener hora actual en formato de Lima para comparar
+      // Obtener hora actual en formato de Lima para comparar el punto de corte
       const limaTimeStr = now.toLocaleString("en-US", { timeZone: "America/Lima", hour12: false });
-      const currentLimaHour = parseInt(limaTimeStr.split(', ')[1].split(':')[0]);
-      const currentLimaMinute = parseInt(limaTimeStr.split(', ')[1].split(':')[1]);
+      const timePart = limaTimeStr.split(', ')[1];
+      const currentLimaHour = parseInt(timePart.split(':')[0]);
+      const currentLimaMinute = parseInt(timePart.split(':')[1]);
       
       const isAfterCutoff = currentLimaHour > 10 || (currentLimaHour === 10 && currentLimaMinute >= 30);
 
-      if (isAfterCutoff) {
-        const visitDate = new Date(formData.fecha_visita_temp);
-        const diffTime = visitDate.getTime() - now.getTime();
-        const diffHours = diffTime / (1000 * 60 * 60);
+      // Normalizar fechas a medianoche para comparar días calendario
+      const todayLima = new Date(now.toLocaleString("en-US", { timeZone: "America/Lima" }));
+      todayLima.setHours(0, 0, 0, 0);
 
-        // Si es después de las 10:30, no permite para las próximas 48 horas (demasiado pronto para planificar)
-        if (diffHours > 0 && diffHours < 48) {
-          alert('No es posible registrar casos con fecha de visita dentro de las próximas 48 horas después de las 10:30 AM (Hora Lima).');
+      // Parsear la fecha de visita asegurando que se trate como fecha local (no UTC)
+      // Si la fecha viene como ISO "YYYY-MM-DD...", extraemos solo la parte de la fecha
+      const visitDateStr = formData.fecha_visita_temp.split('T')[0]; 
+      const [year, month, day] = visitDateStr.split(/[-/]/).map(Number);
+      const visitDate = new Date(year, month - 1, day);
+      visitDate.setHours(0, 0, 0, 0);
+
+      // Calcular diferencia en días exactos
+      const diffTime = visitDate.getTime() - todayLima.getTime();
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+      if (isAfterCutoff) {
+        // Después de las 10:30 AM: Mínimo Hoy + 2
+        if (diffDays < 2) {
+          alert('Después de las 10:30 AM, solo se permiten registros con fecha de visita a partir de PASADO MAÑANA (Hoy + 2).');
+          return;
+        }
+      } else {
+        // Antes de las 10:30 AM: Mínimo Hoy + 1
+        if (diffDays < 1) {
+          alert('Solo se permiten registros con fecha de visita a partir de MAÑANA (Hoy + 1).');
           return;
         }
       }
