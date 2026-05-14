@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         StorageService.remove('auth_token');
     }, []);
 
-    // --- Inactivity Logout Logic (5 Minutes) ---
+    // --- Inactivity Logout Logic (30 Minutes) ---
     useEffect(() => {
         if (!user) return;
 
@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const resetTimer = () => {
             timeoutId = setTimeout(() => {
                 logout();
-            }, 5 * 60 * 1000); // 5 minutes
+            }, 30 * 60 * 1000); // 30 minutes
         };
 
         const activityEvents = ['mousemove', 'keydown', 'mousedown', 'touchstart', 'scroll'];
