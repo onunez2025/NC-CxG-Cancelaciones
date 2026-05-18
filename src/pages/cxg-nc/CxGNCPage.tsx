@@ -82,6 +82,9 @@ export const CxGNCPage = () => {
   const [isAprobarSubmitting, setIsAprobarSubmitting] = useState(false);
   const [cxgMotivos, setCxgMotivos] = useState<CxGNCMotivo[]>([]);
 
+  // Ticket Validation State
+  const [isTicketValidated, setIsTicketValidated] = useState(false);
+
   // Form state
   const [formData, setFormData] = useState<Partial<CxGNC>>({
     tipo: 'CXG',
@@ -161,7 +164,21 @@ export const CxGNCPage = () => {
     if (currentPage !== 1) setCurrentPage(1);
   }, [searchTerm]);
 
+  useEffect(() => {
+    if (!isModalOpen) {
+      setIsTicketValidated(false);
+    }
+  }, [isModalOpen]);
+
   const handleCreate = async () => {
+    if (!isTicketValidated) {
+      dialog.alert({
+        title: 'Validación Requerida',
+        message: 'Debe buscar y validar el ticket con la lupa antes de poder registrar la solicitud.',
+        type: 'warning'
+      });
+      return;
+    }
     setIsSubmitting(true);
     try {
       await ncService.createCxGNC({
@@ -169,6 +186,7 @@ export const CxGNCPage = () => {
         cliente: formData.cliente,
         estado: 'REGISTRADO',
         ticket: formData.ticket,
+        observacion: formData.observacion,
         motivo_elevacion: formData.motivo_elevacion,
         lugar_compra: formData.lugar_compra,
         supervisor_fsm: formData.supervisor_fsm
@@ -212,6 +230,7 @@ export const CxGNCPage = () => {
     try {
       const ticketInfo = await ncService.getTicketDetails(formData.ticket);
       if (ticketInfo.estado !== 'Closed') {
+        setIsTicketValidated(false);
         dialog.alert({ 
           title: 'Ticket No Válido',
           message: `El ticket #${formData.ticket} no está CERRADO. Estado actual: ${ticketInfo.estado || 'Desconocido'}`,
@@ -227,6 +246,7 @@ export const CxGNCPage = () => {
         lugar_compra: ticketInfo.lugar_compra,
         supervisor_fsm: ticketInfo.supervisor_nombre
       });
+      setIsTicketValidated(true);
       dialog.alert({ 
         title: 'Éxito',
         message: "Ticket encontrado y válido",
@@ -234,6 +254,7 @@ export const CxGNCPage = () => {
       });
     } catch (error: any) {
       console.error("Lookup error:", error);
+      setIsTicketValidated(false);
       dialog.alert({ 
         title: 'Error de Búsqueda',
         message: "El ticket es incorrecto o no existe",
@@ -413,9 +434,9 @@ export const CxGNCPage = () => {
       {/* Header */}
       <div className={SIATC_THEME.LAYOUT.HEADER_WRAPPER}>
         <div>
-          <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Cargos y Notas de Crédito</h1>
+          <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Cambios por Garantías y Notas de Crédito</h1>
           <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>
-            Gestión y procesamiento de documentos financieros (CxG / NC).
+            Gestión y procesamiento de documentos financieros (Cambios por Garantías y Notas de Crédito).
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -431,22 +452,44 @@ export const CxGNCPage = () => {
             variant="secondary" 
             icon={FileSpreadsheet}
             onClick={() => {
-              const headers = ['TIPO', 'DOCUMENTO', 'CLIENTE', 'FECHA', 'ESTADO'];
+              const headers = [
+                'TIPO',
+                'DOCUMENTO CLIENTE',
+                'TICKET',
+                'TIENDA',
+                'CLIENTE',
+                'ASESOR CREADOR',
+                'SUPERVISOR',
+                'FECHA DE CREACION',
+                'FECHA APROBACION',
+                'FECHA PROCESADO',
+                'APROBADO',
+                'PROCESADO',
+                'ESTADO'
+              ];
               const csvContent = [
                 headers.join(','),
                 ...displayedData.map(item => [
-                  item.tipo,
-                  item.correlativo,
-                  `"${item.cliente}"`,
-                  new Date(item.fecha).toLocaleDateString(),
-                  item.estado
+                  item.tipo || '',
+                  `"${item.documento_cliente || ''}"`,
+                  item.correlativo || '',
+                  `"${item.tienda || ''}"`,
+                  `"${item.cliente || ''}"`,
+                  `"${item.creado_por || ''}"`,
+                  `"${item.supervisor || ''}"`,
+                  item.fecha ? new Date(item.fecha).toLocaleDateString() : '',
+                  item.aprobado_el ? new Date(item.aprobado_el).toLocaleDateString() : '',
+                  item.procesado_el ? new Date(item.procesado_el).toLocaleDateString() : '',
+                  item.aprobado || 'PENDIENTE',
+                  item.procesado || 'PENDIENTE',
+                  item.estado || ''
                 ].join(','))
               ].join('\n');
               
               const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
               const link = document.createElement('a');
               link.href = URL.createObjectURL(blob);
-              link.setAttribute('download', `Cargos_NotasCredito_${new Date().toISOString().split('T')[0]}.csv`);
+              link.setAttribute('download', `CambiosGarantia_NotasCredito_${new Date().toISOString().split('T')[0]}.csv`);
               document.body.appendChild(link);
               link.click();
               document.body.removeChild(link);
@@ -485,7 +528,7 @@ export const CxGNCPage = () => {
                 onClick={() => setActiveTab('CXG')}
                 className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all ${activeTab === 'CXG' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
               >
-                Cargos x Generar
+                Cambio por Garantía
               </button>
             </div>
             <div className="relative flex-1 max-w-md">
@@ -564,9 +607,16 @@ export const CxGNCPage = () => {
                 <tr className={SIATC_THEME.TABLE.HEADER_ROW}>
                   <SIATCTableHeader>TIPO</SIATCTableHeader>
                   <SIATCTableHeader>DOCUMENTO</SIATCTableHeader>
+                  <SIATCTableHeader>TICKET</SIATCTableHeader>
+                  <SIATCTableHeader>TIENDA</SIATCTableHeader>
                   <SIATCTableHeader>CLIENTE</SIATCTableHeader>
+                  <SIATCTableHeader>ASESOR CREADOR</SIATCTableHeader>
                   <SIATCTableHeader>SUPERVISOR</SIATCTableHeader>
-                  <SIATCTableHeader>FECHA</SIATCTableHeader>
+                  <SIATCTableHeader>FECHA CREACIÓN</SIATCTableHeader>
+                  <SIATCTableHeader>FECHA APROBACIÓN</SIATCTableHeader>
+                  <SIATCTableHeader>FECHA PROCESADO</SIATCTableHeader>
+                  <SIATCTableHeader>APROBADO</SIATCTableHeader>
+                  <SIATCTableHeader>PROCESADO</SIATCTableHeader>
                   <SIATCTableHeader>MOTIVO REAL</SIATCTableHeader>
                   <SIATCTableHeader>ESTADO</SIATCTableHeader>
                   <SIATCTableHeader className="text-right">ACCIONES</SIATCTableHeader>
@@ -581,10 +631,21 @@ export const CxGNCPage = () => {
                       </SIATCBadge>
                     </SIATCTableCell>
                     <SIATCTableCell>
+                      <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>{item.documento_cliente || '—'}</span>
+                    </SIATCTableCell>
+                    <SIATCTableCell>
                       <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>#{item.correlativo}</span>
                     </SIATCTableCell>
                     <SIATCTableCell>
+                      <div className="text-xs font-semibold text-foreground truncate max-w-[120px]">{item.tienda || '—'}</div>
+                    </SIATCTableCell>
+                    <SIATCTableCell>
                       <div className="font-bold text-foreground italic">{item.cliente}</div>
+                    </SIATCTableCell>
+                    <SIATCTableCell>
+                      <div className="text-[10px] font-black uppercase text-muted-foreground truncate max-w-[120px]">
+                        {item.creado_por || '—'}
+                      </div>
                     </SIATCTableCell>
                     <SIATCTableCell>
                       <div className="text-[10px] font-black uppercase text-primary/80 truncate max-w-[120px]">
@@ -594,7 +655,50 @@ export const CxGNCPage = () => {
                     <SIATCTableCell>
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <Calendar className="w-3.5 h-3.5" />
-                        <span className="text-xs">{new Date(item.fecha).toLocaleDateString()}</span>
+                        <span className="text-xs">{item.fecha ? new Date(item.fecha).toLocaleDateString() : '—'}</span>
+                      </div>
+                    </SIATCTableCell>
+                    <SIATCTableCell>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span className="text-xs">{item.aprobado_el ? new Date(item.aprobado_el).toLocaleDateString() : '—'}</span>
+                      </div>
+                    </SIATCTableCell>
+                    <SIATCTableCell>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span className="text-xs">{item.procesado_el ? new Date(item.procesado_el).toLocaleDateString() : '—'}</span>
+                      </div>
+                    </SIATCTableCell>
+                    <SIATCTableCell>
+                      <div className="flex flex-col gap-0.5">
+                        <SIATCBadge variant={
+                          item.aprobado === 'APROBADO' ? 'success' : 
+                          item.aprobado === 'RECHAZADO' ? 'danger' :
+                          'warning'
+                        }>
+                          {item.aprobado === 'APROBADO' ? 'SÍ' : item.aprobado === 'RECHAZADO' ? 'NO' : 'PENDIENTE'}
+                        </SIATCBadge>
+                        {item.aprobado_por && (
+                          <span className="text-[9px] text-muted-foreground/80 truncate max-w-[100px] italic">
+                            {item.aprobado_por}
+                          </span>
+                        )}
+                      </div>
+                    </SIATCTableCell>
+                    <SIATCTableCell>
+                      <div className="flex flex-col gap-0.5">
+                        <SIATCBadge variant={
+                          item.procesado === 'SI' ? 'success' : 
+                          'warning'
+                        }>
+                          {item.procesado === 'SI' ? 'SÍ' : 'PENDIENTE'}
+                        </SIATCBadge>
+                        {item.procesado_por && (
+                          <span className="text-[9px] text-muted-foreground/80 truncate max-w-[100px] italic">
+                            {item.procesado_por}
+                          </span>
+                        )}
                       </div>
                     </SIATCTableCell>
                     <SIATCTableCell>
@@ -705,12 +809,12 @@ export const CxGNCPage = () => {
       <SIATCModalWrapper
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Nueva Solicitud CxG / NC"
+        title="Nueva Solicitud Cambio por Garantía / NC"
         subtitle="Complete los datos para registrar el documento."
         footer={
           <>
             <SIATCButton variant="ghost" onClick={() => setIsModalOpen(false)}>Cancelar</SIATCButton>
-            <SIATCButton variant="primary" onClick={handleCreate} isLoading={isSubmitting}>Registrar</SIATCButton>
+            <SIATCButton variant="primary" onClick={handleCreate} isLoading={isSubmitting} disabled={!isTicketValidated}>Registrar</SIATCButton>
           </>
         }
       >
@@ -733,7 +837,10 @@ export const CxGNCPage = () => {
               <input 
                 className={SIATC_THEME.COMPONENTS.INPUT}
                 value={formData.ticket}
-                onChange={(e) => setFormData({...formData, ticket: e.target.value})}
+                onChange={(e) => {
+                  setFormData({...formData, ticket: e.target.value});
+                  setIsTicketValidated(false);
+                }}
                 placeholder="N° de Ticket FSM"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -773,6 +880,16 @@ export const CxGNCPage = () => {
                 </div>
               </div>
             )}
+          </div>
+
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Motivo de la Solicitud / Observaciones</label>
+            <textarea
+              className={SIATC_THEME.COMPONENTS.INPUT + " min-h-[80px] py-2 resize-none"}
+              value={formData.observacion}
+              onChange={(e) => setFormData({...formData, observacion: e.target.value})}
+              placeholder="Describa el motivo o detalles de la solicitud..."
+            />
           </div>
         </div>
       </SIATCModalWrapper>

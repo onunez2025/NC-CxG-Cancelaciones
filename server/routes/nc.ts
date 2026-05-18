@@ -4,6 +4,56 @@ import sql from 'mssql';
 
 const router = Router();
 
+// Dictionary to map zIDLugarCompra_SDK OData codes to store names
+const C4C_STORE_MAPPING: Record<string, string> = {
+  "000000000000000000000000000000000000000000000000000000002995": "SODIMAC PERU S.A.",
+  "000000000000000000000000000000000000000000000000000000002540": "TIENDAS VARIAS",
+  "000000000000000000000000000000000000000000000000000000000003": "IMPORTACIONES HIRAOKA S.A.C.",
+  "000000000000000000000000000000000000000000000000000000003381": "CASSINELLI S A",
+  "000000000000000000000000000000000000000000000000000000002211": "PROMART - HOMECENTERS PERUANOS S.A.",
+  "000000000000000000000000000000000000000000000000000000003005": "MAESTRO - TIENDA DEL MEJORAMIENTO DEL HOGAR S.A.",
+  "000000000000000000000000000000000000000000000000000000001836": "TIENDAS PERUANAS SA - OECHSLE",
+  "000000000000000000000000000000000000000000000000000000002548": "TIENDAS POR DEPARTAMENTO RIPLEY",
+  "000000000000000000000000000000000000000000000000000000002295": "SAGA FALABELLA SA",
+  "000000000000000000000000000000000000000000000000000000002444": "HIPERMERCADOS TOTTUS SA",
+  "000000000000000000000000000000000000000000000000000000003376": "CASSINELLI - SANIHOLD SAC",
+  "000000000000000000000000000000000000000000000000000000003985": "CLIENTE SHOWROOM CALLAO",
+  "000000000000000000000000000000000000000000000000000000002907": "COMERCIAL LA COLINA E.I.R.LTDA.",
+  "000000000000000000000000000000000000000000000000000000000079": "COMERCIO DIVERSOS ELECTRONIC S.A.C.",
+  "000000000000000000000000000000000000000000000000000000002809": "CONSORCIO COMERCIAL UNIVERSAL SA",
+  "000000000000000000000000000000000000000000000000000000000251": "CORPORACION DELNORT SOCIEDAD",
+  "000000000000000000000000000000000000000000000000000000002271": "CREDISHOP S.A.C.",
+  "000000000000000000000000000000000000000000000000000000003793": "CURACAO / EFE - CONECTA RETAIL S.A.",
+  "000000000000000000000000000000000000000000000000000000001933": "DECOR CENTER - INVERSIONES CYS S.A.",
+  "000000000000000000000000000000000000000000000000000000002340": "DECORACIONES ECONOMICA S.A.C.",
+  "000000000000000000000000000000000000000000000000000000003523": "DECORACIONES Y ACABADOS MONTOYA",
+  "000000000000000000000000000000000000000000000000000000001334": "DIMCORP INGENIERIA E.I.R.L.",
+  "000000000000000000000000000000000000000000000000000000003422": "DISTRIBUCIONES OLANO S.A.C.",
+  "000000000000000000000000000000000000000000000000000000002111": "DISTRIBUIDORA ATACHAGUA E.I.R.L.",
+  "000000000000000000000000000000000000000000000000000000002206": "DISTRIBUIDORA CIA CERAMICA S.A.C.",
+  "000000000000000000000000000000000000000000000000000000001250": "DISTRIBUIDORA E&C EIRL",
+  "000000000000000000000000000000000000000000000000000000003360": "DISTRIBUIDORA FERRE IMPORT HM",
+  "000000000000000000000000000000000000000000000000000000003319": "DISTRIBUIDORA MUNDO CERAMICO",
+  "000000000000000000000000000000000000000000000000000000003446": "D-KASA & DECORACIONES E.I.R.L",
+  "000000000000000000000000000000000000000000000000000000001842": "EDELNOR - ENEL DISTRIBUCION PERU S.A.A.",
+  "000000000000000000000000000000000000000000000000000000003037": "ELECTROMECANICA FERRICENTER",
+  "000000000000000000000000000000000000000000000000000000003943": "ENEL MEGAPLAZA 12 MESES",
+  "000000000000000000000000000000000000000000000000000000000450": "ENEL MEGAPLAZA 18 MESES",
+  "000000000000000000000000000000000000000000000000000000000446": "ENEL MEGAPLAZA 24 MESES",
+  "000000000000000000000000000000000000000000000000000000000444": "ENEL PLAZA NORTE 12 MESE",
+  "000000000000000000000000000000000000000000000000000000003978": "TIENDA SOLE CHORRILLOS",
+  "000000000000000000000000000000000000000000000000000000003984": "TIENDA SOLE PRINCIPAL",
+  "000000000000000000000000000000000000000000000000000000003990": "TIENDA SOLE SANTA ANITA",
+  "000000000000000000000000000000000000000000000000000000003983": "TIENDA METUSA MALVINAS",
+  "000000000000000000000000000000000000000000000000000000003970": "TIENDA SOLE AREQUIPA",
+  "000000000000000000000000000000000000000000000000000000003981": "TIENDA SOLE BELLAVISTA",
+  "000000000000000000000000000000000000000000000000000000003993": "TIENDA SOLE BOULEVAR ASIA",
+  "000000000000000000000000000000000000000000000000000000003982": "TIENDA SOLE CHIMBOTE",
+  "000000000000000000000000000000000000000000000000000000003969": "TIENDA SOLE MALL DEL SUR",
+  "000000000000000000000000000000000000000000000000000000003208": "CENTRO CERAMICO LAS FLORES ORIENTE",
+  "000000000000000000000000000000000000000000000000000000000970": "CENTRO CERAMICO LAS FLORES SAC."
+};
+
 // ─────────────────────────────────────────────
 // SHARED: Ticket Lookup
 // ─────────────────────────────────────────────
@@ -25,6 +75,7 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
                     t.IDEmpresa as lugar_compra_id,
                     emp.DsEmpresa as lugar_compra,
                     t.FechaVisita as fecha_visita,
+                    t.CodigoExternoCliente as documento_cliente,
                     COALESCE(sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor_nombre
                 FROM [SIATC].[Dashboard_FSM] t
                 LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as VARCHAR)
@@ -54,7 +105,76 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Ticket no encontrado' });
         }
 
-        res.json(result.recordset[0]);
+        const ticketData = result.recordset[0];
+        let resolvedLugarCompra = null;
+
+        // 1. Query SAP C4C OData for the custom Lugar de Compra field
+        const sapBaseUrl = process.env.SAP_BASE_URL || 'https://my361897.crm.ondemand.com/sap/c4c/odata/v1/c4codataapi';
+        const sapUser = process.env.SAP_USER || 'oscar.nunez';
+        const sapPassword = process.env.SAP_PASSWORD || '9xP6*epfuhWx4rK';
+
+        try {
+            const authHeader = 'Basic ' + Buffer.from(`${sapUser}:${sapPassword}`).toString('base64');
+            const url = `${sapBaseUrl}/ServiceRequestCollection?$filter=ID eq '${id}'&$format=json`;
+
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': authHeader,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const body = await response.json() as any;
+                const odataResults = body?.d?.results || [];
+                if (odataResults.length > 0) {
+                    const sdkCode = odataResults[0].zIDLugarCompra_SDK;
+                    if (sdkCode) {
+                        resolvedLugarCompra = C4C_STORE_MAPPING[sdkCode] || null;
+                        if (resolvedLugarCompra) {
+                            console.log(`[C4C ODATA SUCCESS] Ticket ${id}: Mapped code "${sdkCode}" to "${resolvedLugarCompra}"`);
+                        } else {
+                            console.warn(`[C4C ODATA WARN] Ticket ${id}: Code "${sdkCode}" not in mapping dictionary`);
+                        }
+                    }
+                }
+            } else {
+                console.error(`[C4C ODATA ERROR] Ticket ${id}: Fetch returned status ${response.status}`);
+            }
+        } catch (odataErr: any) {
+            console.error(`[C4C ODATA EXCEPTION] Ticket ${id}:`, odataErr.message);
+        }
+
+        // 2. Database Fallback (retrieve resolved tienda from TBL_C4C_REPORTE_CONTROL if OData failed or unmapped)
+        if (!resolvedLugarCompra) {
+            try {
+                const fallbackResult = await pool.request()
+                    .input('ticketId', sql.VarChar, id)
+                    .query(`
+                        SELECT TOP 1 TIENDA
+                        FROM [dbo].[TBL_C4C_REPORTE_CONTROL]
+                        WHERE NOS = @ticketId AND TIENDA IS NOT NULL AND TIENDA <> ''
+                    `);
+
+                if (fallbackResult.recordset.length > 0) {
+                    resolvedLugarCompra = fallbackResult.recordset[0].TIENDA;
+                    console.log(`[DB FALLBACK SUCCESS] Ticket ${id}: Retrieved tienda "${resolvedLugarCompra}"`);
+                }
+            } catch (dbErr: any) {
+                console.error(`[DB FALLBACK ERROR] Ticket ${id}:`, dbErr.message);
+            }
+        }
+
+        // 3. Legacy Fallback (CAS Company Name or TIENDAS VARIAS)
+        if (!resolvedLugarCompra) {
+            resolvedLugarCompra = ticketData.lugar_compra || 'TIENDAS VARIAS';
+            console.log(`[LEGACY FALLBACK] Ticket ${id}: Defaulted to "${resolvedLugarCompra}"`);
+        }
+
+        // Update the returned object with our resolved store name
+        ticketData.lugar_compra = resolvedLugarCompra;
+
+        res.json(ticketData);
     } catch (error: any) {
         console.error('Error lookup ticket:', error);
         res.status(500).json({ error: error.message });
@@ -333,9 +453,16 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
                 n.Aprobado_observacion as aprobado_observacion,
                 n.Aprobado_el as aprobado_el,
                 n.Aprobado_por as aprobado_por,
+                n.Creado_por as creado_por,
+                n.Procesado as procesado,
+                n.Procesado_por as procesado_por,
+                n.Procesado_el as procesado_el,
+                t.CodigoExternoCliente as documento_cliente,
+                COALESCE(n.Lugar_Compra, emp.DsEmpresa, CAST(t.IDEmpresa as VARCHAR)) as tienda,
                 COALESCE(n.Supervisor_FSM, sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor
             FROM [dbo].[GAC_APP_TB_CXG_NC] n
             LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
+            LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as VARCHAR)
             -- CAS Supervisor (OUTER APPLY TOP 1 to avoid fan-out)
             OUTER APPLY (
                 SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre

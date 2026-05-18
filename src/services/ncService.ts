@@ -86,6 +86,8 @@ export interface CxGNC {
     lugar_compra?: string;
     supervisor_fsm?: string;
     supervisor?: string;
+    tienda?: string;
+    documento_cliente?: string;
 }
 
 export interface HistorialEntry {
