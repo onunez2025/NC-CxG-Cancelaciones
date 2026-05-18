@@ -54,6 +54,62 @@ const C4C_STORE_MAPPING: Record<string, string> = {
   "000000000000000000000000000000000000000000000000000000000970": "CENTRO CERAMICO LAS FLORES SAC."
 };
 
+export function resolveStoreDescription(code: string | null | undefined): string {
+    if (!code) return 'TIENDAS VARIAS';
+    const cleanCode = code.toString().trim();
+    
+    // Try exact dictionary mapping
+    if (C4C_STORE_MAPPING[cleanCode]) {
+        return C4C_STORE_MAPPING[cleanCode];
+    }
+    
+    // Try to resolve common FSM/short codes
+    if (cleanCode.startsWith('1301') || cleanCode.includes('2995')) {
+        return 'SODIMAC PERU S.A.';
+    }
+    if (cleanCode.startsWith('1303') || cleanCode.includes('2211')) {
+        return 'PROMART - HOMECENTERS PERUANOS S.A.';
+    }
+    if (cleanCode.startsWith('1304') || cleanCode.includes('3005')) {
+        return 'MAESTRO - TIENDA DEL MEJORAMIENTO DEL HOGAR S.A.';
+    }
+    if (cleanCode.startsWith('1305') || cleanCode.includes('3381') || cleanCode.includes('3376')) {
+        return 'CASSINELLI S A';
+    }
+    if (cleanCode.startsWith('1306') || cleanCode.includes('2548')) {
+        return 'TIENDAS POR DEPARTAMENTO RIPLEY';
+    }
+    if (cleanCode.startsWith('1307') || cleanCode.includes('2295')) {
+        return 'SAGA FALABELLA SA';
+    }
+    if (cleanCode.startsWith('1308') || cleanCode.includes('2444')) {
+        return 'HIPERMERCADOS TOTTUS SA';
+    }
+    if (cleanCode.startsWith('1309') || cleanCode.includes('0003')) {
+        return 'IMPORTACIONES HIRAOKA S.A.C.';
+    }
+    if (cleanCode.startsWith('1310') || cleanCode.includes('1836')) {
+        return 'TIENDAS PERUANAS SA - OECHSLE';
+    }
+    
+    // Other common FSM retail channels
+    if (cleanCode.startsWith('1311')) return 'PLAZA VEA';
+    if (cleanCode.startsWith('1312')) return 'ESTILOS';
+    if (cleanCode.startsWith('1313')) return 'METRO';
+    if (cleanCode.startsWith('1314')) return 'TIENDA PARIS';
+    if (cleanCode.startsWith('1315')) return 'TIENDA LA CURACAO';
+    if (cleanCode.startsWith('1316')) return 'TIENDA EFE';
+    if (cleanCode.startsWith('1317')) return 'TIENDA CARSA';
+    if (cleanCode.startsWith('1318')) return 'TIENDA MARCIMEX';
+
+    // If it's already a string description rather than a code, return it
+    if (/^[a-zA-Z]/i.test(cleanCode) && cleanCode !== 'null' && cleanCode !== 'undefined') {
+        return cleanCode;
+    }
+    
+    return 'TIENDAS VARIAS';
+}
+
 // ─────────────────────────────────────────────
 // SHARED: Ticket Lookup
 // ─────────────────────────────────────────────
@@ -167,12 +223,12 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
 
         // 3. Legacy Fallback (CAS Company Name or TIENDAS VARIAS)
         if (!resolvedLugarCompra) {
-            resolvedLugarCompra = ticketData.lugar_compra || 'TIENDAS VARIAS';
+            resolvedLugarCompra = ticketData.lugar_compra || ticketData.lugar_compra_id || 'TIENDAS VARIAS';
             console.log(`[LEGACY FALLBACK] Ticket ${id}: Defaulted to "${resolvedLugarCompra}"`);
         }
 
         // Update the returned object with our resolved store name
-        ticketData.lugar_compra = resolvedLugarCompra;
+        ticketData.lugar_compra = resolveStoreDescription(resolvedLugarCompra);
 
         res.json(ticketData);
     } catch (error: any) {
@@ -488,8 +544,13 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
             FETCH NEXT @pageSize ROWS ONLY
         `);
 
+        const formattedData = result.recordset.map(row => ({
+            ...row,
+            tienda: resolveStoreDescription(row.tienda)
+        }));
+
         res.json({
-            data: result.recordset,
+            data: formattedData,
             total,
             page,
             pageSize
@@ -608,7 +669,9 @@ router.get('/cxg-nc/:id', async (req: Request, res: Response) => {
         if (result.recordset.length === 0) {
             return res.status(404).json({ error: 'No se encontró la solicitud CxG/NC' });
         }
-        res.json(result.recordset[0]);
+        const ticketData = result.recordset[0];
+        ticketData.fsm_lugar_compra = resolveStoreDescription(ticketData.fsm_lugar_compra);
+        res.json(ticketData);
     } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
