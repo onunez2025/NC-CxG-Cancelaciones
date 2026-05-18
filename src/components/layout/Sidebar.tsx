@@ -9,7 +9,8 @@ import {
     ChevronRight,
     Clock,
     AlertCircle,
-    Wrench
+    Wrench,
+    Calendar
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { useTheme } from '../../context/ThemeContext';
@@ -39,6 +40,7 @@ export function Sidebar({ className }: { className?: string }) {
         { to: '/cancelaciones', icon: XCircle, label: 'Cancelaciones', permission: 'cxg.cancelaciones.view' as const },
         { to: '/cxg-nc', icon: FileText, label: 'CxG & NC', permission: 'cxg.cxg_nc.view' as const },
         { to: '/fsm-tracking', icon: Clock, label: 'Horarios Visitas', permission: 'cxg.fsm.view' as const },
+        { to: '/fsm/programa-supervisores', icon: Calendar, label: 'Prog. Supervisores', permission: 'cxg.programa_supervisores.view' as const },
         { to: '/emergencias', icon: Wrench, label: 'Emergencias', permission: 'cxg.emergencias.view' as const },
         { to: '/contact-center/casos-especiales', icon: AlertCircle, label: 'Casos Especiales', permission: 'cxg.casos_especiales.view' as const },
     ];

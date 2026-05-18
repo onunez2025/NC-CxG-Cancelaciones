@@ -24,6 +24,7 @@ import ncRouter from './routes/nc.js';
 import fsmRouter from './routes/fsm.js';
 import specialCasesRouter from './routes/specialCases.js';
 import emergenciasRouter from './routes/emergencias.js';
+import programaSupervisoresRouter from './routes/programaSupervisores.js';
 import { verifyToken, verifyPermission } from './middleware/auth.js';
 import { setupSapViews } from './setup_sap_views.js';
 
@@ -112,6 +113,7 @@ app.use('/api', verifyToken, ncRouter);
 app.use('/api/fsm', verifyToken, fsmRouter);
 app.use('/api/special-cases', verifyToken, specialCasesRouter);
 app.use('/api/emergencias', verifyToken, emergenciasRouter);
+app.use('/api/programa-supervisores', verifyToken, verifyPermission('cxg.programa_supervisores.view'), programaSupervisoresRouter);
 
 // Security Audit Logs
 app.get('/api/config/audit-logs', verifyToken, verifyPermission('ebm.config.users'), async (req: Request, res: Response) => {

@@ -22,6 +22,7 @@ import { CancellationsPage } from './pages/cancelaciones/CancellationsPage';
 import { CxGNCPage } from './pages/cxg-nc/CxGNCPage';
 import { EmergenciasPage } from './pages/emergencias/EmergenciasPage';
 import { FSMDashboardPage } from './pages/fsm/FSMDashboardPage';
+import ProgramaSupervisoresPage from './pages/fsm/ProgramaSupervisoresPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { SpecialCasesPage } from './pages/contact-center/SpecialCasesPage';
 import { NotFound } from './pages/NotFound';
@@ -111,6 +112,9 @@ function App() {
               </Route>
               <Route element={<RequirePermission permission="cxg.fsm.view" />}>
                 <Route path="/fsm-tracking" element={<FSMDashboardPage />} />
+              </Route>
+              <Route element={<RequirePermission permission="cxg.programa_supervisores.view" />}>
+                <Route path="/fsm/programa-supervisores" element={<ProgramaSupervisoresPage />} />
               </Route>
               <Route element={<RequirePermission permission="cxg.casos_especiales.view" />}>
                 <Route path="/contact-center/casos-especiales" element={<SpecialCasesPage />} />

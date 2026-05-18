@@ -33,10 +33,26 @@ export type Permission =
     | 'cxg.cancelaciones.view' | 'cxg.cancelaciones.create' | 'cxg.cancelaciones.assign' | 'cxg.cancelaciones.gestionar' | 'cxg.cancelaciones.process'
     | 'cxg.cxg_nc.view' | 'cxg.cxg_nc.create' | 'cxg.cxg_nc.approve' | 'cxg.cxg_nc.assign' | 'cxg.cxg_nc.gestionar' | 'cxg.cxg_nc.process'
     | 'cxg.fsm.view'
+    | 'cxg.programa_supervisores.view'
     | 'cxg.casos_especiales.view' | 'cxg.casos_especiales.create' | 'cxg.casos_especiales.gestionar'
     | 'cxg.emergencias.view' | 'cxg.emergencias.create' | 'cxg.emergencias.verify' | 'cxg.emergencias.process'
     | 'cxg.reportes.exportar'
     | 'config.users' | 'config.roles' | 'config.cecos' | 'config.accounts' | 'config.managements' | 'config.exchange_rates' | 'config.audit';
+
+export interface ProgramaSupervisor {
+    id: string;
+    empleado_id: string;
+    empleado_name: string;
+    empleado_estado?: string | null;
+    empleado_subarea?: string | null;
+    empleado_role?: string | null;
+    fecha_labor: string;
+    labor: string;
+    creado_el?: string;
+    creado_por?: string;
+    modificado_el?: string;
+    modificado_por?: string;
+}
 
 export interface SpecialCase {
     id: string;
