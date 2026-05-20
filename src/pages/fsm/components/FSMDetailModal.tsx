@@ -107,38 +107,79 @@ export const FSMDetailModal: React.FC<FSMDetailModalProps> = ({
         {/* Animated Gradient Border Layer */}
         <div className="absolute inset-0 bg-gradient-to-r from-primary via-indigo-500 to-cyan-500 animate-gradient-x opacity-70" />
         
-        <div className="relative bg-slate-950/90 backdrop-blur-xl rounded-[1.95rem] p-6 text-white flex items-center justify-between gap-6 overflow-hidden">
+        <div className="relative bg-slate-950/90 backdrop-blur-xl rounded-[1.95rem] p-6 text-white flex flex-col gap-5 overflow-hidden">
           {/* Glass Overlay with Prism effect */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
           
-          <div className="flex items-center gap-5 relative z-10">
-            <div className="relative">
-              <div className="absolute inset-0 bg-primary/40 blur-xl animate-pulse" />
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-primary to-indigo-600 flex items-center justify-center shadow-xl border border-white/20 relative z-10">
-                 <Truck className="w-7 h-7 text-white" />
+          {/* Top Row: Status and Date */}
+          <div className="flex items-center justify-between gap-6 relative z-10 w-full">
+            <div className="flex items-center gap-5">
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/40 blur-xl animate-pulse" />
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-primary to-indigo-600 flex items-center justify-center shadow-xl border border-white/20 relative z-10">
+                   <Truck className="w-7 h-7 text-white" />
+                </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                  <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary/80">FSM STATUS</span>
+                </div>
+                <SIATCBadge variant={
+                  ticket.estado === 'CERRADO' || ticket.estado === 'Finalizado' ? 'success' : 
+                  ticket.estado === 'EN CURSO' || ticket.estado === 'En Ruta' ? 'info' :
+                  ticket.estado === 'PENDIENTE' ? 'warning' :
+                  'secondary'
+                } className="px-3 py-1.5 text-[10px] shadow-md border-white/10">
+                  {ticket.estado}
+                </SIATCBadge>
               </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary/80">FSM STATUS</span>
-              </div>
-              <SIATCBadge variant={
-                ticket.estado === 'CERRADO' || ticket.estado === 'Finalizado' ? 'success' : 
-                ticket.estado === 'EN CURSO' || ticket.estado === 'En Ruta' ? 'info' :
-                ticket.estado === 'PENDIENTE' ? 'warning' :
-                'secondary'
-              } className="px-3 py-1.5 text-[10px] shadow-md border-white/10">
-                {ticket.estado}
-              </SIATCBadge>
+
+            <div className="text-right flex flex-col">
+              <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/40 mb-1">Programación</span>
+              <span className="text-xl font-black text-white tracking-tighter bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+                {new Date(ticket.fecha_visita).toLocaleDateString()}
+              </span>
             </div>
           </div>
 
-          <div className="text-right flex flex-col relative z-10">
-            <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/40 mb-1">Programación</span>
-            <span className="text-xl font-black text-white tracking-tighter bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-              {new Date(ticket.fecha_visita).toLocaleDateString()}
-            </span>
+          {/* Divider */}
+          <div className="h-px bg-white/10 relative z-10 w-full" />
+
+          {/* Bottom Row: Horario, Técnico, Supervisor */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10 w-full">
+             {/* Horario */}
+             <div className="flex flex-col gap-1">
+                <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.2em]">Horario del Ticket</span>
+                <div className="flex items-center gap-2">
+                   <Clock className="w-4 h-4 text-cyan-400" />
+                   <span className="text-[13px] font-black text-white">{ticket.bloque_original || 'S/D'}</span>
+                </div>
+                {ticket.rango_asignado && (
+                   <span className="text-[9px] text-emerald-400 font-bold">
+                      Asignado: {ticket.rango_asignado}
+                   </span>
+                )}
+             </div>
+
+             {/* Técnico */}
+             <div className="flex flex-col gap-1 border-t md:border-t-0 md:border-l border-white/10 pt-2 md:pt-0 md:pl-4">
+                <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.2em]">Técnico Operativo</span>
+                <div className="flex items-center gap-2">
+                   <UserCheck className="w-4 h-4 text-primary" />
+                   <span className="text-[13px] font-black text-white uppercase truncate">{ticket.tecnico || 'BUSCANDO...'}</span>
+                </div>
+             </div>
+
+             {/* Supervisor */}
+             <div className="flex flex-col gap-1 border-t md:border-t-0 md:border-l border-white/10 pt-2 md:pt-0 md:pl-4">
+                <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.2em]">Supervisor a Cargo</span>
+                <div className="flex items-center gap-2">
+                   <User className="w-4 h-4 text-indigo-400" />
+                   <span className="text-[13px] font-black text-white uppercase truncate">{ticket.supervisor || 'NO ASIGNADO'}</span>
+                </div>
+             </div>
           </div>
         </div>
       </div>
@@ -214,29 +255,8 @@ export const FSMDetailModal: React.FC<FSMDetailModalProps> = ({
         <DetailSection icon={Clock} title="Trazabilidad de Tiempo" variant="highlight" index={4}>
            <div className="flex flex-col gap-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                 {/* Horario del Ticket */}
-                 <div className="flex items-center justify-between p-6 bg-slate-50 dark:bg-slate-900/20 rounded-[2rem] border border-slate-200/40 dark:border-slate-800/40 shadow-md relative overflow-hidden group">
-                    <div className="absolute right-0 top-0 w-48 h-48 bg-slate-500/5 rounded-full -mr-24 -mt-24 blur-[80px] transition-all group-hover:scale-110" />
-                    <div className="flex-1 relative z-10">
-                       <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em] mb-2 block">Horario del Ticket</span>
-                       <div className="flex items-center gap-4">
-                          <div className="relative">
-                             <div className="w-14 h-14 rounded-2xl bg-slate-600 flex items-center justify-center shadow-lg relative z-10">
-                               <Clock className="w-7 h-7 text-white" />
-                             </div>
-                          </div>
-                          <div className="flex flex-col gap-0.5">
-                             <span className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tighter">
-                               {ticket.bloque_original || 'S/D'}
-                             </span>
-                             <span className="text-[8px] font-bold text-slate-500/60 uppercase tracking-widest pl-0.5">Carga Originaria</span>
-                          </div>
-                       </div>
-                    </div>
-                 </div>
-
                  {/* Ventana Certificada */}
-                 <div className="flex items-center justify-between p-6 bg-emerald-50 dark:bg-emerald-950/20 rounded-[2rem] border border-emerald-500/10 shadow-md relative overflow-hidden group">
+                 <div className="flex items-center justify-between p-6 bg-emerald-50 dark:bg-emerald-950/20 rounded-[2rem] border border-emerald-500/10 shadow-md relative overflow-hidden group col-span-1 md:col-span-2">
                     <div className="absolute right-0 top-0 w-48 h-48 bg-emerald-500/5 rounded-full -mr-24 -mt-24 blur-[80px] transition-all group-hover:scale-110" />
                     
                     <div className="flex-1 relative z-10">
@@ -279,30 +299,6 @@ export const FSMDetailModal: React.FC<FSMDetailModalProps> = ({
                     </div>
                  </div>
               )}
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                 {/* Técnico */}
-                 <div className="flex items-center gap-4 p-5 bg-white/40 dark:bg-black/20 rounded-2xl border border-white/20 shadow-sm relative group overflow-hidden">
-                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-blue-500/10 flex items-center justify-center border border-primary/20 shadow-inner">
-                     <UserCheck className="w-6 h-6 text-primary" />
-                   </div>
-                   <div className="flex flex-col relative z-10">
-                     <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-0.5">Técnico Operativo</span>
-                     <span className="text-[16px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight leading-none">{ticket.tecnico || 'BUSCANDO...'}</span>
-                   </div>
-                 </div>
-
-                 {/* Supervisor */}
-                 <div className="flex items-center gap-4 p-5 bg-white/40 dark:bg-black/20 rounded-2xl border border-white/20 shadow-sm relative group overflow-hidden">
-                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 flex items-center justify-center border border-indigo-500/20 shadow-inner">
-                     <User className="w-6 h-6 text-indigo-600" />
-                   </div>
-                   <div className="flex flex-col relative z-10">
-                     <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-0.5">Supervisor a Cargo</span>
-                     <span className="text-[16px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight leading-none">{ticket.supervisor || 'NO ASIGNADO'}</span>
-                   </div>
-                 </div>
-              </div>
            </div>
         </DetailSection>
 
