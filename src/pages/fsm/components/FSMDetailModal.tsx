@@ -175,8 +175,8 @@ export const FSMDetailModal: React.FC<FSMDetailModalProps> = ({
           </div>
         </DetailSection>
 
-        {/* Section 3: Equipo */}
-        <DetailSection icon={Box} title="Core de Servicio" index={3}>
+        {/* Section 3: Datos del Servicio */}
+        <DetailSection icon={Box} title="Datos del Servicio" index={3}>
           <div className="grid grid-cols-1 gap-6">
              <div className="relative group/product overflow-hidden rounded-[1.5rem] p-5 border border-white/40 dark:border-white/10 bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-950 shadow-lg transition-all hover:scale-[1.01]">
                <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl transition-all group-hover/product:scale-110" />
@@ -203,16 +203,9 @@ export const FSMDetailModal: React.FC<FSMDetailModalProps> = ({
                </div>
              </div>
              
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="p-5 bg-gradient-to-br from-primary to-indigo-600 rounded-[1.5rem] text-white shadow-md">
-                   <span className="text-[9px] font-black text-white/60 uppercase mb-2 block tracking-[0.2em]">Tipo de Servicio</span>
-                   <p className="text-[15px] font-black uppercase leading-tight tracking-tight">{ticket.tipo_servicio || 'MANTENIMIENTO'}</p>
-                </div>
-                <div className="p-5 bg-slate-950 rounded-[1.5rem] text-white border border-white/10 shadow-md overflow-hidden relative group">
-                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                   <span className="text-[9px] font-black text-white/40 uppercase mb-2 block tracking-[0.2em]">Carga Originaria</span>
-                   <p className="text-[15px] font-black leading-tight tracking-tight">{ticket.bloque_original || 'S/D'}</p>
-                </div>
+             <div className="p-5 bg-gradient-to-br from-primary to-indigo-600 rounded-[1.5rem] text-white shadow-md">
+                <span className="text-[9px] font-black text-white/60 uppercase mb-2 block tracking-[0.2em]">Tipo de Servicio</span>
+                <p className="text-[15px] font-black uppercase leading-tight tracking-tight">{ticket.tipo_servicio || 'MANTENIMIENTO'}</p>
              </div>
           </div>
         </DetailSection>
@@ -220,57 +213,95 @@ export const FSMDetailModal: React.FC<FSMDetailModalProps> = ({
         {/* Section 4: Horarios */}
         <DetailSection icon={Clock} title="Trazabilidad de Tiempo" variant="highlight" index={4}>
            <div className="flex flex-col gap-6">
-              <div className="flex items-center justify-between p-6 bg-emerald-50 dark:bg-emerald-950/20 rounded-[2rem] border border-emerald-500/10 shadow-md relative overflow-hidden group">
-                 <div className="absolute right-0 top-0 w-48 h-48 bg-emerald-500/5 rounded-full -mr-24 -mt-24 blur-[80px] transition-all group-hover:scale-110" />
-                 
-                 <div className="flex-1 relative z-10">
-                    <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.3em] mb-2 block">Ventana Certificada</span>
-                    <div className="flex items-center gap-4">
-                       <div className="relative">
-                          <div className="absolute inset-0 bg-emerald-500/20 blur-xl animate-pulse" />
-                          <div className="w-14 h-14 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-lg relative z-10">
-                            <Clock className="w-7 h-7 text-white" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                 {/* Horario del Ticket */}
+                 <div className="flex items-center justify-between p-6 bg-slate-50 dark:bg-slate-900/20 rounded-[2rem] border border-slate-200/40 dark:border-slate-800/40 shadow-md relative overflow-hidden group">
+                    <div className="absolute right-0 top-0 w-48 h-48 bg-slate-500/5 rounded-full -mr-24 -mt-24 blur-[80px] transition-all group-hover:scale-110" />
+                    <div className="flex-1 relative z-10">
+                       <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em] mb-2 block">Horario del Ticket</span>
+                       <div className="flex items-center gap-4">
+                          <div className="relative">
+                             <div className="w-14 h-14 rounded-2xl bg-slate-600 flex items-center justify-center shadow-lg relative z-10">
+                               <Clock className="w-7 h-7 text-white" />
+                             </div>
                           </div>
-                       </div>
-                       <div className="flex flex-col gap-0.5">
-                          <span className="text-3xl font-black text-slate-900 dark:text-emerald-300 tracking-tighter">
-                            {ticket.rango_asignado || 'OFFLINE'}
-                          </span>
-                          <span className="text-[8px] font-bold text-emerald-600/60 uppercase tracking-widest pl-0.5">FSM GAC Sync</span>
+                          <div className="flex flex-col gap-0.5">
+                             <span className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tighter">
+                               {ticket.bloque_original || 'S/D'}
+                             </span>
+                             <span className="text-[8px] font-bold text-slate-500/60 uppercase tracking-widest pl-0.5">Carga Originaria</span>
+                          </div>
                        </div>
                     </div>
                  </div>
-                 
-                 <div className="text-right relative z-10 scale-100">
-                    <span className="text-[9px] font-black text-slate-500 uppercase block mb-1.5 tracking-[0.2em]">Prioridad</span>
-                    <div className="inline-flex items-center justify-center w-14 h-14 bg-slate-950 text-white rounded-2xl text-xl font-black shadow-lg border border-white/10 ring-4 ring-emerald-500/5">
-                       {ticket.orden || '0'}
+
+                 {/* Ventana Certificada */}
+                 <div className="flex items-center justify-between p-6 bg-emerald-50 dark:bg-emerald-950/20 rounded-[2rem] border border-emerald-500/10 shadow-md relative overflow-hidden group">
+                    <div className="absolute right-0 top-0 w-48 h-48 bg-emerald-500/5 rounded-full -mr-24 -mt-24 blur-[80px] transition-all group-hover:scale-110" />
+                    
+                    <div className="flex-1 relative z-10">
+                       <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.3em] mb-2 block">Ventana Certificada</span>
+                       <div className="flex items-center gap-4">
+                          <div className="relative">
+                             <div className="absolute inset-0 bg-emerald-500/20 blur-xl animate-pulse" />
+                             <div className="w-14 h-14 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-lg relative z-10">
+                               <Clock className="w-7 h-7 text-white" />
+                             </div>
+                          </div>
+                          <div className="flex flex-col gap-0.5">
+                             <span className="text-2xl font-black text-slate-900 dark:text-emerald-300 tracking-tighter">
+                               {ticket.rango_asignado || 'OFFLINE'}
+                             </span>
+                             <span className="text-[8px] font-bold text-emerald-600/60 uppercase tracking-widest pl-0.5">FSM GAC Sync</span>
+                          </div>
+                       </div>
+                    </div>
+                    
+                    <div className="text-right relative z-10 scale-100 pl-2">
+                       <span className="text-[9px] font-black text-slate-500 uppercase block mb-1.5 tracking-[0.2em]">Prioridad</span>
+                       <div className="inline-flex items-center justify-center w-10 h-10 bg-slate-950 text-white rounded-xl text-base font-black shadow-lg border border-white/10 ring-4 ring-emerald-500/5">
+                          {ticket.orden || '0'}
+                       </div>
                     </div>
                  </div>
               </div>
 
               {ticket.comentario_horario && (
-                <div className="p-5 bg-emerald-500/[0.03] dark:bg-emerald-500/[0.012] rounded-2xl border border-dashed border-emerald-500/20 flex items-start gap-4">
-                   <div className="p-1.5 rounded-lg bg-emerald-500/10">
-                    <AlertCircle className="w-5 h-5 text-emerald-500 shrink-0" />
-                   </div>
-                   <div className="flex flex-col gap-0.5">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600/50">Nota de Rango</span>
-                      <p className="text-[13px] font-medium leading-relaxed text-emerald-800 dark:text-emerald-200">
-                        "{ticket.comentario_horario}"
-                      </p>
-                   </div>
-                </div>
+                 <div className="p-5 bg-emerald-500/[0.03] dark:bg-emerald-500/[0.012] rounded-2xl border border-dashed border-emerald-500/20 flex items-start gap-4">
+                    <div className="p-1.5 rounded-lg bg-emerald-500/10">
+                     <AlertCircle className="w-5 h-5 text-emerald-500 shrink-0" />
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                       <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600/50">Nota de Rango</span>
+                       <p className="text-[13px] font-medium leading-relaxed text-emerald-800 dark:text-emerald-200">
+                         "{ticket.comentario_horario}"
+                       </p>
+                    </div>
+                 </div>
               )}
 
-              <div className="flex items-center gap-4 p-5 bg-white/40 dark:bg-black/20 rounded-2xl border border-white/20 shadow-sm relative group overflow-hidden">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-blue-500/10 flex items-center justify-center border border-primary/20 shadow-inner">
-                  <UserCheck className="w-6 h-6 text-primary" />
-                </div>
-                <div className="flex flex-col relative z-10">
-                  <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-0.5">Técnico Operativo</span>
-                  <span className="text-[17px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight leading-none">{ticket.tecnico || 'BUSCANDO...'}</span>
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 {/* Técnico */}
+                 <div className="flex items-center gap-4 p-5 bg-white/40 dark:bg-black/20 rounded-2xl border border-white/20 shadow-sm relative group overflow-hidden">
+                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-blue-500/10 flex items-center justify-center border border-primary/20 shadow-inner">
+                     <UserCheck className="w-6 h-6 text-primary" />
+                   </div>
+                   <div className="flex flex-col relative z-10">
+                     <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-0.5">Técnico Operativo</span>
+                     <span className="text-[16px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight leading-none">{ticket.tecnico || 'BUSCANDO...'}</span>
+                   </div>
+                 </div>
+
+                 {/* Supervisor */}
+                 <div className="flex items-center gap-4 p-5 bg-white/40 dark:bg-black/20 rounded-2xl border border-white/20 shadow-sm relative group overflow-hidden">
+                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 flex items-center justify-center border border-indigo-500/20 shadow-inner">
+                     <User className="w-6 h-6 text-indigo-600" />
+                   </div>
+                   <div className="flex flex-col relative z-10">
+                     <span className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-0.5">Supervisor a Cargo</span>
+                     <span className="text-[16px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight leading-none">{ticket.supervisor || 'NO ASIGNADO'}</span>
+                   </div>
+                 </div>
               </div>
            </div>
         </DetailSection>
