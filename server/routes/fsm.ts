@@ -69,10 +69,33 @@ router.get('/tracking', async (req: Request, res: Response) => {
                 t.ComentarioProgramador as coment_prog,
                 t.ComentarioTecnico as coment_tecnico,
                 ts.Descripcion as tipo_servicio,
-                e.DsSupervisor as supervisor
+                COALESCE(sup_cas.supervisor_nombre, sup_sole.supervisor_nombre, e.DsSupervisor) as supervisor
             FROM [SIATC].[Dashboard_FSM] t
             LEFT JOIN LatestRango lr ON TRIM(t.Ticket) = TRIM(lr.ID_Ticket) AND lr.rn = 1
             LEFT JOIN [SIATC].[FSM_TipoServicio] ts ON t.IdServicio = ts.Id
+            -- CAS Supervisor (OUTER APPLY TOP 1 with active priority and historical order)
+            OUTER APPLY (
+                SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
+                FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas
+                INNER JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] h 
+                    ON cas.Id_colaborar = h.Id_colaborar 
+                INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON h.Supervisor = e.ID_empleado
+                WHERE cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
+                  AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
+                ORDER BY 
+                    CASE WHEN h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE() THEN 1 ELSE 0 END DESC,
+                    h.Fecha_inicio DESC,
+                    h.Creado_el DESC
+            ) sup_cas
+            -- SOLE Supervisor (OUTER APPLY TOP 1)
+            OUTER APPLY (
+                SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
+                FROM [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] da
+                INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] ia ON da.Empleado = ia.Empleado
+                INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON ia.Jefe_directo = e.ID_empleado
+                WHERE (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
+            ) sup_sole
+            -- Prefix fallback
             OUTER APPLY (
                 SELECT TOP 1 DsSupervisor 
                 FROM [SAP].[FSM_TBL_EMPRESA] 

@@ -135,16 +135,19 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
                     COALESCE(sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor_nombre
                 FROM [SIATC].[Dashboard_FSM] t
                 LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as VARCHAR)
-                -- CAS Supervisor (OUTER APPLY TOP 1 to avoid fan-out)
+                -- CAS Supervisor (OUTER APPLY TOP 1 to avoid fan-out, prioritizing active and sorting historically)
                 OUTER APPLY (
                     SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
                     FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas
                     INNER JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] h 
                         ON cas.Id_colaborar = h.Id_colaborar 
-                        AND (h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE())
                     INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON h.Supervisor = e.ID_empleado
                     WHERE cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
                       AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
+                    ORDER BY 
+                        CASE WHEN h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE() THEN 1 ELSE 0 END DESC,
+                        h.Fecha_inicio DESC,
+                        h.Creado_el DESC
                 ) sup_cas
                 -- SOLE Supervisor (OUTER APPLY TOP 1 to avoid fan-out)
                 OUTER APPLY (
@@ -519,16 +522,19 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
             FROM [dbo].[GAC_APP_TB_CXG_NC] n
             LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
             LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as VARCHAR)
-            -- CAS Supervisor (OUTER APPLY TOP 1 to avoid fan-out)
+            -- CAS Supervisor (OUTER APPLY TOP 1 to avoid fan-out, prioritizing active and sorting historically)
             OUTER APPLY (
                 SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
                 FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas
                 INNER JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] h 
                     ON cas.Id_colaborar = h.Id_colaborar 
-                    AND (h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE())
                 INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON h.Supervisor = e.ID_empleado
                 WHERE cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
                   AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
+                ORDER BY 
+                    CASE WHEN h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE() THEN 1 ELSE 0 END DESC,
+                    h.Fecha_inicio DESC,
+                    h.Creado_el DESC
             ) sup_cas
             -- SOLE Supervisor (OUTER APPLY TOP 1 to avoid fan-out)
             OUTER APPLY (
@@ -644,16 +650,19 @@ router.get('/cxg-nc/:id', async (req: Request, res: Response) => {
                 FROM [dbo].[GAC_APP_TB_CXG_NC] n
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
                 LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as VARCHAR)
-                -- CAS Supervisor (OUTER APPLY TOP 1 to avoid fan-out)
+                -- CAS Supervisor (OUTER APPLY TOP 1 to avoid fan-out, prioritizing active and sorting historically)
                 OUTER APPLY (
                     SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
                     FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas
                     INNER JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] h 
                         ON cas.Id_colaborar = h.Id_colaborar 
-                        AND (h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE())
                     INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON h.Supervisor = e.ID_empleado
                     WHERE cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
                       AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
+                    ORDER BY 
+                        CASE WHEN h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE() THEN 1 ELSE 0 END DESC,
+                        h.Fecha_inicio DESC,
+                        h.Creado_el DESC
                 ) sup_cas
                 -- SOLE Supervisor (OUTER APPLY TOP 1 to avoid fan-out)
                 OUTER APPLY (
