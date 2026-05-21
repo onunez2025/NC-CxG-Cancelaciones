@@ -1162,6 +1162,8 @@ export const CxGNCPage = () => {
           </div>
         </div>
       </div>
+        </>
+      )}
       {/* ─────────────────────────────────────────── */}
       {/* Evaluar Solicitud Modal (Supervisor) */}
       {/* ─────────────────────────────────────────── */}
@@ -1441,8 +1443,6 @@ export const CxGNCPage = () => {
         </div>
       </SIATCModalWrapper>
       {/* ─────────────────────────────────────────── */}
-        </>
-      )}
     </div>
   );
 };
