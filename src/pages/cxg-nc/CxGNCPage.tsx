@@ -814,7 +814,7 @@ export const CxGNCPage = () => {
         </div>
 
         {/* Table Area */}
-        <div className={SIATC_THEME.TABLE.SCROLL_AREA}>
+        <div className="flex-1 flex flex-col min-h-0 relative">
           {isLoading ? (
             <SIATCTableSkeleton rows={8} columns={Math.min(visibleColumns.length, 7)} />
           ) : displayedData.length === 0 ? (
