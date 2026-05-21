@@ -274,11 +274,11 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, de
                         </div>
                         <div className="flex flex-col">
                           <span className="text-muted-foreground uppercase font-bold">Visita Realizada</span>
-                          <span className="font-semibold text-cyan-900 dark:text-cyan-100">{eq.visita_realizada ? 'Sí' : 'No'}</span>
+                          <span className="font-semibold text-cyan-900 dark:text-cyan-100">{String(eq.visita_realizada) === 'true' ? 'Sí' : 'No'}</span>
                         </div>
                         <div className="flex flex-col items-end">
                           <span className="text-muted-foreground uppercase font-bold">Trabajo Realizado</span>
-                          <span className="font-semibold text-cyan-900 dark:text-cyan-100">{eq.trabajo_realizado ? 'Sí' : 'No'}</span>
+                          <span className="font-semibold text-cyan-900 dark:text-cyan-100">{String(eq.trabajo_realizado) === 'true' ? 'Sí' : 'No'}</span>
                         </div>
                       </div>
                       {eq.comentario && (
