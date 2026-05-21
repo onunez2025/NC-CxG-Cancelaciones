@@ -82,6 +82,8 @@ export const CxGNCPage = () => {
     { id: 'ticket', label: 'TICKET' },
     { id: 'tienda', label: 'TIENDA' },
     { id: 'cliente', label: 'CLIENTE' },
+    { id: 'codigo_producto', label: 'CÓDIGO PRODUCTO' },
+    { id: 'producto', label: 'PRODUCTO' },
     { id: 'creado_por', label: 'ASESOR CREADOR' },
     { id: 'supervisor', label: 'SUPERVISOR' },
     { id: 'fecha_creacion', label: 'FECHA CREACIÓN' },
@@ -92,7 +94,7 @@ export const CxGNCPage = () => {
   ];
 
   const [visibleColumns, setVisibleColumns] = useState<string[]>([
-    'tipo', 'documento', 'ticket', 'tienda', 'cliente', 'creado_por', 'supervisor', 'fecha_creacion', 'aprobado', 'procesado', 'motivo_real', 'estado'
+    'tipo', 'documento', 'ticket', 'tienda', 'cliente', 'codigo_producto', 'producto', 'creado_por', 'supervisor', 'fecha_creacion', 'aprobado', 'procesado', 'motivo_real', 'estado'
   ]);
   const [isColumnDropdownOpen, setIsColumnDropdownOpen] = useState(false);
 
@@ -624,6 +626,8 @@ export const CxGNCPage = () => {
                       case 'ticket': return item.correlativo || '';
                       case 'tienda': return `"${item.tienda || ''}"`;  
                       case 'cliente': return `"${item.cliente || ''}"`;  
+                      case 'codigo_producto': return `"${item.codigo_producto || ''}"`;
+                      case 'producto': return `"${item.producto || ''}"`;
                       case 'creado_por': return `"${item.creado_por || ''}"`;  
                       case 'supervisor': return `"${item.supervisor || ''}"`;  
                       case 'fecha_creacion': return item.fecha ? new Date(item.fecha).toLocaleDateString() : '';
@@ -980,6 +984,12 @@ export const CxGNCPage = () => {
                       case 'cliente': return (
                         <SIATCTooltip content={item.cliente || ''} position="bottom">
                           <div className="font-bold text-foreground truncate max-w-[140px]">{item.cliente}</div>
+                        </SIATCTooltip>
+                      );
+                      case 'codigo_producto': return <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>{item.codigo_producto || '—'}</span>;
+                      case 'producto': return (
+                        <SIATCTooltip content={item.producto || ''} position="bottom">
+                          <div className="text-xs text-foreground truncate max-w-[150px]">{item.producto || '—'}</div>
                         </SIATCTooltip>
                       );
                       case 'creado_por': return (

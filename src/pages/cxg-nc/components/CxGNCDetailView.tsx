@@ -150,6 +150,18 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, de
                   <span className="text-xs font-bold text-muted-foreground uppercase">Ticket Referencia</span>
                   <span className="text-sm font-black">#{detailData.ticket}</span>
                 </div>
+                {detailData.codigo_producto && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-bold text-muted-foreground uppercase">Cód. Producto</span>
+                    <span className="text-sm font-mono text-muted-foreground">{detailData.codigo_producto}</span>
+                  </div>
+                )}
+                {detailData.producto && (
+                  <div className="flex justify-between items-start">
+                    <span className="text-xs font-bold text-muted-foreground uppercase">Producto</span>
+                    <span className="text-sm font-semibold text-right max-w-[200px]">{detailData.producto}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-start">
                   <span className="text-xs font-bold text-muted-foreground uppercase">Cliente</span>
                   <span className="text-sm font-bold text-right italic">{detailData.cliente}</span>

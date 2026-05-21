@@ -570,6 +570,8 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
                     n.Procesado_por as procesado_por,
                     n.Procesado_el as procesado_el,
                     t.CodigoExternoCliente as documento_cliente,
+                    t.CodigoExternoEquipo as codigo_producto,
+                    t.NombreEquipo as producto,
                     COALESCE(n.Lugar_Compra, emp.DsEmpresa, CAST(t.IDEmpresa as VARCHAR)) as tienda,
                     COALESCE(n.Supervisor_FSM, sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor
                 FROM [dbo].[GAC_APP_TB_CXG_NC] n
@@ -805,7 +807,9 @@ router.get('/cxg-nc/:id', verifyPermission('cxg.cxg_nc.view'), async (req: Reque
                     COALESCE(n.Motivo_Elevacion, t.ComentarioProgramador) as fsm_motivo_elevacion,
                     COALESCE(n.Lugar_Compra, emp.DsEmpresa, CAST(t.IDEmpresa as VARCHAR)) as fsm_lugar_compra,
                     COALESCE(n.Supervisor_FSM, sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor_asignado,
-                    t.NombreCliente as fsm_cliente
+                    t.NombreCliente as fsm_cliente,
+                    t.CodigoExternoEquipo as codigo_producto,
+                    t.NombreEquipo as producto
                 FROM [dbo].[GAC_APP_TB_CXG_NC] n
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
                 LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as VARCHAR)
