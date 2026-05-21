@@ -452,7 +452,9 @@ router.get('/cxg-nc/unique-values', verifyPermission('cxg.cxg_nc.view'), async (
             aprobado: 'n.Aprobado',
             procesado: 'n.Procesado',
             motivo_real: 'n.Vali_Motivo_Real',
-            estado: 'n.Estado_Proceso'
+            estado: 'n.Estado_Proceso',
+            codigo_producto: 't.CodigoExternoEquipo',
+            producto: 't.NombreEquipo'
         };
 
         const dbCol = columnMap[column];
@@ -638,7 +640,9 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
             aprobado: 'aprobado',
             procesado: 'procesado',
             motivo_real: 'vali_motivo_real',
-            estado: 'estado'
+            estado: 'estado',
+            codigo_producto: 'codigo_producto',
+            producto: 'producto'
         };
 
         let filterIndex = 0;
