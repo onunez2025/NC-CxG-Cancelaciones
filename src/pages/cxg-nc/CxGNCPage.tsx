@@ -194,7 +194,6 @@ export const CxGNCPage = () => {
   const handleClearFilters = () => {
     setSearchTerm('');
     setActiveTab('TODOS');
-    setDateRange({ start: '', end: '' });
     setStatusFilter('TODOS');
     setSortConfig(null);
     setColumnFilters({});
@@ -786,8 +785,8 @@ export const CxGNCPage = () => {
               <input 
                 type="date" 
                 className="bg-transparent border-none text-xs font-bold text-foreground focus:ring-0 cursor-pointer"
-                value={dateRange.start}
-                onChange={(e) => setDateRange({...dateRange, start: e.target.value})}
+                value={columnFilters['fecha_creacion_start'] || ''}
+                onChange={(e) => setColumnFilters(prev => ({...prev, fecha_creacion_start: e.target.value}))}
               />
             </div>
 
@@ -796,12 +795,12 @@ export const CxGNCPage = () => {
               <input 
                 type="date" 
                 className="bg-transparent border-none text-xs font-bold text-foreground focus:ring-0 cursor-pointer"
-                value={dateRange.end}
-                onChange={(e) => setDateRange({...dateRange, end: e.target.value})}
+                value={columnFilters['fecha_creacion_end'] || ''}
+                onChange={(e) => setColumnFilters(prev => ({...prev, fecha_creacion_end: e.target.value}))}
               />
             </div>
 
-            {(searchTerm !== '' || activeTab !== 'TODOS' || dateRange.start !== '' || dateRange.end !== '' || statusFilter !== 'TODOS') && (
+            {(searchTerm !== '' || activeTab !== 'TODOS' || columnFilters['fecha_creacion_start'] || columnFilters['fecha_creacion_end'] || statusFilter !== 'TODOS' || Object.keys(columnFilters).length > 0) && (
               <SIATCButton 
                 variant="ghost" 
                 size="sm" 
@@ -851,7 +850,7 @@ export const CxGNCPage = () => {
                              )}
                            </div>
                            <button 
-                             className={`p-1 rounded shrink-0 hover:bg-muted/50 transition-colors ${columnFilters[colId] ? 'text-primary bg-primary/10' : 'text-muted-foreground opacity-30 hover:opacity-100'}`}
+                             className={`p-1 rounded shrink-0 hover:bg-muted/50 transition-colors ${columnFilters[colId] || columnFilters[`${colId}_start`] || columnFilters[`${colId}_end`] ? 'text-primary bg-primary/10' : 'text-muted-foreground opacity-30 hover:opacity-100'}`}
                              onClick={(e) => { e.stopPropagation(); toggleFilter(colId); }}
                            >
                              <Filter className="w-3 h-3" />
@@ -859,44 +858,82 @@ export const CxGNCPage = () => {
                            {activeFilterCol === colId && (
                              <div 
                                ref={filterDropdownRef}
-                               className="absolute top-full left-0 mt-1 w-56 bg-card border border-border rounded-xl shadow-lg z-50 p-2 font-normal"
+                               className="absolute top-full left-0 mt-1 w-72 bg-card border border-border rounded-xl shadow-lg z-50 p-2 font-normal"
                                onClick={e => e.stopPropagation()}
                              >
                                <div className="flex flex-col gap-2">
-                                 <input 
-                                   type="text" 
-                                   className={`${SIATC_THEME.COMPONENTS.INPUT} h-8 text-xs font-semibold`}
-                                   placeholder={`Buscar en ${label}...`}
-                                   value={filterSearchTerm}
-                                   onChange={(e) => setFilterSearchTerm(e.target.value)}
-                                   autoFocus
-                                 />
-                                 <div className="max-h-40 overflow-y-auto flex flex-col gap-1 pr-1 custom-scrollbar">
-                                   {isFetchingSuggestions ? (
-                                      <div className="text-xs text-muted-foreground p-2 text-center flex items-center justify-center gap-2"><Loader2 className="w-3 h-3 animate-spin"/> Cargando...</div>
-                                   ) : filterSuggestions.length === 0 ? (
-                                      <div className="text-xs text-muted-foreground p-2 text-center">Sin resultados</div>
-                                   ) : (
-                                      <>
-                                        <button 
-                                          className={`text-left px-2 py-1.5 text-xs rounded hover:bg-muted/50 truncate italic ${!columnFilters[colId] ? 'bg-primary/5 text-primary' : 'text-muted-foreground'}`}
-                                          onClick={() => applyFilter(colId, '')}
-                                        >
-                                          (Todos los valores)
-                                        </button>
-                                        {filterSuggestions.map(val => (
-                                          <button 
-                                            key={val}
-                                            className={`text-left px-2 py-1.5 text-xs rounded hover:bg-muted/50 truncate ${columnFilters[colId] === val ? 'bg-primary/10 text-primary font-bold' : 'text-foreground'}`}
-                                            onClick={() => applyFilter(colId, val)}
-                                            title={val}
-                                          >
-                                            {val}
-                                          </button>
-                                        ))}
-                                      </>
-                                   )}
-                                 </div>
+                                 {colId === 'fecha_creacion' ? (
+                                    <div className="flex flex-col gap-2 p-1">
+                                      <div className="flex flex-col gap-1">
+                                        <span className="text-[10px] font-black uppercase text-muted-foreground">Desde</span>
+                                        <input 
+                                          type="date"
+                                          className={`${SIATC_THEME.COMPONENTS.INPUT} h-8 text-xs font-semibold`}
+                                          value={columnFilters[`${colId}_start`] || ''}
+                                          onChange={(e) => {
+                                             const val = e.target.value;
+                                             setColumnFilters(prev => ({ ...prev, [`${colId}_start`]: val }));
+                                          }}
+                                        />
+                                      </div>
+                                      <div className="flex flex-col gap-1">
+                                        <span className="text-[10px] font-black uppercase text-muted-foreground">Hasta</span>
+                                        <input 
+                                          type="date"
+                                          className={`${SIATC_THEME.COMPONENTS.INPUT} h-8 text-xs font-semibold`}
+                                          value={columnFilters[`${colId}_end`] || ''}
+                                          onChange={(e) => {
+                                             const val = e.target.value;
+                                             setColumnFilters(prev => ({ ...prev, [`${colId}_end`]: val }));
+                                          }}
+                                        />
+                                      </div>
+                                      <SIATCButton 
+                                        variant="primary" 
+                                        size="sm" 
+                                        className="mt-2"
+                                        onClick={() => setActiveFilterCol(null)}
+                                      >
+                                        Aplicar Rango
+                                      </SIATCButton>
+                                    </div>
+                                 ) : (
+                                    <>
+                                       <input 
+                                         type="text" 
+                                         className={`${SIATC_THEME.COMPONENTS.INPUT} h-8 text-xs font-semibold`}
+                                         placeholder={`Buscar en ${label}...`}
+                                         value={filterSearchTerm}
+                                         onChange={(e) => setFilterSearchTerm(e.target.value)}
+                                         autoFocus
+                                       />
+                                       <div className="max-h-56 overflow-y-auto flex flex-col gap-1 pr-1 custom-scrollbar">
+                                         {isFetchingSuggestions ? (
+                                            <div className="text-xs text-muted-foreground p-2 text-center flex items-center justify-center gap-2"><Loader2 className="w-3 h-3 animate-spin"/> Cargando...</div>
+                                         ) : filterSuggestions.length === 0 ? (
+                                            <div className="text-xs text-muted-foreground p-2 text-center">Sin resultados</div>
+                                         ) : (
+                                            <>
+                                              <button 
+                                                className={`text-left px-2 py-1.5 text-xs rounded hover:bg-muted/50 leading-tight ${!columnFilters[colId] ? 'bg-primary/5 text-primary' : 'text-muted-foreground'}`}
+                                                onClick={() => applyFilter(colId, '')}
+                                              >
+                                                (Todos los valores)
+                                              </button>
+                                              {filterSuggestions.map(val => (
+                                                <button 
+                                                  key={val}
+                                                  className={`text-left px-2 py-1.5 text-xs rounded hover:bg-muted/50 break-words leading-tight ${columnFilters[colId] === val ? 'bg-primary/10 text-primary font-bold' : 'text-foreground'}`}
+                                                  onClick={() => applyFilter(colId, val)}
+                                                >
+                                                  {val}
+                                                </button>
+                                              ))}
+                                            </>
+                                         )}
+                                       </div>
+                                    </>
+                                 )}
                                </div>
                              </div>
                            )}

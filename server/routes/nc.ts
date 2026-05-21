@@ -643,6 +643,25 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
         for (const key in req.query) {
             if (key.startsWith('filter_')) {
                 const colKey = key.replace('filter_', '');
+                
+                // Handle date ranges specially
+                if (colKey.endsWith('_start') || colKey.endsWith('_end')) {
+                    const baseColKey = colKey.replace(/_(start|end)$/, '');
+                    const dbCol = filterMappings[baseColKey];
+                    const value = req.query[key] as string;
+                    if (dbCol && value) {
+                        if (colKey.endsWith('_start')) {
+                            whereClause += ` AND CAST(${dbCol} AS DATE) >= @fval${filterIndex}`;
+                        } else {
+                            whereClause += ` AND CAST(${dbCol} AS DATE) <= @fval${filterIndex}`;
+                        }
+                        countRequest.input(`fval${filterIndex}`, sql.Date, value);
+                        dataRequest.input(`fval${filterIndex}`, sql.Date, value);
+                        filterIndex++;
+                    }
+                    continue;
+                }
+
                 const dbCol = filterMappings[colKey];
                 const value = req.query[key] as string;
                 if (dbCol && value) {
