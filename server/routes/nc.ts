@@ -451,7 +451,7 @@ router.get('/cxg-nc/unique-values', verifyPermission('cxg.cxg_nc.view'), async (
             supervisor: 'COALESCE(n.Supervisor_FSM, sup_cas.supervisor_nombre, sup_sole.supervisor_nombre)',
             aprobado: 'n.Aprobado',
             procesado: 'n.Procesado',
-            estado: 'CASE WHEN n.Procesado IS NOT NULL AND n.Procesado <> \'\' AND n.Procesado <> \'NO\' THEN \'CERRADO\' WHEN n.Asignado_a IS NOT NULL AND n.Asignado_a <> \'\' THEN \'ASIGNADO\' WHEN n.Aprobado = \'No\' THEN \'RECHAZADO\' WHEN n.Aprobado = \'Si\' THEN \'APROBADO_SUP\' ELSE \'REGISTRADO\' END',
+            estado: 'CASE WHEN n.Procesado IS NOT NULL AND n.Procesado <> \'\' AND n.Procesado <> \'NO\' THEN \'CERRADO\' WHEN n.Procesado_por IS NOT NULL AND n.Procesado_por <> \'\' THEN \'ASIGNADO\' WHEN n.Aprobado = \'No\' THEN \'RECHAZADO\' WHEN n.Aprobado = \'Si\' THEN \'APROBADO_SUP\' ELSE \'REGISTRADO\' END',
             codigo_producto: 't.CodigoExternoEquipo',
             producto: 't.NombreEquipo'
         };
@@ -547,12 +547,9 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
                     n.Ticket as correlativo,
                     n.Creado_el as fecha_creacion,
                     COALESCE(t.NombreCliente, n.Tienda) as cliente,
-                    n.Asignado_a,
-                    n.Asignado_por,
-                    n.Asignado_el,
                     CASE 
                         WHEN n.Procesado IS NOT NULL AND n.Procesado <> '' AND n.Procesado <> 'NO' THEN 'CERRADO'
-                        WHEN n.Asignado_a IS NOT NULL AND n.Asignado_a <> '' THEN 'ASIGNADO'
+                        WHEN n.Procesado_por IS NOT NULL AND n.Procesado_por <> '' THEN 'ASIGNADO'
                         WHEN n.Aprobado = 'No' THEN 'RECHAZADO'
                         WHEN n.Aprobado = 'Si' THEN 'APROBADO_SUP'
                         ELSE 'REGISTRADO'
@@ -569,8 +566,8 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
                     t.CodigoExternoCliente as documento_cliente,
                     t.CodigoExternoEquipo as codigo_producto,
                     t.NombreEquipo as producto,
-                    COALESCE(n.Lugar_Compra, emp.DsEmpresa, CAST(t.IDEmpresa as VARCHAR)) as tienda,
-                    COALESCE(n.Supervisor_FSM, sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor
+                    COALESCE(emp.DsEmpresa, CAST(t.IDEmpresa as VARCHAR)) as tienda,
+                    COALESCE(sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor
                 FROM [dbo].[GAC_APP_TB_CXG_NC] n
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
                 LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as VARCHAR)
@@ -774,12 +771,8 @@ router.get('/cxg-nc/:id', verifyPermission('cxg.cxg_nc.view'), async (req: Reque
                     n.Creado_por as creado_por,
                     COALESCE(t.NombreCliente, n.Tienda) as cliente,
                     n.Observacion as observacion_inicial,
-                    n.Asignado_a,
-                    n.Asignado_por,
-                    n.Asignado_el,
                     CASE 
                         WHEN n.Procesado IS NOT NULL AND n.Procesado <> '' AND n.Procesado <> 'NO' THEN 'CERRADO'
-                        WHEN n.Asignado_a IS NOT NULL AND n.Asignado_a <> '' THEN 'ASIGNADO'
                         WHEN n.Aprobado = 'No' THEN 'RECHAZADO'
                         WHEN n.Aprobado = 'Si' THEN 'APROBADO_SUP'
                         ELSE 'REGISTRADO'
@@ -1101,7 +1094,7 @@ router.post('/cxg-nc/:id/aprobar-solicitud', verifyPermission('cxg.cxg_nc.approv
             SELECT 
                 CASE 
                     WHEN Procesado IS NOT NULL AND Procesado <> '' AND Procesado <> 'NO' THEN 'CERRADO'
-                    WHEN Asignado_a IS NOT NULL AND Asignado_a <> '' THEN 'ASIGNADO'
+                    WHEN Procesado_por IS NOT NULL AND Procesado_por <> '' THEN 'ASIGNADO'
                     WHEN Aprobado = 'No' THEN 'RECHAZADO'
                     WHEN Aprobado = 'Si' THEN 'APROBADO_SUP'
                     ELSE 'REGISTRADO'
@@ -1165,7 +1158,7 @@ router.post('/cxg-nc/:id/asignar', verifyPermission('cxg.cxg_nc.assign'), async 
             SELECT 
                 CASE 
                     WHEN Procesado IS NOT NULL AND Procesado <> '' AND Procesado <> 'NO' THEN 'CERRADO'
-                    WHEN Asignado_a IS NOT NULL AND Asignado_a <> '' THEN 'ASIGNADO'
+                    WHEN Procesado_por IS NOT NULL AND Procesado_por <> '' THEN 'ASIGNADO'
                     WHEN Aprobado = 'No' THEN 'RECHAZADO'
                     WHEN Aprobado = 'Si' THEN 'APROBADO_SUP'
                     ELSE 'REGISTRADO'
@@ -1185,7 +1178,7 @@ router.post('/cxg-nc/:id/asignar', verifyPermission('cxg.cxg_nc.assign'), async 
             .input('asignado_por', sql.VarChar, asignado_por)
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_CXG_NC] 
-                SET Asignado_a = @asignado_a, Asignado_por = @asignado_por, Asignado_el = GETDATE()
+                SET Procesado_por = @asignado_a
                 WHERE ID_Apro_CxG_NC = @id
             `);
 
@@ -1221,7 +1214,7 @@ router.post('/cxg-nc/:id/gestionar', verifyPermission('cxg.cxg_nc.process'), asy
             SELECT 
                 CASE 
                     WHEN Procesado IS NOT NULL AND Procesado <> '' AND Procesado <> 'NO' THEN 'CERRADO'
-                    WHEN Asignado_a IS NOT NULL AND Asignado_a <> '' THEN 'ASIGNADO'
+                    WHEN Procesado_por IS NOT NULL AND Procesado_por <> '' THEN 'ASIGNADO'
                     WHEN Aprobado = 'No' THEN 'RECHAZADO'
                     WHEN Aprobado = 'Si' THEN 'APROBADO_SUP'
                     ELSE 'REGISTRADO'

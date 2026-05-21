@@ -44,10 +44,6 @@ export interface CxGNC {
     creado_por?: string;
     cliente: string;
     estado: 'REGISTRADO' | 'APROBADO_SUP' | 'ASIGNADO' | 'VALIDADO' | 'CERRADO' | 'RECHAZADO';
-    asignado_a?: string;
-    asignado_por?: string;
-    asignado_el?: string;
-    gestionado?: string;
     observacion?: string;
     observacion_inicial?: string;
     // Native approval fields from GAC_APP_TB_CXG_NC
@@ -64,23 +60,15 @@ export interface CxGNC {
     procesado_por?: string;
     ticket_desinstalacion?: string;
     gestionado_por?: string;
-    fecha_gestionado?: string;
     resultado?: string;
     ticket?: string;
     // Extended fields for detail view
     fsm_cliente?: string;
-    fsm_lugar_compra?: string;
-    fsm_motivo_elevacion?: string;
-    supervisor_asignado?: string;
-    // Persisted FSM fields
-    motivo_elevacion?: string;
-    lugar_compra?: string;
-    supervisor_fsm?: string;
-    supervisor?: string;
     tienda?: string;
     documento_cliente?: string;
     codigo_producto?: string;
     producto?: string;
+    supervisor?: string;
 }
 
 export interface HistorialEntry {

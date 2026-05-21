@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, DollarSign, ShieldCheck, UserPlus, ClipboardCheck, CheckCircle2, XCircle, Clock, Search, ArrowLeft, MessageSquare, Wrench } from 'lucide-react';
+import { Loader2, DollarSign, ShieldCheck, UserPlus, ClipboardCheck, CheckCircle2, XCircle, Clock, ArrowLeft, MessageSquare, Wrench } from 'lucide-react';
 import { SIATCBadge } from '../../../components/siatc/SIATCBadge';
 import { SIATCButton } from '../../../components/siatc/SIATCButton';
 import { ncService, type CxGNC, type HistorialEntry, type EquipmentHistoryEntry } from '../../../services/ncService';
@@ -196,31 +196,7 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, de
               </div>
             </div>
 
-            {/* FSM Ticket Context */}
-            <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-800">
-              <h3 className="text-xs font-black uppercase tracking-widest text-amber-700 dark:text-amber-400 mb-4 flex items-center gap-2">
-                <Search className="w-4 h-4" /> Contexto del Ticket FSM
-              </h3>
-              <div className="space-y-3">
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] font-bold text-amber-600/70 uppercase">Cliente Original</span>
-                  <span className="text-sm font-black text-amber-900 dark:text-amber-200">{detailData.fsm_cliente || detailData.cliente || 'No disponible'}</span>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] font-bold text-amber-600/70 uppercase">Lugar de Compra</span>
-                  <span className="text-sm font-bold text-amber-800 dark:text-amber-300 italic">{detailData.lugar_compra || detailData.fsm_lugar_compra || 'No identificado'}</span>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] font-bold text-amber-600/70 uppercase">Supervisor FSM</span>
-                  <span className="text-sm font-black text-amber-900 dark:text-amber-100">{detailData.supervisor_fsm || detailData.supervisor_asignado || 'No asignado'}</span>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] font-bold text-amber-600/70 uppercase">Motivo de Elevación</span>
-                  <p className="text-sm text-amber-800/80 dark:text-amber-400/80 leading-tight italic">{detailData.motivo_elevacion || detailData.fsm_motivo_elevacion || 'Sin comentarios'}</p>
-                </div>
-              </div>
-            </div>
-            
+
 
             {/* Equipment History */}
             <div className="p-4 rounded-xl bg-cyan-50 dark:bg-cyan-950/20 border border-cyan-100 dark:border-cyan-800">

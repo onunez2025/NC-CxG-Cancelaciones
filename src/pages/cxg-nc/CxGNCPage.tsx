@@ -149,10 +149,7 @@ export const CxGNCPage = () => {
     tipo: 'CXG',
     ticket: '',
     cliente: '',
-    observacion: '',
-    motivo_elevacion: '',
-    lugar_compra: '',
-    supervisor_fsm: ''
+    observacion: ''
   });
 
   const fetchData = async () => {
@@ -292,10 +289,7 @@ export const CxGNCPage = () => {
         cliente: formData.cliente,
         estado: 'REGISTRADO',
         ticket: formData.ticket,
-        observacion: formData.observacion,
-        motivo_elevacion: formData.motivo_elevacion,
-        lugar_compra: formData.lugar_compra,
-        supervisor_fsm: formData.supervisor_fsm
+        observacion: formData.observacion
       });
       
       await auditService.logAction({
@@ -313,10 +307,7 @@ export const CxGNCPage = () => {
         tipo: 'CXG', 
         cliente: '', 
         ticket: '',
-        observacion: '',
-        motivo_elevacion: '',
-        lugar_compra: '',
-        supervisor_fsm: ''
+        observacion: ''
       });
     } catch (error: any) {
       console.error(error);
@@ -339,10 +330,7 @@ export const CxGNCPage = () => {
 
       setFormData({
         ...formData,
-        cliente: ticketInfo.cliente,
-        motivo_elevacion: ticketInfo.motivo_elevacion,
-        lugar_compra: ticketInfo.lugar_compra,
-        supervisor_fsm: ticketInfo.supervisor_nombre
+        cliente: ticketInfo.cliente
       });
       setIsTicketValidated(true);
       toast.success('Éxito', 'Ticket encontrado y válido');

@@ -79,23 +79,11 @@ export const CxGNCFormView: React.FC<CxGNCFormViewProps> = ({
               {formData.cliente && (
                 <div className="mt-4 p-5 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                   <p className="text-[10px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-400">Información Capturada</p>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4">
                     <div>
                       <span className="text-[10px] font-bold text-emerald-600/70 uppercase block">Cliente</span>
                       <span className="text-sm font-black text-emerald-900 dark:text-emerald-200">{formData.cliente}</span>
                     </div>
-                    <div>
-                      <span className="text-[10px] font-bold text-emerald-600/70 uppercase block">Lugar de Compra</span>
-                      <span className="text-sm font-bold text-emerald-800 dark:text-emerald-300 italic">{formData.lugar_compra || 'No identificado'}</span>
-                    </div>
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-emerald-600/70 uppercase block">Supervisor FSM</span>
-                    <span className="text-sm font-black text-emerald-900 dark:text-emerald-100">{formData.supervisor_fsm || 'No asignado'}</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-emerald-600/70 uppercase block">Motivo de Elevación</span>
-                    <p className="text-sm text-emerald-800/80 dark:text-emerald-400/80 leading-tight italic">{formData.motivo_elevacion || 'Sin comentarios'}</p>
                   </div>
                 </div>
               )}
