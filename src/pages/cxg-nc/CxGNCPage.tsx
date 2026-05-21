@@ -14,7 +14,8 @@ import {
   ShieldCheck,
   Clock,
   MessageSquare,
-  Eraser
+  Eraser,
+  Columns
 } from 'lucide-react';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 import { SIATCButton } from '../../components/siatc/SIATCButton';
@@ -50,6 +51,47 @@ export const CxGNCPage = () => {
   const [activeTab, setActiveTab] = useState<'TODOS' | 'NC' | 'CXG'>('TODOS');
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
   const [statusFilter, setStatusFilter] = useState<'TODOS' | 'REGISTRADO' | 'APROBADO_SUP' | 'ASIGNADO' | 'VALIDADO' | 'CERRADO'>('TODOS');
+
+  // Column Visibility
+  const AVAILABLE_COLUMNS = [
+    { id: 'tipo', label: 'TIPO' },
+    { id: 'documento', label: 'DOCUMENTO CLIENTE' },
+    { id: 'ticket', label: 'TICKET' },
+    { id: 'tienda', label: 'TIENDA' },
+    { id: 'cliente', label: 'CLIENTE' },
+    { id: 'creado_por', label: 'ASESOR CREADOR' },
+    { id: 'supervisor', label: 'SUPERVISOR' },
+    { id: 'fecha_creacion', label: 'FECHA CREACIÓN' },
+    { id: 'fecha_aprobacion', label: 'FECHA APROBACIÓN' },
+    { id: 'fecha_procesado', label: 'FECHA PROCESADO' },
+    { id: 'aprobado', label: 'APROBADO' },
+    { id: 'procesado', label: 'PROCESADO' },
+    { id: 'motivo_real', label: 'MOTIVO REAL' },
+    { id: 'estado', label: 'ESTADO' }
+  ];
+
+  const [visibleColumns, setVisibleColumns] = useState<string[]>([
+    'tipo', 'documento', 'ticket', 'tienda', 'cliente', 'creado_por', 'supervisor', 'fecha_creacion', 'fecha_aprobacion', 'fecha_procesado', 'aprobado', 'procesado', 'motivo_real', 'estado'
+  ]);
+  const [isColumnDropdownOpen, setIsColumnDropdownOpen] = useState(false);
+
+  const toggleColumn = (colId: string) => {
+    setVisibleColumns(prev => 
+      prev.includes(colId) ? prev.filter(c => c !== colId) : [...prev, colId]
+    );
+  };
+
+  const moveColumn = (index: number, direction: 'up' | 'down') => {
+    if (direction === 'up' && index > 0) {
+      const newCols = [...visibleColumns];
+      [newCols[index - 1], newCols[index]] = [newCols[index], newCols[index - 1]];
+      setVisibleColumns(newCols);
+    } else if (direction === 'down' && index < visibleColumns.length - 1) {
+      const newCols = [...visibleColumns];
+      [newCols[index + 1], newCols[index]] = [newCols[index], newCols[index + 1]];
+      setVisibleColumns(newCols);
+    }
+  };
 
   // Analysts for assignment
   const [analysts, setAnalysts] = useState<SystemUser[]>([]);
@@ -497,6 +539,57 @@ export const CxGNCPage = () => {
           >
             Exportar
           </SIATCButton>
+          <div className="relative">
+            <SIATCButton 
+              variant="secondary" 
+              icon={Columns}
+              onClick={() => setIsColumnDropdownOpen(!isColumnDropdownOpen)}
+            >
+              Columnas
+            </SIATCButton>
+            
+            {isColumnDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-64 bg-card border border-border rounded-xl shadow-lg z-50 p-2 flex flex-col gap-1">
+                <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-2 py-1 mb-1 border-b border-border">
+                  Columnas Visibles (Arrastra o haz clic)
+                </div>
+                {visibleColumns.map((colId, index) => {
+                  const colDef = AVAILABLE_COLUMNS.find(c => c.id === colId);
+                  if (!colDef) return null;
+                  return (
+                    <div key={colId} className="flex items-center justify-between px-2 py-1.5 hover:bg-muted/50 rounded-lg group">
+                      <label className="flex items-center gap-2 cursor-pointer flex-1">
+                        <input 
+                          type="checkbox" 
+                          className="rounded border-border text-primary focus:ring-primary"
+                          checked={true}
+                          onChange={() => toggleColumn(colId)}
+                        />
+                        <span className="text-xs font-semibold text-foreground">{colDef.label}</span>
+                      </label>
+                      <div className="flex flex-col opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => moveColumn(index, 'up')} disabled={index === 0} className="text-muted-foreground hover:text-primary disabled:opacity-30 p-0 m-0 leading-none" style={{fontSize: '8px'}}>▲</button>
+                        <button onClick={() => moveColumn(index, 'down')} disabled={index === visibleColumns.length - 1} className="text-muted-foreground hover:text-primary disabled:opacity-30 p-0 m-0 leading-none" style={{fontSize: '8px'}}>▼</button>
+                      </div>
+                    </div>
+                  );
+                })}
+                {AVAILABLE_COLUMNS.filter(c => !visibleColumns.includes(c.id)).map(col => (
+                  <div key={col.id} className="flex items-center justify-between px-2 py-1.5 hover:bg-muted/50 rounded-lg opacity-60 hover:opacity-100 transition-opacity">
+                    <label className="flex items-center gap-2 cursor-pointer flex-1">
+                      <input 
+                        type="checkbox" 
+                        className="rounded border-border text-primary focus:ring-primary"
+                        checked={false}
+                        onChange={() => toggleColumn(col.id)}
+                      />
+                      <span className="text-xs font-semibold text-foreground">{col.label}</span>
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
           <SIATCButton 
             variant="primary" 
             icon={DollarSign}
@@ -605,119 +698,93 @@ export const CxGNCPage = () => {
             <SIATCTable>
               <thead>
                 <tr className={SIATC_THEME.TABLE.HEADER_ROW}>
-                  <SIATCTableHeader>TIPO</SIATCTableHeader>
-                  <SIATCTableHeader>DOCUMENTO</SIATCTableHeader>
-                  <SIATCTableHeader>TICKET</SIATCTableHeader>
-                  <SIATCTableHeader>TIENDA</SIATCTableHeader>
-                  <SIATCTableHeader>CLIENTE</SIATCTableHeader>
-                  <SIATCTableHeader>ASESOR CREADOR</SIATCTableHeader>
-                  <SIATCTableHeader>SUPERVISOR</SIATCTableHeader>
-                  <SIATCTableHeader>FECHA CREACIÓN</SIATCTableHeader>
-                  <SIATCTableHeader>FECHA APROBACIÓN</SIATCTableHeader>
-                  <SIATCTableHeader>FECHA PROCESADO</SIATCTableHeader>
-                  <SIATCTableHeader>APROBADO</SIATCTableHeader>
-                  <SIATCTableHeader>PROCESADO</SIATCTableHeader>
-                  <SIATCTableHeader>MOTIVO REAL</SIATCTableHeader>
-                  <SIATCTableHeader>ESTADO</SIATCTableHeader>
+                  {visibleColumns.map(colId => (
+                    <SIATCTableHeader key={colId}>
+                      {AVAILABLE_COLUMNS.find(c => c.id === colId)?.label}
+                    </SIATCTableHeader>
+                  ))}
                   <SIATCTableHeader className="text-right">ACCIONES</SIATCTableHeader>
                 </tr>
               </thead>
               <tbody>
-                {displayedData.map((item) => (
-                  <SIATCTableRow key={item.id}>
-                    <SIATCTableCell>
-                      <SIATCBadge variant={((item.tipo as string) === 'NC' || (item.tipo as string) === 'Nota de Credito') ? 'warning' : 'info'}>
-                        {item.tipo}
-                      </SIATCBadge>
-                    </SIATCTableCell>
-                    <SIATCTableCell>
-                      <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>{item.documento_cliente || '—'}</span>
-                    </SIATCTableCell>
-                    <SIATCTableCell>
-                      <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>#{item.correlativo}</span>
-                    </SIATCTableCell>
-                    <SIATCTableCell>
-                      <div className="text-xs font-semibold text-foreground truncate max-w-[120px]">{item.tienda || '—'}</div>
-                    </SIATCTableCell>
-                    <SIATCTableCell>
-                      <div className="font-bold text-foreground italic">{item.cliente}</div>
-                    </SIATCTableCell>
-                    <SIATCTableCell>
-                      <div className="text-[10px] font-black uppercase text-muted-foreground truncate max-w-[120px]">
-                        {item.creado_por || '—'}
-                      </div>
-                    </SIATCTableCell>
-                    <SIATCTableCell>
-                      <div className="text-[10px] font-black uppercase text-primary/80 truncate max-w-[120px]">
-                        {item.supervisor || '—'}
-                      </div>
-                    </SIATCTableCell>
-                    <SIATCTableCell>
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Calendar className="w-3.5 h-3.5" />
-                        <span className="text-xs">{item.fecha ? new Date(item.fecha).toLocaleDateString() : '—'}</span>
-                      </div>
-                    </SIATCTableCell>
-                    <SIATCTableCell>
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Calendar className="w-3.5 h-3.5" />
-                        <span className="text-xs">{item.aprobado_el ? new Date(item.aprobado_el).toLocaleDateString() : '—'}</span>
-                      </div>
-                    </SIATCTableCell>
-                    <SIATCTableCell>
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Calendar className="w-3.5 h-3.5" />
-                        <span className="text-xs">{item.procesado_el ? new Date(item.procesado_el).toLocaleDateString() : '—'}</span>
-                      </div>
-                    </SIATCTableCell>
-                    <SIATCTableCell>
-                      <div className="flex flex-col gap-0.5">
-                        <SIATCBadge variant={
-                          item.aprobado === 'APROBADO' ? 'success' : 
-                          item.aprobado === 'RECHAZADO' ? 'danger' :
-                          'warning'
-                        }>
-                          {item.aprobado === 'APROBADO' ? 'SÍ' : item.aprobado === 'RECHAZADO' ? 'NO' : 'PENDIENTE'}
+                {displayedData.map((item) => {
+                  const renderCellContent = (colId: string) => {
+                    switch (colId) {
+                      case 'tipo': return (
+                        <SIATCBadge variant={((item.tipo as string) === 'NC' || (item.tipo as string) === 'Nota de Credito') ? 'warning' : 'info'}>
+                          {item.tipo}
                         </SIATCBadge>
-                        {item.aprobado_por && (
-                          <span className="text-[9px] text-muted-foreground/80 truncate max-w-[100px] italic">
-                            {item.aprobado_por}
-                          </span>
-                        )}
-                      </div>
-                    </SIATCTableCell>
-                    <SIATCTableCell>
-                      <div className="flex flex-col gap-0.5">
+                      );
+                      case 'documento': return <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>{item.documento_cliente || '—'}</span>;
+                      case 'ticket': return <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>#{item.correlativo}</span>;
+                      case 'tienda': return <div className="text-xs font-semibold text-foreground truncate max-w-[120px]">{item.tienda || '—'}</div>;
+                      case 'cliente': return <div className="font-bold text-foreground italic">{item.cliente}</div>;
+                      case 'creado_por': return <div className="text-[10px] font-black uppercase text-muted-foreground truncate max-w-[120px]">{item.creado_por || '—'}</div>;
+                      case 'supervisor': return <div className="text-[10px] font-black uppercase text-primary/80 truncate max-w-[120px]">{item.supervisor || '—'}</div>;
+                      case 'fecha_creacion': return (
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Calendar className="w-3.5 h-3.5" />
+                          <span className="text-xs">{item.fecha ? new Date(item.fecha).toLocaleDateString() : '—'}</span>
+                        </div>
+                      );
+                      case 'fecha_aprobacion': return (
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Calendar className="w-3.5 h-3.5" />
+                          <span className="text-xs">{item.aprobado_el ? new Date(item.aprobado_el).toLocaleDateString() : '—'}</span>
+                        </div>
+                      );
+                      case 'fecha_procesado': return (
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Calendar className="w-3.5 h-3.5" />
+                          <span className="text-xs">{item.procesado_el ? new Date(item.procesado_el).toLocaleDateString() : '—'}</span>
+                        </div>
+                      );
+                      case 'aprobado': return (
+                        <div className="flex flex-col gap-0.5">
+                          <SIATCBadge variant={item.aprobado === 'APROBADO' ? 'success' : item.aprobado === 'RECHAZADO' ? 'danger' : 'warning'}>
+                            {item.aprobado === 'APROBADO' ? 'SÍ' : item.aprobado === 'RECHAZADO' ? 'NO' : 'PENDIENTE'}
+                          </SIATCBadge>
+                          {item.aprobado_por && <span className="text-[9px] text-muted-foreground/80 truncate max-w-[100px] italic">{item.aprobado_por}</span>}
+                        </div>
+                      );
+                      case 'procesado': return (
+                        <div className="flex flex-col gap-0.5">
+                          <SIATCBadge variant={item.procesado === 'SI' ? 'success' : 'warning'}>
+                            {item.procesado === 'SI' ? 'SÍ' : 'PENDIENTE'}
+                          </SIATCBadge>
+                          {item.procesado_por && <span className="text-[9px] text-muted-foreground/80 truncate max-w-[100px] italic">{item.procesado_por}</span>}
+                        </div>
+                      );
+                      case 'motivo_real': return <span className="text-xs font-bold text-rose-500">{item.vali_motivo_real || '—'}</span>;
+                      case 'estado': return (
                         <SIATCBadge variant={
-                          item.procesado === 'SI' ? 'success' : 
-                          'warning'
+                          item.estado === 'CERRADO' ? 'success' : 
+                          item.estado === 'REGISTRADO' ? 'warning' :
+                          item.estado === 'VALIDADO' ? 'info' :
+                          item.estado === 'APROBADO_SUP' ? 'secondary' :
+                          item.estado === 'RECHAZADO' ? 'danger' :
+                          'info'
                         }>
-                          {item.procesado === 'SI' ? 'SÍ' : 'PENDIENTE'}
+                          {item.estado}
                         </SIATCBadge>
-                        {item.procesado_por && (
-                          <span className="text-[9px] text-muted-foreground/80 truncate max-w-[100px] italic">
-                            {item.procesado_por}
-                          </span>
-                        )}
-                      </div>
-                    </SIATCTableCell>
-                    <SIATCTableCell>
-                      <span className="text-xs font-bold text-rose-500">{item.vali_motivo_real || '—'}</span>
-                    </SIATCTableCell>
-                    <SIATCTableCell>
-                      <SIATCBadge variant={
-                        item.estado === 'CERRADO' ? 'success' : 
-                        item.estado === 'REGISTRADO' ? 'warning' :
-                        item.estado === 'VALIDADO' ? 'info' :
-                        item.estado === 'APROBADO_SUP' ? 'secondary' :
-                        item.estado === 'RECHAZADO' ? 'danger' :
-                        'info'
-                      }>
-                        {item.estado}
-                      </SIATCBadge>
-                    </SIATCTableCell>
-                    <SIATCTableCell className="text-right">
-                      <div className="flex justify-end">
+                      );
+                      default: return null;
+                    }
+                  };
+
+                  return (
+                    <SIATCTableRow 
+                      key={item.id} 
+                      onClick={() => handleViewDetail(item.id)}
+                      className="cursor-pointer hover:bg-muted/50 transition-colors"
+                    >
+                      {visibleColumns.map(colId => (
+                        <SIATCTableCell key={colId}>
+                          {renderCellContent(colId)}
+                        </SIATCTableCell>
+                      ))}
+                      <SIATCTableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex justify-end">
                         <SIATCActionDropdown 
                           actions={[
                             {
