@@ -451,8 +451,7 @@ router.get('/cxg-nc/unique-values', verifyPermission('cxg.cxg_nc.view'), async (
             supervisor: 'COALESCE(n.Supervisor_FSM, sup_cas.supervisor_nombre, sup_sole.supervisor_nombre)',
             aprobado: 'n.Aprobado',
             procesado: 'n.Procesado',
-            motivo_real: 'n.Vali_Motivo_Real',
-            estado: 'n.Estado_Proceso',
+            estado: 'CASE WHEN n.Procesado IS NOT NULL AND n.Procesado <> \'\' AND n.Procesado <> \'NO\' THEN \'CERRADO\' WHEN n.Asignado_a IS NOT NULL AND n.Asignado_a <> \'\' THEN \'ASIGNADO\' WHEN n.Aprobado = \'No\' THEN \'RECHAZADO\' WHEN n.Aprobado = \'Si\' THEN \'APROBADO_SUP\' ELSE \'REGISTRADO\' END',
             codigo_producto: 't.CodigoExternoEquipo',
             producto: 't.NombreEquipo'
         };
@@ -551,17 +550,13 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
                     n.Asignado_a,
                     n.Asignado_por,
                     n.Asignado_el,
-                    n.Gestionado,
-                    n.Observacion_Gestionado as observacion,
-                    n.Estado_Proceso as estado,
-                    n.Apro_Solicitud as apro_solicitud,
-                    n.Apro_Por as apro_por,
-                    n.Apro_El as apro_el,
-                    n.Apro_Obs as apro_obs,
-                    n.Vali_Cliente as vali_cliente,
-                    n.Vali_Por as vali_por,
-                    n.Vali_El as vali_el,
-                    n.Vali_Motivo_Real as vali_motivo_real,
+                    CASE 
+                        WHEN n.Procesado IS NOT NULL AND n.Procesado <> '' AND n.Procesado <> 'NO' THEN 'CERRADO'
+                        WHEN n.Asignado_a IS NOT NULL AND n.Asignado_a <> '' THEN 'ASIGNADO'
+                        WHEN n.Aprobado = 'No' THEN 'RECHAZADO'
+                        WHEN n.Aprobado = 'Si' THEN 'APROBADO_SUP'
+                        ELSE 'REGISTRADO'
+                    END as estado,
                     n.Aprobado as aprobado,
                     n.Aprobado_motivo as aprobado_motivo,
                     n.Aprobado_observacion as aprobado_observacion,
@@ -639,7 +634,6 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
             supervisor: 'supervisor',
             aprobado: 'aprobado',
             procesado: 'procesado',
-            motivo_real: 'vali_motivo_real',
             estado: 'estado',
             codigo_producto: 'codigo_producto',
             producto: 'producto'
@@ -783,18 +777,13 @@ router.get('/cxg-nc/:id', verifyPermission('cxg.cxg_nc.view'), async (req: Reque
                     n.Asignado_a,
                     n.Asignado_por,
                     n.Asignado_el,
-                    n.Gestionado,
-                    n.Observacion_Gestionado as observacion,
-                    n.Estado_Proceso as estado,
-                    n.Vali_Cliente as vali_cliente,
-                    n.Vali_Obs as vali_obs,
-                    n.Vali_Por as vali_por,
-                    n.Vali_El as vali_el,
-                    n.Apro_Solicitud as apro_solicitud,
-                    n.Apro_Obs as apro_obs,
-                    n.Apro_Por as apro_por,
-                    n.Apro_El as apro_el,
-                    n.Vali_Motivo_Real as vali_motivo_real,
+                    CASE 
+                        WHEN n.Procesado IS NOT NULL AND n.Procesado <> '' AND n.Procesado <> 'NO' THEN 'CERRADO'
+                        WHEN n.Asignado_a IS NOT NULL AND n.Asignado_a <> '' THEN 'ASIGNADO'
+                        WHEN n.Aprobado = 'No' THEN 'RECHAZADO'
+                        WHEN n.Aprobado = 'Si' THEN 'APROBADO_SUP'
+                        ELSE 'REGISTRADO'
+                    END as estado,
                     n.Aprobado as aprobado,
                     n.Aprobado_motivo as aprobado_motivo,
                     n.Aprobado_observacion as aprobado_observacion,
@@ -1108,7 +1097,17 @@ router.post('/cxg-nc/:id/aprobar-solicitud', verifyPermission('cxg.cxg_nc.approv
         const { id } = req.params;
         const { aprobado, motivo, observacion, usuario } = req.body;
         const pool = await getDbConnection();
-        const checkState = await pool.request().input('id', sql.VarChar, id).query(`SELECT Estado_Proceso FROM [dbo].[GAC_APP_TB_CXG_NC] WHERE ID_Apro_CxG_NC = @id`);
+        const checkState = await pool.request().input('id', sql.VarChar, id).query(`
+            SELECT 
+                CASE 
+                    WHEN Procesado IS NOT NULL AND Procesado <> '' AND Procesado <> 'NO' THEN 'CERRADO'
+                    WHEN Asignado_a IS NOT NULL AND Asignado_a <> '' THEN 'ASIGNADO'
+                    WHEN Aprobado = 'No' THEN 'RECHAZADO'
+                    WHEN Aprobado = 'Si' THEN 'APROBADO_SUP'
+                    ELSE 'REGISTRADO'
+                END as Estado_Proceso
+            FROM [dbo].[GAC_APP_TB_CXG_NC] WHERE ID_Apro_CxG_NC = @id
+        `);
         if (checkState.recordset.length === 0) return res.status(404).json({ error: 'Solicitud no encontrada' });
         if (checkState.recordset[0].Estado_Proceso !== 'REGISTRADO') {
             return res.status(400).json({ error: `Acción inválida. Estado actual: ${checkState.recordset[0].Estado_Proceso}. Se requiere: REGISTRADO.` });
@@ -1119,23 +1118,18 @@ router.post('/cxg-nc/:id/aprobar-solicitud', verifyPermission('cxg.cxg_nc.approv
         // Update main table
         await pool.request()
             .input('id', sql.VarChar, id)
-            .input('aprobado', sql.VarChar, aprobado) // 'APROBADO' | 'RECHAZADO'
+            .input('aprobado', sql.VarChar, aprobado) // 'Si' | 'No'
             .input('motivo', sql.VarChar, motivo || null)
             .input('obs', sql.VarChar, observacion || '')
             .input('por', sql.VarChar, usuario || '')
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_CXG_NC] 
                 SET 
-                    Apro_Solicitud = @aprobado,
-                    Apro_Obs = @obs,
-                    Apro_Por = @por,
-                    Apro_El = GETDATE(),
                     Aprobado = @aprobado,
                     Aprobado_motivo = @motivo,
                     Aprobado_observacion = @obs,
                     Aprobado_por = @por,
-                    Aprobado_el = GETDATE(),
-                    Estado_Proceso = CASE WHEN @aprobado = 'APROBADO' THEN 'APROBADO_SUP' ELSE 'RECHAZADO' END
+                    Aprobado_el = GETDATE()
                 WHERE ID_Apro_CxG_NC = @id
             `);
 
@@ -1167,7 +1161,17 @@ router.post('/cxg-nc/:id/asignar', verifyPermission('cxg.cxg_nc.assign'), async 
         const { id } = req.params;
         const { asignado_a, asignado_por, asignado_nombre } = req.body;
         const pool = await getDbConnection();
-        const checkState = await pool.request().input('id', sql.VarChar, id).query(`SELECT Estado_Proceso FROM [dbo].[GAC_APP_TB_CXG_NC] WHERE ID_Apro_CxG_NC = @id`);
+        const checkState = await pool.request().input('id', sql.VarChar, id).query(`
+            SELECT 
+                CASE 
+                    WHEN Procesado IS NOT NULL AND Procesado <> '' AND Procesado <> 'NO' THEN 'CERRADO'
+                    WHEN Asignado_a IS NOT NULL AND Asignado_a <> '' THEN 'ASIGNADO'
+                    WHEN Aprobado = 'No' THEN 'RECHAZADO'
+                    WHEN Aprobado = 'Si' THEN 'APROBADO_SUP'
+                    ELSE 'REGISTRADO'
+                END as Estado_Proceso
+            FROM [dbo].[GAC_APP_TB_CXG_NC] WHERE ID_Apro_CxG_NC = @id
+        `);
         if (checkState.recordset.length === 0) return res.status(404).json({ error: 'Solicitud no encontrada' });
         if (checkState.recordset[0].Estado_Proceso !== 'APROBADO_SUP') {
             return res.status(400).json({ error: `Acción inválida. Estado actual: ${checkState.recordset[0].Estado_Proceso}. Se requiere: APROBADO_SUP.` });
@@ -1181,8 +1185,7 @@ router.post('/cxg-nc/:id/asignar', verifyPermission('cxg.cxg_nc.assign'), async 
             .input('asignado_por', sql.VarChar, asignado_por)
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_CXG_NC] 
-                SET Asignado_a = @asignado_a, Asignado_por = @asignado_por, Asignado_el = GETDATE(), 
-                    Gestionado = 'No', Estado_Proceso = 'ASIGNADO'
+                SET Asignado_a = @asignado_a, Asignado_por = @asignado_por, Asignado_el = GETDATE()
                 WHERE ID_Apro_CxG_NC = @id
             `);
 
@@ -1212,12 +1215,22 @@ router.post('/cxg-nc/:id/asignar', verifyPermission('cxg.cxg_nc.assign'), async 
 router.post('/cxg-nc/:id/gestionar', verifyPermission('cxg.cxg_nc.process'), async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { observacion, gestionado_por, resultado } = req.body;
+        const { observacion, gestionado_por, resultado, motivo } = req.body;
         const pool = await getDbConnection();
-        const checkState = await pool.request().input('id', sql.VarChar, id).query(`SELECT Estado_Proceso FROM [dbo].[GAC_APP_TB_CXG_NC] WHERE ID_Apro_CxG_NC = @id`);
+        const checkState = await pool.request().input('id', sql.VarChar, id).query(`
+            SELECT 
+                CASE 
+                    WHEN Procesado IS NOT NULL AND Procesado <> '' AND Procesado <> 'NO' THEN 'CERRADO'
+                    WHEN Asignado_a IS NOT NULL AND Asignado_a <> '' THEN 'ASIGNADO'
+                    WHEN Aprobado = 'No' THEN 'RECHAZADO'
+                    WHEN Aprobado = 'Si' THEN 'APROBADO_SUP'
+                    ELSE 'REGISTRADO'
+                END as Estado_Proceso
+            FROM [dbo].[GAC_APP_TB_CXG_NC] WHERE ID_Apro_CxG_NC = @id
+        `);
         if (checkState.recordset.length === 0) return res.status(404).json({ error: 'Solicitud no encontrada' });
-        if (checkState.recordset[0].Estado_Proceso !== 'VALIDADO') {
-            return res.status(400).json({ error: `Acción inválida. Estado actual: ${checkState.recordset[0].Estado_Proceso}. Se requiere: VALIDADO.` });
+        if (checkState.recordset[0].Estado_Proceso !== 'ASIGNADO') {
+            return res.status(400).json({ error: `Acción inválida. Estado actual: ${checkState.recordset[0].Estado_Proceso}. Se requiere: ASIGNADO.` });
         }
 
         const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
@@ -1227,12 +1240,12 @@ router.post('/cxg-nc/:id/gestionar', verifyPermission('cxg.cxg_nc.process'), asy
             .input('observacion', sql.VarChar, observacion || '')
             .input('gestionado_por', sql.VarChar, gestionado_por || '')
             .input('resultado', sql.VarChar, resultado || 'Si')
+            .input('motivo', sql.VarChar, motivo || '')
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_CXG_NC] 
-                SET Procesado = 'SI', Procesado_el = GETDATE(), Procesado_por = @gestionado_por, 
+                SET Procesado = @resultado, Procesado_el = GETDATE(), Procesado_por = @gestionado_por, 
                     Procesado_observacion = @observacion,
-                    Observacion_Gestionado = @observacion, Gestionado = @resultado, Gestionado_el = GETDATE(),
-                    Estado_Proceso = CASE WHEN @resultado = 'Si' THEN 'CERRADO' ELSE 'RECHAZADO' END
+                    Procesado_motivo = @motivo
                 WHERE ID_Apro_CxG_NC = @id
             `);
 
@@ -1329,58 +1342,6 @@ router.post('/cancelaciones/:id/validar-cliente', verifyPermission('cxg.cancelac
     }
 });
 
-// ─────────────────────────────────────────────
-// CXG/NC: Validar Cliente + History
-// ─────────────────────────────────────────────
 
-router.post('/cxg-nc/:id/validar-cliente', verifyPermission('cxg.cxg_nc.gestionar'), async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const { resultado, observacion, usuario, motivo_real } = req.body;
-        const pool = await getDbConnection();
-        const checkState = await pool.request().input('id', sql.VarChar, id).query(`SELECT Estado_Proceso FROM [dbo].[GAC_APP_TB_CXG_NC] WHERE ID_Apro_CxG_NC = @id`);
-        if (checkState.recordset.length === 0) return res.status(404).json({ error: 'Solicitud no encontrada' });
-        if (checkState.recordset[0].Estado_Proceso !== 'ASIGNADO') {
-            return res.status(400).json({ error: `Acción inválida. Estado actual: ${checkState.recordset[0].Estado_Proceso}. Se requiere: ASIGNADO.` });
-        }
-
-        const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
-
-        await pool.request()
-            .input('id', sql.VarChar, id)
-            .input('resultado', sql.VarChar, resultado)
-            .input('obs', sql.VarChar, observacion || '')
-            .input('por', sql.VarChar, usuario || '')
-            .input('motivo_real', sql.VarChar, motivo_real || null)
-            .query(`
-                UPDATE [dbo].[GAC_APP_TB_CXG_NC] 
-                SET 
-                    Vali_Cliente = @resultado,
-                    Vali_Obs = @obs,
-                    Vali_Por = @por,
-                    Vali_El = GETDATE(),
-                    Vali_Motivo_Real = @motivo_real,
-                    Estado_Proceso = 'VALIDADO'
-                WHERE ID_Apro_CxG_NC = @id
-            `);
-
-        // Insert history entry
-        await pool.request()
-            .input('histId', sql.VarChar, histId)
-            .input('solicitud', sql.VarChar, id)
-            .input('tipo', sql.VarChar, 'Validación')
-            .input('obs', sql.VarChar, `${resultado}${motivo_real ? ' — Motivo Real: ' + motivo_real : ''}${observacion ? ' — ' + observacion : ''}`)
-            .input('usuario', sql.VarChar, usuario || '')
-            .query(`
-                INSERT INTO [dbo].[GAC_APP_TB_HISTOTIAL_APROB_CXG_NC]
-                (ID_Historial_Apro_CxG_NC, Solicitud, Tipo, Observacion, Creado_el, Creado_por)
-                VALUES (@histId, @solicitud, @tipo, @obs, GETDATE(), @usuario)
-            `);
-
-        res.json({ message: 'Validación de cliente registrada' });
-    } catch (error: any) {
-        res.status(500).json({ error: error.message });
-    }
-});
 
 export default router;

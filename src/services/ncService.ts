@@ -50,15 +50,6 @@ export interface CxGNC {
     gestionado?: string;
     observacion?: string;
     observacion_inicial?: string;
-    vali_cliente?: string;
-    vali_obs?: string;
-    vali_por?: string;
-    vali_el?: string;
-    vali_motivo_real?: string;
-    apro_por?: string;
-    apro_el?: string;
-    apro_solicitud?: string;
-    apro_obs?: string;
     // Native approval fields from GAC_APP_TB_CXG_NC
     aprobado?: string;
     aprobado_motivo?: string;

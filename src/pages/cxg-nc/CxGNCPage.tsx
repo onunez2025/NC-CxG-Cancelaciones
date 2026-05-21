@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   XCircle,
   Eye,
-  ClipboardCheck,
   ShieldCheck,
   Eraser,
   Columns,
@@ -89,12 +88,11 @@ export const CxGNCPage = () => {
     { id: 'fecha_creacion', label: 'FECHA CREACIÓN' },
     { id: 'aprobado', label: 'APROBACIÓN' },
     { id: 'procesado', label: 'PROCESADO' },
-    { id: 'motivo_real', label: 'MOTIVO REAL' },
     { id: 'estado', label: 'ESTADO' }
   ];
 
   const [visibleColumns, setVisibleColumns] = useState<string[]>([
-    'tipo', 'documento', 'ticket', 'tienda', 'cliente', 'codigo_producto', 'producto', 'creado_por', 'supervisor', 'fecha_creacion', 'aprobado', 'procesado', 'motivo_real', 'estado'
+    'tipo', 'documento', 'ticket', 'tienda', 'cliente', 'codigo_producto', 'producto', 'creado_por', 'supervisor', 'fecha_creacion', 'aprobado', 'procesado', 'estado'
   ]);
   const [isColumnDropdownOpen, setIsColumnDropdownOpen] = useState(false);
 
@@ -135,11 +133,7 @@ export const CxGNCPage = () => {
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
   const [detailHistorial, setDetailHistorial] = useState<HistorialEntry[]>([]);
 
-  // Validation state
-  const [isValidarClienteOpen, setIsValidarClienteOpen] = useState(false);
-  const [validarForm, setValidarForm] = useState({ resultado: '' as 'REAL' | 'FALSA' | '', observacion: '', motivo_real: '' });
-  const [isValidarSubmitting, setIsValidarSubmitting] = useState(false);
-  const [motivos, setMotivos] = useState<{ id: string; motivo: string }[]>([]);
+  // Validation state removed
 
   // Approval state (Supervisor)
   const [isAprobarOpen, setIsAprobarOpen] = useState(false);
@@ -264,11 +258,7 @@ export const CxGNCPage = () => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [cancelMotivos, cxgMot] = await Promise.all([
-          ncService.getCancellationMotivos(),
-          ncService.getCxGNCMotivos()
-        ]);
-        setMotivos(cancelMotivos);
+        const cxgMot = await ncService.getCxGNCMotivos();
         setCxgMotivos(cxgMot);
       } catch (error) {
         console.error('Error fetching motives:', error);
@@ -463,28 +453,6 @@ export const CxGNCPage = () => {
     }
   };
 
-  const handleValidarCliente = async () => {
-    if (!selectedRecord || !validarForm.resultado) return;
-    setIsValidarSubmitting(true);
-    try {
-      await ncService.validarClienteCxGNC(selectedRecord.id, {
-        resultado: validarForm.resultado as 'REAL' | 'FALSA',
-        observacion: validarForm.observacion,
-        usuario: user?.full_name || user?.username || 'Sistema',
-        motivo_real: validarForm.resultado === 'FALSA' ? validarForm.motivo_real : undefined
-      });
-      setIsValidarClienteOpen(false);
-      fetchData();
-      if (isDetailOpen && selectedRecord) {
-        handleViewDetail(selectedRecord.id);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsValidarSubmitting(false);
-    }
-  };
-
   const handleViewDetail = async (id: string) => {
     setIsDetailOpen(true);
     setIsLoadingDetail(true);
@@ -578,13 +546,7 @@ export const CxGNCPage = () => {
               setSelectedRecord(detailData);
               setIsAssignModalOpen(true);
             },
-            canValidate: detailData?.estado === 'ASIGNADO' && hasPermission('cxg.cxg_nc.gestionar'),
-            onValidate: () => {
-              setSelectedRecord(detailData);
-              setValidarForm({ resultado: '', observacion: '', motivo_real: '' });
-              setIsValidarClienteOpen(true);
-            },
-            canManage: detailData?.estado === 'VALIDADO' && hasPermission('cxg.cxg_nc.gestionar'),
+            canManage: detailData?.estado === 'ASIGNADO' && hasPermission('cxg.cxg_nc.gestionar'),
             onManage: () => {
               setSelectedRecord(detailData);
               setIsGestionModalOpen(true);
@@ -645,7 +607,6 @@ export const CxGNCPage = () => {
                       case 'fecha_creacion': return item.fecha ? new Date(item.fecha).toLocaleDateString() : '';
                       case 'aprobado': return `"${item.aprobado || 'PENDIENTE'} ${item.aprobado_el ? `(${new Date(item.aprobado_el).toLocaleDateString()})` : ''}"`;
                       case 'procesado': return `"${item.procesado || 'PENDIENTE'} ${item.procesado_el ? `(${new Date(item.procesado_el).toLocaleDateString()})` : ''}"`;
-                      case 'motivo_real': return `"${item.vali_motivo_real || ''}"`;  
                       case 'estado': return item.estado || '';
                       default: return '';
                     }
@@ -734,7 +695,6 @@ export const CxGNCPage = () => {
           { label: 'Registrado', value: kpiStats.registrado, icon: FileText, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-500/10', border: 'border-amber-200 dark:border-amber-500/20', filter: 'REGISTRADO' as const },
           { label: 'Aprobado', value: kpiStats.aprobado, icon: ShieldCheck, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-500/10', border: 'border-blue-200 dark:border-blue-500/20', filter: 'APROBADO_SUP' as const },
           { label: 'Asignado', value: kpiStats.asignado, icon: UserPlus, color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-500/10', border: 'border-purple-200 dark:border-purple-500/20', filter: 'ASIGNADO' as const },
-          { label: 'Validado', value: kpiStats.validado, icon: ClipboardCheck, color: 'text-cyan-600', bg: 'bg-cyan-50 dark:bg-cyan-500/10', border: 'border-cyan-200 dark:border-cyan-500/20', filter: 'VALIDADO' as const },
           { label: 'Cerrado', value: kpiStats.cerrado, icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-500/10', border: 'border-emerald-200 dark:border-emerald-500/20', filter: 'CERRADO' as const },
         ].map((kpi) => (
           <button
@@ -1054,12 +1014,10 @@ export const CxGNCPage = () => {
                           </div>
                         </div>
                       );
-                      case 'motivo_real': return <span className="text-xs font-bold text-rose-500">{item.vali_motivo_real || '—'}</span>;
                       case 'estado': return (
                         <SIATCBadge variant={
                           item.estado === 'CERRADO' ? 'success' : 
                           item.estado === 'REGISTRADO' ? 'warning' :
-                          item.estado === 'VALIDADO' ? 'info' :
                           item.estado === 'APROBADO_SUP' ? 'secondary' :
                           item.estado === 'RECHAZADO' ? 'danger' :
                           'info'
@@ -1116,23 +1074,13 @@ export const CxGNCPage = () => {
                               show: item.estado === 'APROBADO_SUP' && hasPermission('cxg.cxg_nc.assign')
                             },
                             {
-                              label: 'Validar Cliente',
-                              icon: ClipboardCheck,
-                              onClick: () => {
-                                setSelectedRecord(item);
-                                setValidarForm({ resultado: '', observacion: '', motivo_real: '' });
-                                setIsValidarClienteOpen(true);
-                              },
-                              show: item.estado === 'ASIGNADO' && hasPermission('cxg.cxg_nc.gestionar')
-                            },
-                            {
                               label: 'Gestionar Solicitud',
                               icon: CheckCircle2,
                               onClick: () => {
                                 setSelectedRecord(item);
                                 setIsGestionModalOpen(true);
                               },
-                              show: item.estado === 'VALIDADO' && hasPermission('cxg.cxg_nc.gestionar')
+                              show: item.estado === 'ASIGNADO' && hasPermission('cxg.cxg_nc.gestionar')
                             }
                           ]}
                         />
@@ -1295,92 +1243,7 @@ export const CxGNCPage = () => {
         </div>
       </SIATCModalWrapper>
 
-      {/* ─────────────────────────────────────────── */}
-      {/* Validar Cliente Modal */}
-      {/* ─────────────────────────────────────────── */}
-       <SIATCModalWrapper
-        isOpen={isValidarClienteOpen}
-        onClose={() => setIsValidarClienteOpen(false)}
-        title="Validación con Cliente"
-        subtitle={`Confirme si el motivo de la solicitud es real conversando con el cliente.`}
-        footer={
-          <>
-            <SIATCButton variant="ghost" onClick={() => setIsValidarClienteOpen(false)}>Cancelar</SIATCButton>
-            <SIATCButton 
-              variant="primary" 
-              onClick={handleValidarCliente} 
-              isLoading={isValidarSubmitting}
-              disabled={!validarForm.resultado || (validarForm.resultado === 'FALSA' && !validarForm.motivo_real)}
-            >
-              Confirmar Validación
-            </SIATCButton>
-          </>
-        }
-      >
-        <div className="space-y-4">
-           <div className="p-4 bg-muted/30 rounded-xl border border-border/50">
-            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Resumen del Documento</p>
-            <p className="text-sm font-bold">{selectedRecord?.tipo} #{selectedRecord?.correlativo}</p>
-            <p className="text-xs text-muted-foreground">Cliente: {selectedRecord?.cliente}</p>
-          </div>
 
-          <div>
-            <label className="text-[10px] font-black uppercase text-muted-foreground mb-3 block tracking-widest pl-4 font-bold">¿El cliente confirma el motivo?</label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setValidarForm({ ...validarForm, resultado: 'REAL' })}
-                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all font-bold text-sm ${
-                  validarForm.resultado === 'REAL'
-                    ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-lg shadow-blue-500/10'
-                    : 'border-border text-muted-foreground hover:bg-muted/50'
-                }`}
-              >
-                <CheckCircle2 className="w-5 h-5" />
-                SÍ, MOTIVO REAL
-              </button>
-              <button
-                type="button"
-                onClick={() => setValidarForm({ ...validarForm, resultado: 'FALSA' })}
-                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all font-bold text-sm ${
-                  validarForm.resultado === 'FALSA'
-                    ? 'border-rose-500 bg-rose-50 text-rose-700 shadow-lg shadow-rose-500/10'
-                    : 'border-border text-muted-foreground hover:bg-muted/50'
-                }`}
-              >
-                <XCircle className="w-5 h-5" />
-                MOTIVO NO REAL
-              </button>
-            </div>
-          </div>
-
-          {validarForm.resultado === 'FALSA' && (
-            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-              <label className="text-[10px] font-black uppercase text-rose-500 mb-1.5 block tracking-widest pl-4">¿Cuál es el Motivo Real?</label>
-              <select
-                className={`${SIATC_THEME.COMPONENTS.INPUT} font-bold text-rose-600 border-rose-200 bg-rose-50/30`}
-                value={validarForm.motivo_real}
-                onChange={(e) => setValidarForm({ ...validarForm, motivo_real: e.target.value })}
-              >
-                <option value="">Seleccione el motivo real...</option>
-                {motivos.map(m => (
-                  <option key={m.id} value={m.motivo}>{m.motivo}</option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          <div>
-            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Notas de la llamada</label>
-            <textarea 
-              className={`${SIATC_THEME.COMPONENTS.INPUT} h-24 pt-2 resize-none`}
-              placeholder="Detalle de lo conversado con el cliente..."
-              value={validarForm.observacion}
-              onChange={(e) => setValidarForm({...validarForm, observacion: e.target.value})}
-            />
-          </div>
-        </div>
-      </SIATCModalWrapper>
 
       {/* ─────────────────────────────────────────── */}
       {/* Gestionar Modal */}

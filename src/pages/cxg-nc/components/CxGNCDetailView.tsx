@@ -14,8 +14,6 @@ interface CxGNCDetailViewProps {
     onApprove?: () => void;
     canAssign?: boolean;
     onAssign?: () => void;
-    canValidate?: boolean;
-    onValidate?: () => void;
     canManage?: boolean;
     onManage?: () => void;
   };
@@ -108,11 +106,6 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, de
               Asignar Analista
             </SIATCButton>
           )}
-          {actions?.canValidate && (
-            <SIATCButton variant="secondary" size="sm" icon={ClipboardCheck} onClick={actions.onValidate}>
-              Validar Cliente
-            </SIATCButton>
-          )}
           {actions?.canManage && (
             <SIATCButton variant="success" size="sm" icon={CheckCircle2} onClick={actions.onManage}>
               Gestionar Solicitud
@@ -123,15 +116,14 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, de
 
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
         {/* Process Timeline Steps */}
-        <div className="grid grid-cols-5 gap-2 px-2 max-w-4xl mx-auto w-full">
+        <div className="grid grid-cols-4 gap-2 px-2 max-w-3xl mx-auto w-full">
           {[
             { key: 'REGISTRADO', label: 'Registro', icon: DollarSign },
             { key: 'APROBADO_SUP', label: 'Aprobación', icon: ShieldCheck },
             { key: 'ASIGNADO', label: 'Asignación', icon: UserPlus },
-            { key: 'VALIDADO', label: 'Validación', icon: ClipboardCheck },
             { key: 'CERRADO', label: 'Cierre', icon: CheckCircle2 }
           ].map((step, idx) => {
-            const stepOrder = ['REGISTRADO', 'APROBADO_SUP', 'ASIGNADO', 'VALIDADO', 'CERRADO'];
+            const stepOrder = ['REGISTRADO', 'APROBADO_SUP', 'ASIGNADO', 'CERRADO'];
             const currentIdx = stepOrder.indexOf(detailData.estado === 'RECHAZADO' ? 'REGISTRADO' : detailData.estado);
             const isCompleted = currentIdx >= idx;
             const isActive = currentIdx === idx;
@@ -229,13 +221,6 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, de
               </div>
             </div>
             
-            {/* Motivo Real Alert */}
-            {detailData.vali_motivo_real && (
-              <div className="p-4 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800 rounded-xl">
-                <div className="text-[10px] font-black uppercase text-rose-600 mb-1">⚠ Motivo Real Detectado</div>
-                <p className="text-base font-bold text-rose-700 dark:text-rose-400">{detailData.vali_motivo_real}</p>
-              </div>
-            )}
 
             {/* Equipment History */}
             <div className="p-4 rounded-xl bg-cyan-50 dark:bg-cyan-950/20 border border-cyan-100 dark:border-cyan-800">
