@@ -835,7 +835,8 @@ export const CxGNCPage = () => {
                       </div>
                     </SIATCTableCell>
                   </SIATCTableRow>
-                ))}
+                  );
+                })}
               </tbody>
             </SIATCTable>
           )}
