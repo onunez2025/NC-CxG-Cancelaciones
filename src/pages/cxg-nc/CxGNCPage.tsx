@@ -829,7 +829,7 @@ export const CxGNCPage = () => {
               <SIATCButton variant="ghost" size="sm" icon={Eraser} onClick={handleClearFilters}>Limpiar Filtros</SIATCButton>
             </div>
           ) : (
-            <SIATCTable>
+            <SIATCTable className="min-w-[1600px]">
               <thead>
                 <tr className={SIATC_THEME.TABLE.HEADER_ROW}>
                   {visibleColumns.map(colId => {
