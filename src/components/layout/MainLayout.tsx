@@ -144,7 +144,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                 </header>
 
                 {/* Content Viewport */}
-                <main className="flex-1 overflow-y-auto px-4 md:px-8 pb-8 flex flex-col custom-scrollbar relative">
+                <main className="flex-1 overflow-hidden px-4 md:px-8 pb-8 flex flex-col relative">
                     <div className="flex-1 w-full max-w-[1600px] mx-auto flex flex-col min-h-0">
                         {children}
                     </div>
