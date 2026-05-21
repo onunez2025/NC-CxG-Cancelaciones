@@ -445,10 +445,10 @@ router.get('/cxg-nc/unique-values', verifyPermission('cxg.cxg_nc.view'), async (
             tipo: 'n.Tipo',
             documento: 't.CodigoExternoCliente',
             ticket: 'n.Ticket',
-            tienda: 'COALESCE(n.Lugar_Compra, emp.DsEmpresa, CAST(t.IDEmpresa as VARCHAR))',
+            tienda: 'COALESCE(emp.DsEmpresa, CAST(t.IDEmpresa as VARCHAR))',
             cliente: 'COALESCE(t.NombreCliente, n.Tienda)',
             creado_por: 'n.Creado_por',
-            supervisor: 'COALESCE(n.Supervisor_FSM, sup_cas.supervisor_nombre, sup_sole.supervisor_nombre)',
+            supervisor: 'COALESCE(sup_cas.supervisor_nombre, sup_sole.supervisor_nombre)',
             aprobado: 'n.Aprobado',
             procesado: 'n.Procesado',
             estado: 'CASE WHEN n.Procesado IS NOT NULL AND n.Procesado <> \'\' AND n.Procesado <> \'NO\' THEN \'CERRADO\' WHEN n.Procesado_por IS NOT NULL AND n.Procesado_por <> \'\' THEN \'ASIGNADO\' WHEN n.Aprobado = \'No\' THEN \'RECHAZADO\' WHEN n.Aprobado = \'Si\' THEN \'APROBADO_SUP\' ELSE \'REGISTRADO\' END',
@@ -481,8 +481,7 @@ router.get('/cxg-nc/unique-values', verifyPermission('cxg.cxg_nc.view'), async (
                 INNER JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] h 
                     ON cas.Id_colaborar = h.Id_colaborar 
                 INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON h.Supervisor = e.ID_empleado
-                WHERE n.Supervisor_FSM IS NULL
-                  AND cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
+                WHERE cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
                   AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
                 ORDER BY 
                     CASE WHEN h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE() THEN 1 ELSE 0 END DESC,
@@ -495,8 +494,7 @@ router.get('/cxg-nc/unique-values', verifyPermission('cxg.cxg_nc.view'), async (
                 FROM [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] da
                 INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] ia ON da.Empleado = ia.Empleado
                 INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON ia.Jefe_directo = e.ID_empleado
-                WHERE n.Supervisor_FSM IS NULL
-                  AND (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
+                WHERE (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
             ) sup_sole
             ${whereClause}
             ORDER BY ${dbCol} ASC
@@ -578,8 +576,7 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
                     INNER JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] h 
                         ON cas.Id_colaborar = h.Id_colaborar 
                     INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON h.Supervisor = e.ID_empleado
-                    WHERE n.Supervisor_FSM IS NULL
-                      AND cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
+                    WHERE cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
                       AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
                     ORDER BY 
                         CASE WHEN h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE() THEN 1 ELSE 0 END DESC,
@@ -592,8 +589,7 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
                     FROM [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] da
                     INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] ia ON da.Empleado = ia.Empleado
                     INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON ia.Jefe_directo = e.ID_empleado
-                    WHERE n.Supervisor_FSM IS NULL
-                      AND (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
+                    WHERE (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
                 ) sup_sole
             )
         `;
@@ -788,11 +784,10 @@ router.get('/cxg-nc/:id', verifyPermission('cxg.cxg_nc.view'), async (req: Reque
                     n.Procesado_el as procesado_el,
                     n.Procesado_por as procesado_por,
                     n.Ticket_desinstalacion as ticket_desinstalacion,
-                    n.Gestionado_el as fecha_gestionado,
                     n.Ticket as ticket,
-                    COALESCE(n.Motivo_Elevacion, t.ComentarioProgramador) as fsm_motivo_elevacion,
-                    COALESCE(n.Lugar_Compra, emp.DsEmpresa, CAST(t.IDEmpresa as VARCHAR)) as fsm_lugar_compra,
-                    COALESCE(n.Supervisor_FSM, sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor_asignado,
+                    COALESCE(t.ComentarioProgramador, '') as fsm_motivo_elevacion,
+                    COALESCE(emp.DsEmpresa, CAST(t.IDEmpresa as VARCHAR)) as fsm_lugar_compra,
+                    COALESCE(sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor_asignado,
                     t.NombreCliente as fsm_cliente,
                     t.CodigoExternoEquipo as codigo_producto,
                     t.NombreEquipo as producto
@@ -806,8 +801,7 @@ router.get('/cxg-nc/:id', verifyPermission('cxg.cxg_nc.view'), async (req: Reque
                     INNER JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] h 
                         ON cas.Id_colaborar = h.Id_colaborar 
                     INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON h.Supervisor = e.ID_empleado
-                    WHERE n.Supervisor_FSM IS NULL
-                      AND cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
+                    WHERE cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
                       AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
                     ORDER BY 
                         CASE WHEN h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE() THEN 1 ELSE 0 END DESC,
@@ -820,8 +814,7 @@ router.get('/cxg-nc/:id', verifyPermission('cxg.cxg_nc.view'), async (req: Reque
                     FROM [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] da
                     INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] ia ON da.Empleado = ia.Empleado
                     INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON ia.Jefe_directo = e.ID_empleado
-                    WHERE n.Supervisor_FSM IS NULL
-                      AND (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
+                    WHERE (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
                 ) sup_sole
                 WHERE n.ID_Apro_CxG_NC = @id
             `);
@@ -1025,7 +1018,7 @@ router.post('/cancelaciones/:id/reject', async (req: Request, res: Response) => 
 
 router.post('/cxg-nc', verifyPermission('cxg.cxg_nc.create'), async (req: Request, res: Response) => {
     try {
-        const { tipo, cliente, ticket, observacion, motivo_elevacion, lugar_compra, supervisor_fsm } = req.body;
+        const { tipo, cliente, ticket, observacion } = req.body;
         const pool = await getDbConnection();
 
         // 1. Check if ticket already exists in an active state
