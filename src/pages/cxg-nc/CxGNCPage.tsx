@@ -72,16 +72,14 @@ export const CxGNCPage = () => {
     { id: 'creado_por', label: 'ASESOR CREADOR' },
     { id: 'supervisor', label: 'SUPERVISOR' },
     { id: 'fecha_creacion', label: 'FECHA CREACIÓN' },
-    { id: 'fecha_aprobacion', label: 'FECHA APROBACIÓN' },
-    { id: 'fecha_procesado', label: 'FECHA PROCESADO' },
-    { id: 'aprobado', label: 'APROBADO' },
+    { id: 'aprobado', label: 'APROBACIÓN' },
     { id: 'procesado', label: 'PROCESADO' },
     { id: 'motivo_real', label: 'MOTIVO REAL' },
     { id: 'estado', label: 'ESTADO' }
   ];
 
   const [visibleColumns, setVisibleColumns] = useState<string[]>([
-    'tipo', 'documento', 'ticket', 'tienda', 'cliente', 'creado_por', 'supervisor', 'fecha_creacion', 'fecha_aprobacion', 'fecha_procesado', 'aprobado', 'procesado', 'motivo_real', 'estado'
+    'tipo', 'documento', 'ticket', 'tienda', 'cliente', 'creado_por', 'supervisor', 'fecha_creacion', 'aprobado', 'procesado', 'motivo_real', 'estado'
   ]);
   const [isColumnDropdownOpen, setIsColumnDropdownOpen] = useState(false);
 
@@ -539,10 +537,8 @@ export const CxGNCPage = () => {
                       case 'creado_por': return `"${item.creado_por || ''}"`;  
                       case 'supervisor': return `"${item.supervisor || ''}"`;  
                       case 'fecha_creacion': return item.fecha ? new Date(item.fecha).toLocaleDateString() : '';
-                      case 'fecha_aprobacion': return item.aprobado_el ? new Date(item.aprobado_el).toLocaleDateString() : '';
-                      case 'fecha_procesado': return item.procesado_el ? new Date(item.procesado_el).toLocaleDateString() : '';
-                      case 'aprobado': return item.aprobado || 'PENDIENTE';
-                      case 'procesado': return item.procesado || 'PENDIENTE';
+                      case 'aprobado': return `"${item.aprobado || 'PENDIENTE'} ${item.aprobado_el ? `(${new Date(item.aprobado_el).toLocaleDateString()})` : ''}"`;
+                      case 'procesado': return `"${item.procesado || 'PENDIENTE'} ${item.procesado_el ? `(${new Date(item.procesado_el).toLocaleDateString()})` : ''}"`;
                       case 'motivo_real': return `"${item.vali_motivo_real || ''}"`;  
                       case 'estado': return item.estado || '';
                       default: return '';
@@ -811,36 +807,36 @@ export const CxGNCPage = () => {
                           </div>
                         </SIATCTooltip>
                       );
-                      case 'fecha_aprobacion': return (
-                        <SIATCTooltip content={fullDate(item.aprobado_el)} position="bottom">
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <Calendar className="w-3.5 h-3.5" />
-                            <span className="text-xs">{relativeDate(item.aprobado_el)}</span>
-                          </div>
-                        </SIATCTooltip>
-                      );
-                      case 'fecha_procesado': return (
-                        <SIATCTooltip content={fullDate(item.procesado_el)} position="bottom">
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <Calendar className="w-3.5 h-3.5" />
-                            <span className="text-xs">{relativeDate(item.procesado_el)}</span>
-                          </div>
-                        </SIATCTooltip>
-                      );
                       case 'aprobado': return (
-                        <div className="flex flex-col gap-0.5">
-                          <SIATCBadge variant={item.aprobado === 'APROBADO' ? 'success' : item.aprobado === 'RECHAZADO' ? 'danger' : 'warning'}>
-                            {item.aprobado === 'APROBADO' ? 'SÍ' : item.aprobado === 'RECHAZADO' ? 'NO' : 'PENDIENTE'}
-                          </SIATCBadge>
-                          {item.aprobado_por && <span className="text-[9px] text-muted-foreground/80 truncate max-w-[100px] italic">{item.aprobado_por}</span>}
+                        <div className="flex flex-col gap-1">
+                          <SIATCTooltip content={item.aprobado_el ? fullDate(item.aprobado_el) : 'Sin fecha'} position="bottom">
+                            <div className="flex items-center gap-1.5 text-muted-foreground mb-0.5">
+                              <Calendar className="w-3.5 h-3.5" />
+                              <span className="text-xs">{item.aprobado_el ? relativeDate(item.aprobado_el) : '—'}</span>
+                            </div>
+                          </SIATCTooltip>
+                          <div className="flex flex-col gap-0.5">
+                            <SIATCBadge variant={item.aprobado === 'APROBADO' ? 'success' : item.aprobado === 'RECHAZADO' ? 'danger' : 'warning'}>
+                              {item.aprobado === 'APROBADO' ? 'SÍ' : item.aprobado === 'RECHAZADO' ? 'NO' : 'PENDIENTE'}
+                            </SIATCBadge>
+                            {item.aprobado_por && <span className="text-[9px] text-muted-foreground/80 truncate max-w-[100px] italic">{item.aprobado_por}</span>}
+                          </div>
                         </div>
                       );
                       case 'procesado': return (
-                        <div className="flex flex-col gap-0.5">
-                          <SIATCBadge variant={item.procesado === 'SI' ? 'success' : 'warning'}>
-                            {item.procesado === 'SI' ? 'SÍ' : 'PENDIENTE'}
-                          </SIATCBadge>
-                          {item.procesado_por && <span className="text-[9px] text-muted-foreground/80 truncate max-w-[100px] italic">{item.procesado_por}</span>}
+                        <div className="flex flex-col gap-1">
+                          <SIATCTooltip content={item.procesado_el ? fullDate(item.procesado_el) : 'Sin fecha'} position="bottom">
+                            <div className="flex items-center gap-1.5 text-muted-foreground mb-0.5">
+                              <Calendar className="w-3.5 h-3.5" />
+                              <span className="text-xs">{item.procesado_el ? relativeDate(item.procesado_el) : '—'}</span>
+                            </div>
+                          </SIATCTooltip>
+                          <div className="flex flex-col gap-0.5">
+                            <SIATCBadge variant={item.procesado === 'SI' ? 'success' : 'warning'}>
+                              {item.procesado === 'SI' ? 'SÍ' : 'PENDIENTE'}
+                            </SIATCBadge>
+                            {item.procesado_por && <span className="text-[9px] text-muted-foreground/80 truncate max-w-[100px] italic">{item.procesado_por}</span>}
+                          </div>
                         </div>
                       );
                       case 'motivo_real': return <span className="text-xs font-bold text-rose-500">{item.vali_motivo_real || '—'}</span>;
