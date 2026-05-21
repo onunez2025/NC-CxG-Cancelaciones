@@ -1018,7 +1018,7 @@ export const CxGNCPage = () => {
                         <SIATCTooltip content={fullDate(item.fecha)} position="bottom">
                           <div className="flex items-center gap-2 text-muted-foreground">
                             <Calendar className="w-3.5 h-3.5" />
-                            <span className="text-xs">{relativeDate(item.fecha)}</span>
+                            <span className="text-xs">{new Date(item.fecha).toLocaleDateString('es-PE')}</span>
                           </div>
                         </SIATCTooltip>
                       );
