@@ -388,6 +388,9 @@ export const CxGNCPage = () => {
       setIsAprobarOpen(false);
       setAprobarForm({ aprobado: '', motivo: '', observacion: '' });
       fetchData();
+      if (isDetailOpen && selectedRecord) {
+        handleViewDetail(selectedRecord.id);
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -417,6 +420,9 @@ export const CxGNCPage = () => {
 
       setIsAssignModalOpen(false);
       fetchData();
+      if (isDetailOpen && selectedRecord) {
+        handleViewDetail(selectedRecord.id);
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -447,6 +453,9 @@ export const CxGNCPage = () => {
       setGestiónObs('');
       setGestiónResultado('');
       fetchData();
+      if (isDetailOpen && selectedRecord) {
+        handleViewDetail(selectedRecord.id);
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -466,6 +475,9 @@ export const CxGNCPage = () => {
       });
       setIsValidarClienteOpen(false);
       fetchData();
+      if (isDetailOpen && selectedRecord) {
+        handleViewDetail(selectedRecord.id);
+      }
     } catch (error) {
       console.error(error);
     } finally {

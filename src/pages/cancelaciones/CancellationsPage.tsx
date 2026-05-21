@@ -336,6 +336,9 @@ export const CancellationsPage = () => {
 
       setIsGestionarOpen(false);
       fetchData();
+      if (isDetailOpen && gestionItem) {
+        handleViewDetail(gestionItem.id);
+      }
     } catch (error) {
       console.error('Error gestionando:', error);
     } finally {
@@ -370,6 +373,9 @@ export const CancellationsPage = () => {
 
       setIsAssignOpen(false);
       fetchData();
+      if (isDetailOpen && assignItem) {
+        handleViewDetail(assignItem.id);
+      }
     } catch (error) {
       console.error('Error assigning:', error);
     } finally {
@@ -398,6 +404,9 @@ export const CancellationsPage = () => {
 
       setIsAprobarSolicitudOpen(false);
       fetchData();
+      if (isDetailOpen && aprobarSolicitudItem) {
+        handleViewDetail(aprobarSolicitudItem.id);
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -427,6 +436,9 @@ export const CancellationsPage = () => {
 
       setIsValidarClienteOpen(false);
       fetchData();
+      if (isDetailOpen && validarClienteItem) {
+        handleViewDetail(validarClienteItem.id);
+      }
     } catch (error) {
       console.error(error);
     } finally {
