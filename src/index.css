@@ -124,3 +124,17 @@
 .zoom-in-95 {
   animation-name: zoomIn95;
 }
+
+@keyframes slideInFromRight {
+  from { opacity: 0; transform: translateX(2rem); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.slide-in-from-right-8 {
+  animation-name: slideInFromRight;
+}
+
+/* Staggered row animation */
+tbody tr {
+  animation: fadeIn 300ms ease-out both;
+}

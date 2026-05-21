@@ -26,74 +26,73 @@ interface FSMDetailModalProps {
   ticket: FSMTracking | null;
 }
 
+const DetailSection = ({ icon: Icon, title, children, variant = 'default', index }: { icon: any, title: string, children: React.ReactNode, variant?: 'default' | 'accent' | 'highlight', index: number }) => (
+  <div 
+    className={cn(
+      "rounded-[1.5rem] border transition-all duration-500 relative overflow-hidden group",
+      "animate-in fade-in slide-in-from-right-12 ease-out",
+      variant === 'default' && "bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border-white/40 dark:border-white/5 shadow-lg",
+      variant === 'accent' && "bg-slate-50/60 dark:bg-slate-800/20 border-slate-200/40 dark:border-slate-700/40 shadow-sm",
+      variant === 'highlight' && "bg-emerald-50/40 dark:bg-emerald-900/10 border-emerald-500/20 shadow-sm"
+    )}
+    style={{ animationDelay: `${index * 80}ms`, animationFillMode: 'both' }}
+  >
+    {/* Background Aura Decoration */}
+    <div className={cn(
+      "absolute -top-12 -right-12 w-24 h-24 rounded-full blur-[40px] opacity-10 transition-all group-hover:opacity-20",
+      variant === 'default' && "bg-primary",
+      variant === 'accent' && "bg-slate-400",
+      variant === 'highlight' && "bg-emerald-400"
+    )} />
+
+    <div className="flex items-center gap-4 p-5 border-b border-inherit bg-inherit/40 relative z-10">
+      <div className={cn(
+        "p-2.5 rounded-xl shadow-md relative overflow-hidden",
+        variant === 'default' && "bg-gradient-to-br from-primary to-blue-600 text-white",
+        variant === 'accent' && "bg-gradient-to-br from-slate-600 to-slate-800 text-white",
+        variant === 'highlight' && "bg-gradient-to-br from-emerald-500 to-teal-700 text-white"
+      )}>
+        {/* Internal Glow for icon */}
+        <div className="absolute inset-0 bg-white/10 blur-sm translate-y-1/2" />
+        <Icon className="w-4 h-4 relative z-10" />
+      </div>
+      <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100 opacity-70 group-hover:opacity-100 transition-opacity">
+        {title}
+      </h3>
+    </div>
+    <div className="p-7 relative z-10">
+      <div className="grid grid-cols-1 gap-7">
+        {children}
+      </div>
+    </div>
+  </div>
+);
+
+const InfoItem = ({ label, value, icon: Icon, fullWidth = false }: { label: string, value: string | null | undefined, icon?: any, fullWidth?: boolean }) => (
+  <div className={cn("flex flex-col group", fullWidth && "col-span-full")}>
+    <span className="text-[8px] font-black text-muted-foreground uppercase tracking-[0.15em] mb-2 opacity-30 group-hover:opacity-80 transition-opacity flex items-center gap-2">
+      {label}
+      <div className="flex-1 h-px bg-slate-200 dark:bg-white/5" />
+    </span>
+    <div className="flex items-start gap-3">
+      {Icon && (
+        <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 group-hover:border-primary/30 transition-colors">
+          <Icon className="w-3.5 h-3.5 text-slate-400 group-hover:text-primary transition-colors" />
+        </div>
+      )}
+      <span className="text-[14px] font-bold text-slate-900 dark:text-slate-100 leading-tight tracking-tight mt-0.5">
+        {value || <span className="opacity-10 italic font-medium uppercase text-[9px]">S/I</span>}
+      </span>
+    </div>
+  </div>
+);
+
 export const FSMDetailModal: React.FC<FSMDetailModalProps> = ({
   isOpen,
   onClose,
   ticket
 }) => {
   if (!ticket) return null;
-
-  const DetailSection = ({ icon: Icon, title, children, variant = 'default', index }: { icon: any, title: string, children: React.ReactNode, variant?: 'default' | 'accent' | 'highlight', index: number }) => (
-    <div 
-      className={cn(
-        "rounded-[1.5rem] border transition-all duration-500 relative overflow-hidden group",
-        "animate-in fade-in slide-in-from-right-12 ease-out",
-        variant === 'default' && "bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border-white/40 dark:border-white/5 shadow-lg",
-        variant === 'accent' && "bg-slate-50/60 dark:bg-slate-800/20 border-slate-200/40 dark:border-slate-700/40 shadow-sm",
-        variant === 'highlight' && "bg-emerald-50/40 dark:bg-emerald-900/10 border-emerald-500/20 shadow-sm"
-      )}
-      style={{ animationDelay: `${index * 80}ms`, animationFillMode: 'both' }}
-    >
-      {/* Background Aura Decoration */}
-      <div className={cn(
-        "absolute -top-12 -right-12 w-24 h-24 rounded-full blur-[40px] opacity-10 transition-all group-hover:opacity-20",
-        variant === 'default' && "bg-primary",
-        variant === 'accent' && "bg-slate-400",
-        variant === 'highlight' && "bg-emerald-400"
-      )} />
-
-      <div className="flex items-center gap-4 p-5 border-b border-inherit bg-inherit/40 relative z-10">
-        <div className={cn(
-          "p-2.5 rounded-xl shadow-md relative overflow-hidden",
-          variant === 'default' && "bg-gradient-to-br from-primary to-blue-600 text-white",
-          variant === 'accent' && "bg-gradient-to-br from-slate-600 to-slate-800 text-white",
-          variant === 'highlight' && "bg-gradient-to-br from-emerald-500 to-teal-700 text-white"
-        )}>
-          {/* Internal Glow for icon */}
-          <div className="absolute inset-0 bg-white/10 blur-sm translate-y-1/2" />
-          <Icon className="w-4 h-4 relative z-10" />
-        </div>
-        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-900 dark:text-slate-100 opacity-70 group-hover:opacity-100 transition-opacity">
-          {title}
-        </h3>
-      </div>
-      <div className="p-7 relative z-10">
-        <div className="grid grid-cols-1 gap-7">
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-
-  const InfoItem = ({ label, value, icon: Icon, fullWidth = false }: { label: string, value: string | null | undefined, icon?: any, fullWidth?: boolean }) => (
-    <div className={cn("flex flex-col group", fullWidth && "col-span-full")}>
-      <span className="text-[8px] font-black text-muted-foreground uppercase tracking-[0.15em] mb-2 opacity-30 group-hover:opacity-80 transition-opacity flex items-center gap-2">
-        {label}
-        <div className="flex-1 h-px bg-slate-200 dark:bg-white/5" />
-      </span>
-      <div className="flex items-start gap-3">
-        {Icon && (
-          <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 group-hover:border-primary/30 transition-colors">
-            <Icon className="w-3.5 h-3.5 text-slate-400 group-hover:text-primary transition-colors" />
-          </div>
-        )}
-        <span className="text-[14px] font-bold text-slate-900 dark:text-slate-100 leading-tight tracking-tight mt-0.5">
-          {value || <span className="opacity-10 italic font-medium uppercase text-[9px]">S/I</span>}
-        </span>
-      </div>
-    </div>
-  );
-
   return (
     <SIATCDrawer
       isOpen={isOpen}

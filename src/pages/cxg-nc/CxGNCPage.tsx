@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
   Search, 
   RefreshCw, 
@@ -15,13 +15,18 @@ import {
   Clock,
   MessageSquare,
   Eraser,
-  Columns
+  Columns,
+  FileText,
+  BarChart3,
+  Inbox
 } from 'lucide-react';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 import { SIATCButton } from '../../components/siatc/SIATCButton';
 import { SIATCBadge } from '../../components/siatc/SIATCBadge';
 import { SIATCModalWrapper } from '../../components/siatc/SIATCModalWrapper';
 import { SIATCActionDropdown } from '../../components/siatc/SIATCActionDropdown';
+import { SIATCTooltip } from '../../components/siatc/SIATCTooltip';
+import { SIATCTableSkeleton } from '../../components/siatc/SIATCSkeleton';
 import { 
   SIATCTable, 
   SIATCTableHeader, 
@@ -35,10 +40,14 @@ import { useAuth } from '../../hooks/useAuth';
 import { UsersService } from '../../services/usersService';
 import type { User as SystemUser } from '../../types';
 import { useDialog } from '../../context/DialogContext';
+import { useToast } from '../../context/ToastContext';
+import { relativeDate, fullDate } from '../../utils/relativeDate';
 
 export const CxGNCPage = () => {
   const { user } = useAuth();
   const dialog = useDialog();
+  const toast = useToast();
+  const columnDropdownRef = useRef<HTMLDivElement>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
@@ -51,6 +60,7 @@ export const CxGNCPage = () => {
   const [activeTab, setActiveTab] = useState<'TODOS' | 'NC' | 'CXG'>('TODOS');
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
   const [statusFilter, setStatusFilter] = useState<'TODOS' | 'REGISTRADO' | 'APROBADO_SUP' | 'ASIGNADO' | 'VALIDADO' | 'CERRADO'>('TODOS');
+  const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
   // Column Visibility
   const AVAILABLE_COLUMNS = [
@@ -214,11 +224,7 @@ export const CxGNCPage = () => {
 
   const handleCreate = async () => {
     if (!isTicketValidated) {
-      dialog.alert({
-        title: 'Validación Requerida',
-        message: 'Debe buscar y validar el ticket con la lupa antes de poder registrar la solicitud.',
-        type: 'warning'
-      });
+      toast.warning('Validación Requerida', 'Debe buscar y validar el ticket con la lupa antes de poder registrar la solicitud.');
       return;
     }
     setIsSubmitting(true);
@@ -256,11 +262,7 @@ export const CxGNCPage = () => {
       });
     } catch (error: any) {
       console.error(error);
-      dialog.alert({
-        title: 'Error al Registrar',
-        message: error.response?.data?.error || 'No se pudo registrar la solicitud. Verifique que el ticket no haya sido registrado previamente.',
-        type: 'error'
-      });
+      toast.error('Error al Registrar', error.response?.data?.error || 'No se pudo registrar la solicitud. Verifique que el ticket no haya sido registrado previamente.');
     } finally {
       setIsSubmitting(false);
     }
@@ -273,11 +275,7 @@ export const CxGNCPage = () => {
       const ticketInfo = await ncService.getTicketDetails(formData.ticket);
       if (ticketInfo.estado !== 'Closed') {
         setIsTicketValidated(false);
-        dialog.alert({ 
-          title: 'Ticket No Válido',
-          message: `El ticket #${formData.ticket} no está CERRADO. Estado actual: ${ticketInfo.estado || 'Desconocido'}`,
-          type: 'error'
-        });
+        toast.error('Ticket No Válido', `El ticket #${formData.ticket} no está CERRADO. Estado actual: ${ticketInfo.estado || 'Desconocido'}`);
         return;
       }
 
@@ -289,19 +287,11 @@ export const CxGNCPage = () => {
         supervisor_fsm: ticketInfo.supervisor_nombre
       });
       setIsTicketValidated(true);
-      dialog.alert({ 
-        title: 'Éxito',
-        message: "Ticket encontrado y válido",
-        type: 'success'
-      });
+      toast.success('Éxito', 'Ticket encontrado y válido');
     } catch (error: any) {
       console.error("Lookup error:", error);
       setIsTicketValidated(false);
-      dialog.alert({ 
-        title: 'Error de Búsqueda',
-        message: "El ticket es incorrecto o no existe",
-        type: 'error'
-      });
+      toast.error('Error de Búsqueda', 'El ticket es incorrecto o no existe');
     } finally {
       setIsLookingUp(false);
     }
@@ -446,6 +436,46 @@ export const CxGNCPage = () => {
 
   const displayedData = data;
 
+  // KPI stats from current data
+  const kpiStats = {
+    total: totalRecords,
+    registrado: data.filter(d => d.estado === 'REGISTRADO').length,
+    aprobado: data.filter(d => d.estado === 'APROBADO_SUP').length,
+    asignado: data.filter(d => d.estado === 'ASIGNADO').length,
+    validado: data.filter(d => d.estado === 'VALIDADO').length,
+    cerrado: data.filter(d => d.estado === 'CERRADO').length,
+  };
+
+  // Click outside to close column dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (columnDropdownRef.current && !columnDropdownRef.current.contains(event.target as Node)) {
+        setIsColumnDropdownOpen(false);
+      }
+    };
+    if (isColumnDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isColumnDropdownOpen]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isDetailOpen) { setIsDetailOpen(false); setDetailData(null); setDetailHistorial([]); }
+        else if (isModalOpen) setIsModalOpen(false);
+        else if (isColumnDropdownOpen) setIsColumnDropdownOpen(false);
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+        e.preventDefault();
+        setIsModalOpen(true);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isDetailOpen, isModalOpen, isColumnDropdownOpen]);
+
   // Helper: icon for history type
   const getHistoryIcon = (tipo: string) => {
     switch (tipo) {
@@ -494,38 +524,32 @@ export const CxGNCPage = () => {
             variant="secondary" 
             icon={FileSpreadsheet}
             onClick={() => {
-              const headers = [
-                'TIPO',
-                'DOCUMENTO CLIENTE',
-                'TICKET',
-                'TIENDA',
-                'CLIENTE',
-                'ASESOR CREADOR',
-                'SUPERVISOR',
-                'FECHA DE CREACION',
-                'FECHA APROBACION',
-                'FECHA PROCESADO',
-                'APROBADO',
-                'PROCESADO',
-                'ESTADO'
-              ];
+              const exportColumns = AVAILABLE_COLUMNS.filter(c => visibleColumns.includes(c.id));
+              const headers = [...exportColumns.map(c => c.label), 'ESTADO'];
               const csvContent = [
                 headers.join(','),
-                ...displayedData.map(item => [
-                  item.tipo || '',
-                  `"${item.documento_cliente || ''}"`,
-                  item.correlativo || '',
-                  `"${item.tienda || ''}"`,
-                  `"${item.cliente || ''}"`,
-                  `"${item.creado_por || ''}"`,
-                  `"${item.supervisor || ''}"`,
-                  item.fecha ? new Date(item.fecha).toLocaleDateString() : '',
-                  item.aprobado_el ? new Date(item.aprobado_el).toLocaleDateString() : '',
-                  item.procesado_el ? new Date(item.procesado_el).toLocaleDateString() : '',
-                  item.aprobado || 'PENDIENTE',
-                  item.procesado || 'PENDIENTE',
-                  item.estado || ''
-                ].join(','))
+                ...displayedData.map(item => {
+                  const row = exportColumns.map(col => {
+                    switch (col.id) {
+                      case 'tipo': return item.tipo || '';
+                      case 'documento': return `"${item.documento_cliente || ''}"`;  
+                      case 'ticket': return item.correlativo || '';
+                      case 'tienda': return `"${item.tienda || ''}"`;  
+                      case 'cliente': return `"${item.cliente || ''}"`;  
+                      case 'creado_por': return `"${item.creado_por || ''}"`;  
+                      case 'supervisor': return `"${item.supervisor || ''}"`;  
+                      case 'fecha_creacion': return item.fecha ? new Date(item.fecha).toLocaleDateString() : '';
+                      case 'fecha_aprobacion': return item.aprobado_el ? new Date(item.aprobado_el).toLocaleDateString() : '';
+                      case 'fecha_procesado': return item.procesado_el ? new Date(item.procesado_el).toLocaleDateString() : '';
+                      case 'aprobado': return item.aprobado || 'PENDIENTE';
+                      case 'procesado': return item.procesado || 'PENDIENTE';
+                      case 'motivo_real': return `"${item.vali_motivo_real || ''}"`;  
+                      case 'estado': return item.estado || '';
+                      default: return '';
+                    }
+                  });
+                  return [...row, item.estado || ''].join(',');
+                })
               ].join('\n');
               
               const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -535,11 +559,12 @@ export const CxGNCPage = () => {
               document.body.appendChild(link);
               link.click();
               document.body.removeChild(link);
+              toast.success('Exportación exitosa', `Se exportaron ${displayedData.length} registros con ${exportColumns.length} columnas.`);
             }}
           >
             Exportar
           </SIATCButton>
-          <div className="relative">
+          <div className="relative" ref={columnDropdownRef}>
             <SIATCButton 
               variant="secondary" 
               icon={Columns}
@@ -600,6 +625,36 @@ export const CxGNCPage = () => {
         </div>
       </div>
 
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 px-1 shrink-0">
+        {[
+          { label: 'Total', value: kpiStats.total, icon: BarChart3, color: 'text-slate-600 dark:text-slate-400', bg: 'bg-slate-50 dark:bg-slate-800/50', border: 'border-slate-200 dark:border-slate-700', filter: 'TODOS' as const },
+          { label: 'Registrado', value: kpiStats.registrado, icon: FileText, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-500/10', border: 'border-amber-200 dark:border-amber-500/20', filter: 'REGISTRADO' as const },
+          { label: 'Aprobado', value: kpiStats.aprobado, icon: ShieldCheck, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-500/10', border: 'border-blue-200 dark:border-blue-500/20', filter: 'APROBADO_SUP' as const },
+          { label: 'Asignado', value: kpiStats.asignado, icon: UserPlus, color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-500/10', border: 'border-purple-200 dark:border-purple-500/20', filter: 'ASIGNADO' as const },
+          { label: 'Validado', value: kpiStats.validado, icon: ClipboardCheck, color: 'text-cyan-600', bg: 'bg-cyan-50 dark:bg-cyan-500/10', border: 'border-cyan-200 dark:border-cyan-500/20', filter: 'VALIDADO' as const },
+          { label: 'Cerrado', value: kpiStats.cerrado, icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-500/10', border: 'border-emerald-200 dark:border-emerald-500/20', filter: 'CERRADO' as const },
+        ].map((kpi) => (
+          <button
+            key={kpi.label}
+            onClick={() => setStatusFilter(kpi.filter)}
+            className={`flex items-center gap-3 p-3 rounded-2xl border transition-all duration-300 hover:shadow-md hover:scale-[1.02] active:scale-95 group ${
+              statusFilter === kpi.filter
+                ? `${kpi.bg} ${kpi.border} shadow-md ring-2 ring-primary/10`
+                : 'bg-card border-border/50 hover:border-border'
+            }`}
+          >
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${kpi.bg} ${kpi.color} shrink-0 transition-transform group-hover:scale-110`}>
+              <kpi.icon className="w-4.5 h-4.5" />
+            </div>
+            <div className="flex flex-col items-start min-w-0">
+              <span className="text-lg font-black text-foreground leading-none">{kpi.value}</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground truncate">{kpi.label}</span>
+            </div>
+          </button>
+        ))}
+      </div>
+
       <div className={SIATC_THEME.LAYOUT.CONTENT_CONTAINER}>
         {/* Tabs, Search & Filters */}
         <div className="px-6 py-4 border-b border-border flex flex-col gap-4 sticky top-0 z-20 bg-card/95 backdrop-blur-md">
@@ -607,21 +662,24 @@ export const CxGNCPage = () => {
             <div className="flex bg-muted/50 p-1 rounded-lg w-fit border border-border/50">
               <button 
                 onClick={() => setActiveTab('TODOS')}
-                className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all ${activeTab === 'TODOS' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all flex items-center gap-2 ${activeTab === 'TODOS' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 Todos
+                <span className={`px-1.5 py-0.5 text-[9px] rounded-md font-black ${activeTab === 'TODOS' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>{totalRecords}</span>
               </button>
               <button 
                 onClick={() => setActiveTab('NC')}
-                className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all ${activeTab === 'NC' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all flex items-center gap-2 ${activeTab === 'NC' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 Notas de Crédito
+                <span className={`px-1.5 py-0.5 text-[9px] rounded-md font-black ${activeTab === 'NC' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>{data.filter(d => (d.tipo as string) === 'NC' || (d.tipo as string) === 'Nota de Credito').length}</span>
               </button>
               <button 
                 onClick={() => setActiveTab('CXG')}
-                className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all ${activeTab === 'CXG' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all flex items-center gap-2 ${activeTab === 'CXG' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
               >
                 Cambio por Garantía
+                <span className={`px-1.5 py-0.5 text-[9px] rounded-md font-black ${activeTab === 'CXG' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>{data.filter(d => (d.tipo as string) === 'CXG' || (d.tipo as string) === 'Cambio por Garantia').length}</span>
               </button>
             </div>
             <div className="relative flex-1 max-w-md">
@@ -690,9 +748,17 @@ export const CxGNCPage = () => {
         {/* Table Area */}
         <div className={SIATC_THEME.TABLE.SCROLL_AREA}>
           {isLoading ? (
-            <div className="h-64 flex flex-col items-center justify-center gap-3">
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-              <p className="text-sm text-muted-foreground font-medium">Sincronizando con SAP...</p>
+            <SIATCTableSkeleton rows={8} columns={Math.min(visibleColumns.length, 7)} />
+          ) : displayedData.length === 0 ? (
+            <div className="h-64 flex flex-col items-center justify-center gap-4 py-12">
+              <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center">
+                <Inbox className="w-8 h-8 text-muted-foreground/40" />
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-bold text-foreground">Sin resultados</p>
+                <p className="text-xs text-muted-foreground mt-1">No se encontraron solicitudes con los filtros actuales.</p>
+              </div>
+              <SIATCButton variant="ghost" size="sm" icon={Eraser} onClick={handleClearFilters}>Limpiar Filtros</SIATCButton>
             </div>
           ) : (
             <SIATCTable>
@@ -707,37 +773,59 @@ export const CxGNCPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {displayedData.map((item) => {
+                {displayedData.map((item, rowIndex) => {
                   const renderCellContent = (colId: string) => {
                     switch (colId) {
                       case 'tipo': return (
                         <SIATCBadge variant={((item.tipo as string) === 'NC' || (item.tipo as string) === 'Nota de Credito') ? 'warning' : 'info'}>
-                          {item.tipo}
+                          {((item.tipo as string) === 'Cambio por Garantia' || (item.tipo as string) === 'CXG') ? 'CXG' : 'NC'}
                         </SIATCBadge>
                       );
                       case 'documento': return <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>{item.documento_cliente || '—'}</span>;
                       case 'ticket': return <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>#{item.correlativo}</span>;
-                      case 'tienda': return <div className="text-xs font-semibold text-foreground truncate max-w-[120px]">{item.tienda || '—'}</div>;
-                      case 'cliente': return <div className="font-bold text-foreground italic">{item.cliente}</div>;
-                      case 'creado_por': return <div className="text-[10px] font-black uppercase text-muted-foreground truncate max-w-[120px]">{item.creado_por || '—'}</div>;
-                      case 'supervisor': return <div className="text-[10px] font-black uppercase text-primary/80 truncate max-w-[120px]">{item.supervisor || '—'}</div>;
+                      case 'tienda': return (
+                        <SIATCTooltip content={item.tienda || ''} position="bottom">
+                          <div className="text-xs font-semibold text-foreground truncate max-w-[120px]">{item.tienda || '—'}</div>
+                        </SIATCTooltip>
+                      );
+                      case 'cliente': return (
+                        <SIATCTooltip content={item.cliente || ''} position="bottom">
+                          <div className="font-bold text-foreground truncate max-w-[140px]">{item.cliente}</div>
+                        </SIATCTooltip>
+                      );
+                      case 'creado_por': return (
+                        <SIATCTooltip content={item.creado_por || ''} position="bottom">
+                          <div className="text-[10px] font-black uppercase text-muted-foreground truncate max-w-[120px]">{item.creado_por || '—'}</div>
+                        </SIATCTooltip>
+                      );
+                      case 'supervisor': return (
+                        <SIATCTooltip content={item.supervisor || ''} position="bottom">
+                          <div className="text-[10px] font-black uppercase text-primary/80 truncate max-w-[120px]">{item.supervisor || '—'}</div>
+                        </SIATCTooltip>
+                      );
                       case 'fecha_creacion': return (
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Calendar className="w-3.5 h-3.5" />
-                          <span className="text-xs">{item.fecha ? new Date(item.fecha).toLocaleDateString() : '—'}</span>
-                        </div>
+                        <SIATCTooltip content={fullDate(item.fecha)} position="bottom">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span className="text-xs">{relativeDate(item.fecha)}</span>
+                          </div>
+                        </SIATCTooltip>
                       );
                       case 'fecha_aprobacion': return (
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Calendar className="w-3.5 h-3.5" />
-                          <span className="text-xs">{item.aprobado_el ? new Date(item.aprobado_el).toLocaleDateString() : '—'}</span>
-                        </div>
+                        <SIATCTooltip content={fullDate(item.aprobado_el)} position="bottom">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span className="text-xs">{relativeDate(item.aprobado_el)}</span>
+                          </div>
+                        </SIATCTooltip>
                       );
                       case 'fecha_procesado': return (
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Calendar className="w-3.5 h-3.5" />
-                          <span className="text-xs">{item.procesado_el ? new Date(item.procesado_el).toLocaleDateString() : '—'}</span>
-                        </div>
+                        <SIATCTooltip content={fullDate(item.procesado_el)} position="bottom">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span className="text-xs">{relativeDate(item.procesado_el)}</span>
+                          </div>
+                        </SIATCTooltip>
                       );
                       case 'aprobado': return (
                         <div className="flex flex-col gap-0.5">
@@ -775,8 +863,10 @@ export const CxGNCPage = () => {
                   return (
                     <SIATCTableRow 
                       key={item.id} 
-                      onClick={() => handleViewDetail(item.id)}
+                      isActive={selectedRowId === item.id}
+                      onClick={() => { setSelectedRowId(item.id); handleViewDetail(item.id); }}
                       className="cursor-pointer hover:bg-muted/50 transition-colors"
+                      style={{ animationDelay: `${rowIndex * 30}ms` }}
                     >
                       {visibleColumns.map(colId => {
                         const colDef = AVAILABLE_COLUMNS.find(c => c.id === colId);
@@ -1199,7 +1289,8 @@ export const CxGNCPage = () => {
                 {/* Audit Steps Summary */}
                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
                   <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">Trazabilidad de Proceso</h3>
-                  <div className="space-y-2">
+                  <div className="relative space-y-0 pl-2">
+                    <div className="absolute left-[19px] top-4 bottom-4 w-[2px] bg-border/50" />
                     <AuditStep 
                       label="Aprobación Supervisor" 
                       user={detailData.aprobado_por} 
@@ -1207,6 +1298,7 @@ export const CxGNCPage = () => {
                       status={detailData.aprobado}
                       reason={detailData.aprobado_motivo}
                       obs={detailData.aprobado_observacion}
+                      icon={ShieldCheck}
                     />
                     {detailData.asignado_a && (
                       <AuditStep 
@@ -1214,6 +1306,7 @@ export const CxGNCPage = () => {
                         user={detailData.asignado_por} 
                         date={detailData.asignado_el} 
                         status="ASIGNADO" 
+                        icon={UserPlus}
                       />
                     )}
                     <AuditStep 
@@ -1221,12 +1314,14 @@ export const CxGNCPage = () => {
                       user={detailData.vali_por} 
                       date={detailData.vali_el} 
                       status={detailData.vali_cliente} 
+                      icon={ClipboardCheck}
                     />
                     <AuditStep 
                       label="Cierre Final" 
                       user={detailData.procesado_por || detailData.gestionado_por} 
                       date={detailData.procesado_el || detailData.fecha_gestionado} 
                       status={detailData.gestionado === 'Si' ? 'CERRADO' : detailData.gestionado === 'No' ? 'RECHAZADO' : null} 
+                      icon={CheckCircle2}
                     />
                   </div>
                 </div>
@@ -1467,25 +1562,42 @@ export const CxGNCPage = () => {
   );
 };
 
-const AuditStep = ({ label, user, date, status, reason, obs }: { label: string, user?: string | null, date?: string | null, status?: string | null, reason?: string | null, obs?: string | null }) => {
-  if (!user && !status) return <div className="p-2 rounded border border-dashed border-border/50 text-[10px] text-muted-foreground text-center font-bold">{label} - Pendiente</div>;
+const AuditStep = ({ label, user, date, status, reason, obs, icon: Icon }: { label: string, user?: string | null, date?: string | null, status?: string | null, reason?: string | null, obs?: string | null, icon?: any }) => {
+  const isPending = !user && !status;
+  const isRejected = status === 'RECHAZADO' || status === 'FALSA';
+  const IconComponent = Icon || CheckCircle2;
   
   return (
-    <div className="p-2 bg-white dark:bg-slate-900 border border-border shadow-sm rounded-lg flex flex-col gap-2">
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="text-[9px] font-black uppercase text-primary leading-none mb-1">{label}</div>
-          <div className="text-[10px] font-bold text-foreground">{user || '—'}</div>
-          <div className="text-[9px] text-muted-foreground italic">{date ? new Date(date).toLocaleString() : ''}</div>
-        </div>
-        <SIATCBadge variant={status === 'RECHAZADO' || status === 'FALSA' ? 'danger' : 'success'} className="text-[8px] h-5 px-1.5">{status}</SIATCBadge>
+    <div className="relative pl-10 pb-6 last:pb-0 group">
+      {/* Stepper dot */}
+      <div className={`absolute left-[3px] top-1 w-[16px] h-[16px] rounded-full border-2 flex items-center justify-center bg-card transition-colors z-10 ${
+        isPending ? 'border-border text-border' : 
+        isRejected ? 'border-rose-500 text-rose-500' : 'border-emerald-500 text-emerald-500'
+      }`}>
+        {isPending ? <div className="w-1.5 h-1.5 rounded-full bg-border" /> : <IconComponent className="w-2.5 h-2.5" />}
       </div>
-      {(reason || obs) && (
-        <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
-          {reason && <p className="text-[9px] font-black text-rose-500 uppercase leading-none mb-1">Motivo: <span className="text-foreground">{reason}</span></p>}
-          {obs && <p className="text-[10px] text-muted-foreground leading-tight italic">"{obs}"</p>}
+      
+      <div className={`p-3 bg-white dark:bg-slate-900 border shadow-sm rounded-lg flex flex-col gap-2 transition-all ${
+        isPending ? 'border-border/50 opacity-60' : 
+        isRejected ? 'border-rose-200 dark:border-rose-800' : 'border-emerald-200 dark:border-emerald-800 hover:shadow-md'
+      }`}>
+        <div className="flex items-center justify-between">
+          <div>
+            <div className={`text-[9px] font-black uppercase leading-none mb-1 ${isPending ? 'text-muted-foreground' : 'text-primary'}`}>{label}</div>
+            <div className="text-[10px] font-bold text-foreground">{user || (isPending ? 'Pendiente' : '—')}</div>
+            <div className="text-[9px] text-muted-foreground italic">{date ? new Date(date).toLocaleString() : ''}</div>
+          </div>
+          {status && (
+            <SIATCBadge variant={isRejected ? 'danger' : 'success'} className="text-[8px] h-5 px-1.5">{status}</SIATCBadge>
+          )}
         </div>
-      )}
+        {(reason || obs) && (
+          <div className="pt-2 mt-1 border-t border-slate-100 dark:border-slate-800">
+            {reason && <p className="text-[9px] font-black text-rose-500 uppercase leading-none mb-1">Motivo: <span className="text-foreground">{reason}</span></p>}
+            {obs && <p className="text-[10px] text-muted-foreground leading-tight italic">"{obs}"</p>}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
