@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { apiClient, API_BASE_URL } from './apiClient';
 import type { SAPTransactionData } from '../types';
 
@@ -127,11 +127,15 @@ export class SapParserService {
 
             reader.onload = async (e) => {
                 try {
-                    const data = new Uint8Array(e.target?.result as ArrayBuffer);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const sheetName = workbook.SheetNames[0];
-                    const sheet = workbook.Sheets[sheetName];
-                    const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                    const data = e.target?.result as ArrayBuffer;
+                    const workbook = new ExcelJS.Workbook();
+                    await workbook.xlsx.load(data);
+                    const sheet = workbook.worksheets[0];
+                    const jsonData: any[][] = [];
+                    sheet.eachRow((row) => {
+                        const rowValues = row.values as any[];
+                        jsonData.push(rowValues.slice(1));
+                    });
 
                     if (jsonData.length === 0) {
                         reject(new Error('El archivo está vacío'));

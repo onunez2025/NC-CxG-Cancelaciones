@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Upload, X, AlertCircle, CheckCircle, FileSpreadsheet, Loader2 } from 'lucide-react';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { Modal } from '../common/Modal';
 import { AccountsService } from '../../services/accountsService';
 import { CostCentersService } from '../../services/costCentersService';
@@ -60,10 +60,14 @@ export function BulkBudgetUploadModal({ isOpen, onClose, onSuccess, targetYear }
             setAllAccounts(fetchedAccounts);
             setAllBudgets(fetchedBudgets);
             const data = await file.arrayBuffer();
-            const workbook = XLSX.read(data, { type: 'array' });
-            const sheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[sheetName];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
+            const workbook = new ExcelJS.Workbook();
+            await workbook.xlsx.load(data);
+            const worksheet = workbook.worksheets[0];
+            const jsonData: any[][] = [];
+            worksheet.eachRow((row) => {
+                const rowValues = row.values as any[];
+                jsonData.push(rowValues.slice(1));
+            });
 
             if (jsonData.length < 2) throw new Error('El archivo está vacío o no tiene datos');
 

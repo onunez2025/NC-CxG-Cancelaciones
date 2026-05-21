@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
+import { verifyPermission } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -244,7 +245,7 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
 // CANCELACIONES: Motivos (must be before :id)
 // ─────────────────────────────────────────────
 
-router.get('/cancelaciones/motivos', async (req: Request, res: Response) => {
+router.get('/cancelaciones/motivos', verifyPermission('cxg.cancelaciones.view'), async (req: Request, res: Response) => {
     try {
         const pool = await getDbConnection();
         const result = await pool.request().query(`
@@ -263,7 +264,7 @@ router.get('/cancelaciones/motivos', async (req: Request, res: Response) => {
 // CANCELACIONES: Detail
 // ─────────────────────────────────────────────
 
-router.get('/cancelaciones/:id', async (req: Request, res: Response) => {
+router.get('/cancelaciones/:id', verifyPermission('cxg.cancelaciones.view'), async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const pool = await getDbConnection();
@@ -322,7 +323,7 @@ router.get('/cancelaciones/:id', async (req: Request, res: Response) => {
 // CANCELACIONES: List (Paginated)
 // ─────────────────────────────────────────────
 
-router.get('/cancelaciones', async (req: Request, res: Response) => {
+router.get('/cancelaciones', verifyPermission('cxg.cancelaciones.view'), async (req: Request, res: Response) => {
     try {
         const page = parseInt(req.query.page as string) || 1;
         const pageSize = parseInt(req.query.pageSize as string) || 20;
@@ -415,7 +416,7 @@ router.get('/cancelaciones', async (req: Request, res: Response) => {
 // CXG/NC: Motivos (must be before :id routes)
 // ─────────────────────────────────────────────
 
-router.get('/cxg-nc/motivos', async (req: Request, res: Response) => {
+router.get('/cxg-nc/motivos', verifyPermission('cxg.cxg_nc.view'), async (req: Request, res: Response) => {
     try {
         const pool = await getDbConnection();
         const result = await pool.request().query(`
@@ -434,7 +435,7 @@ router.get('/cxg-nc/motivos', async (req: Request, res: Response) => {
 // CXG/NC: List (Paginated)
 // ─────────────────────────────────────────────
 
-router.get('/cxg-nc', async (req: Request, res: Response) => {
+router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, res: Response) => {
     try {
         const page = parseInt(req.query.page as string) || 1;
         const pageSize = parseInt(req.query.pageSize as string) || 20;
@@ -529,7 +530,8 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
                 INNER JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] h 
                     ON cas.Id_colaborar = h.Id_colaborar 
                 INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON h.Supervisor = e.ID_empleado
-                WHERE cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
+                WHERE n.Supervisor_FSM IS NULL
+                  AND cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
                   AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
                 ORDER BY 
                     CASE WHEN h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE() THEN 1 ELSE 0 END DESC,
@@ -542,7 +544,8 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
                 FROM [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] da
                 INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] ia ON da.Empleado = ia.Empleado
                 INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON ia.Jefe_directo = e.ID_empleado
-                WHERE (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
+                WHERE n.Supervisor_FSM IS NULL
+                  AND (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
             ) sup_sole
             ${whereClause}
             ORDER BY n.Creado_el DESC
@@ -571,7 +574,7 @@ router.get('/cxg-nc', async (req: Request, res: Response) => {
 // CXG/NC: Historial for a solicitud
 // ─────────────────────────────────────────────
 
-router.get('/cxg-nc/:id/historial', async (req: Request, res: Response) => {
+router.get('/cxg-nc/:id/historial', verifyPermission('cxg.cxg_nc.view'), async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const pool = await getDbConnection();
@@ -600,7 +603,7 @@ router.get('/cxg-nc/:id/historial', async (req: Request, res: Response) => {
 // CXG/NC: Detail
 // ─────────────────────────────────────────────
 
-router.get('/cxg-nc/:id', async (req: Request, res: Response) => {
+router.get('/cxg-nc/:id', verifyPermission('cxg.cxg_nc.view'), async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const pool = await getDbConnection();
@@ -657,7 +660,8 @@ router.get('/cxg-nc/:id', async (req: Request, res: Response) => {
                     INNER JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] h 
                         ON cas.Id_colaborar = h.Id_colaborar 
                     INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON h.Supervisor = e.ID_empleado
-                    WHERE cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
+                    WHERE n.Supervisor_FSM IS NULL
+                      AND cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
                       AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
                     ORDER BY 
                         CASE WHEN h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE() THEN 1 ELSE 0 END DESC,
@@ -670,7 +674,8 @@ router.get('/cxg-nc/:id', async (req: Request, res: Response) => {
                     FROM [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] da
                     INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] ia ON da.Empleado = ia.Empleado
                     INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON ia.Jefe_directo = e.ID_empleado
-                    WHERE (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
+                    WHERE n.Supervisor_FSM IS NULL
+                      AND (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
                 ) sup_sole
                 WHERE n.ID_Apro_CxG_NC = @id
             `);
@@ -690,7 +695,7 @@ router.get('/cxg-nc/:id', async (req: Request, res: Response) => {
 // CANCELACIONES: Create
 // ─────────────────────────────────────────────
 
-router.post('/cancelaciones', async (req: Request, res: Response) => {
+router.post('/cancelaciones', verifyPermission('cxg.cancelaciones.create'), async (req: Request, res: Response) => {
     try {
         const { cliente, motive, ticket, observacion, usuario } = req.body;
         const pool = await getDbConnection();
@@ -705,10 +710,21 @@ router.post('/cancelaciones', async (req: Request, res: Response) => {
             .input('autorizador', sql.VarChar, usuario || 'Sistema')
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_CANCELACIONES] 
-                (ID_Cancelados, Ticket, Motivo_Cancelacion, Autorizador_Cancelacion, Generado_el, Estado_Proceso)
-                VALUES (@id, @ticket, @motivo, @autorizador, GETDATE(), 'REGISTRADO')
+                (ID_Cancelados, Ticket, Motivo_Cancelacion, Autorizador_Cancelacion, Generado_el, Estado_Proceso, Creado_por)
+                VALUES (@id, @ticket, @motivo, @autorizador, GETDATE(), 'REGISTRADO', @autorizador)
             `);
             
+        await pool.request()
+                .input('histId', sql.VarChar, Math.random().toString(16).substring(2, 10).toUpperCase())
+                .input('id', sql.VarChar, id)
+                .input('accion', sql.VarChar, 'Creación')
+                .input('obs', sql.VarChar, observacion || 'Solicitud registrada')
+                .input('usuario', sql.VarChar, usuario || 'Sistema')
+                .query(`
+                    INSERT INTO [dbo].[GAC_APP_TB_HISTORIAL_CANCELACIONES]
+                    (ID_Historial_Cancelacion, ID_Cancelados, Accion, Observacion, Creado_el, Creado_por)
+                    VALUES (@histId, @id, @accion, @obs, GETDATE(), @usuario)
+                `);
         res.status(201).json({ message: 'Cancelación registrada', id });
     } catch (error: any) {
         res.status(500).json({ error: error.message });
@@ -719,7 +735,7 @@ router.post('/cancelaciones', async (req: Request, res: Response) => {
 // CANCELACIONES: Gestionar
 // ─────────────────────────────────────────────
 
-router.post('/cancelaciones/:id/gestionar', async (req: Request, res: Response) => {
+router.post('/cancelaciones/:id/gestionar', verifyPermission('cxg.cancelaciones.process'), async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { 
@@ -730,6 +746,12 @@ router.post('/cancelaciones/:id/gestionar', async (req: Request, res: Response) 
         } = req.body;
         
         const pool = await getDbConnection();
+        const checkState = await pool.request().input('id', sql.VarChar, id).query(`SELECT Estado_Proceso FROM [dbo].[GAC_APP_TB_CANCELACIONES] WHERE ID_Cancelados = @id`);
+        if (checkState.recordset.length === 0) return res.status(404).json({ error: 'Solicitud no encontrada' });
+        if (checkState.recordset[0].Estado_Proceso !== 'VALIDADO') {
+            return res.status(400).json({ error: `Acción inválida. Estado actual: ${checkState.recordset[0].Estado_Proceso}. Se requiere: VALIDADO.` });
+        }
+
         await pool.request()
             .input('id', sql.VarChar, id)
             .input('cancelacion_correcta', sql.VarChar, cancelacion_correcta)
@@ -746,9 +768,22 @@ router.post('/cancelaciones/:id/gestionar', async (req: Request, res: Response) 
                     Gestionado_por = @gestionado_por,
                     Gestionado = @gestionado,
                     Gestionado_el = GETDATE(),
-                    Estado_Proceso = 'CERRADO'
+                    Estado_Proceso = 'CERRADO',
+                    Modificado_por = @gestionado_por,
+                    Modificado_el = GETDATE()
                 WHERE ID_Cancelados = @id
             `);
+        await pool.request()
+                .input('histId', sql.VarChar, Math.random().toString(16).substring(2, 10).toUpperCase())
+                .input('id', sql.VarChar, id)
+                .input('accion', sql.VarChar, 'Gestión Final')
+                .input('obs', sql.VarChar, observacion || 'Se gestionó la solicitud')
+                .input('usuario', sql.VarChar, gestionado_por || 'Sistema')
+                .query(`
+                    INSERT INTO [dbo].[GAC_APP_TB_HISTORIAL_CANCELACIONES]
+                    (ID_Historial_Cancelacion, ID_Cancelados, Accion, Observacion, Creado_el, Creado_por)
+                    VALUES (@histId, @id, @accion, @obs, GETDATE(), @usuario)
+                `);
         res.json({ message: 'Cancelación gestionada correctamente' });
     } catch (error: any) {
         res.status(500).json({ error: error.message });
@@ -759,12 +794,17 @@ router.post('/cancelaciones/:id/gestionar', async (req: Request, res: Response) 
 // CANCELACIONES: Asignar
 // ─────────────────────────────────────────────
 
-router.post('/cancelaciones/:id/asignar', async (req: Request, res: Response) => {
+router.post('/cancelaciones/:id/asignar', verifyPermission('cxg.cancelaciones.assign'), async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { asignado_a, asignado_por } = req.body;
-        
         const pool = await getDbConnection();
+        const checkState = await pool.request().input('id', sql.VarChar, id).query(`SELECT Estado_Proceso FROM [dbo].[GAC_APP_TB_CANCELACIONES] WHERE ID_Cancelados = @id`);
+        if (checkState.recordset.length === 0) return res.status(404).json({ error: 'Solicitud no encontrada' });
+        if (checkState.recordset[0].Estado_Proceso !== 'APROBADO_SUP') {
+            return res.status(400).json({ error: `Acción inválida. Estado actual: ${checkState.recordset[0].Estado_Proceso}. Se requiere: APROBADO_SUP.` });
+        }
+
         await pool.request()
             .input('id', sql.VarChar, id)
             .input('asignado_a', sql.VarChar, asignado_a)
@@ -776,9 +816,22 @@ router.post('/cancelaciones/:id/asignar', async (req: Request, res: Response) =>
                     Asignado_por = @asignado_por,
                     Asignado_el = GETDATE(),
                     Gestionado = 'No',
-                    Estado_Proceso = 'ASIGNADO'
+                    Estado_Proceso = 'ASIGNADO',
+                    Modificado_por = @asignado_por,
+                    Modificado_el = GETDATE()
                 WHERE ID_Cancelados = @id
             `);
+        await pool.request()
+                .input('histId', sql.VarChar, Math.random().toString(16).substring(2, 10).toUpperCase())
+                .input('id', sql.VarChar, id)
+                .input('accion', sql.VarChar, 'Asignación')
+                .input('obs', sql.VarChar, 'Asignado a: ' + asignado_a)
+                .input('usuario', sql.VarChar, asignado_por || 'Sistema')
+                .query(`
+                    INSERT INTO [dbo].[GAC_APP_TB_HISTORIAL_CANCELACIONES]
+                    (ID_Historial_Cancelacion, ID_Cancelados, Accion, Observacion, Creado_el, Creado_por)
+                    VALUES (@histId, @id, @accion, @obs, GETDATE(), @usuario)
+                `);
         res.json({ message: 'Cancelación asignada' });
     } catch (error: any) {
         res.status(500).json({ error: error.message });
@@ -824,7 +877,7 @@ router.post('/cancelaciones/:id/reject', async (req: Request, res: Response) => 
 // CXG/NC: Create + History entry
 // ─────────────────────────────────────────────
 
-router.post('/cxg-nc', async (req: Request, res: Response) => {
+router.post('/cxg-nc', verifyPermission('cxg.cxg_nc.create'), async (req: Request, res: Response) => {
     try {
         const { tipo, cliente, ticket, observacion, motivo_elevacion, lugar_compra, supervisor_fsm } = req.body;
         const pool = await getDbConnection();
@@ -886,11 +939,17 @@ router.post('/cxg-nc', async (req: Request, res: Response) => {
 // CXG/NC: Aprobar Solicitud (Supervisor) + History
 // ─────────────────────────────────────────────
 
-router.post('/cxg-nc/:id/aprobar-solicitud', async (req: Request, res: Response) => {
+router.post('/cxg-nc/:id/aprobar-solicitud', verifyPermission('cxg.cxg_nc.approve'), async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { aprobado, motivo, observacion, usuario } = req.body;
         const pool = await getDbConnection();
+        const checkState = await pool.request().input('id', sql.VarChar, id).query(`SELECT Estado_Proceso FROM [dbo].[GAC_APP_TB_CXG_NC] WHERE ID_Apro_CxG_NC = @id`);
+        if (checkState.recordset.length === 0) return res.status(404).json({ error: 'Solicitud no encontrada' });
+        if (checkState.recordset[0].Estado_Proceso !== 'REGISTRADO') {
+            return res.status(400).json({ error: `Acción inválida. Estado actual: ${checkState.recordset[0].Estado_Proceso}. Se requiere: REGISTRADO.` });
+        }
+
         const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
 
         // Update main table
@@ -939,11 +998,17 @@ router.post('/cxg-nc/:id/aprobar-solicitud', async (req: Request, res: Response)
 // CXG/NC: Asignar + History
 // ─────────────────────────────────────────────
 
-router.post('/cxg-nc/:id/asignar', async (req: Request, res: Response) => {
+router.post('/cxg-nc/:id/asignar', verifyPermission('cxg.cxg_nc.assign'), async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { asignado_a, asignado_por, asignado_nombre } = req.body;
         const pool = await getDbConnection();
+        const checkState = await pool.request().input('id', sql.VarChar, id).query(`SELECT Estado_Proceso FROM [dbo].[GAC_APP_TB_CXG_NC] WHERE ID_Apro_CxG_NC = @id`);
+        if (checkState.recordset.length === 0) return res.status(404).json({ error: 'Solicitud no encontrada' });
+        if (checkState.recordset[0].Estado_Proceso !== 'APROBADO_SUP') {
+            return res.status(400).json({ error: `Acción inválida. Estado actual: ${checkState.recordset[0].Estado_Proceso}. Se requiere: APROBADO_SUP.` });
+        }
+
         const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
 
         await pool.request()
@@ -980,11 +1045,17 @@ router.post('/cxg-nc/:id/asignar', async (req: Request, res: Response) => {
 // CXG/NC: Gestionar (Cierre) + History
 // ─────────────────────────────────────────────
 
-router.post('/cxg-nc/:id/gestionar', async (req: Request, res: Response) => {
+router.post('/cxg-nc/:id/gestionar', verifyPermission('cxg.cxg_nc.process'), async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { observacion, gestionado_por, resultado } = req.body;
         const pool = await getDbConnection();
+        const checkState = await pool.request().input('id', sql.VarChar, id).query(`SELECT Estado_Proceso FROM [dbo].[GAC_APP_TB_CXG_NC] WHERE ID_Apro_CxG_NC = @id`);
+        if (checkState.recordset.length === 0) return res.status(404).json({ error: 'Solicitud no encontrada' });
+        if (checkState.recordset[0].Estado_Proceso !== 'VALIDADO') {
+            return res.status(400).json({ error: `Acción inválida. Estado actual: ${checkState.recordset[0].Estado_Proceso}. Se requiere: VALIDADO.` });
+        }
+
         const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
 
         await pool.request()
@@ -1024,11 +1095,17 @@ router.post('/cxg-nc/:id/gestionar', async (req: Request, res: Response) => {
 // CANCELACIONES: Aprobar Solicitud (Supervisor)
 // ─────────────────────────────────────────────
 
-router.post('/cancelaciones/:id/aprobar-solicitud', async (req: Request, res: Response) => {
+router.post('/cancelaciones/:id/aprobar-solicitud', verifyPermission('cxg.cancelaciones.gestionar'), async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { aprobado, observacion, usuario } = req.body;
         const pool = await getDbConnection();
+        const checkState = await pool.request().input('id', sql.VarChar, id).query(`SELECT Estado_Proceso FROM [dbo].[GAC_APP_TB_CANCELACIONES] WHERE ID_Cancelados = @id`);
+        if (checkState.recordset.length === 0) return res.status(404).json({ error: 'Solicitud no encontrada' });
+        if (checkState.recordset[0].Estado_Proceso !== 'REGISTRADO') {
+            return res.status(400).json({ error: `Acción inválida. Estado actual: ${checkState.recordset[0].Estado_Proceso}. Se requiere: REGISTRADO.` });
+        }
+
         await pool.request()
             .input('id', sql.VarChar, id)
             .input('aprobado', sql.VarChar, aprobado)
@@ -1054,11 +1131,17 @@ router.post('/cancelaciones/:id/aprobar-solicitud', async (req: Request, res: Re
 // CANCELACIONES: Validar Cliente
 // ─────────────────────────────────────────────
 
-router.post('/cancelaciones/:id/validar-cliente', async (req: Request, res: Response) => {
+router.post('/cancelaciones/:id/validar-cliente', verifyPermission('cxg.cancelaciones.process'), async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { resultado, observacion, usuario, motivo_real } = req.body;
         const pool = await getDbConnection();
+        const checkState = await pool.request().input('id', sql.VarChar, id).query(`SELECT Estado_Proceso FROM [dbo].[GAC_APP_TB_CANCELACIONES] WHERE ID_Cancelados = @id`);
+        if (checkState.recordset.length === 0) return res.status(404).json({ error: 'Solicitud no encontrada' });
+        if (checkState.recordset[0].Estado_Proceso !== 'ASIGNADO') {
+            return res.status(400).json({ error: `Acción inválida. Estado actual: ${checkState.recordset[0].Estado_Proceso}. Se requiere: ASIGNADO.` });
+        }
+
         await pool.request()
             .input('id', sql.VarChar, id)
             .input('resultado', sql.VarChar, resultado)
@@ -1086,11 +1169,17 @@ router.post('/cancelaciones/:id/validar-cliente', async (req: Request, res: Resp
 // CXG/NC: Validar Cliente + History
 // ─────────────────────────────────────────────
 
-router.post('/cxg-nc/:id/validar-cliente', async (req: Request, res: Response) => {
+router.post('/cxg-nc/:id/validar-cliente', verifyPermission('cxg.cxg_nc.gestionar'), async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { resultado, observacion, usuario, motivo_real } = req.body;
         const pool = await getDbConnection();
+        const checkState = await pool.request().input('id', sql.VarChar, id).query(`SELECT Estado_Proceso FROM [dbo].[GAC_APP_TB_CXG_NC] WHERE ID_Apro_CxG_NC = @id`);
+        if (checkState.recordset.length === 0) return res.status(404).json({ error: 'Solicitud no encontrada' });
+        if (checkState.recordset[0].Estado_Proceso !== 'ASIGNADO') {
+            return res.status(400).json({ error: `Acción inválida. Estado actual: ${checkState.recordset[0].Estado_Proceso}. Se requiere: ASIGNADO.` });
+        }
+
         const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
 
         await pool.request()
