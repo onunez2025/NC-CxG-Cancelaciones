@@ -34,8 +34,11 @@ import {
   SIATCTableRow, 
   SIATCTableCell 
 } from '../../components/siatc/table/SIATCTable';
-import { ncService } from '../../services/ncService';
-import type { CxGNC, HistorialEntry, CxGNCMotivo } from '../../services/ncService';
+import { 
+  ncService, 
+  type CxGNC,
+  type CxGNCMotivo
+} from '../../services/ncService';
 import { auditService } from '../../services/auditService';
 import { useAuth } from '../../hooks/useAuth';
 import { UsersService } from '../../services/usersService';
@@ -131,7 +134,7 @@ export const CxGNCPage = () => {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [detailData, setDetailData] = useState<CxGNC | null>(null);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
-  const [detailHistorial, setDetailHistorial] = useState<HistorialEntry[]>([]);
+
 
   // Validation state removed
 
@@ -444,15 +447,11 @@ export const CxGNCPage = () => {
   const handleViewDetail = async (id: string) => {
     setIsDetailOpen(true);
     setIsLoadingDetail(true);
-    setDetailHistorial([]);
+
     setDetailData(null);
     try {
-      const [detail, historial] = await Promise.all([
-        ncService.getCxGNCDetail(id),
-        ncService.getCxGNCHistorial(id)
-      ]);
+      const detail = await ncService.getCxGNCDetail(id);
       setDetailData(detail);
-      setDetailHistorial(historial);
     } catch (error) {
       console.error('Error fetching detail:', error);
       dialog.alert({
@@ -498,7 +497,7 @@ export const CxGNCPage = () => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (isDetailOpen) { setIsDetailOpen(false); setDetailData(null); setDetailHistorial([]); }
+        if (isDetailOpen) { setIsDetailOpen(false); setDetailData(null); }
         else if (isModalOpen) setIsModalOpen(false);
         else if (isColumnDropdownOpen) setIsColumnDropdownOpen(false);
         else if (activeFilterCol) setActiveFilterCol(null);
@@ -519,9 +518,9 @@ export const CxGNCPage = () => {
       {isDetailOpen && detailData ? (
         <CxGNCDetailView 
           detailData={detailData}
-          detailHistorial={detailHistorial}
+
           isLoadingDetail={isLoadingDetail}
-          onBack={() => { setIsDetailOpen(false); setDetailData(null); setDetailHistorial([]); }}
+          onBack={() => { setIsDetailOpen(false); setDetailData(null); }}
           actions={{
             canApprove: detailData?.estado === 'REGISTRADO' && hasPermission('cxg.cxg_nc.approve'),
             onApprove: () => {

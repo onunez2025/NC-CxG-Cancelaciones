@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, DollarSign, ShieldCheck, UserPlus, ClipboardCheck, CheckCircle2, XCircle, Clock, ArrowLeft, MessageSquare, Wrench } from 'lucide-react';
+import { Loader2, DollarSign, ShieldCheck, UserPlus, CheckCircle2, ArrowLeft, Wrench, XCircle } from 'lucide-react';
 import { SIATCBadge } from '../../../components/siatc/SIATCBadge';
 import { SIATCButton } from '../../../components/siatc/SIATCButton';
-import { ncService, type CxGNC, type HistorialEntry, type EquipmentHistoryEntry } from '../../../services/ncService';
+import { ncService, type CxGNC, type EquipmentHistoryEntry } from '../../../services/ncService';
 
 interface CxGNCDetailViewProps {
   detailData: CxGNC;
-  detailHistorial: HistorialEntry[];
+
   isLoadingDetail: boolean;
   onBack: () => void;
   actions?: {
@@ -19,7 +19,7 @@ interface CxGNCDetailViewProps {
   };
 }
 
-export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, detailHistorial, isLoadingDetail, onBack, actions }) => {
+export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, isLoadingDetail, onBack, actions }) => {
   const [equipmentHistory, setEquipmentHistory] = useState<EquipmentHistoryEntry[]>([]);
   const [isLoadingEquipment, setIsLoadingEquipment] = useState(false);
 
@@ -59,29 +59,6 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, de
     );
   }
 
-  const getHistoryIcon = (tipo: string) => {
-    switch (tipo) {
-      case 'Registro': return DollarSign;
-      case 'Aprobación': return ShieldCheck;
-      case 'Asignación': return UserPlus;
-      case 'Validación': return ClipboardCheck;
-      case 'Gestión': return CheckCircle2;
-      case 'Llamada': return MessageSquare;
-      default: return Clock;
-    }
-  };
-
-  const getHistoryColor = (tipo: string) => {
-    switch (tipo) {
-      case 'Registro': return 'text-slate-500 bg-slate-100 border-slate-200';
-      case 'Aprobación': return 'text-amber-600 bg-amber-50 border-amber-200';
-      case 'Asignación': return 'text-blue-600 bg-blue-50 border-blue-200';
-      case 'Validación': return 'text-purple-600 bg-purple-50 border-purple-200';
-      case 'Gestión': return 'text-emerald-600 bg-emerald-50 border-emerald-200';
-      case 'Llamada': return 'text-cyan-600 bg-cyan-50 border-cyan-200';
-      default: return 'text-gray-500 bg-gray-50 border-gray-200';
-    }
-  };
 
 
   return (
@@ -149,7 +126,7 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, de
           })}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto w-full">
+        <div className="grid grid-cols-1 gap-6 max-w-4xl mx-auto w-full">
           {/* Left column: Registration & Audit */}
           <div className="space-y-4">
             <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
@@ -332,61 +309,7 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, de
             </div>
           </div>
 
-          {/* Right column: Dynamic History Timeline */}
-          <div className="space-y-4">
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 h-full">
-              <h3 className="text-xs font-black uppercase tracking-widest text-primary mb-4">
-                Historial de Acciones ({detailHistorial.length})
-              </h3>
-              
-              {detailHistorial.length === 0 ? (
-                <div className="text-center py-8">
-                  <Clock className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground italic">Sin registros de historial</p>
-                </div>
-              ) : (
-                <div className="relative space-y-0">
-                  {/* Timeline line */}
-                  <div className="absolute left-[19px] top-4 bottom-4 w-[2px] bg-border/50" />
-                  
-                  {detailHistorial.map((entry, idx) => {
-                    const Icon = getHistoryIcon(entry.tipo);
-                    const colorClass = getHistoryColor(entry.tipo);
-                    
-                    return (
-                      <div key={entry.id || idx} className="relative pl-12 pb-6 last:pb-0">
-                        {/* Timeline dot */}
-                        <div className={`absolute left-[7px] top-1 w-[26px] h-[26px] rounded-full border-2 flex items-center justify-center ${colorClass}`}>
-                          <Icon className="w-3.5 h-3.5" />
-                        </div>
-                        
-                        <div className="bg-white dark:bg-slate-900 border border-border/50 rounded-lg p-4 shadow-sm">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${colorClass}`}>
-                              {entry.tipo}
-                            </span>
-                            <span className="text-[10px] text-muted-foreground italic">
-                              {entry.fecha ? new Date(entry.fecha).toLocaleString() : ''}
-                            </span>
-                          </div>
-                          {entry.usuario && (
-                            <div className="text-xs font-bold text-foreground mb-1">
-                              {entry.usuario}
-                            </div>
-                          )}
-                          {entry.observacion && (
-                            <p className="text-xs text-muted-foreground leading-relaxed">
-                              {entry.observacion}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
+
         </div>
       </div>
     </div>
