@@ -4,6 +4,7 @@ import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { MainLayout } from './components/layout/MainLayout';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { DialogProvider } from './context/DialogContext';
+import { ToastProvider } from './context/ToastContext';
 import { LoginPage } from './pages/LoginPage';
 import { ForceChangePasswordPage } from './pages/ForceChangePasswordPage';
 import UsersPage from './pages/config/UsersPage';
@@ -77,6 +78,7 @@ function App() {
       <Router>
         <AuthProvider>
           <DialogProvider>
+            <ToastProvider>
             <Routes>
               <Route path="/login" element={<LoginPage />} />
 
@@ -123,8 +125,9 @@ function App() {
               <Route path="/profile" element={<ProfilePage />} />
             </Route>
 
-            <Route path="*" element={<NotFound />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
+            </ToastProvider>
           </DialogProvider>
         </AuthProvider>
       </Router>

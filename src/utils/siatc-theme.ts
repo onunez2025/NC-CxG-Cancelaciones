@@ -33,19 +33,19 @@ export const SIATC_THEME = {
         SECTION_TITLE: "text-base font-black text-white tracking-tight leading-none",
         TABLE_HEADER: "px-6 py-4 font-black text-[13px] uppercase tracking-wider text-muted-foreground",
         BADGE_TEXT: "text-[10px] font-black tracking-widest uppercase",
-        FOOTER_STATS: "text-[10px] font-black text-muted-foreground tracking-[0.2em] uppercase opacity-60",
+        FOOTER_STATS: "text-[10px] font-black text-muted-foreground tracking-[0.2em] uppercase opacity-80",
         TINY_MONO: "text-[12px] font-mono font-black tracking-tight",
     },
 
     // 3. TABLAS (DENSIDAD Y ESTILOS PLATINUM)
     TABLE: {
-        TABLE_ELEMENT: "w-full text-sm text-left border-collapse min-w-[1000px]",
-        HEADER_ROW: "sticky top-0 z-20 bg-muted/90 backdrop-blur-md border-b border-border shadow-sm",
+        TABLE_ELEMENT: "w-full text-sm text-left border-collapse md:min-w-[1000px]",
+        HEADER_ROW: "hidden md:table-row sticky top-0 z-20 bg-muted/90 backdrop-blur-md border-b border-border shadow-sm",
         HEADER_TH: "px-6 py-4 font-black text-[13px] uppercase tracking-wider text-muted-foreground whitespace-nowrap text-left",
-        BODY_ROW: "group hover:bg-primary/5 transition-all duration-200 border-b border-border/50",
-        CELL: "px-6 py-4 align-top font-medium",
+        BODY_ROW: "group hover:bg-primary/5 transition-all duration-200 border-b border-border/50 block md:table-row mb-4 md:mb-0 bg-card rounded-[1.5rem] md:rounded-none shadow-sm md:shadow-none p-2 md:p-0 border md:border-b",
+        CELL: "flex md:table-cell justify-between items-center md:items-start px-4 py-3 md:px-6 md:py-4 align-top font-medium before:content-[attr(data-label)] before:font-bold before:text-[10px] before:uppercase before:text-muted-foreground md:before:hidden before:mr-4 gap-4",
         SCROLL_AREA: "flex-1 overflow-auto relative custom-scrollbar",
-        FOOTER: "px-6 py-4 border-t border-border bg-muted/30 flex items-center justify-between shrink-0 rounded-b-[2rem]",
+        FOOTER: "px-6 py-4 border-t border-border bg-muted/30 flex flex-col md:flex-row items-center justify-between shrink-0 rounded-b-[2rem] gap-4 md:gap-0",
     },
 
     // 4. EFECTOS ESPECIALES

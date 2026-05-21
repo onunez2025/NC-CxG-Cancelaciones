@@ -778,12 +778,15 @@ export const CxGNCPage = () => {
                       onClick={() => handleViewDetail(item.id)}
                       className="cursor-pointer hover:bg-muted/50 transition-colors"
                     >
-                      {visibleColumns.map(colId => (
-                        <SIATCTableCell key={colId}>
+                      {visibleColumns.map(colId => {
+                        const colDef = AVAILABLE_COLUMNS.find(c => c.id === colId);
+                        return (
+                        <SIATCTableCell key={colId} data-label={colDef?.label}>
                           {renderCellContent(colId)}
                         </SIATCTableCell>
-                      ))}
-                      <SIATCTableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                        );
+                      })}
+                      <SIATCTableCell className="text-right" onClick={(e) => e.stopPropagation()} data-label="Acciones">
                         <div className="flex justify-end">
                         <SIATCActionDropdown 
                           actions={[
