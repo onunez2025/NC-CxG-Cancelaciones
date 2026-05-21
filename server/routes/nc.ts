@@ -546,10 +546,10 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
                     n.Creado_el as fecha_creacion,
                     COALESCE(t.NombreCliente, n.Tienda) as cliente,
                     CASE 
-                        WHEN n.Procesado IS NOT NULL AND n.Procesado <> '' AND n.Procesado <> 'NO' THEN 'CERRADO'
+                        WHEN n.Procesado = 'true' THEN 'CERRADO'
                         WHEN n.Procesado_por IS NOT NULL AND n.Procesado_por <> '' THEN 'ASIGNADO'
-                        WHEN n.Aprobado = 'No' THEN 'RECHAZADO'
-                        WHEN n.Aprobado = 'Si' THEN 'APROBADO_SUP'
+                        WHEN n.Aprobado = 'false' THEN 'RECHAZADO'
+                        WHEN n.Aprobado = 'true' THEN 'APROBADO_SUP'
                         ELSE 'REGISTRADO'
                     END as estado,
                     n.Aprobado as aprobado,
@@ -768,9 +768,10 @@ router.get('/cxg-nc/:id', verifyPermission('cxg.cxg_nc.view'), async (req: Reque
                     COALESCE(t.NombreCliente, n.Tienda) as cliente,
                     n.Observacion as observacion_inicial,
                     CASE 
-                        WHEN n.Procesado IS NOT NULL AND n.Procesado <> '' AND n.Procesado <> 'NO' THEN 'CERRADO'
-                        WHEN n.Aprobado = 'No' THEN 'RECHAZADO'
-                        WHEN n.Aprobado = 'Si' THEN 'APROBADO_SUP'
+                        WHEN n.Procesado = 'true' THEN 'CERRADO'
+                        WHEN n.Procesado_por IS NOT NULL AND n.Procesado_por <> '' THEN 'ASIGNADO'
+                        WHEN n.Aprobado = 'false' THEN 'RECHAZADO'
+                        WHEN n.Aprobado = 'true' THEN 'APROBADO_SUP'
                         ELSE 'REGISTRADO'
                     END as estado,
                     n.Aprobado as aprobado,
@@ -1052,7 +1053,7 @@ router.post('/cxg-nc', verifyPermission('cxg.cxg_nc.create'), async (req: Reques
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_CXG_NC] 
                 (ID_Apro_CxG_NC, Ticket, Tipo, Tienda, Observacion, Creado_el, Creado_por, Procesado, Estado_Proceso, Motivo_Elevacion, Lugar_Compra, Supervisor_FSM)
-                VALUES (@id, @ticket, @tipo, @tienda, @observacion, GETDATE(), @usuario, 'NO', 'REGISTRADO', @motivo_elevacion, @lugar_compra, @supervisor_fsm)
+                VALUES (@id, @ticket, @tipo, @tienda, @observacion, GETDATE(), @usuario, 'false', 'REGISTRADO', @motivo_elevacion, @lugar_compra, @supervisor_fsm)
             `);
 
         // Insert history entry
@@ -1086,10 +1087,10 @@ router.post('/cxg-nc/:id/aprobar-solicitud', verifyPermission('cxg.cxg_nc.approv
         const checkState = await pool.request().input('id', sql.VarChar, id).query(`
             SELECT 
                 CASE 
-                    WHEN Procesado IS NOT NULL AND Procesado <> '' AND Procesado <> 'NO' THEN 'CERRADO'
+                    WHEN Procesado = 'true' THEN 'CERRADO'
                     WHEN Procesado_por IS NOT NULL AND Procesado_por <> '' THEN 'ASIGNADO'
-                    WHEN Aprobado = 'No' THEN 'RECHAZADO'
-                    WHEN Aprobado = 'Si' THEN 'APROBADO_SUP'
+                    WHEN Aprobado = 'false' THEN 'RECHAZADO'
+                    WHEN Aprobado = 'true' THEN 'APROBADO_SUP'
                     ELSE 'REGISTRADO'
                 END as Estado_Proceso
             FROM [dbo].[GAC_APP_TB_CXG_NC] WHERE ID_Apro_CxG_NC = @id
@@ -1150,10 +1151,10 @@ router.post('/cxg-nc/:id/asignar', verifyPermission('cxg.cxg_nc.assign'), async 
         const checkState = await pool.request().input('id', sql.VarChar, id).query(`
             SELECT 
                 CASE 
-                    WHEN Procesado IS NOT NULL AND Procesado <> '' AND Procesado <> 'NO' THEN 'CERRADO'
+                    WHEN Procesado = 'true' THEN 'CERRADO'
                     WHEN Procesado_por IS NOT NULL AND Procesado_por <> '' THEN 'ASIGNADO'
-                    WHEN Aprobado = 'No' THEN 'RECHAZADO'
-                    WHEN Aprobado = 'Si' THEN 'APROBADO_SUP'
+                    WHEN Aprobado = 'false' THEN 'RECHAZADO'
+                    WHEN Aprobado = 'true' THEN 'APROBADO_SUP'
                     ELSE 'REGISTRADO'
                 END as Estado_Proceso
             FROM [dbo].[GAC_APP_TB_CXG_NC] WHERE ID_Apro_CxG_NC = @id
@@ -1206,10 +1207,10 @@ router.post('/cxg-nc/:id/gestionar', verifyPermission('cxg.cxg_nc.process'), asy
         const checkState = await pool.request().input('id', sql.VarChar, id).query(`
             SELECT 
                 CASE 
-                    WHEN Procesado IS NOT NULL AND Procesado <> '' AND Procesado <> 'NO' THEN 'CERRADO'
+                    WHEN Procesado = 'true' THEN 'CERRADO'
                     WHEN Procesado_por IS NOT NULL AND Procesado_por <> '' THEN 'ASIGNADO'
-                    WHEN Aprobado = 'No' THEN 'RECHAZADO'
-                    WHEN Aprobado = 'Si' THEN 'APROBADO_SUP'
+                    WHEN Aprobado = 'false' THEN 'RECHAZADO'
+                    WHEN Aprobado = 'true' THEN 'APROBADO_SUP'
                     ELSE 'REGISTRADO'
                 END as Estado_Proceso
             FROM [dbo].[GAC_APP_TB_CXG_NC] WHERE ID_Apro_CxG_NC = @id
@@ -1240,7 +1241,7 @@ router.post('/cxg-nc/:id/gestionar', verifyPermission('cxg.cxg_nc.process'), asy
             .input('histId', sql.VarChar, histId)
             .input('solicitud', sql.VarChar, id)
             .input('tipo', sql.VarChar, 'Gestión')
-            .input('obs', sql.VarChar, `${resultado === 'Si' ? 'PROCESADO' : 'RECHAZADO'} — ${observacion || ''}`)
+            .input('obs', sql.VarChar, `${resultado === 'true' ? 'PROCESADO' : 'RECHAZADO'} — ${observacion || ''}`)
             .input('usuario', sql.VarChar, gestionado_por || '')
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_HISTOTIAL_APROB_CXG_NC]

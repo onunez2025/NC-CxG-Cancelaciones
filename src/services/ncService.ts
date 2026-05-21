@@ -47,13 +47,13 @@ export interface CxGNC {
     observacion?: string;
     observacion_inicial?: string;
     // Native approval fields from GAC_APP_TB_CXG_NC
-    aprobado?: string;
+    aprobado?: 'true' | 'false';
     aprobado_motivo?: string;
     aprobado_observacion?: string;
     aprobado_el?: string;
     aprobado_por?: string;
     // Processing fields
-    procesado?: string;
+    procesado?: 'true' | 'false';
     procesado_motivo?: string;
     procesado_observacion?: string;
     procesado_el?: string;
@@ -274,7 +274,7 @@ export const ncService = {
         if (!response.ok) throw new Error('Error al asignar CxG/NC');
     },
 
-    async gestionarCxGNC(id: string, data: { observacion: string; gestionado_por: string; resultado?: 'Si' | 'No' }): Promise<void> {
+    async gestionarCxGNC(id: string, data: { observacion: string; gestionado_por: string; resultado?: 'true' | 'false' }): Promise<void> {
         const response = await apiClient(`${API_BASE_URL}/cxg-nc/${id}/gestionar`, {
             method: 'POST',
             body: JSON.stringify(data)
@@ -317,7 +317,7 @@ export const ncService = {
         if (!response.ok) throw new Error('Error al evaluar solicitud');
     },
 
-    async aprobarSolicitudCxGNC(id: string, data: { aprobado: 'APROBADO' | 'RECHAZADO'; motivo?: string; observacion: string; usuario: string }): Promise<void> {
+    async aprobarSolicitudCxGNC(id: string, data: { aprobado: 'true' | 'false'; motivo?: string; observacion: string; usuario: string }): Promise<void> {
         const response = await apiClient(`${API_BASE_URL}/cxg-nc/${id}/aprobar-solicitud`, {
             method: 'POST',
             body: JSON.stringify(data)

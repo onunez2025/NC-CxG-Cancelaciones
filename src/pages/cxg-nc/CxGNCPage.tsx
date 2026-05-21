@@ -125,7 +125,7 @@ export const CxGNCPage = () => {
   // Gestión state
   const [isGestionModalOpen, setIsGestionModalOpen] = useState(false);
   const [gestiónObs, setGestiónObs] = useState('');
-  const [gestiónResultado, setGestiónResultado] = useState<'Si' | 'No' | ''>('');
+  const [gestiónResultado, setGestiónResultado] = useState<'true' | 'false' | ''>('');
 
   // Detail state
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -137,7 +137,7 @@ export const CxGNCPage = () => {
 
   // Approval state (Supervisor)
   const [isAprobarOpen, setIsAprobarOpen] = useState(false);
-  const [aprobarForm, setAprobarForm] = useState({ aprobado: '' as 'APROBADO' | 'RECHAZADO' | '', motivo: '', observacion: '' });
+  const [aprobarForm, setAprobarForm] = useState({ aprobado: '' as 'true' | 'false' | '', motivo: '', observacion: '' });
   const [isAprobarSubmitting, setIsAprobarSubmitting] = useState(false);
   const [cxgMotivos, setCxgMotivos] = useState<CxGNCMotivo[]>([]);
 
@@ -357,7 +357,7 @@ export const CxGNCPage = () => {
       await auditService.logAction({
         UsuarioID: user?.id || '0',
         UsuarioNombre: user?.username || 'Sistema',
-        Accion: aprobarForm.aprobado === 'APROBADO' ? 'APPROVE' : 'REJECT',
+        Accion: aprobarForm.aprobado === 'true' ? 'APPROVE' : 'REJECT',
         Entidad: 'CXG_NC',
         EntidadID: selectedRecord.id,
         Detalle: `Solicitud ${selectedRecord.correlativo} ${aprobarForm.aprobado}. Motivo: ${aprobarForm.motivo || 'N/A'}`
@@ -415,16 +415,16 @@ export const CxGNCPage = () => {
       await ncService.gestionarCxGNC(selectedRecord.id, {
         observacion: gestiónObs,
         gestionado_por: user?.full_name || user?.username || 'Unknown',
-        resultado: gestiónResultado as 'Si' | 'No'
+        resultado: gestiónResultado as 'true' | 'false'
       });
 
       await auditService.logAction({
         UsuarioID: user?.id || '0',
         UsuarioNombre: user?.username || 'Sistema',
-        Accion: gestiónResultado === 'Si' ? 'PROCESS' : 'REJECT',
+        Accion: gestiónResultado === 'true' ? 'PROCESS' : 'REJECT',
         Entidad: 'CXG_NC',
         EntidadID: selectedRecord.id,
-        Detalle: `Solicitud ${selectedRecord.correlativo} ${gestiónResultado === 'Si' ? 'procesada' : 'rechazada'} en SAP/Sistema. Obs: ${gestiónObs}`
+        Detalle: `Solicitud ${selectedRecord.correlativo} ${gestiónResultado === 'true' ? 'procesada' : 'rechazada'} en SAP/Sistema. Obs: ${gestiónObs}`
       });
 
       setIsGestionModalOpen(false);
@@ -593,7 +593,7 @@ export const CxGNCPage = () => {
                       case 'creado_por': return `"${item.creado_por || ''}"`;  
                       case 'supervisor': return `"${item.supervisor || ''}"`;  
                       case 'fecha_creacion': return item.fecha ? new Date(item.fecha).toLocaleDateString() : '';
-                      case 'aprobado': return `"${item.aprobado || 'PENDIENTE'} ${item.aprobado_el ? `(${new Date(item.aprobado_el).toLocaleDateString()})` : ''}"`;
+                      case 'aprobado': return `"${item.aprobado === 'true' ? 'SÍ' : item.aprobado === 'false' ? 'NO' : 'PENDIENTE'} ${item.aprobado_el ? `(${new Date(item.aprobado_el).toLocaleDateString()})` : ''}"`;
                       case 'procesado': return `"${item.procesado || 'PENDIENTE'} ${item.procesado_el ? `(${new Date(item.procesado_el).toLocaleDateString()})` : ''}"`;
                       case 'estado': return item.estado || '';
                       default: return '';
@@ -979,8 +979,8 @@ export const CxGNCPage = () => {
                             </div>
                           </SIATCTooltip>
                           <div className="flex flex-col gap-0.5">
-                            <SIATCBadge variant={item.aprobado === 'APROBADO' ? 'success' : item.aprobado === 'RECHAZADO' ? 'danger' : 'warning'}>
-                              {item.aprobado === 'APROBADO' ? 'SÍ' : item.aprobado === 'RECHAZADO' ? 'NO' : 'PENDIENTE'}
+                            <SIATCBadge variant={item.aprobado === 'true' ? 'success' : item.aprobado === 'false' ? 'danger' : 'warning'}>
+                              {item.aprobado === 'true' ? 'SÍ' : item.aprobado === 'false' ? 'NO' : 'PENDIENTE'}
                             </SIATCBadge>
                             {item.aprobado_por && <span className="text-[9px] text-muted-foreground/80 truncate max-w-[100px] italic">{item.aprobado_por}</span>}
                           </div>
@@ -995,8 +995,8 @@ export const CxGNCPage = () => {
                             </div>
                           </SIATCTooltip>
                           <div className="flex flex-col gap-0.5">
-                            <SIATCBadge variant={item.procesado === 'SI' ? 'success' : 'warning'}>
-                              {item.procesado === 'SI' ? 'SÍ' : 'PENDIENTE'}
+                            <SIATCBadge variant={item.procesado === 'true' ? 'success' : 'warning'}>
+                              {item.procesado === 'true' ? 'SÍ' : 'PENDIENTE'}
                             </SIATCBadge>
                             {item.procesado_por && <span className="text-[9px] text-muted-foreground/80 truncate max-w-[100px] italic">{item.procesado_por}</span>}
                           </div>
@@ -1127,7 +1127,7 @@ export const CxGNCPage = () => {
               variant="primary" 
               onClick={handleAprobar} 
               isLoading={isAprobarSubmitting}
-              disabled={!aprobarForm.aprobado || (aprobarForm.aprobado === 'RECHAZADO' && !aprobarForm.observacion)}
+              disabled={!aprobarForm.aprobado || (aprobarForm.aprobado === 'false' && !aprobarForm.observacion)}
             >
               Confirmar Evaluación
             </SIATCButton>
@@ -1146,9 +1146,9 @@ export const CxGNCPage = () => {
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => setAprobarForm({ ...aprobarForm, aprobado: 'APROBADO' })}
+                onClick={() => setAprobarForm({ ...aprobarForm, aprobado: 'true' })}
                 className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all font-bold text-sm ${
-                  aprobarForm.aprobado === 'APROBADO'
+                  aprobarForm.aprobado === 'true'
                     ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-lg shadow-emerald-500/10'
                     : 'border-border text-muted-foreground hover:bg-muted/50'
                 }`}
@@ -1158,9 +1158,9 @@ export const CxGNCPage = () => {
               </button>
               <button
                 type="button"
-                onClick={() => setAprobarForm({ ...aprobarForm, aprobado: 'RECHAZADO' })}
+                onClick={() => setAprobarForm({ ...aprobarForm, aprobado: 'false' })}
                 className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all font-bold text-sm ${
-                  aprobarForm.aprobado === 'RECHAZADO'
+                  aprobarForm.aprobado === 'false'
                     ? 'border-rose-500 bg-rose-50 text-rose-700 shadow-lg shadow-rose-500/10'
                     : 'border-border text-muted-foreground hover:bg-muted/50'
                 }`}
@@ -1187,11 +1187,11 @@ export const CxGNCPage = () => {
 
           <div>
             <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">
-              Observaciones {aprobarForm.aprobado === 'RECHAZADO' && <span className="text-rose-500 font-bold ml-1">(REQUERIDO)</span>}
+              Observaciones {aprobarForm.aprobado === 'false' && <span className="text-rose-500 font-bold ml-1">(REQUERIDO)</span>}
             </label>
             <textarea 
               className={`${SIATC_THEME.COMPONENTS.INPUT} h-24 pt-2 resize-none`}
-              placeholder={aprobarForm.aprobado === 'RECHAZADO' ? 'Explique el motivo del rechazo...' : 'Observaciones adicionales...'}
+              placeholder={aprobarForm.aprobado === 'false' ? 'Explique el motivo del rechazo...' : 'Observaciones adicionales...'}
               value={aprobarForm.observacion}
               onChange={(e) => setAprobarForm({...aprobarForm, observacion: e.target.value})}
             />
@@ -1248,7 +1248,7 @@ export const CxGNCPage = () => {
               variant="primary" 
               onClick={handleGestionar} 
               isLoading={isSubmitting}
-              disabled={!gestiónResultado || (gestiónResultado === 'No' && !gestiónObs)}
+              disabled={!gestiónResultado || (gestiónResultado === 'false' && !gestiónObs)}
             >
               Confirmar Gestión
             </SIATCButton>
@@ -1267,9 +1267,9 @@ export const CxGNCPage = () => {
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => setGestiónResultado('Si')}
+                onClick={() => setGestiónResultado('true')}
                 className={`flex items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all font-bold text-sm ${
-                  gestiónResultado === 'Si'
+                  gestiónResultado === 'true'
                     ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-lg shadow-emerald-500/10'
                     : 'border-border text-muted-foreground hover:bg-muted/50'
                 }`}
@@ -1279,9 +1279,9 @@ export const CxGNCPage = () => {
               </button>
               <button
                 type="button"
-                onClick={() => setGestiónResultado('No')}
+                onClick={() => setGestiónResultado('false')}
                 className={`flex items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all font-bold text-sm ${
-                  gestiónResultado === 'No'
+                  gestiónResultado === 'false'
                     ? 'border-rose-500 bg-rose-50 text-rose-700 shadow-lg shadow-rose-500/10'
                     : 'border-border text-muted-foreground hover:bg-muted/50'
                 }`}
@@ -1294,11 +1294,11 @@ export const CxGNCPage = () => {
 
           <div>
             <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">
-              Observaciones de Gestión {gestiónResultado === 'No' && <span className="text-rose-500 font-bold ml-1">(REQUERIDO)</span>}
+              Observaciones de Gestión {gestiónResultado === 'false' && <span className="text-rose-500 font-bold ml-1">(REQUERIDO)</span>}
             </label>
             <textarea 
               className={`${SIATC_THEME.COMPONENTS.INPUT} h-24 pt-2 resize-none`}
-              placeholder={gestiónResultado === 'No' ? 'Explique el motivo del rechazo...' : 'Detalle el resultado del proceso (ej: N° de Nota SAP...)'}
+              placeholder={gestiónResultado === 'false' ? 'Explique el motivo del rechazo...' : 'Detalle el resultado del proceso (ej: N° de Nota SAP...)'}
               value={gestiónObs}
               onChange={(e) => setGestiónObs(e.target.value)}
             />
