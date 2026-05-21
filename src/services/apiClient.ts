@@ -14,7 +14,13 @@ export const apiClient = async (url: string, options: RequestInit = {}) => {
         headers.set('Content-Type', 'application/json');
     }
 
+    // Disable caching
+    headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    headers.set('Pragma', 'no-cache');
+    headers.set('Expires', '0');
+
     const response = await fetch(url, {
+        cache: 'no-store',
         ...options,
         headers,
     });
