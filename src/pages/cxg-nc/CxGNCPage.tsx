@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Search, 
   RefreshCw, 
@@ -18,7 +18,11 @@ import {
   Columns,
   FileText,
   BarChart3,
-  Inbox
+  Inbox,
+  ArrowUp,
+  ArrowDown,
+  ArrowUpDown,
+  Filter
 } from 'lucide-react';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 import { SIATCButton } from '../../components/siatc/SIATCButton';
@@ -48,6 +52,8 @@ export const CxGNCPage = () => {
   const dialog = useDialog();
   const toast = useToast();
   const columnDropdownRef = useRef<HTMLDivElement>(null);
+  const filterDropdownRef = useRef<HTMLDivElement>(null);
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
@@ -61,6 +67,14 @@ export const CxGNCPage = () => {
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
   const [statusFilter, setStatusFilter] = useState<'TODOS' | 'REGISTRADO' | 'APROBADO_SUP' | 'ASIGNADO' | 'VALIDADO' | 'CERRADO'>('TODOS');
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
+
+  // Sorting & Filtering State
+  const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' } | null>(null);
+  const [columnFilters, setColumnFilters] = useState<Record<string, string>>({});
+  const [activeFilterCol, setActiveFilterCol] = useState<string | null>(null);
+  const [filterSearchTerm, setFilterSearchTerm] = useState('');
+  const [filterSuggestions, setFilterSuggestions] = useState<string[]>([]);
+  const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
 
   // Column Visibility
   const AVAILABLE_COLUMNS = [
@@ -154,7 +168,10 @@ export const CxGNCPage = () => {
         pageSize, 
         search: searchTerm,
         tipo: activeTab,
-        estado: statusFilter
+        estado: statusFilter,
+        sortBy: sortConfig?.key,
+        sortOrder: sortConfig?.direction,
+        filters: columnFilters
       });
       setData(response.data);
       setTotalRecords(response.total);
@@ -179,7 +196,62 @@ export const CxGNCPage = () => {
     setActiveTab('TODOS');
     setDateRange({ start: '', end: '' });
     setStatusFilter('TODOS');
+    setSortConfig(null);
+    setColumnFilters({});
     setCurrentPage(1);
+  };
+
+  const handleSort = (colId: string) => {
+    setSortConfig(current => {
+      if (!current || current.key !== colId) return { key: colId, direction: 'asc' };
+      if (current.direction === 'asc') return { key: colId, direction: 'desc' };
+      return null;
+    });
+  };
+
+  const toggleFilter = (colId: string) => {
+    if (activeFilterCol === colId) {
+      setActiveFilterCol(null);
+    } else {
+      setActiveFilterCol(colId);
+      setFilterSearchTerm('');
+      setFilterSuggestions([]);
+    }
+  };
+
+  const fetchSuggestions = async (colId: string, search: string) => {
+    setIsFetchingSuggestions(true);
+    try {
+      const suggestions = await ncService.getUniqueColumnValues(colId, search);
+      setFilterSuggestions(suggestions);
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+      setFilterSuggestions([]);
+    } finally {
+      setIsFetchingSuggestions(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeFilterCol) {
+      const timer = setTimeout(() => {
+        fetchSuggestions(activeFilterCol, filterSearchTerm);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [filterSearchTerm, activeFilterCol]);
+
+  const applyFilter = (colId: string, value: string) => {
+    setColumnFilters(prev => {
+      const next = { ...prev };
+      if (value) {
+        next[colId] = value;
+      } else {
+        delete next[colId];
+      }
+      return next;
+    });
+    setActiveFilterCol(null);
   };
 
   useEffect(() => {
@@ -187,7 +259,7 @@ export const CxGNCPage = () => {
       fetchData();
     }, 500);
     return () => clearTimeout(timer);
-  }, [currentPage, searchTerm, activeTab, statusFilter]);
+  }, [currentPage, searchTerm, activeTab, statusFilter, sortConfig, columnFilters]);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -202,8 +274,6 @@ export const CxGNCPage = () => {
         console.error('Error fetching motives:', error);
       }
     };
-    // Only fetch users list if current user has permission to assign analysts
-    // Asesor CC users don't have 'ebm.config.users' so GET /api/users returns 403
     if (hasPermission('cxg.cxg_nc.assign')) {
       fetchAnalysts();
     }
@@ -212,7 +282,7 @@ export const CxGNCPage = () => {
 
   useEffect(() => {
     if (currentPage !== 1) setCurrentPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, sortConfig, columnFilters]);
 
   useEffect(() => {
     if (!isModalOpen) {
@@ -450,12 +520,15 @@ export const CxGNCPage = () => {
       if (columnDropdownRef.current && !columnDropdownRef.current.contains(event.target as Node)) {
         setIsColumnDropdownOpen(false);
       }
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
+        setActiveFilterCol(null);
+      }
     };
-    if (isColumnDropdownOpen) {
+    if (isColumnDropdownOpen || activeFilterCol) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isColumnDropdownOpen]);
+  }, [isColumnDropdownOpen, activeFilterCol]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -464,6 +537,7 @@ export const CxGNCPage = () => {
         if (isDetailOpen) { setIsDetailOpen(false); setDetailData(null); setDetailHistorial([]); }
         else if (isModalOpen) setIsModalOpen(false);
         else if (isColumnDropdownOpen) setIsColumnDropdownOpen(false);
+        else if (activeFilterCol) setActiveFilterCol(null);
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
         e.preventDefault();
@@ -472,7 +546,7 @@ export const CxGNCPage = () => {
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isDetailOpen, isModalOpen, isColumnDropdownOpen]);
+  }, [isDetailOpen, isModalOpen, isColumnDropdownOpen, activeFilterCol]);
 
   // Helper: icon for history type
   const getHistoryIcon = (tipo: string) => {
@@ -760,11 +834,76 @@ export const CxGNCPage = () => {
             <SIATCTable>
               <thead>
                 <tr className={SIATC_THEME.TABLE.HEADER_ROW}>
-                  {visibleColumns.map(colId => (
-                    <SIATCTableHeader key={colId}>
-                      {AVAILABLE_COLUMNS.find(c => c.id === colId)?.label}
-                    </SIATCTableHeader>
-                  ))}
+                  {visibleColumns.map(colId => {
+                    const label = AVAILABLE_COLUMNS.find(c => c.id === colId)?.label;
+                    return (
+                      <SIATCTableHeader key={colId} className="relative group p-0">
+                        <div className="flex items-center justify-between gap-1 px-3 py-2 w-full h-full">
+                           <div 
+                             className="flex items-center gap-1 cursor-pointer hover:text-primary transition-colors flex-1 min-w-0"
+                             onClick={() => handleSort(colId)}
+                           >
+                             <span className="truncate leading-tight">{label}</span>
+                             {sortConfig?.key === colId ? (
+                               sortConfig.direction === 'asc' ? <ArrowUp className="w-3 h-3 shrink-0" /> : <ArrowDown className="w-3 h-3 shrink-0" />
+                             ) : (
+                               <ArrowUpDown className="w-3 h-3 opacity-0 group-hover:opacity-40 transition-opacity shrink-0" />
+                             )}
+                           </div>
+                           <button 
+                             className={`p-1 rounded shrink-0 hover:bg-muted/50 transition-colors ${columnFilters[colId] ? 'text-primary bg-primary/10' : 'text-muted-foreground opacity-30 hover:opacity-100'}`}
+                             onClick={(e) => { e.stopPropagation(); toggleFilter(colId); }}
+                           >
+                             <Filter className="w-3 h-3" />
+                           </button>
+                           {activeFilterCol === colId && (
+                             <div 
+                               ref={filterDropdownRef}
+                               className="absolute top-full left-0 mt-1 w-56 bg-card border border-border rounded-xl shadow-lg z-50 p-2 font-normal"
+                               onClick={e => e.stopPropagation()}
+                             >
+                               <div className="flex flex-col gap-2">
+                                 <input 
+                                   type="text" 
+                                   className={`${SIATC_THEME.COMPONENTS.INPUT} h-8 text-xs font-semibold`}
+                                   placeholder={`Buscar en ${label}...`}
+                                   value={filterSearchTerm}
+                                   onChange={(e) => setFilterSearchTerm(e.target.value)}
+                                   autoFocus
+                                 />
+                                 <div className="max-h-40 overflow-y-auto flex flex-col gap-1 pr-1 custom-scrollbar">
+                                   {isFetchingSuggestions ? (
+                                      <div className="text-xs text-muted-foreground p-2 text-center flex items-center justify-center gap-2"><Loader2 className="w-3 h-3 animate-spin"/> Cargando...</div>
+                                   ) : filterSuggestions.length === 0 ? (
+                                      <div className="text-xs text-muted-foreground p-2 text-center">Sin resultados</div>
+                                   ) : (
+                                      <>
+                                        <button 
+                                          className={`text-left px-2 py-1.5 text-xs rounded hover:bg-muted/50 truncate italic ${!columnFilters[colId] ? 'bg-primary/5 text-primary' : 'text-muted-foreground'}`}
+                                          onClick={() => applyFilter(colId, '')}
+                                        >
+                                          (Todos los valores)
+                                        </button>
+                                        {filterSuggestions.map(val => (
+                                          <button 
+                                            key={val}
+                                            className={`text-left px-2 py-1.5 text-xs rounded hover:bg-muted/50 truncate ${columnFilters[colId] === val ? 'bg-primary/10 text-primary font-bold' : 'text-foreground'}`}
+                                            onClick={() => applyFilter(colId, val)}
+                                            title={val}
+                                          >
+                                            {val}
+                                          </button>
+                                        ))}
+                                      </>
+                                   )}
+                                 </div>
+                               </div>
+                             </div>
+                           )}
+                        </div>
+                      </SIATCTableHeader>
+                    );
+                  })}
                   <SIATCTableHeader className="text-right">ACCIONES</SIATCTableHeader>
                 </tr>
               </thead>

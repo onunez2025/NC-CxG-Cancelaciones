@@ -432,98 +432,48 @@ router.get('/cxg-nc/motivos', verifyPermission('cxg.cxg_nc.view'), async (req: R
 });
 
 // ─────────────────────────────────────────────
-// CXG/NC: List (Paginated)
+// CXG/NC: Unique Values for Autocomplete
 // ─────────────────────────────────────────────
 
-router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, res: Response) => {
+router.get('/cxg-nc/unique-values', verifyPermission('cxg.cxg_nc.view'), async (req: Request, res: Response) => {
     try {
-        const page = parseInt(req.query.page as string) || 1;
-        const pageSize = parseInt(req.query.pageSize as string) || 20;
+        const column = req.query.column as string;
         const search = req.query.search as string || '';
-        const tipo = req.query.tipo as string || 'TODOS';
-        const estado = req.query.estado as string || 'TODOS';
-        const offset = (page - 1) * pageSize;
+        if (!column) return res.status(400).json({ error: 'Column is required' });
+
+        const columnMap: Record<string, string> = {
+            tipo: 'n.Tipo',
+            documento: 't.CodigoExternoCliente',
+            ticket: 'n.Ticket',
+            tienda: 'COALESCE(n.Lugar_Compra, emp.DsEmpresa, CAST(t.IDEmpresa as VARCHAR))',
+            cliente: 'COALESCE(t.NombreCliente, n.Tienda)',
+            creado_por: 'n.Creado_por',
+            supervisor: 'COALESCE(n.Supervisor_FSM, sup_cas.supervisor_nombre, sup_sole.supervisor_nombre)',
+            aprobado: 'n.Aprobado',
+            procesado: 'n.Procesado',
+            motivo_real: 'n.Vali_Motivo_Real',
+            estado: 'n.Estado_Proceso'
+        };
+
+        const dbCol = columnMap[column];
+        if (!dbCol) return res.status(400).json({ error: 'Invalid column' });
 
         const pool = await getDbConnection();
-
-        let whereClause = 'WHERE 1=1';
+        const request = pool.request();
+        
+        let whereClause = `WHERE ${dbCol} IS NOT NULL AND ${dbCol} <> ''`;
         if (search) {
-            whereClause += ` AND (n.Ticket LIKE @search OR n.Tienda LIKE @search OR t.NombreCliente LIKE @search)`;
-        }
-        
-        if (tipo !== 'TODOS') {
-            if (tipo === 'NC') {
-                whereClause += ` AND (n.Tipo = 'NC' OR n.Tipo = 'Nota de Credito')`;
-            } else if (tipo === 'CXG') {
-                whereClause += ` AND (n.Tipo = 'CXG' OR n.Tipo = 'Cambio por Garantia')`;
-            } else {
-                whereClause += ` AND n.Tipo = @tipo`;
-            }
+            whereClause += ` AND ${dbCol} LIKE @search`;
+            request.input('search', sql.VarChar, `%${search}%`);
         }
 
-        if (estado !== 'TODOS') {
-            whereClause += ` AND n.Estado_Proceso = @estado`;
-        }
-
-        // Get total count
-        const countRequest = pool.request();
-        countRequest.input('search', sql.VarChar, `%${search}%`);
-        if (tipo !== 'TODOS' && tipo !== 'NC' && tipo !== 'CXG') countRequest.input('tipo', sql.VarChar, tipo);
-        if (estado !== 'TODOS') countRequest.input('estado', sql.VarChar, estado);
-
-        const countResult = await countRequest.query(`
-            SELECT COUNT(*) as total 
-            FROM [dbo].[GAC_APP_TB_CXG_NC] n 
-            ${search ? 'LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket' : ''}
-            ${whereClause}
-        `);
-        
-        const total = countResult.recordset[0].total;
-
-        const dataRequest = pool.request();
-        dataRequest.input('search', sql.VarChar, `%${search}%`);
-        dataRequest.input('offset', sql.Int, offset);
-        dataRequest.input('pageSize', sql.Int, pageSize);
-        if (tipo !== 'TODOS' && tipo !== 'NC' && tipo !== 'CXG') dataRequest.input('tipo', sql.VarChar, tipo);
-        if (estado !== 'TODOS') dataRequest.input('estado', sql.VarChar, estado);
-
-        const result = await dataRequest.query(`
-            SELECT 
-                n.ID_Apro_CxG_NC as id,
-                n.Tipo as tipo,
-                n.Ticket as correlativo,
-                n.Creado_el as fecha,
-                COALESCE(t.NombreCliente, n.Tienda) as cliente,
-                n.Asignado_a,
-                n.Asignado_por,
-                n.Asignado_el,
-                n.Gestionado,
-                n.Observacion_Gestionado as observacion,
-                n.Estado_Proceso as estado,
-                n.Apro_Solicitud as apro_solicitud,
-                n.Apro_Por as apro_por,
-                n.Apro_El as apro_el,
-                n.Apro_Obs as apro_obs,
-                n.Vali_Cliente as vali_cliente,
-                n.Vali_Por as vali_por,
-                n.Vali_El as vali_el,
-                n.Vali_Motivo_Real as vali_motivo_real,
-                n.Aprobado as aprobado,
-                n.Aprobado_motivo as aprobado_motivo,
-                n.Aprobado_observacion as aprobado_observacion,
-                n.Aprobado_el as aprobado_el,
-                n.Aprobado_por as aprobado_por,
-                n.Creado_por as creado_por,
-                n.Procesado as procesado,
-                n.Procesado_por as procesado_por,
-                n.Procesado_el as procesado_el,
-                t.CodigoExternoCliente as documento_cliente,
-                COALESCE(n.Lugar_Compra, emp.DsEmpresa, CAST(t.IDEmpresa as VARCHAR)) as tienda,
-                COALESCE(n.Supervisor_FSM, sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor
+        const query = `
+            SELECT DISTINCT TOP 50
+                ${dbCol} as value
             FROM [dbo].[GAC_APP_TB_CXG_NC] n
             LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
             LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as VARCHAR)
-            -- CAS Supervisor (OUTER APPLY TOP 1 to avoid fan-out, prioritizing active and sorting historically)
+            -- CAS Supervisor
             OUTER APPLY (
                 SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
                 FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas
@@ -538,7 +488,7 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
                     h.Fecha_inicio DESC,
                     h.Creado_el DESC
             ) sup_cas
-            -- SOLE Supervisor (OUTER APPLY TOP 1 to avoid fan-out)
+            -- SOLE Supervisor
             OUTER APPLY (
                 SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
                 FROM [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] da
@@ -548,7 +498,194 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
                   AND (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
             ) sup_sole
             ${whereClause}
-            ORDER BY n.Creado_el DESC
+            ORDER BY ${dbCol} ASC
+        `;
+
+        const result = await request.query(query);
+        
+        // Map resolved store names for tienda
+        let values = result.recordset.map(r => r.value);
+        if (column === 'tienda') {
+            values = values.map(v => resolveStoreDescription(v));
+            // De-duplicate after resolution
+            values = [...new Set(values)];
+        }
+
+        res.json(values);
+    } catch (error: any) {
+        console.error('Error fetching unique values:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ─────────────────────────────────────────────
+// CXG/NC: List (Paginated)
+// ─────────────────────────────────────────────
+
+router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, res: Response) => {
+    try {
+        const page = parseInt(req.query.page as string) || 1;
+        const pageSize = parseInt(req.query.pageSize as string) || 20;
+        const search = req.query.search as string || '';
+        const tipo = req.query.tipo as string || 'TODOS';
+        const estado = req.query.estado as string || 'TODOS';
+        
+        const sortBy = req.query.sortBy as string || 'fecha_creacion';
+        const sortOrder = (req.query.sortOrder as string)?.toLowerCase() === 'asc' ? 'ASC' : 'DESC';
+
+        const offset = (page - 1) * pageSize;
+
+        const pool = await getDbConnection();
+
+        // Base CTE to wrap complex columns
+        const baseCte = `
+            WITH BaseQuery AS (
+                SELECT 
+                    n.ID_Apro_CxG_NC as id,
+                    n.Tipo as tipo,
+                    n.Ticket as correlativo,
+                    n.Creado_el as fecha_creacion,
+                    COALESCE(t.NombreCliente, n.Tienda) as cliente,
+                    n.Asignado_a,
+                    n.Asignado_por,
+                    n.Asignado_el,
+                    n.Gestionado,
+                    n.Observacion_Gestionado as observacion,
+                    n.Estado_Proceso as estado,
+                    n.Apro_Solicitud as apro_solicitud,
+                    n.Apro_Por as apro_por,
+                    n.Apro_El as apro_el,
+                    n.Apro_Obs as apro_obs,
+                    n.Vali_Cliente as vali_cliente,
+                    n.Vali_Por as vali_por,
+                    n.Vali_El as vali_el,
+                    n.Vali_Motivo_Real as vali_motivo_real,
+                    n.Aprobado as aprobado,
+                    n.Aprobado_motivo as aprobado_motivo,
+                    n.Aprobado_observacion as aprobado_observacion,
+                    n.Aprobado_el as aprobado_el,
+                    n.Aprobado_por as aprobado_por,
+                    n.Creado_por as creado_por,
+                    n.Procesado as procesado,
+                    n.Procesado_por as procesado_por,
+                    n.Procesado_el as procesado_el,
+                    t.CodigoExternoCliente as documento_cliente,
+                    COALESCE(n.Lugar_Compra, emp.DsEmpresa, CAST(t.IDEmpresa as VARCHAR)) as tienda,
+                    COALESCE(n.Supervisor_FSM, sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor
+                FROM [dbo].[GAC_APP_TB_CXG_NC] n
+                LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
+                LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as VARCHAR)
+                -- CAS Supervisor (OUTER APPLY TOP 1 to avoid fan-out, prioritizing active and sorting historically)
+                OUTER APPLY (
+                    SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
+                    FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas
+                    INNER JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] h 
+                        ON cas.Id_colaborar = h.Id_colaborar 
+                    INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON h.Supervisor = e.ID_empleado
+                    WHERE n.Supervisor_FSM IS NULL
+                      AND cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
+                      AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
+                    ORDER BY 
+                        CASE WHEN h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE() THEN 1 ELSE 0 END DESC,
+                        h.Fecha_inicio DESC,
+                        h.Creado_el DESC
+                ) sup_cas
+                -- SOLE Supervisor (OUTER APPLY TOP 1 to avoid fan-out)
+                OUTER APPLY (
+                    SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
+                    FROM [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] da
+                    INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] ia ON da.Empleado = ia.Empleado
+                    INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON ia.Jefe_directo = e.ID_empleado
+                    WHERE n.Supervisor_FSM IS NULL
+                      AND (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
+                ) sup_sole
+            )
+        `;
+
+        let whereClause = 'WHERE 1=1';
+        if (search) {
+            whereClause += ` AND (correlativo LIKE @search OR tienda LIKE @search OR cliente LIKE @search)`;
+        }
+        
+        if (tipo !== 'TODOS') {
+            if (tipo === 'NC') {
+                whereClause += ` AND (tipo = 'NC' OR tipo = 'Nota de Credito')`;
+            } else if (tipo === 'CXG') {
+                whereClause += ` AND (tipo = 'CXG' OR tipo = 'Cambio por Garantia')`;
+            } else {
+                whereClause += ` AND tipo = @tipo`;
+            }
+        }
+
+        if (estado !== 'TODOS') {
+            whereClause += ` AND estado = @estado`;
+        }
+
+        const countRequest = pool.request();
+        const dataRequest = pool.request();
+
+        // Process dynamic column filters
+        const filterMappings: Record<string, string> = {
+            tipo: 'tipo',
+            documento: 'documento_cliente',
+            ticket: 'correlativo',
+            tienda: 'tienda',
+            cliente: 'cliente',
+            creado_por: 'creado_por',
+            supervisor: 'supervisor',
+            aprobado: 'aprobado',
+            procesado: 'procesado',
+            motivo_real: 'vali_motivo_real',
+            estado: 'estado'
+        };
+
+        let filterIndex = 0;
+        for (const key in req.query) {
+            if (key.startsWith('filter_')) {
+                const colKey = key.replace('filter_', '');
+                const dbCol = filterMappings[colKey];
+                const value = req.query[key] as string;
+                if (dbCol && value) {
+                    whereClause += ` AND ${dbCol} LIKE @fval${filterIndex}`;
+                    countRequest.input(`fval${filterIndex}`, sql.VarChar, `%${value}%`);
+                    dataRequest.input(`fval${filterIndex}`, sql.VarChar, `%${value}%`);
+                    filterIndex++;
+                }
+            }
+        }
+
+        countRequest.input('search', sql.VarChar, `%${search}%`);
+        if (tipo !== 'TODOS' && tipo !== 'NC' && tipo !== 'CXG') countRequest.input('tipo', sql.VarChar, tipo);
+        if (estado !== 'TODOS') countRequest.input('estado', sql.VarChar, estado);
+
+        const countResult = await countRequest.query(`
+            ${baseCte}
+            SELECT COUNT(*) as total 
+            FROM BaseQuery
+            ${whereClause}
+        `);
+        
+        const total = countResult.recordset[0].total;
+
+        dataRequest.input('search', sql.VarChar, `%${search}%`);
+        dataRequest.input('offset', sql.Int, offset);
+        dataRequest.input('pageSize', sql.Int, pageSize);
+        if (tipo !== 'TODOS' && tipo !== 'NC' && tipo !== 'CXG') dataRequest.input('tipo', sql.VarChar, tipo);
+        if (estado !== 'TODOS') dataRequest.input('estado', sql.VarChar, estado);
+
+        // Mapping sortBy to CTE columns
+        const sortMappings: Record<string, string> = {
+            ...filterMappings,
+            fecha_creacion: 'fecha_creacion'
+        };
+        const orderCol = sortMappings[sortBy] || 'fecha_creacion';
+
+        const result = await dataRequest.query(`
+            ${baseCte}
+            SELECT *, fecha_creacion as fecha
+            FROM BaseQuery
+            ${whereClause}
+            ORDER BY ${orderCol} ${sortOrder}
             OFFSET @offset ROWS
             FETCH NEXT @pageSize ROWS ONLY
         `);
