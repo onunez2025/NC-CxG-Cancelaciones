@@ -12,8 +12,6 @@ import {
   Eye,
   ClipboardCheck,
   ShieldCheck,
-  Clock,
-  MessageSquare,
   Eraser,
   Columns,
   FileText,
@@ -46,6 +44,8 @@ import type { User as SystemUser } from '../../types';
 import { useDialog } from '../../context/DialogContext';
 import { useToast } from '../../context/ToastContext';
 import { relativeDate, fullDate } from '../../utils/relativeDate';
+import { CxGNCDetailView } from './components/CxGNCDetailView';
+import { CxGNCFormView } from './components/CxGNCFormView';
 
 export const CxGNCPage = () => {
   const { user } = useAuth();
@@ -546,41 +546,39 @@ export const CxGNCPage = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isDetailOpen, isModalOpen, isColumnDropdownOpen, activeFilterCol]);
 
-  // Helper: icon for history type
-  const getHistoryIcon = (tipo: string) => {
-    switch (tipo) {
-      case 'Registro': return DollarSign;
-      case 'Aprobación': return ShieldCheck;
-      case 'Asignación': return UserPlus;
-      case 'Validación': return ClipboardCheck;
-      case 'Gestión': return CheckCircle2;
-      case 'Llamada': return MessageSquare;
-      default: return Clock;
-    }
-  };
 
-  const getHistoryColor = (tipo: string) => {
-    switch (tipo) {
-      case 'Registro': return 'text-slate-500 bg-slate-100 border-slate-200';
-      case 'Aprobación': return 'text-amber-600 bg-amber-50 border-amber-200';
-      case 'Asignación': return 'text-blue-600 bg-blue-50 border-blue-200';
-      case 'Validación': return 'text-purple-600 bg-purple-50 border-purple-200';
-      case 'Gestión': return 'text-emerald-600 bg-emerald-50 border-emerald-200';
-      case 'Llamada': return 'text-cyan-600 bg-cyan-50 border-cyan-200';
-      default: return 'text-gray-500 bg-gray-50 border-gray-200';
-    }
-  };
 
   return (
     <div className={SIATC_THEME.LAYOUT.PAGE_WRAPPER}>
-      {/* Header */}
-      <div className={SIATC_THEME.LAYOUT.HEADER_WRAPPER}>
-        <div>
-          <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Cambios por Garantías y Notas de Crédito</h1>
-          <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>
-            Gestión y procesamiento de documentos financieros (Cambios por Garantías y Notas de Crédito).
-          </p>
-        </div>
+      {isDetailOpen && detailData ? (
+        <CxGNCDetailView
+          detailData={detailData}
+          detailHistorial={detailHistorial}
+          isLoadingDetail={isLoadingDetail}
+          onBack={() => { setIsDetailOpen(false); setDetailData(null); setDetailHistorial([]); }}
+        />
+      ) : isModalOpen ? (
+        <CxGNCFormView
+          formData={formData}
+          setFormData={setFormData}
+          isSubmitting={isSubmitting}
+          isLookingUp={isLookingUp}
+          isTicketValidated={isTicketValidated}
+          setIsTicketValidated={setIsTicketValidated}
+          handleLookupTicket={handleLookupTicket}
+          handleCreate={handleCreate}
+          onCancel={() => setIsModalOpen(false)}
+        />
+      ) : (
+        <>
+          {/* Header */}
+          <div className={SIATC_THEME.LAYOUT.HEADER_WRAPPER}>
+            <div>
+              <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Cambios por Garantías y Notas de Crédito</h1>
+              <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>
+                Gestión y procesamiento de documentos financieros (Cambios por Garantías y Notas de Crédito).
+              </p>
+            </div>
         <div className="flex items-center gap-3">
           <SIATCButton 
             variant="secondary" 
@@ -1134,98 +1132,6 @@ export const CxGNCPage = () => {
           </div>
         </div>
       </div>
-
-      {/* ─────────────────────────────────────────── */}
-      {/* Create Modal */}
-      {/* ─────────────────────────────────────────── */}
-      <SIATCModalWrapper
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Nueva Solicitud Cambio por Garantía / NC"
-        subtitle="Complete los datos para registrar el documento."
-        footer={
-          <>
-            <SIATCButton variant="ghost" onClick={() => setIsModalOpen(false)}>Cancelar</SIATCButton>
-            <SIATCButton variant="primary" onClick={handleCreate} isLoading={isSubmitting} disabled={!isTicketValidated}>Registrar</SIATCButton>
-          </>
-        }
-      >
-        <div className="space-y-4">
-          <div>
-            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Tipo de Solicitud</label>
-            <select 
-              className={SIATC_THEME.COMPONENTS.INPUT}
-              value={formData.tipo}
-              onChange={(e) => setFormData({...formData, tipo: e.target.value as 'NC' | 'CXG'})}
-            >
-              <option value="CXG">Cambio por garantía</option>
-              <option value="NC">Nota de Crédito</option>
-            </select>
-          </div>
-          
-          <div>
-            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Ticket de Referencia</label>
-            <div className="flex gap-2">
-              <input 
-                className={SIATC_THEME.COMPONENTS.INPUT}
-                value={formData.ticket}
-                onChange={(e) => {
-                  setFormData({...formData, ticket: e.target.value});
-                  setIsTicketValidated(false);
-                }}
-                placeholder="N° de Ticket FSM"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleLookupTicket();
-                  }
-                }}
-              />
-              <SIATCButton 
-                variant="secondary" 
-                icon={isLookingUp ? Loader2 : Search}
-                onClick={handleLookupTicket}
-                isLoading={isLookingUp}
-                className="w-12 h-10 flex-shrink-0"
-              />
-            </div>
-            {formData.cliente && (
-              <div className="mt-4 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                <p className="text-[10px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-400">Información Capturada</p>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-[9px] font-bold text-emerald-600/70 uppercase block">Cliente</span>
-                    <span className="text-xs font-black text-emerald-900 dark:text-emerald-200">{formData.cliente}</span>
-                  </div>
-                  <div>
-                    <span className="text-[9px] font-bold text-emerald-600/70 uppercase block">Lugar de Compra</span>
-                    <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300 italic">{formData.lugar_compra || 'No identificado'}</span>
-                  </div>
-                </div>
-                <div>
-                  <span className="text-[9px] font-bold text-emerald-600/70 uppercase block">Supervisor FSM</span>
-                  <span className="text-xs font-black text-emerald-900 dark:text-emerald-100">{formData.supervisor_fsm || 'No asignado'}</span>
-                </div>
-                <div>
-                  <span className="text-[9px] font-bold text-emerald-600/70 uppercase block">Motivo de Elevación</span>
-                  <p className="text-xs text-emerald-800/80 dark:text-emerald-400/80 leading-tight italic line-clamp-2">{formData.motivo_elevacion || 'Sin comentarios'}</p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div>
-            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Motivo de la Solicitud / Observaciones</label>
-            <textarea
-              className={SIATC_THEME.COMPONENTS.INPUT + " min-h-[80px] py-2 resize-none"}
-              value={formData.observacion}
-              onChange={(e) => setFormData({...formData, observacion: e.target.value})}
-              placeholder="Describa el motivo o detalles de la solicitud..."
-            />
-          </div>
-        </div>
-      </SIATCModalWrapper>
-
       {/* ─────────────────────────────────────────── */}
       {/* Evaluar Solicitud Modal (Supervisor) */}
       {/* ─────────────────────────────────────────── */}
@@ -1343,231 +1249,6 @@ export const CxGNCPage = () => {
             </select>
           </div>
         </div>
-      </SIATCModalWrapper>
-
-      {/* ─────────────────────────────────────────── */}
-      {/* Detail Modal with Dynamic Timeline */}
-      {/* ─────────────────────────────────────────── */}
-      <SIATCModalWrapper
-        isOpen={isDetailOpen}
-        onClose={() => { setIsDetailOpen(false); setDetailData(null); setDetailHistorial([]); }}
-        title="Detalle de Solicitud"
-        subtitle={detailData ? `${detailData.tipo} #${detailData.correlativo}` : 'Cargando...'}
-        size="lg"
-      >
-        {isLoadingDetail ? (
-          <div className="h-48 flex flex-col items-center justify-center gap-3">
-            <Loader2 className="w-8 h-8 text-primary animate-spin" />
-            <p className="text-sm text-muted-foreground">Cargando información...</p>
-          </div>
-        ) : detailData ? (
-          <div className="space-y-6">
-             {/* Process Timeline Steps */}
-             <div className="grid grid-cols-5 gap-2 px-2">
-              {[
-                { key: 'REGISTRADO', label: 'Registro', icon: DollarSign },
-                { key: 'APROBADO_SUP', label: 'Aprobación', icon: ShieldCheck },
-                { key: 'ASIGNADO', label: 'Asignación', icon: UserPlus },
-                { key: 'VALIDADO', label: 'Validación', icon: ClipboardCheck },
-                { key: 'CERRADO', label: 'Cierre', icon: CheckCircle2 }
-              ].map((step, idx) => {
-                const stepOrder = ['REGISTRADO', 'APROBADO_SUP', 'ASIGNADO', 'VALIDADO', 'CERRADO'];
-                const currentIdx = stepOrder.indexOf(detailData.estado === 'RECHAZADO' ? 'REGISTRADO' : detailData.estado);
-                const isCompleted = currentIdx >= idx;
-                const isActive = currentIdx === idx;
-                const isRejected = detailData.estado === 'RECHAZADO' && idx === 1;
-
-                return (
-                  <div key={step.key} className="flex flex-col items-center gap-2">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${
-                      isRejected ? 'bg-rose-500 border-rose-500 text-white' :
-                      isCompleted ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 
-                      'bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-800 dark:border-slate-700'
-                    } ${isActive ? 'ring-4 ring-primary/10 scale-110' : ''}`}>
-                      {isRejected ? <XCircle className="w-4 h-4" /> : <step.icon className="w-4 h-4" />}
-                    </div>
-                    <span className={`text-[9px] font-black uppercase tracking-tighter text-center leading-none ${
-                       isRejected ? 'text-rose-500' :
-                       isCompleted ? 'text-primary' : 'text-slate-400'
-                    }`}>
-                      {isRejected ? 'Rechazado' : (step.key === 'APROBADO_SUP' && detailData.estado === 'APROBADO_SUP' ? 'Pendiente ST' : step.label)}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Left column: Registration & Audit */}
-              <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                  <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">Datos del Registro</h3>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase">Tipo</span>
-                      <SIATCBadge variant={detailData.tipo === 'NC' ? 'warning' : 'info'}>{detailData.tipo}</SIATCBadge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase">Ticket Referencia</span>
-                      <span className="text-xs font-black">#{detailData.ticket}</span>
-                    </div>
-                    <div className="flex justify-between items-start">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase">Cliente</span>
-                      <span className="text-xs font-bold text-right italic">{detailData.cliente}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase">Registrado por</span>
-                      <span className="text-xs font-semibold">{detailData.creado_por || '—'}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase">Fecha Registro</span>
-                      <span className="text-xs">{new Date(detailData.fecha).toLocaleString()}</span>
-                    </div>
-                    {detailData.ticket_desinstalacion && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase">Ticket Desinstalación</span>
-                        <span className="text-xs font-black text-amber-600">#{detailData.ticket_desinstalacion}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* FSM Ticket Context */}
-                <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-800">
-                  <h3 className="text-[10px] font-black uppercase tracking-widest text-amber-700 dark:text-amber-400 mb-4 flex items-center gap-2">
-                    <Search className="w-3 h-3" /> Contexto del Ticket FSM
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[9px] font-bold text-amber-600/70 uppercase">Cliente Original</span>
-                      <span className="text-xs font-black text-amber-900 dark:text-amber-200">{detailData.fsm_cliente || detailData.cliente || 'No disponible'}</span>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[9px] font-bold text-amber-600/70 uppercase">Lugar de Compra</span>
-                      <span className="text-xs font-bold text-amber-800 dark:text-amber-300 italic">{detailData.lugar_compra || detailData.fsm_lugar_compra || 'No identificado'}</span>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[9px] font-bold text-amber-600/70 uppercase">Supervisor FSM</span>
-                      <span className="text-xs font-black text-amber-900 dark:text-amber-100">{detailData.supervisor_fsm || detailData.supervisor_asignado || 'No asignado'}</span>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[9px] font-bold text-amber-600/70 uppercase">Motivo de Elevación</span>
-                      <p className="text-xs text-amber-800/80 dark:text-amber-400/80 leading-tight italic">{detailData.motivo_elevacion || detailData.fsm_motivo_elevacion || 'Sin comentarios'}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Audit Steps Summary */}
-                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                  <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">Trazabilidad de Proceso</h3>
-                  <div className="relative space-y-0 pl-2">
-                    <div className="absolute left-[19px] top-4 bottom-4 w-[2px] bg-border/50" />
-                    <AuditStep 
-                      label="Aprobación Supervisor" 
-                      user={detailData.aprobado_por} 
-                      date={detailData.aprobado_el} 
-                      status={detailData.aprobado}
-                      reason={detailData.aprobado_motivo}
-                      obs={detailData.aprobado_observacion}
-                      icon={ShieldCheck}
-                    />
-                    {detailData.asignado_a && (
-                      <AuditStep 
-                        label="Asignación" 
-                        user={detailData.asignado_por} 
-                        date={detailData.asignado_el} 
-                        status="ASIGNADO" 
-                        icon={UserPlus}
-                      />
-                    )}
-                    <AuditStep 
-                      label="Validación Cliente" 
-                      user={detailData.vali_por} 
-                      date={detailData.vali_el} 
-                      status={detailData.vali_cliente} 
-                      icon={ClipboardCheck}
-                    />
-                    <AuditStep 
-                      label="Cierre Final" 
-                      user={detailData.procesado_por || detailData.gestionado_por} 
-                      date={detailData.procesado_el || detailData.fecha_gestionado} 
-                      status={detailData.gestionado === 'Si' ? 'CERRADO' : detailData.gestionado === 'No' ? 'RECHAZADO' : null} 
-                      icon={CheckCircle2}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Right column: Dynamic History Timeline */}
-              <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 h-full">
-                  <h3 className="text-[10px] font-black uppercase tracking-widest text-primary mb-4">
-                    Historial de Acciones ({detailHistorial.length})
-                  </h3>
-                  
-                  {detailHistorial.length === 0 ? (
-                    <div className="text-center py-8">
-                      <Clock className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
-                      <p className="text-xs text-muted-foreground italic">Sin registros de historial</p>
-                    </div>
-                  ) : (
-                    <div className="relative space-y-0">
-                      {/* Timeline line */}
-                      <div className="absolute left-[15px] top-4 bottom-4 w-[2px] bg-border/50" />
-                      
-                      {detailHistorial.map((entry, idx) => {
-                        const Icon = getHistoryIcon(entry.tipo);
-                        const colorClass = getHistoryColor(entry.tipo);
-                        
-                        return (
-                          <div key={entry.id || idx} className="relative pl-10 pb-4 last:pb-0">
-                            {/* Timeline dot */}
-                            <div className={`absolute left-[7px] top-1 w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center ${colorClass}`}>
-                              <Icon className="w-2.5 h-2.5" />
-                            </div>
-                            
-                            <div className="bg-white dark:bg-slate-900 border border-border/50 rounded-lg p-3 shadow-sm">
-                              <div className="flex items-center justify-between mb-1">
-                                <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${colorClass}`}>
-                                  {entry.tipo}
-                                </span>
-                                <span className="text-[9px] text-muted-foreground italic">
-                                  {entry.fecha ? new Date(entry.fecha).toLocaleString() : ''}
-                                </span>
-                              </div>
-                              {entry.usuario && (
-                                <div className="text-[10px] font-bold text-foreground mb-0.5">
-                                  {entry.usuario}
-                                </div>
-                              )}
-                              {entry.observacion && (
-                                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                                  {entry.observacion}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Motivo Real Alert */}
-            {detailData.vali_motivo_real && (
-              <div className="p-3 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800 rounded-xl">
-                <div className="text-[9px] font-black uppercase text-rose-600 mb-1">⚠ Motivo Real Detectado</div>
-                <p className="text-sm font-bold text-rose-700 dark:text-rose-400">{detailData.vali_motivo_real}</p>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="h-48 flex items-center justify-center">
-            <p className="text-sm text-muted-foreground font-bold">No se pudo cargar el detalle.</p>
-          </div>
-        )}
       </SIATCModalWrapper>
 
       {/* ─────────────────────────────────────────── */}
@@ -1729,48 +1410,12 @@ export const CxGNCPage = () => {
           </div>
         </div>
       </SIATCModalWrapper>
+      {/* ─────────────────────────────────────────── */}
+        </>
+      )}
     </div>
   );
 };
 
-const AuditStep = ({ label, user, date, status, reason, obs, icon: Icon }: { label: string, user?: string | null, date?: string | null, status?: string | null, reason?: string | null, obs?: string | null, icon?: any }) => {
-  const isPending = !user && !status;
-  const isRejected = status === 'RECHAZADO' || status === 'FALSA';
-  const IconComponent = Icon || CheckCircle2;
-  
-  return (
-    <div className="relative pl-10 pb-6 last:pb-0 group">
-      {/* Stepper dot */}
-      <div className={`absolute left-[3px] top-1 w-[16px] h-[16px] rounded-full border-2 flex items-center justify-center bg-card transition-colors z-10 ${
-        isPending ? 'border-border text-border' : 
-        isRejected ? 'border-rose-500 text-rose-500' : 'border-emerald-500 text-emerald-500'
-      }`}>
-        {isPending ? <div className="w-1.5 h-1.5 rounded-full bg-border" /> : <IconComponent className="w-2.5 h-2.5" />}
-      </div>
-      
-      <div className={`p-3 bg-white dark:bg-slate-900 border shadow-sm rounded-lg flex flex-col gap-2 transition-all ${
-        isPending ? 'border-border/50 opacity-60' : 
-        isRejected ? 'border-rose-200 dark:border-rose-800' : 'border-emerald-200 dark:border-emerald-800 hover:shadow-md'
-      }`}>
-        <div className="flex items-center justify-between">
-          <div>
-            <div className={`text-[9px] font-black uppercase leading-none mb-1 ${isPending ? 'text-muted-foreground' : 'text-primary'}`}>{label}</div>
-            <div className="text-[10px] font-bold text-foreground">{user || (isPending ? 'Pendiente' : '—')}</div>
-            <div className="text-[9px] text-muted-foreground italic">{date ? new Date(date).toLocaleString() : ''}</div>
-          </div>
-          {status && (
-            <SIATCBadge variant={isRejected ? 'danger' : 'success'} className="text-[8px] h-5 px-1.5">{status}</SIATCBadge>
-          )}
-        </div>
-        {(reason || obs) && (
-          <div className="pt-2 mt-1 border-t border-slate-100 dark:border-slate-800">
-            {reason && <p className="text-[9px] font-black text-rose-500 uppercase leading-none mb-1">Motivo: <span className="text-foreground">{reason}</span></p>}
-            {obs && <p className="text-[10px] text-muted-foreground leading-tight italic">"{obs}"</p>}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
 
 export default CxGNCPage;
