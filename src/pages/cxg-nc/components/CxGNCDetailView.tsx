@@ -196,7 +196,83 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, de
               </div>
             </div>
 
+            {/* Evaluation Data (Aprobación/Rechazo) */}
+            {(detailData.aprobado === 'true' || detailData.aprobado === 'false') && (
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                <h3 className="text-xs font-black uppercase tracking-widest text-primary mb-4">Datos de Evaluación</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-bold text-muted-foreground uppercase">Resultado</span>
+                    <SIATCBadge variant={detailData.aprobado === 'true' ? 'success' : 'error'}>
+                      {detailData.aprobado === 'true' ? 'APROBADO' : 'RECHAZADO'}
+                    </SIATCBadge>
+                  </div>
+                  {detailData.aprobado_motivo && (
+                    <div className="flex justify-between items-start">
+                      <span className="text-xs font-bold text-muted-foreground uppercase">Motivo</span>
+                      <span className="text-sm font-semibold text-right max-w-[200px]">{detailData.aprobado_motivo}</span>
+                    </div>
+                  )}
+                  {detailData.aprobado_observacion && (
+                    <div className="flex justify-between items-start">
+                      <span className="text-xs font-bold text-muted-foreground uppercase">Observación</span>
+                      <span className="text-sm text-right max-w-[250px] italic">{detailData.aprobado_observacion}</span>
+                    </div>
+                  )}
+                  {detailData.aprobado_por && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold text-muted-foreground uppercase">Evaluado por</span>
+                      <span className="text-sm font-semibold">{detailData.aprobado_por}</span>
+                    </div>
+                  )}
+                  {detailData.aprobado_el && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold text-muted-foreground uppercase">Fecha Evaluación</span>
+                      <span className="text-sm">{new Date(detailData.aprobado_el).toLocaleString()}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
+            {/* Gestion Data (Procesado) */}
+            {(detailData.procesado === 'true' || detailData.procesado === 'false') && (
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                <h3 className="text-xs font-black uppercase tracking-widest text-primary mb-4">Datos de Gestión</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-bold text-muted-foreground uppercase">Resultado</span>
+                    <SIATCBadge variant={detailData.procesado === 'true' ? 'success' : 'error'}>
+                      {detailData.procesado === 'true' ? 'GESTIONADO' : 'RECHAZADO (GESTIÓN)'}
+                    </SIATCBadge>
+                  </div>
+                  {detailData.procesado_motivo && (
+                    <div className="flex justify-between items-start">
+                      <span className="text-xs font-bold text-muted-foreground uppercase">Motivo</span>
+                      <span className="text-sm font-semibold text-right max-w-[200px]">{detailData.procesado_motivo}</span>
+                    </div>
+                  )}
+                  {detailData.procesado_observacion && (
+                    <div className="flex justify-between items-start">
+                      <span className="text-xs font-bold text-muted-foreground uppercase">Observación</span>
+                      <span className="text-sm text-right max-w-[250px] italic">{detailData.procesado_observacion}</span>
+                    </div>
+                  )}
+                  {detailData.procesado_por && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold text-muted-foreground uppercase">Gestionado por</span>
+                      <span className="text-sm font-semibold">{detailData.procesado_por}</span>
+                    </div>
+                  )}
+                  {detailData.procesado_el && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold text-muted-foreground uppercase">Fecha Gestión</span>
+                      <span className="text-sm">{new Date(detailData.procesado_el).toLocaleString()}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Equipment History */}
             <div className="p-4 rounded-xl bg-cyan-50 dark:bg-cyan-950/20 border border-cyan-100 dark:border-cyan-800">
