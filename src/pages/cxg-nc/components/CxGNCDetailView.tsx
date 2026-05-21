@@ -1,8 +1,8 @@
-import React from 'react';
-import { Loader2, DollarSign, ShieldCheck, UserPlus, ClipboardCheck, CheckCircle2, XCircle, Clock, Search, ArrowLeft, MessageSquare } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Loader2, DollarSign, ShieldCheck, UserPlus, ClipboardCheck, CheckCircle2, XCircle, Clock, Search, ArrowLeft, MessageSquare, Wrench } from 'lucide-react';
 import { SIATCBadge } from '../../../components/siatc/SIATCBadge';
 import { SIATCButton } from '../../../components/siatc/SIATCButton';
-import type { CxGNC, HistorialEntry } from '../../../services/ncService';
+import { ncService, type CxGNC, type HistorialEntry, type EquipmentHistoryEntry } from '../../../services/ncService';
 
 interface CxGNCDetailViewProps {
   detailData: CxGNC;
@@ -22,6 +22,27 @@ interface CxGNCDetailViewProps {
 }
 
 export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, detailHistorial, isLoadingDetail, onBack, actions }) => {
+  const [equipmentHistory, setEquipmentHistory] = useState<EquipmentHistoryEntry[]>([]);
+  const [isLoadingEquipment, setIsLoadingEquipment] = useState(false);
+
+  useEffect(() => {
+    const fetchEquipmentHistory = async () => {
+      if (!detailData?.ticket) return;
+      setIsLoadingEquipment(true);
+      try {
+        const history = await ncService.getEquipmentHistory(detailData.ticket);
+        setEquipmentHistory(history);
+      } catch (error) {
+        console.error('Error fetching equipment history:', error);
+      } finally {
+        setIsLoadingEquipment(false);
+      }
+    };
+    if (detailData && !isLoadingDetail) {
+      fetchEquipmentHistory();
+    }
+  }, [detailData?.ticket, isLoadingDetail]);
+
   if (isLoadingDetail) {
     return (
       <div className="h-64 flex flex-col items-center justify-center gap-3 w-full">
@@ -215,6 +236,63 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, de
                 <p className="text-base font-bold text-rose-700 dark:text-rose-400">{detailData.vali_motivo_real}</p>
               </div>
             )}
+
+            {/* Equipment History */}
+            <div className="p-4 rounded-xl bg-cyan-50 dark:bg-cyan-950/20 border border-cyan-100 dark:border-cyan-800">
+              <h3 className="text-xs font-black uppercase tracking-widest text-cyan-700 dark:text-cyan-400 mb-4 flex items-center gap-2">
+                <Wrench className="w-4 h-4" /> Historial del Equipo
+              </h3>
+              {isLoadingEquipment ? (
+                <div className="flex justify-center py-4">
+                  <Loader2 className="w-5 h-5 text-cyan-600 animate-spin" />
+                </div>
+              ) : equipmentHistory.length === 0 ? (
+                <p className="text-xs text-cyan-800/60 italic text-center py-2">No hay historial registrado o no se pudo cargar.</p>
+              ) : (
+                <div className="space-y-4">
+                  {equipmentHistory.map((eq, idx) => (
+                    <div key={idx} className="bg-white dark:bg-slate-900 rounded-lg p-3 border border-cyan-200 dark:border-cyan-800/50 shadow-sm">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <span className="text-[10px] font-bold text-cyan-600 uppercase bg-cyan-100 dark:bg-cyan-900 px-2 py-0.5 rounded mr-2">
+                            Ticket: {eq.ticket}
+                          </span>
+                          <span className="text-xs font-semibold">{eq.tipo_servicio || 'Servicio'}</span>
+                        </div>
+                        <span className="text-[10px] text-muted-foreground">
+                          {eq.fecha_visita ? new Date(eq.fecha_visita).toLocaleDateString() : ''}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 mb-2 text-[10px]">
+                        <div className="flex flex-col">
+                          <span className="text-muted-foreground uppercase font-bold">Técnico</span>
+                          <span className="font-semibold text-cyan-900 dark:text-cyan-100 truncate" title={eq.tecnico}>{eq.tecnico || 'No asignado'}</span>
+                        </div>
+                        <div className="flex flex-col items-end">
+                          <span className="text-muted-foreground uppercase font-bold">Estado</span>
+                          <span className="font-semibold text-cyan-900 dark:text-cyan-100">{eq.estado || '-'}</span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-muted-foreground uppercase font-bold">Visita Realizada</span>
+                          <span className="font-semibold text-cyan-900 dark:text-cyan-100">{eq.visita_realizada ? 'Sí' : 'No'}</span>
+                        </div>
+                        <div className="flex flex-col items-end">
+                          <span className="text-muted-foreground uppercase font-bold">Trabajo Realizado</span>
+                          <span className="font-semibold text-cyan-900 dark:text-cyan-100">{eq.trabajo_realizado ? 'Sí' : 'No'}</span>
+                        </div>
+                      </div>
+                      {eq.comentario && (
+                        <div className="mt-2 p-2 bg-cyan-50/50 dark:bg-cyan-950/30 rounded border border-cyan-100 dark:border-cyan-900/50">
+                          <p className="text-xs text-cyan-800 dark:text-cyan-300 italic leading-relaxed">
+                            "{eq.comentario}"
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Right column: Dynamic History Timeline */}

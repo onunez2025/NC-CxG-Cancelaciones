@@ -126,4 +126,41 @@ router.get('/tracking', async (req: Request, res: Response) => {
     }
 });
 
+router.get('/equipment-history/:ticket', async (req: Request, res: Response) => {
+    try {
+        const pool = await getDbConnection();
+        const ticket = req.params.ticket;
+
+        if (!ticket) {
+            return res.status(400).json({ error: 'Missing ticket' });
+        }
+
+        const query = `
+            SELECT 
+                t2.Ticket as ticket,
+                ISNULL(t2.NombreTecnico, '') + ' ' + ISNULL(t2.ApellidoTecnico, '') as tecnico,
+                t2.ComentarioTecnico as comentario,
+                t2.Estado as estado,
+                ts.Descripcion as tipo_servicio,
+                t2.FechaVisita as fecha_visita,
+                t2.VisitaRealizada as visita_realizada,
+                t2.TrabajoRealizado as trabajo_realizado
+            FROM [SIATC].[Dashboard_FSM] t1
+            INNER JOIN [SIATC].[Dashboard_FSM] t2 ON t1.IdEquipo = t2.IdEquipo AND t1.CodigoExternoEquipo = t2.CodigoExternoEquipo
+            LEFT JOIN [SIATC].[FSM_TipoServicio] ts ON t2.IdServicio = ts.Id
+            WHERE t1.Ticket = @ticket
+            ORDER BY t2.FechaVisita DESC
+        `;
+
+        const request = pool.request();
+        request.input('ticket', sql.VarChar, ticket);
+
+        const result = await request.query(query);
+        res.json(result.recordset);
+    } catch (error: any) {
+        console.error('Error fetching equipment history:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 export default router;

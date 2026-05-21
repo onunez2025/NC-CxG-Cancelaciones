@@ -101,6 +101,17 @@ export interface HistorialEntry {
     usuario: string;
 }
 
+export interface EquipmentHistoryEntry {
+    ticket: string;
+    tecnico: string;
+    comentario: string;
+    estado: string;
+    tipo_servicio: string;
+    fecha_visita: string;
+    visita_realizada: boolean;
+    trabajo_realizado: boolean;
+}
+
 export interface CxGNCMotivo {
     id: string;
     motivo: string;
@@ -310,6 +321,12 @@ export const ncService = {
     async getCancellationMotivos(): Promise<{ id: string; motivo: string }[]> {
         const response = await apiClient(`${API_BASE_URL}/cancelaciones/motivos`);
         if (!response.ok) throw new Error('Error al obtener motivos de cancelación');
+        return response.json();
+    },
+
+    async getEquipmentHistory(ticket: string): Promise<EquipmentHistoryEntry[]> {
+        const response = await apiClient(`${API_BASE_URL}/fsm/equipment-history/${ticket}`);
+        if (!response.ok) throw new Error('Error al obtener historial de equipo');
         return response.json();
     },
 
