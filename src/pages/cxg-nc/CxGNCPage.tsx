@@ -48,7 +48,7 @@ import { CxGNCDetailView } from './components/CxGNCDetailView';
 import { CxGNCFormView } from './components/CxGNCFormView';
 
 export const CxGNCPage = () => {
-  const { user } = useAuth();
+  const { user, hasPermission } = useAuth();
   const dialog = useDialog();
   const toast = useToast();
   const columnDropdownRef = useRef<HTMLDivElement>(null);
@@ -496,10 +496,6 @@ export const CxGNCPage = () => {
     }
   };
 
-  const hasPermission = (perm: string) => {
-    return user?.permissions?.includes(perm as any) || false;
-  };
-
   const displayedData = data;
 
   // KPI stats from current data
@@ -551,11 +547,35 @@ export const CxGNCPage = () => {
   return (
     <div className={SIATC_THEME.LAYOUT.PAGE_WRAPPER}>
       {isDetailOpen && detailData ? (
-        <CxGNCDetailView
+        <CxGNCDetailView 
           detailData={detailData}
           detailHistorial={detailHistorial}
           isLoadingDetail={isLoadingDetail}
           onBack={() => { setIsDetailOpen(false); setDetailData(null); setDetailHistorial([]); }}
+          actions={{
+            canApprove: detailData?.estado === 'REGISTRADO' && hasPermission('cxg.cxg_nc.approve'),
+            onApprove: () => {
+              setSelectedRecord(detailData);
+              setAprobarForm({ aprobado: '', motivo: '', observacion: '' });
+              setIsAprobarOpen(true);
+            },
+            canAssign: detailData?.estado === 'APROBADO_SUP' && hasPermission('cxg.cxg_nc.assign'),
+            onAssign: () => {
+              setSelectedRecord(detailData);
+              setIsAssignModalOpen(true);
+            },
+            canValidate: detailData?.estado === 'ASIGNADO' && hasPermission('cxg.cxg_nc.gestionar'),
+            onValidate: () => {
+              setSelectedRecord(detailData);
+              setValidarForm({ resultado: '', observacion: '', motivo_real: '' });
+              setIsValidarClienteOpen(true);
+            },
+            canManage: detailData?.estado === 'VALIDADO' && hasPermission('cxg.cxg_nc.gestionar'),
+            onManage: () => {
+              setSelectedRecord(detailData);
+              setIsGestionModalOpen(true);
+            }
+          }}
         />
       ) : isModalOpen ? (
         <CxGNCFormView

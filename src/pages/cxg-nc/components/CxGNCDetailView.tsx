@@ -9,9 +9,19 @@ interface CxGNCDetailViewProps {
   detailHistorial: HistorialEntry[];
   isLoadingDetail: boolean;
   onBack: () => void;
+  actions?: {
+    canApprove?: boolean;
+    onApprove?: () => void;
+    canAssign?: boolean;
+    onAssign?: () => void;
+    canValidate?: boolean;
+    onValidate?: () => void;
+    canManage?: boolean;
+    onManage?: () => void;
+  };
 }
 
-export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, detailHistorial, isLoadingDetail, onBack }) => {
+export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, detailHistorial, isLoadingDetail, onBack, actions }) => {
   if (isLoadingDetail) {
     return (
       <div className="h-64 flex flex-col items-center justify-center gap-3 w-full">
@@ -64,6 +74,29 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, de
         <div>
           <h2 className="text-lg font-black text-foreground">{detailData.tipo} #{detailData.correlativo}</h2>
           <p className="text-xs text-muted-foreground">{detailData.cliente}</p>
+        </div>
+        <div className="flex-1" />
+        <div className="flex items-center gap-2">
+          {actions?.canApprove && (
+            <SIATCButton variant="info" size="sm" icon={ShieldCheck} onClick={actions.onApprove}>
+              Evaluar Solicitud
+            </SIATCButton>
+          )}
+          {actions?.canAssign && (
+            <SIATCButton variant="primary" size="sm" icon={UserPlus} onClick={actions.onAssign}>
+              Asignar Analista
+            </SIATCButton>
+          )}
+          {actions?.canValidate && (
+            <SIATCButton variant="secondary" size="sm" icon={ClipboardCheck} onClick={actions.onValidate}>
+              Validar Cliente
+            </SIATCButton>
+          )}
+          {actions?.canManage && (
+            <SIATCButton variant="success" size="sm" icon={CheckCircle2} onClick={actions.onManage}>
+              Gestionar Solicitud
+            </SIATCButton>
+          )}
         </div>
       </div>
 
