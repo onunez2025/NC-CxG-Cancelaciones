@@ -214,6 +214,11 @@ export const CxGNCPage = () => {
   };
 
   const fetchSuggestions = async (colId: string, search: string) => {
+    if (colId === 'aprobado' || colId === 'procesado') {
+      setFilterSuggestions(['Aprobado', 'Rechazado', 'Pendiente'].filter(s => s.toLowerCase().includes(search.toLowerCase())));
+      return;
+    }
+
     setIsFetchingSuggestions(true);
     try {
       const suggestions = await ncService.getUniqueColumnValues(colId, search);

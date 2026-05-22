@@ -658,10 +658,20 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
                 const dbCol = filterMappings[colKey];
                 const value = req.query[key] as string;
                 if (dbCol && value) {
-                    whereClause += ` AND ${dbCol} LIKE @fval${filterIndex}`;
-                    countRequest.input(`fval${filterIndex}`, sql.VarChar, `%${value}%`);
-                    dataRequest.input(`fval${filterIndex}`, sql.VarChar, `%${value}%`);
-                    filterIndex++;
+                    if (colKey === 'aprobado' || colKey === 'procesado') {
+                        if (value === 'Pendiente') {
+                            whereClause += ` AND (${dbCol} IS NULL OR ${dbCol} = '')`;
+                        } else if (value === 'Aprobado') {
+                            whereClause += ` AND (${dbCol} = 'true' OR ${dbCol} = 'Si' OR ${dbCol} = 'APROBADO')`;
+                        } else if (value === 'Rechazado') {
+                            whereClause += ` AND (${dbCol} = 'false' OR ${dbCol} = 'No' OR ${dbCol} = 'RECHAZADO')`;
+                        }
+                    } else {
+                        whereClause += ` AND ${dbCol} LIKE @fval${filterIndex}`;
+                        countRequest.input(`fval${filterIndex}`, sql.VarChar, `%${value}%`);
+                        dataRequest.input(`fval${filterIndex}`, sql.VarChar, `%${value}%`);
+                        filterIndex++;
+                    }
                 }
             }
         }
