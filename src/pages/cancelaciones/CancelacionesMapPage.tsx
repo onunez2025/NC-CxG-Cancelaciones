@@ -7,6 +7,8 @@ import { SIATCButton } from '../../components/siatc/SIATCButton';
 import { ArrowLeft, Loader2, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+import { apiClient, API_BASE_URL } from '../../services/apiClient';
+
 // Fix for default marker icons in React-Leaflet
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -38,12 +40,7 @@ export const CancelacionesMapPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('siatc_token');
-        const res = await fetch('/api/cancelaciones/mapa/hoy', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
+        const res = await apiClient(`${API_BASE_URL}/cancelaciones/mapa/hoy`);
         if (!res.ok) throw new Error('Error al cargar datos del mapa');
         const json = await res.json();
         setData(json);
