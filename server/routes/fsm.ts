@@ -123,20 +123,24 @@ router.get('/tracking', async (req: Request, res: Response) => {
                 INNER JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] h 
                     ON cas.Id_colaborar = h.Id_colaborar 
                 INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON h.Supervisor = e.ID_empleado
-                WHERE cas.Nombre_FSM LIKE '%' + p.NombreTecnico + '%' 
-                  AND cas.Nombre_FSM LIKE '%' + p.ApellidoTecnico + '%'
+                WHERE cas.Nombre_FSM LIKE '%' + LTRIM(RTRIM(ISNULL(p.NombreTecnico, ''))) + '%' 
+                  AND cas.Nombre_FSM LIKE '%' + LTRIM(RTRIM(ISNULL(p.ApellidoTecnico, ''))) + '%'
                 ORDER BY 
-                    CASE WHEN h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE() THEN 1 ELSE 0 END DESC,
+                    CASE WHEN h.Fecha_fin IS NULL OR h.Fecha_fin >= CAST(GETDATE() AS DATE) THEN 1 ELSE 0 END DESC,
                     h.Fecha_inicio DESC,
                     h.Creado_el DESC
             ) sup_cas
-            -- SOLE Supervisor (OUTER APPLY TOP 1)
+            -- SOLE Supervisor (OUTER APPLY TOP 1 with active priority and historical order)
             OUTER APPLY (
                 SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
                 FROM [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] da
                 INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] ia ON da.Empleado = ia.Empleado
                 INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON ia.Jefe_directo = e.ID_empleado
-                WHERE (p.NombreTecnico + ' ' + p.ApellidoTecnico) = da.[Nombre SAP]
+                WHERE (LTRIM(RTRIM(ISNULL(p.NombreTecnico, ''))) + ' ' + LTRIM(RTRIM(ISNULL(p.ApellidoTecnico, '')))) = da.[Nombre SAP]
+                ORDER BY 
+                    CASE WHEN ia.Fecha_fin IS NULL OR ia.Fecha_fin >= CAST(GETDATE() AS DATE) THEN 1 ELSE 0 END DESC,
+                    ia.Fecha_inicio DESC,
+                    ia.ID_empleado_info_adi DESC
             ) sup_sole
             -- Prefix fallback
             OUTER APPLY (
