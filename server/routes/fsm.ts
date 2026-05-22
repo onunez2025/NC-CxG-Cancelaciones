@@ -20,7 +20,7 @@ router.get('/tracking', async (req: Request, res: Response) => {
 
         // Logic: if specific ID filters (ticket/doc) are provided, allow historical search.
         // If technician, client or phone are used, keep the "Today" (Peru Time) restriction.
-        let whereClause = "WHERE CAST(t.FechaVisita AT TIME ZONE 'UTC' AT TIME ZONE 'SA Pacific Standard Time' AS DATE) = CAST(SYSDATETIMEOFFSET() AT TIME ZONE 'SA Pacific Standard Time' AS DATE)"; 
+        let whereClause = "WHERE t.FechaVisita >= @StartTodayUTC AND t.FechaVisita < @EndTodayUTC"; 
         
         if (ticket || documento) {
             whereClause = "WHERE 1=1";
@@ -33,46 +33,89 @@ router.get('/tracking', async (req: Request, res: Response) => {
         if (celular) whereClause += " AND (t.Celular1 LIKE @celular OR t.Celular2 LIKE @celular)";
 
         const query = `
-            WITH LatestRango AS (
+            DECLARE @TodayPeru DATE = CAST(SYSDATETIMEOFFSET() AT TIME ZONE 'SA Pacific Standard Time' AS DATE);
+            DECLARE @StartTodayUTC DATETIME = CAST(CAST(@TodayPeru AS DATETIME) AT TIME ZONE 'SA Pacific Standard Time' AT TIME ZONE 'UTC' AS DATETIME);
+            DECLARE @EndTodayUTC DATETIME = CAST(DATEADD(day, 1, CAST(@TodayPeru AS DATETIME)) AT TIME ZONE 'SA Pacific Standard Time' AT TIME ZONE 'UTC' AS DATETIME);
+
+            WITH TodayTickets AS (
                 SELECT 
-                    ID_Ticket,
-                    Rango_horario,
-                    Orden_atención,
-                    Comentario,
-                    Creado_el,
-                    ROW_NUMBER() OVER(PARTITION BY ID_Ticket ORDER BY Creado_el DESC) as rn
-                FROM [dbo].[GAC_APP_TB_RANGO_HORARIO]
+                    t.Ticket,
+                    t.NombreCliente,
+                    t.CodigoExternoCliente,
+                    t.Distrito,
+                    t.Ciudad,
+                    t.NombreTecnico,
+                    t.ApellidoTecnico,
+                    t.BloqueHorario,
+                    t.FechaVisita,
+                    t.Estado,
+                    t.Calle,
+                    t.NumeroCalle,
+                    t.Referencia,
+                    t.NombreEquipo,
+                    t.CodigoExternoEquipo,
+                    t.IdEquipo,
+                    t.Email,
+                    t.Celular1,
+                    t.Celular2,
+                    t.ComentarioProgramador,
+                    t.ComentarioTecnico,
+                    t.IdServicio
+                FROM [SIATC].[Dashboard_FSM] t
+                ${whereClause}
+            ),
+            LatestRango AS (
+                SELECT 
+                    lr.ID_Ticket,
+                    lr.Rango_horario,
+                    lr.Orden_atención,
+                    lr.Comentario,
+                    ROW_NUMBER() OVER(PARTITION BY lr.ID_Ticket ORDER BY lr.Creado_el DESC) as rn
+                FROM [dbo].[GAC_APP_TB_RANGO_HORARIO] lr
+                WHERE lr.ID_Ticket IN (SELECT Ticket FROM TodayTickets)
+            ),
+            PagedTickets AS (
+                SELECT TOP (@limit)
+                    t.*,
+                    lr.Rango_horario,
+                    lr.Orden_atención,
+                    lr.Comentario
+                FROM TodayTickets t
+                LEFT JOIN LatestRango lr ON t.Ticket = lr.ID_Ticket AND lr.rn = 1
+                ORDER BY 
+                    t.FechaVisita DESC, 
+                    CASE WHEN lr.Rango_horario IS NULL THEN 1 ELSE 0 END,
+                    ISNULL(lr.Orden_atención, 99999) ASC,
+                    t.Ticket DESC
             )
-            SELECT TOP (@limit)
-                t.Ticket as ticket,
-                t.NombreCliente as cliente,
-                t.CodigoExternoCliente as doc_cliente,
-                t.Distrito as distrito,
-                t.Ciudad as ciudad,
-                ISNULL(t.NombreTecnico, '') + ' ' + ISNULL(t.ApellidoTecnico, '') as tecnico,
-                t.BloqueHorario as bloque_original,
-                lr.Rango_horario as rango_asignado,
-                lr.Orden_atención as orden,
-                lr.Comentario as comentario_horario,
-                t.FechaVisita as fecha_visita,
-                t.Estado as estado,
-                -- New detail fields
-                t.Calle as calle,
-                t.NumeroCalle as numero_calle,
-                t.Referencia as referencia,
-                t.NombreEquipo as equipo,
-                t.CodigoExternoEquipo as cod_equipo,
-                t.IdEquipo as id_equipo,
-                t.Email as email,
-                t.Celular1 as celular1,
-                t.Celular2 as celular2,
-                t.ComentarioProgramador as coment_prog,
-                t.ComentarioTecnico as coment_tecnico,
+            SELECT 
+                p.Ticket as ticket,
+                p.NombreCliente as cliente,
+                p.CodigoExternoCliente as doc_cliente,
+                p.Distrito as distrito,
+                p.Ciudad as ciudad,
+                ISNULL(p.NombreTecnico, '') + ' ' + ISNULL(p.ApellidoTecnico, '') as tecnico,
+                p.BloqueHorario as bloque_original,
+                p.Rango_horario as rango_asignado,
+                p.Orden_atención as orden,
+                p.Comentario as comentario_horario,
+                p.FechaVisita as fecha_visita,
+                p.Estado as estado,
+                p.Calle as calle,
+                p.NumeroCalle as numero_calle,
+                p.Referencia as referencia,
+                p.NombreEquipo as equipo,
+                p.CodigoExternoEquipo as cod_equipo,
+                p.IdEquipo as id_equipo,
+                p.Email as email,
+                p.Celular1 as celular1,
+                p.Celular2 as celular2,
+                p.ComentarioProgramador as coment_prog,
+                p.ComentarioTecnico as coment_tecnico,
                 ts.Descripcion as tipo_servicio,
                 COALESCE(sup_cas.supervisor_nombre, sup_sole.supervisor_nombre, e.DsSupervisor) as supervisor
-            FROM [SIATC].[Dashboard_FSM] t
-            LEFT JOIN LatestRango lr ON TRIM(t.Ticket) = TRIM(lr.ID_Ticket) AND lr.rn = 1
-            LEFT JOIN [SIATC].[FSM_TipoServicio] ts ON t.IdServicio = ts.Id
+            FROM PagedTickets p
+            LEFT JOIN [SIATC].[FSM_TipoServicio] ts ON p.IdServicio = ts.Id
             -- CAS Supervisor (OUTER APPLY TOP 1 with active priority and historical order)
             OUTER APPLY (
                 SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
@@ -80,8 +123,8 @@ router.get('/tracking', async (req: Request, res: Response) => {
                 INNER JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] h 
                     ON cas.Id_colaborar = h.Id_colaborar 
                 INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON h.Supervisor = e.ID_empleado
-                WHERE cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
-                  AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
+                WHERE cas.Nombre_FSM LIKE '%' + p.NombreTecnico + '%' 
+                  AND cas.Nombre_FSM LIKE '%' + p.ApellidoTecnico + '%'
                 ORDER BY 
                     CASE WHEN h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE() THEN 1 ELSE 0 END DESC,
                     h.Fecha_inicio DESC,
@@ -93,21 +136,20 @@ router.get('/tracking', async (req: Request, res: Response) => {
                 FROM [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] da
                 INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] ia ON da.Empleado = ia.Empleado
                 INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON ia.Jefe_directo = e.ID_empleado
-                WHERE (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
+                WHERE (p.NombreTecnico + ' ' + p.ApellidoTecnico) = da.[Nombre SAP]
             ) sup_sole
             -- Prefix fallback
             OUTER APPLY (
                 SELECT TOP 1 DsSupervisor 
                 FROM [SAP].[FSM_TBL_EMPRESA] 
-                WHERE (ISNULL(t.NombreTecnico, '') + ' ' + ISNULL(t.ApellidoTecnico, '')) LIKE DsPrefijoTecnico + '%'
+                WHERE (ISNULL(p.NombreTecnico, '') + ' ' + ISNULL(p.ApellidoTecnico, '')) LIKE DsPrefijoTecnico + '%'
                 AND DsPrefijoTecnico != ''
             ) e
-            ${whereClause}
             ORDER BY 
-                t.FechaVisita DESC, 
-                CASE WHEN lr.Rango_horario IS NULL THEN 1 ELSE 0 END,
-                ISNULL(lr.Orden_atención, 99999) ASC,
-                t.Ticket DESC
+                p.FechaVisita DESC, 
+                CASE WHEN p.Rango_horario IS NULL THEN 1 ELSE 0 END,
+                ISNULL(p.Orden_atención, 99999) ASC,
+                p.Ticket DESC
         `;
 
         const request = pool.request();

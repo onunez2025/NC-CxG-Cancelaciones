@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
+import sql from 'mssql';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -127,6 +128,37 @@ app.get('/api/config/audit-logs', verifyToken, verifyPermission('ebm.config.user
         `);
         res.json(result.recordset);
     } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/config/audit-logs', verifyToken, async (req: Request, res: Response) => {
+    try {
+        const { UsuarioID, UsuarioNombre, Accion, Entidad, EntidadID, Detalle } = req.body;
+
+        // Validation
+        if (!UsuarioID || !UsuarioNombre || !Accion || !Entidad || !EntidadID) {
+            return res.status(400).json({ error: 'Missing required audit log parameters' });
+        }
+
+        const pool = await getDbConnection();
+        await pool.request()
+            .input('UsuarioID', sql.VarChar(100), UsuarioID)
+            .input('UsuarioNombre', sql.VarChar(255), UsuarioNombre)
+            .input('Accion', sql.VarChar(50), Accion)
+            .input('Entidad', sql.VarChar(100), Entidad)
+            .input('EntidadID', sql.VarChar(100), EntidadID)
+            .input('Detalle', sql.NVarChar(sql.MAX), Detalle || '')
+            .query(`
+                INSERT INTO [dbo].[GAC_APP_TB_AUDIT_LOG] 
+                (Fecha, UsuarioID, UsuarioNombre, Accion, Entidad, EntidadID, Detalle)
+                VALUES 
+                (GETDATE(), @UsuarioID, @UsuarioNombre, @Accion, @Entidad, @EntidadID, @Detalle)
+            `);
+
+        res.status(201).json({ message: 'Audit log created successfully' });
+    } catch (error: any) {
+        console.error('Error creating audit log:', error);
         res.status(500).json({ error: error.message });
     }
 });

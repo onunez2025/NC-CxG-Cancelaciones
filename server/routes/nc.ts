@@ -445,7 +445,7 @@ router.get('/cxg-nc/unique-values', verifyPermission('cxg.cxg_nc.view'), async (
             tipo: 'n.Tipo',
             documento: 't.CodigoExternoCliente',
             ticket: 'n.Ticket',
-            tienda: 'COALESCE(emp.DsEmpresa, CAST(t.IDEmpresa as VARCHAR))',
+            tienda: 'COALESCE(emp.DsEmpresa, t.IDEmpresa)',
             cliente: 'COALESCE(t.NombreCliente, n.Tienda)',
             creado_por: 'n.Creado_por',
             supervisor: 'COALESCE(sup_cas.supervisor_nombre, sup_sole.supervisor_nombre)',
@@ -472,8 +472,8 @@ router.get('/cxg-nc/unique-values', verifyPermission('cxg.cxg_nc.view'), async (
             SELECT DISTINCT TOP 50
                 ${dbCol} as value
             FROM [dbo].[GAC_APP_TB_CXG_NC] n
-            LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
-            LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as VARCHAR)
+            LEFT JOIN [SIATC].[Dashboard_FSM] t ON t.Ticket = CAST(n.Ticket AS NVARCHAR(255))
+            LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as NVARCHAR(255))
             -- CAS Supervisor
             OUTER APPLY (
                 SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
@@ -536,6 +536,41 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
 
         const pool = await getDbConnection();
 
+        // Check if supervisor lookup is needed inside BaseQuery CTE (for filtering or sorting by supervisor)
+        const hasSupervisorFilter = !!req.query.filter_supervisor;
+        const needSupervisorInBase = hasSupervisorFilter || (sortBy === 'supervisor');
+
+        const supervisorSelect = needSupervisorInBase
+            ? `COALESCE(sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor`
+            : `CAST(NULL as VARCHAR(255)) as supervisor`;
+
+        const supervisorJoin = needSupervisorInBase
+            ? `
+                -- CAS Supervisor (OUTER APPLY TOP 1 to avoid fan-out, prioritizing active and sorting historically)
+                OUTER APPLY (
+                    SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
+                    FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas
+                    INNER JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] h 
+                        ON cas.Id_colaborar = h.Id_colaborar 
+                    INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON h.Supervisor = e.ID_empleado
+                    WHERE cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
+                      AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
+                    ORDER BY 
+                        CASE WHEN h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE() THEN 1 ELSE 0 END DESC,
+                        h.Fecha_inicio DESC,
+                        h.Creado_el DESC
+                ) sup_cas
+                -- SOLE Supervisor (OUTER APPLY TOP 1 to avoid fan-out)
+                OUTER APPLY (
+                    SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
+                    FROM [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] da
+                    INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] ia ON da.Empleado = ia.Empleado
+                    INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON ia.Jefe_directo = e.ID_empleado
+                    WHERE (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
+                ) sup_sole
+              `
+            : ``;
+
         // Base CTE to wrap complex columns
         const baseCte = `
             WITH BaseQuery AS (
@@ -564,33 +599,14 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
                     t.CodigoExternoCliente as documento_cliente,
                     t.CodigoExternoEquipo as codigo_producto,
                     t.NombreEquipo as producto,
-                    COALESCE(emp.DsEmpresa, CAST(t.IDEmpresa as VARCHAR)) as tienda,
-                    COALESCE(sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor
+                    COALESCE(emp.DsEmpresa, t.IDEmpresa) as tienda,
+                    t.NombreTecnico,
+                    t.ApellidoTecnico,
+                    ${supervisorSelect}
                 FROM [dbo].[GAC_APP_TB_CXG_NC] n
-                LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
-                LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as VARCHAR)
-                -- CAS Supervisor (OUTER APPLY TOP 1 to avoid fan-out, prioritizing active and sorting historically)
-                OUTER APPLY (
-                    SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
-                    FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas
-                    INNER JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] h 
-                        ON cas.Id_colaborar = h.Id_colaborar 
-                    INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON h.Supervisor = e.ID_empleado
-                    WHERE cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
-                      AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
-                    ORDER BY 
-                        CASE WHEN h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE() THEN 1 ELSE 0 END DESC,
-                        h.Fecha_inicio DESC,
-                        h.Creado_el DESC
-                ) sup_cas
-                -- SOLE Supervisor (OUTER APPLY TOP 1 to avoid fan-out)
-                OUTER APPLY (
-                    SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
-                    FROM [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] da
-                    INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] ia ON da.Empleado = ia.Empleado
-                    INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON ia.Jefe_directo = e.ID_empleado
-                    WHERE (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
-                ) sup_sole
+                LEFT JOIN [SIATC].[Dashboard_FSM] t ON t.Ticket = CAST(n.Ticket AS NVARCHAR(255))
+                LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as NVARCHAR(255))
+                ${supervisorJoin}
             )
         `;
 
@@ -709,15 +725,62 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
         };
         const orderCol = sortMappings[sortBy] || 'fecha_creacion';
 
-        const result = await dataRequest.query(`
-            ${baseCte}
-            SELECT *, fecha_creacion as fecha
-            FROM BaseQuery
-            ${whereClause}
-            ORDER BY ${orderCol} ${sortOrder}
-            OFFSET @offset ROWS
-            FETCH NEXT @pageSize ROWS ONLY
-        `);
+        let dataQuery = '';
+        if (needSupervisorInBase) {
+            dataQuery = `
+                ${baseCte}
+                SELECT *, fecha_creacion as fecha
+                FROM BaseQuery
+                ${whereClause}
+                ORDER BY ${orderCol} ${sortOrder}
+                OFFSET @offset ROWS
+                FETCH NEXT @pageSize ROWS ONLY
+            `;
+        } else {
+            dataQuery = `
+                ${baseCte}
+                , Filtered AS (
+                    SELECT *
+                    FROM BaseQuery
+                    ${whereClause}
+                )
+                , Paged AS (
+                    SELECT *
+                    FROM Filtered
+                    ORDER BY ${orderCol} ${sortOrder}
+                    OFFSET @offset ROWS
+                    FETCH NEXT @pageSize ROWS ONLY
+                )
+                SELECT p.*, p.fecha_creacion as fecha,
+                       COALESCE(sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor
+                FROM Paged p
+                -- CAS Supervisor (OUTER APPLY TOP 1 on final 20 rows)
+                OUTER APPLY (
+                    SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
+                    FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas
+                    INNER JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] h 
+                        ON cas.Id_colaborar = h.Id_colaborar 
+                    INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON h.Supervisor = e.ID_empleado
+                    WHERE cas.Nombre_FSM LIKE '%' + p.NombreTecnico + '%' 
+                      AND cas.Nombre_FSM LIKE '%' + p.ApellidoTecnico + '%'
+                    ORDER BY 
+                        CASE WHEN h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE() THEN 1 ELSE 0 END DESC,
+                        h.Fecha_inicio DESC,
+                        h.Creado_el DESC
+                ) sup_cas
+                -- SOLE Supervisor (OUTER APPLY TOP 1 on final 20 rows)
+                OUTER APPLY (
+                    SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
+                    FROM [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] da
+                    INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] ia ON da.Empleado = ia.Empleado
+                    INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON ia.Jefe_directo = e.ID_empleado
+                    WHERE (p.NombreTecnico + ' ' + p.ApellidoTecnico) = da.[Nombre SAP]
+                ) sup_sole
+                ORDER BY ${orderCol} ${sortOrder}
+            `;
+        }
+
+        const result = await dataRequest.query(dataQuery);
 
         const formattedData = result.recordset.map(row => ({
             ...row,
@@ -811,14 +874,14 @@ router.get('/cxg-nc/:id', verifyPermission('cxg.cxg_nc.view'), async (req: Reque
                     n.Ticket_desinstalacion as ticket_desinstalacion,
                     n.Ticket as ticket,
                     COALESCE(t.ComentarioProgramador, '') as fsm_motivo_elevacion,
-                    COALESCE(emp.DsEmpresa, CAST(t.IDEmpresa as VARCHAR)) as fsm_lugar_compra,
+                    COALESCE(emp.DsEmpresa, t.IDEmpresa) as fsm_lugar_compra,
                     COALESCE(sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor_asignado,
                     t.NombreCliente as fsm_cliente,
                     t.CodigoExternoEquipo as codigo_producto,
                     t.NombreEquipo as producto
                 FROM [dbo].[GAC_APP_TB_CXG_NC] n
-                LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
-                LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as VARCHAR)
+                LEFT JOIN [SIATC].[Dashboard_FSM] t ON t.Ticket = CAST(n.Ticket AS NVARCHAR(255))
+                LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as NVARCHAR(255))
                 -- CAS Supervisor (OUTER APPLY TOP 1 to avoid fan-out, prioritizing active and sorting historically)
                 OUTER APPLY (
                     SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
