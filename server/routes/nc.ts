@@ -273,17 +273,16 @@ router.get('/cancelaciones/mapa/hoy', verifyPermission('cxg.cancelaciones.view')
         const pool = await getDbConnection();
         const result = await pool.request().query(`
             SELECT 
-                c.ID_Cancelados as id,
-                c.Ticket as ticket,
+                t.Ticket as id,
+                t.Ticket as ticket,
                 t.NombreCliente as cliente,
                 t.Asunto as asunto,
-                ISNULL(m.Motivo, c.Motivo_Cancelacion) as motivo,
+                ISNULL(t.ComentarioProgramador, 'Sin motivo especificado') as motivo,
                 t.Latitud as latitud,
                 t.Longitud as longitud
-            FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
-            INNER JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
-            LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] m ON c.Motivo_Cancelacion = m.ID_Cancelados_motivo
-            WHERE CAST(c.Generado_el AS DATE) = CAST(GETDATE() AS DATE)
+            FROM [SIATC].[Dashboard_FSM] t
+            WHERE CAST(t.FechaVisita AS DATE) = CAST(GETDATE() AS DATE)
+              AND t.Estado = 'Cancelled'
               AND t.Latitud IS NOT NULL AND t.Latitud <> ''
               AND t.Longitud IS NOT NULL AND t.Longitud <> ''
         `);
