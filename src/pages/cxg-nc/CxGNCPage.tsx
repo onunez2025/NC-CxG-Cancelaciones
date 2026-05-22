@@ -59,6 +59,7 @@ export const CxGNCPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
+  const [globalStats, setGlobalStats] = useState({ registrado: 0, aprobado: 0, asignado: 0, validado: 0, cerrado: 0 });
   const pageSize = 20;
   const [data, setData] = useState<CxGNC[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -94,10 +95,26 @@ export const CxGNCPage = () => {
     { id: 'estado', label: 'ESTADO' }
   ];
 
-  const [visibleColumns, setVisibleColumns] = useState<string[]>([
-    'tipo', 'documento', 'ticket', 'tienda', 'cliente', 'codigo_producto', 'producto', 'creado_por', 'supervisor', 'fecha_creacion', 'aprobado', 'procesado', 'estado'
-  ]);
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(() => {
+    const saved = localStorage.getItem(`cxg_nc_columns_${user?.id || 'default'}`);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Error parsing saved columns', e);
+      }
+    }
+    return [
+      'tipo', 'documento', 'ticket', 'tienda', 'cliente', 'codigo_producto', 'producto', 'creado_por', 'supervisor', 'fecha_creacion', 'aprobado', 'procesado', 'estado'
+    ];
+  });
   const [isColumnDropdownOpen, setIsColumnDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    if (user?.id) {
+      localStorage.setItem(`cxg_nc_columns_${user.id}`, JSON.stringify(visibleColumns));
+    }
+  }, [visibleColumns, user?.id]);
 
   const toggleColumn = (colId: string) => {
     setVisibleColumns(prev => 
@@ -170,6 +187,7 @@ export const CxGNCPage = () => {
       });
       setData(response.data);
       setTotalRecords(response.total);
+      if (response.stats) setGlobalStats(response.stats);
     } catch (error) {
       console.error('Error fetching CxG/NC data:', error);
     } finally {
@@ -472,14 +490,14 @@ export const CxGNCPage = () => {
 
   const displayedData = data;
 
-  // KPI stats from current data
+  // KPI stats from backend
   const kpiStats = {
     total: totalRecords,
-    registrado: data.filter(d => d.estado === 'REGISTRADO').length,
-    aprobado: data.filter(d => d.estado === 'APROBADO_SUP').length,
-    asignado: data.filter(d => d.estado === 'ASIGNADO').length,
-    validado: data.filter(d => d.estado === 'VALIDADO').length,
-    cerrado: data.filter(d => d.estado === 'CERRADO').length,
+    registrado: globalStats.registrado,
+    aprobado: globalStats.aprobado,
+    asignado: globalStats.asignado,
+    validado: globalStats.validado,
+    cerrado: globalStats.cerrado,
   };
 
   // Click outside to close column dropdown

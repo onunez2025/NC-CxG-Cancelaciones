@@ -682,12 +682,19 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
 
         const countResult = await countRequest.query(`
             ${baseCte}
-            SELECT COUNT(*) as total 
+            SELECT 
+                COUNT(*) as total,
+                SUM(CASE WHEN estado = 'REGISTRADO' THEN 1 ELSE 0 END) as registrado,
+                SUM(CASE WHEN estado = 'APROBADO_SUP' THEN 1 ELSE 0 END) as aprobado,
+                SUM(CASE WHEN estado = 'ASIGNADO' THEN 1 ELSE 0 END) as asignado,
+                SUM(CASE WHEN estado = 'VALIDADO' THEN 1 ELSE 0 END) as validado,
+                SUM(CASE WHEN estado = 'CERRADO' THEN 1 ELSE 0 END) as cerrado
             FROM BaseQuery
             ${whereClause}
         `);
         
-        const total = countResult.recordset[0].total;
+        const stats = countResult.recordset[0];
+        const total = stats.total || 0;
 
         dataRequest.input('search', sql.VarChar, `%${search}%`);
         dataRequest.input('offset', sql.Int, offset);
@@ -720,6 +727,13 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
         res.json({
             data: formattedData,
             total,
+            stats: {
+                registrado: stats.registrado || 0,
+                aprobado: stats.aprobado || 0,
+                asignado: stats.asignado || 0,
+                validado: stats.validado || 0,
+                cerrado: stats.cerrado || 0
+            },
             page,
             pageSize
         });
@@ -1049,7 +1063,116 @@ router.post('/cxg-nc', verifyPermission('cxg.cxg_nc.create'), async (req: Reques
 
         const solicitudId = `CNC-${Date.now()}`;
         const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
-        
+
+        // Retrieve ticket details internally to fill motivo_elevacion, lugar_compra, supervisor_fsm
+        let motivo_elevacion = null;
+        let supervisor_fsm = null;
+        let lugar_compra = null;
+
+        if (ticket) {
+            try {
+                const ticketResult = await pool.request()
+                    .input('ticketId', sql.VarChar, ticket)
+                    .query(`
+                        SELECT TOP 1
+                            t.ComentarioProgramador as motivo_elevacion,
+                            t.IDEmpresa as lugar_compra_id,
+                            emp.DsEmpresa as lugar_compra,
+                            COALESCE(sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor_nombre
+                        FROM [SIATC].[Dashboard_FSM] t
+                        LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as VARCHAR)
+                        -- CAS Supervisor (OUTER APPLY TOP 1 to avoid fan-out, prioritizing active and sorting historically)
+                        OUTER APPLY (
+                            SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
+                            FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas
+                            INNER JOIN [dbo].[GAC_APP_TB_COLABORADORES_CAS_HISTORIAL_SUPERVISORES] h 
+                                ON cas.Id_colaborar = h.Id_colaborar 
+                            INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON h.Supervisor = e.ID_empleado
+                            WHERE cas.Nombre_FSM LIKE '%' + t.NombreTecnico + '%' 
+                              AND cas.Nombre_FSM LIKE '%' + t.ApellidoTecnico + '%'
+                            ORDER BY 
+                                CASE WHEN h.Fecha_fin IS NULL OR h.Fecha_fin >= GETDATE() THEN 1 ELSE 0 END DESC,
+                                h.Fecha_inicio DESC,
+                                h.Creado_el DESC
+                        ) sup_cas
+                        -- SOLE Supervisor (OUTER APPLY TOP 1 to avoid fan-out)
+                        OUTER APPLY (
+                            SELECT TOP 1 e.Nombre_Empleado as supervisor_nombre
+                            FROM [dbo].[GAC_APP_TB_EMPLEADOS_DATOS_ADICIONAL] da
+                            INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS_INFORMACION_ADICIONAL] ia ON da.Empleado = ia.Empleado
+                            INNER JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON ia.Jefe_directo = e.ID_empleado
+                            WHERE (t.NombreTecnico + ' ' + t.ApellidoTecnico) = da.[Nombre SAP]
+                        ) sup_sole
+                        WHERE t.Ticket = @ticketId
+                    `);
+
+                if (ticketResult.recordset.length > 0) {
+                    const ticketData = ticketResult.recordset[0];
+                    motivo_elevacion = ticketData.motivo_elevacion || null;
+                    supervisor_fsm = ticketData.supervisor_nombre || null;
+
+                    let resolvedLugarCompra = null;
+                    // 1. Query SAP C4C OData for the custom Lugar de Compra field
+                    const sapBaseUrl = process.env.SAP_BASE_URL || 'https://my361897.crm.ondemand.com/sap/c4c/odata/v1/c4codataapi';
+                    const sapUser = process.env.SAP_USER || 'oscar.nunez';
+                    const sapPassword = process.env.SAP_PASSWORD || '9xP6*epfuhWx4rK';
+
+                    try {
+                        const authHeader = 'Basic ' + Buffer.from(`${sapUser}:${sapPassword}`).toString('base64');
+                        const url = `${sapBaseUrl}/ServiceRequestCollection?$filter=ID eq '${ticket}'&$format=json`;
+
+                        const response = await fetch(url, {
+                            headers: {
+                                'Authorization': authHeader,
+                                'Accept': 'application/json'
+                            }
+                        });
+
+                        if (response.ok) {
+                            const body = await response.json() as any;
+                            const odataResults = body?.d?.results || [];
+                            if (odataResults.length > 0) {
+                                const sdkCode = odataResults[0].zIDLugarCompra_SDK;
+                                if (sdkCode) {
+                                    resolvedLugarCompra = C4C_STORE_MAPPING[sdkCode] || null;
+                                }
+                            }
+                        }
+                    } catch (odataErr) {
+                        console.error(`[POST /cxg-nc ODATA ERROR]:`, odataErr);
+                    }
+
+                    // 2. Database Fallback (retrieve resolved tienda from TBL_C4C_REPORTE_CONTROL if OData failed or unmapped)
+                    if (!resolvedLugarCompra) {
+                        try {
+                            const fallbackResult = await pool.request()
+                                .input('ticketId', sql.VarChar, ticket)
+                                .query(`
+                                    SELECT TOP 1 TIENDA
+                                    FROM [dbo].[TBL_C4C_REPORTE_CONTROL]
+                                    WHERE NOS = @ticketId AND TIENDA IS NOT NULL AND TIENDA <> ''
+                                `);
+
+                            if (fallbackResult.recordset.length > 0) {
+                                resolvedLugarCompra = fallbackResult.recordset[0].TIENDA;
+                            }
+                        } catch (dbErr) {
+                            console.error(`[POST /cxg-nc DB FALLBACK ERROR]:`, dbErr);
+                        }
+                    }
+
+                    // 3. FSM Fallback
+                    if (!resolvedLugarCompra) {
+                        resolvedLugarCompra = ticketData.lugar_compra || ticketData.lugar_compra_id || 'TIENDAS VARIAS';
+                    }
+
+                    lugar_compra = resolveStoreDescription(resolvedLugarCompra);
+                }
+            } catch (err) {
+                console.error('Error fetching ticket details internally:', err);
+            }
+        }
+
         await pool.request()
             .input('id', sql.VarChar, solicitudId)
             .input('ticket', sql.VarChar, ticket || 'MT-TK-TEMP')

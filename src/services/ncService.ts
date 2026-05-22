@@ -114,6 +114,13 @@ export interface PaginatedResponse<T> {
     total: number;
     page: number;
     pageSize: number;
+    stats?: {
+        registrado: number;
+        aprobado: number;
+        asignado: number;
+        validado: number;
+        cerrado: number;
+    };
 }
 
 export interface GestionarData {
