@@ -8,6 +8,7 @@ import { ArrowLeft, Loader2, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { apiClient, API_BASE_URL } from '../../services/apiClient';
+import MarkerClusterGroup from 'react-leaflet-cluster';
 
 // Fix for default marker icons in React-Leaflet
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -27,6 +28,7 @@ interface MapData {
   cliente: string;
   asunto: string;
   motivo: string;
+  distrito: string;
   latitud: string;
   longitud: string;
 }
@@ -96,24 +98,27 @@ export const CancelacionesMapPage = () => {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              {data.map((item) => {
-                const lat = parseFloat(item.latitud);
-                const lng = parseFloat(item.longitud);
-                if (isNaN(lat) || isNaN(lng)) return null;
+              <MarkerClusterGroup>
+                {data.map((item) => {
+                  const lat = parseFloat(item.latitud);
+                  const lng = parseFloat(item.longitud);
+                  if (isNaN(lat) || isNaN(lng)) return null;
 
-                return (
-                  <Marker key={item.id} position={[lat, lng]}>
-                    <Popup>
-                      <div className="p-1">
-                        <p className="font-bold text-sm mb-1">Ticket #{item.ticket}</p>
-                        <p className="text-xs text-slate-600 dark:text-slate-300 mb-1"><b>Cliente:</b> {item.cliente}</p>
-                        <p className="text-xs text-slate-600 dark:text-slate-300 mb-1"><b>Asunto:</b> {item.asunto}</p>
-                        <p className="text-xs text-red-600 dark:text-red-400 font-semibold"><b>Motivo:</b> {item.motivo}</p>
-                      </div>
-                    </Popup>
-                  </Marker>
-                );
-              })}
+                  return (
+                    <Marker key={item.id} position={[lat, lng]}>
+                      <Popup>
+                        <div className="p-1 min-w-[200px]">
+                          <p className="font-bold text-sm mb-1">Ticket #{item.ticket}</p>
+                          <p className="text-xs text-slate-600 dark:text-slate-300 mb-1"><b>Cliente:</b> {item.cliente}</p>
+                          <p className="text-xs text-slate-600 dark:text-slate-300 mb-1"><b>Asunto:</b> {item.asunto}</p>
+                          <p className="text-xs text-slate-600 dark:text-slate-300 mb-1"><b>Distrito:</b> {item.distrito || 'No especificado'}</p>
+                          <p className="text-xs text-red-600 dark:text-red-400 font-semibold"><b>Motivo:</b> {item.motivo}</p>
+                        </div>
+                      </Popup>
+                    </Marker>
+                  );
+                })}
+              </MarkerClusterGroup>
             </MapContainer>
             
             {/* Legend / Stats overlay */}

@@ -278,6 +278,7 @@ router.get('/cancelaciones/mapa/hoy', verifyPermission('cxg.cancelaciones.view')
                 t.NombreCliente as cliente,
                 t.Asunto as asunto,
                 ISNULL(t.ComentarioProgramador, 'Sin motivo especificado') as motivo,
+                t.Distrito as distrito,
                 t.Latitud as latitud,
                 t.Longitud as longitud
             FROM [SIATC].[Dashboard_FSM] t
