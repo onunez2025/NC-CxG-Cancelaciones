@@ -14,7 +14,8 @@ import {
   ClipboardCheck,
   User,
   AlertTriangle,
-  UserPlus
+  UserPlus,
+  MapPin
 } from 'lucide-react';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 import { SIATCButton } from '../../components/siatc/SIATCButton';
@@ -32,6 +33,7 @@ import { auditService } from '../../services/auditService';
 import { useAuth } from '../../hooks/useAuth';
 import { UsersService } from '../../services/usersService';
 import type { User as SystemUser } from '../../types';
+import { useNavigate } from 'react-router-dom';
 
 // ---- Dropdown Menu Component ----
 const ActionsMenu = ({ 
@@ -145,6 +147,7 @@ const DetailRow = ({ icon: Icon, label, value, className }: { icon: any; label: 
 
 export const CancellationsPage = () => {
   const { user, hasPermission } = useAuth();
+  const navigate = useNavigate();
 
   const canCreate = hasPermission('cxg.cancelaciones.create');
   const canAssign = hasPermission('cxg.cancelaciones.assign');
@@ -480,6 +483,13 @@ export const CancellationsPage = () => {
             isLoading={isLoading}
           >
             Sincronizar
+          </SIATCButton>
+          <SIATCButton 
+            variant="secondary" 
+            icon={MapPin}
+            onClick={() => navigate('/cancelaciones/mapa')}
+          >
+            Mapa de Hoy
           </SIATCButton>
           <SIATCButton 
             variant="secondary" 

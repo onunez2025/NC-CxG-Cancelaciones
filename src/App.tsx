@@ -20,6 +20,7 @@ import { RequirePermission } from './components/common/RequirePermission';
 // Placeholder Pages
 import { DashboardPage } from './pages/DashboardPage';
 import { CancellationsPage } from './pages/cancelaciones/CancellationsPage';
+import { CancelacionesMapPage } from './pages/cancelaciones/CancelacionesMapPage';
 import { CxGNCPage } from './pages/cxg-nc/CxGNCPage';
 import { EmergenciasPage } from './pages/emergencias/EmergenciasPage';
 import { FSMDashboardPage } from './pages/fsm/FSMDashboardPage';
@@ -105,6 +106,7 @@ function App() {
               {/* NC-CxG-Cancelaciones Routes */}
               <Route element={<RequirePermission permission="cxg.cancelaciones.view" />}>
                 <Route path="/cancelaciones" element={<CancellationsPage />} />
+                <Route path="/cancelaciones/mapa" element={<CancelacionesMapPage />} />
               </Route>
               <Route element={<RequirePermission permission="cxg.cxg_nc.view" />}>
                 <Route path="/cxg-nc" element={<CxGNCPage />} />

@@ -265,6 +265,36 @@ router.get('/cancelaciones/motivos', verifyPermission('cxg.cancelaciones.view'),
 });
 
 // ─────────────────────────────────────────────
+// CANCELACIONES: Mapa de Hoy
+// ─────────────────────────────────────────────
+
+router.get('/cancelaciones/mapa/hoy', verifyPermission('cxg.cancelaciones.view'), async (req: Request, res: Response) => {
+    try {
+        const pool = await getDbConnection();
+        const result = await pool.request().query(`
+            SELECT 
+                c.ID_Cancelados as id,
+                c.Ticket as ticket,
+                t.NombreCliente as cliente,
+                t.Asunto as asunto,
+                ISNULL(m.Motivo, c.Motivo_Cancelacion) as motivo,
+                t.Latitud as latitud,
+                t.Longitud as longitud
+            FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
+            INNER JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
+            LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] m ON c.Motivo_Cancelacion = m.ID_Cancelados_motivo
+            WHERE CAST(c.Generado_el AS DATE) = CAST(GETDATE() AS DATE)
+              AND t.Latitud IS NOT NULL AND t.Latitud <> ''
+              AND t.Longitud IS NOT NULL AND t.Longitud <> ''
+        `);
+        res.json(result.recordset);
+    } catch (error: any) {
+        console.error('Error fetching today cancellations map:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ─────────────────────────────────────────────
 // CANCELACIONES: Detail
 // ─────────────────────────────────────────────
 
