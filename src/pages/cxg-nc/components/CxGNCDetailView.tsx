@@ -212,15 +212,28 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, is
               </div>
             )}
 
+            {/* Assignment Data */}
+            {detailData.procesado_por && (
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                <h3 className="text-xs font-black uppercase tracking-widest text-primary mb-4">Datos de Asignación</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-bold text-muted-foreground uppercase">Analista Responsable</span>
+                    <span className="text-sm font-semibold">{detailData.procesado_por}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Gestion Data (Procesado) */}
             {(detailData.procesado === 'true' || detailData.procesado === 'false') && (
               <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                <h3 className="text-xs font-black uppercase tracking-widest text-primary mb-4">Datos de Gestión</h3>
+                <h3 className="text-xs font-black uppercase tracking-widest text-primary mb-4">Datos de Procesamiento</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-xs font-bold text-muted-foreground uppercase">Resultado</span>
                     <SIATCBadge variant={detailData.procesado === 'true' ? 'success' : 'error'}>
-                      {detailData.procesado === 'true' ? 'GESTIONADO' : 'RECHAZADO (GESTIÓN)'}
+                      {detailData.procesado === 'true' ? 'PROCESADO CORRECTAMENTE' : 'RECHAZADO EN GESTIÓN'}
                     </SIATCBadge>
                   </div>
                   {detailData.procesado_motivo && (
@@ -237,13 +250,13 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, is
                   )}
                   {detailData.procesado_por && (
                     <div className="flex justify-between items-center">
-                      <span className="text-xs font-bold text-muted-foreground uppercase">Gestionado por</span>
+                      <span className="text-xs font-bold text-muted-foreground uppercase">Procesado por</span>
                       <span className="text-sm font-semibold">{detailData.procesado_por}</span>
                     </div>
                   )}
                   {detailData.procesado_el && (
                     <div className="flex justify-between items-center">
-                      <span className="text-xs font-bold text-muted-foreground uppercase">Fecha Gestión</span>
+                      <span className="text-xs font-bold text-muted-foreground uppercase">Fecha Proceso</span>
                       <span className="text-sm">{new Date(detailData.procesado_el).toLocaleString()}</span>
                     </div>
                   )}
