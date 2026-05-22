@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, DollarSign, ShieldCheck, UserPlus, CheckCircle2, ArrowLeft, Wrench, XCircle } from 'lucide-react';
+import { Loader2, DollarSign, ShieldCheck, UserPlus, CheckCircle2, ArrowLeft, Wrench, XCircle, FileText } from 'lucide-react';
 import { SIATCBadge } from '../../../components/siatc/SIATCBadge';
 import { SIATCButton } from '../../../components/siatc/SIATCButton';
 import { ncService, type CxGNC, type EquipmentHistoryEntry } from '../../../services/ncService';
+import { useDialog } from '../../../context/DialogContext';
 
 interface CxGNCDetailViewProps {
   detailData: CxGNC;
@@ -22,6 +23,42 @@ interface CxGNCDetailViewProps {
 export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, isLoadingDetail, onBack, actions }) => {
   const [equipmentHistory, setEquipmentHistory] = useState<EquipmentHistoryEntry[]>([]);
   const [isLoadingEquipment, setIsLoadingEquipment] = useState(false);
+  const [loadingPdf, setLoadingPdf] = useState<string | null>(null);
+  const { alert } = useDialog();
+
+  const handleViewC4CReport = async (ticketId: string) => {
+    try {
+      setLoadingPdf(ticketId);
+      const response = await ncService.getC4CReport(ticketId);
+
+      if (!response.ok) {
+        let errorMessage = 'No se pudo obtener el informe técnico';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.details || errorData.error || errorMessage;
+        } catch (_) {}
+        throw new Error(errorMessage);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const win = window.open(url, '_blank');
+      if (!win) {
+        throw new Error('El navegador bloqueó la ventana emergente. Por favor, permite las ventanas emergentes para este sitio.');
+      }
+      
+      // Cleanup after some time
+      setTimeout(() => window.URL.revokeObjectURL(url), 60000);
+    } catch (err: any) {
+      alert({
+        title: 'Error de Reporte',
+        message: err.message,
+        type: 'error'
+      });
+    } finally {
+      setLoadingPdf(null);
+    }
+  };
 
   useEffect(() => {
     const fetchEquipmentHistory = async () => {
@@ -280,10 +317,20 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, is
                   {equipmentHistory.map((eq, idx) => (
                     <div key={idx} className="bg-white dark:bg-slate-900 rounded-lg p-3 border border-cyan-200 dark:border-cyan-800/50 shadow-sm">
                       <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <span className="text-[10px] font-bold text-cyan-600 uppercase bg-cyan-100 dark:bg-cyan-900 px-2 py-0.5 rounded mr-2">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[10px] font-bold text-cyan-600 uppercase bg-cyan-100 dark:bg-cyan-900 px-2 py-0.5 rounded">
                             Ticket: {eq.ticket}
                           </span>
+                          <SIATCButton 
+                            variant="ghost" 
+                            size="sm"
+                            className="!p-1 !h-auto text-cyan-600 hover:text-cyan-700 hover:bg-cyan-100 dark:hover:bg-cyan-950/50 !rounded border border-cyan-200 dark:border-cyan-800"
+                            icon={FileText}
+                            isLoading={loadingPdf === eq.ticket}
+                            onClick={() => handleViewC4CReport(eq.ticket)}
+                            disabled={loadingPdf !== null}
+                            title="Ver Informe Técnico C4C"
+                          />
                           <span className="text-xs font-semibold">{eq.tipo_servicio || 'Servicio'}</span>
                         </div>
                         <span className="text-[10px] text-muted-foreground">

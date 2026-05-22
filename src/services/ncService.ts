@@ -346,5 +346,10 @@ export const ncService = {
             body: JSON.stringify(data)
         });
         if (!response.ok) throw new Error('Error al validar cliente');
+    },
+
+    async getC4CReport(ticketId: string): Promise<Response> {
+        const response = await apiClient(`${API_BASE_URL}/c4c/report/${ticketId}`);
+        return response;
     }
 };

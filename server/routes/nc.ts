@@ -1442,6 +1442,114 @@ router.post('/cancelaciones/:id/validar-cliente', verifyPermission('cxg.cancelac
     }
 });
 
+// ─────────────────────────────────────────────
+// C4C: Obtener Informe Técnico (PDF)
+// ─────────────────────────────────────────────
 
+router.get('/c4c/report/:ticketId', async (req: Request, res: Response) => {
+    try {
+        const { ticketId } = req.params;
+
+        const sapBaseUrl = process.env.SAP_BASE_URL || 'https://my361897.crm.ondemand.com/sap/c4c/odata/v1/c4codataapi';
+        const sapUser = process.env.SAP_USER || 'oscar.nunez';
+        const sapPassword = process.env.SAP_PASSWORD || '9xP6*epfuhWx4rK';
+
+        const authHeader = 'Basic ' + Buffer.from(`${sapUser}:${sapPassword}`).toString('base64');
+
+        // 1. Find the Service Request
+        const searchUrl = `${sapBaseUrl}/ServiceRequestCollection?$filter=ID eq '${ticketId}'&$format=json`;
+        const searchResponse = await fetch(searchUrl, {
+            headers: { 
+                'Authorization': authHeader,
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!searchResponse.ok) {
+            return res.status(searchResponse.status).json({ 
+                error: `Error al buscar el ticket en C4C`, 
+                details: `C4C retornó código ${searchResponse.status}` 
+            });
+        }
+
+        const searchData = await searchResponse.json() as any;
+        const ticket = searchData?.d?.results?.[0];
+        if (!ticket) {
+            return res.status(404).json({ error: `Ticket ${ticketId} no encontrado en C4C` });
+        }
+
+        // 2. Fetch Attachments using the ObjectID
+        let attachments = ticket.ServiceRequestAttachmentFolder?.results;
+        
+        if (!attachments || attachments.length === 0) {
+            const attachmentUrl = `${sapBaseUrl}/ServiceRequestCollection('${ticket.ObjectID}')/ServiceRequestAttachmentFolder?$format=json`;
+            try {
+                const attachResponse = await fetch(attachmentUrl, {
+                    headers: { 
+                        'Authorization': authHeader,
+                        'Accept': 'application/json'
+                    }
+                });
+                if (attachResponse.ok) {
+                    const attachData = await attachResponse.json() as any;
+                    attachments = attachData?.d?.results;
+                }
+            } catch (attachErr: any) {
+                console.warn('Could not fetch attachments directly:', attachErr.message);
+            }
+        }
+
+        if (!attachments || attachments.length === 0) {
+            return res.status(404).json({ 
+                error: `No se encontraron adjuntos para el ticket ${ticketId}`,
+                details: 'El ticket existe pero no tiene archivos asociados en la pestaña de Adjuntos de C4C.'
+            });
+        }
+
+        // 3. Look for the technical report PDF
+        // We prioritize PDFs with "Informe" or "Report" in the name
+        let report = attachments.find((a: any) => 
+            a.MimeType === 'application/pdf' && 
+            (a.Name.toLowerCase().includes('informe') || a.Name.toLowerCase().includes('report'))
+        );
+
+        // Fallback: take any PDF if no specific name match
+        if (!report) {
+            report = attachments.find((a: any) => a.MimeType === 'application/pdf');
+        }
+
+        if (!report) {
+            return res.status(404).json({ error: `No se encontró un informe en PDF para el ticket ${ticketId}` });
+        }
+
+        // 4. Fetch the actual PDF binary content
+        const downloadUrl = `${sapBaseUrl}/ServiceRequestAttachmentFolderCollection('${report.ObjectID}')/Binary/$value`;
+        
+        const pdfResponse = await fetch(downloadUrl, {
+            headers: { 'Authorization': authHeader }
+        });
+
+        if (!pdfResponse.ok) {
+            return res.status(pdfResponse.status).json({ 
+                error: 'Failed to retrieve report content from C4C',
+                details: `C4C download returned status ${pdfResponse.status}`
+            });
+        }
+
+        const arrayBuffer = await pdfResponse.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(report.Name)}"`);
+        res.send(buffer);
+
+    } catch (err: any) {
+        console.error('C4C Proxy Error:', err.message);
+        res.status(500).json({ 
+            error: 'Failed to retrieve report from C4C',
+            details: err.message
+        });
+    }
+});
 
 export default router;
