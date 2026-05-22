@@ -9,6 +9,8 @@ import { useNavigate } from 'react-router-dom';
 
 import { apiClient, API_BASE_URL } from '../../services/apiClient';
 import MarkerClusterGroup from 'react-leaflet-cluster';
+import 'react-leaflet-cluster/dist/assets/MarkerCluster.css';
+import 'react-leaflet-cluster/dist/assets/MarkerCluster.Default.css';
 
 // Fix for default marker icons in React-Leaflet
 import icon from 'leaflet/dist/images/marker-icon.png';
