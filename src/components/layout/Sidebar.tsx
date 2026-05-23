@@ -63,23 +63,21 @@ export function Sidebar({ className }: { className?: string }) {
                 </div>
                 <div className="flex flex-col">
                     <h1 className="font-bold text-xl leading-none tracking-tight text-foreground uppercase">NC-CxG</h1>
-                    <p className="text-[10px] font-black text-primary tracking-[0.2em] uppercase mt-1 opacity-90">Cancelaciones</p>
+                    <p className="text-[10px] font-black text-primary tracking-[0.2em] uppercase mt-1 opacity-70">Cancelaciones</p>
                 </div>
             </div>
 
             {/* Navigation: High Density Standard */}
             <nav className="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto custom-scrollbar">
-                <p className="text-[10px] font-black text-muted-foreground tracking-[0.2em] px-4 py-2 uppercase opacity-80">Menú Principal</p>
+                <p className="text-[10px] font-black text-muted-foreground tracking-[0.2em] px-4 py-2 uppercase opacity-40">Menú Principal</p>
                 {filteredNavItems.map((item) => (
                     <NavLink
                         key={item.to}
                         to={item.to}
-                        className={({ isActive }) => cn(
-                            "group/item flex items-center justify-between text-sm transition-all duration-300 relative overflow-hidden",
-                            isActive
-                                ? SIATC_THEME.LAYOUT.SIDEBAR_ITEM_ACTIVE
-                                : SIATC_THEME.LAYOUT.SIDEBAR_ITEM_INACTIVE
-                        )}
+                        className={({ isActive }) => isActive
+                            ? SIATC_THEME.LAYOUT.SIDEBAR_ITEM_ACTIVE
+                            : SIATC_THEME.LAYOUT.SIDEBAR_ITEM_INACTIVE
+                        }
                     >
                         <div className="flex items-center gap-3 relative z-10">
                             <item.icon className={cn(
