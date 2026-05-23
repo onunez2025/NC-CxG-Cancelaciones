@@ -15,7 +15,8 @@ export default {
         },
         extend: {
             fontFamily: {
-                sans: ['"Lato"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                sans: ['"DM Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                mono: ['"JetBrains Mono"', 'monospace'],
             },
             colors: {
                 border: "hsl(var(--border))",
@@ -51,11 +52,33 @@ export default {
                     DEFAULT: "hsl(var(--card))",
                     foreground: "hsl(var(--card-foreground))",
                 },
+                // Crypto Blue Semantic Aliases (Master Palette)
+                cb: {
+                    blue: '#4C5F80',
+                    slate: '#5B616E',
+                    neutral: '#8A919E',
+                    success: '#05B169',
+                    error: '#DF2935',
+                    warning: '#F0AD4E',
+                    bg: '#F9FAFB',
+                    'text-primary': '#1A1C1E',
+                    'text-secondary': '#515254',
+                    border: '#E2E4E9',
+                }
             },
             borderRadius: {
                 lg: "var(--radius)",
                 md: "calc(var(--radius) - 2px)",
                 sm: "calc(var(--radius) - 4px)",
+                'cb-chip': '4px',
+                'cb-btn': '8px',
+                'cb-card': '12px',
+                'cb-modal': '16px',
+            },
+            boxShadow: {
+                'cb-level-1': '0 1px 3px rgba(5,15,26,0.06)',
+                'cb-level-2': '0 4px 12px rgba(5,15,26,0.08)',
+                'cb-level-3': '0 12px 24px rgba(5,15,26,0.12)',
             },
             keyframes: {
                 "accordion-down": {

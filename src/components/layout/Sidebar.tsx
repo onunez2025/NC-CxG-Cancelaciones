@@ -18,6 +18,7 @@ import { useAuth } from '../../hooks/useAuth';
 import type { Permission } from '../../types';
 
 // SIATC DESIGN SYSTEM IMPORTS
+import { SIATC_THEME } from '../../utils/siatc-theme';
 
 export function Sidebar({ className }: { className?: string }) {
     const { t, i18n } = useTranslation();
@@ -61,7 +62,7 @@ export function Sidebar({ className }: { className?: string }) {
                     <img src="/nc-logo.png" alt="NC Logo" className="h-full w-full object-contain" />
                 </div>
                 <div className="flex flex-col">
-                    <h1 className="font-bold text-lg leading-none tracking-tight text-foreground uppercase">NC-CxG</h1>
+                    <h1 className="font-bold text-xl leading-none tracking-tight text-foreground uppercase">NC-CxG</h1>
                     <p className="text-[10px] font-black text-primary tracking-[0.2em] uppercase mt-1 opacity-90">Cancelaciones</p>
                 </div>
             </div>
@@ -74,10 +75,10 @@ export function Sidebar({ className }: { className?: string }) {
                         key={item.to}
                         to={item.to}
                         className={({ isActive }) => cn(
-                            "group/item flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300 relative overflow-hidden",
+                            "group/item flex items-center justify-between text-sm transition-all duration-300 relative overflow-hidden",
                             isActive
-                                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 translate-x-1"
-                                : "text-muted-foreground hover:bg-muted hover:text-foreground hover:translate-x-1"
+                                ? SIATC_THEME.LAYOUT.SIDEBAR_ITEM_ACTIVE
+                                : SIATC_THEME.LAYOUT.SIDEBAR_ITEM_INACTIVE
                         )}
                     >
                         <div className="flex items-center gap-3 relative z-10">

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { ShieldAlert, KeyRound, Loader2, ArrowRight } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { API_BASE_URL } from '../services/apiClient';
+import { SIATC_THEME } from '../utils/siatc-theme';
+import { cn } from '../utils/cn';
 
 export const ForceChangePasswordPage = () => {
     const navigate = useNavigate();
@@ -69,61 +71,57 @@ export const ForceChangePasswordPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className={SIATC_THEME.LOGIN_LAYOUT.CENTERED_CONTAINER}>
+            <div className={SIATC_THEME.LOGIN_LAYOUT.CENTERED_HEADER}>
                 <div className="flex justify-center">
-                    <div className="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center">
-                        <ShieldAlert className="h-8 w-8 text-blue-600" />
+                    <div className="h-16 w-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-4">
+                        <ShieldAlert className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                     </div>
                 </div>
-                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                <h2 className={SIATC_THEME.LOGIN_LAYOUT.TITLE}>
                     Cambio de Contraseña Obligatorio
                 </h2>
-                <p className="mt-2 text-center text-sm text-gray-600">
+                <p className={SIATC_THEME.LOGIN_LAYOUT.SUBTITLE}>
                     Por motivos de seguridad, debes actualizar tu contraseña temporal antes de continuar al sistema.
                 </p>
             </div>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-4 shadow rounded-lg sm:px-10 border border-yellow-100">
+            <div className="mt-8 w-full max-w-md mx-auto">
+                <div className={SIATC_THEME.LOGIN_LAYOUT.CARD}>
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         {error && (
-                            <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
-                                <div className="flex">
-                                    <div className="ml-3">
-                                        <p className="text-sm text-red-700">{error}</p>
-                                    </div>
-                                </div>
+                            <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm font-medium text-center animate-in fade-in slide-in-from-top-1">
+                                {error}
                             </div>
                         )}
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Contraseña Temporal Actual</label>
-                            <div className="mt-1 relative rounded-md shadow-sm">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <KeyRound className="h-5 w-5 text-gray-400" />
+                            <label className="block text-sm font-medium mb-1.5 ml-1">Contraseña Temporal Actual</label>
+                            <div className={SIATC_THEME.LOGIN_LAYOUT.INPUT_WRAPPER}>
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
+                                    <KeyRound className="h-5 w-5" />
                                 </div>
                                 <input
                                     type="password"
                                     required
-                                    className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 px-3 border"
+                                    className={SIATC_THEME.LOGIN_LAYOUT.INPUT}
                                     value={currentPassword}
                                     onChange={(e) => setCurrentPassword(e.target.value)}
-                                    placeholder="Contraseña proporcionada por tu administrador"
+                                    placeholder="Contraseña temporal"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Nueva Contraseña</label>
-                            <div className="mt-1 relative rounded-md shadow-sm">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <KeyRound className="h-5 w-5 text-blue-400" />
+                            <label className="block text-sm font-medium mb-1.5 ml-1">Nueva Contraseña</label>
+                            <div className={SIATC_THEME.LOGIN_LAYOUT.INPUT_WRAPPER}>
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
+                                    <KeyRound className="h-5 w-5" />
                                 </div>
                                 <input
                                     type="password"
                                     required
-                                    className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 px-3 border"
+                                    className={SIATC_THEME.LOGIN_LAYOUT.INPUT}
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
                                     placeholder="Mínimo 6 caracteres"
@@ -132,15 +130,15 @@ export const ForceChangePasswordPage = () => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Confirmar Nueva Contraseña</label>
-                            <div className="mt-1 relative rounded-md shadow-sm">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <KeyRound className="h-5 w-5 text-blue-400" />
+                            <label className="block text-sm font-medium mb-1.5 ml-1">Confirmar Nueva Contraseña</label>
+                            <div className={SIATC_THEME.LOGIN_LAYOUT.INPUT_WRAPPER}>
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
+                                    <KeyRound className="h-5 w-5" />
                                 </div>
                                 <input
                                     type="password"
                                     required
-                                    className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 px-3 border"
+                                    className={SIATC_THEME.LOGIN_LAYOUT.INPUT}
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                     placeholder="Repite la nueva contraseña"
@@ -152,7 +150,10 @@ export const ForceChangePasswordPage = () => {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300 transition-colors"
+                                className={cn(
+                                    SIATC_THEME.COMPONENTS.BUTTON_PRIMARY,
+                                    "w-full flex justify-center disabled:opacity-70 disabled:cursor-not-allowed"
+                                )}
                             >
                                 {isLoading ? (
                                     <>
