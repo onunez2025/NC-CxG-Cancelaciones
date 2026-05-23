@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '../../utils/cn';
+import { SIATC_THEME } from '../../utils/siatc-theme';
 
 interface ResizableHeaderProps {
   columnId: string;
@@ -23,7 +24,7 @@ export function ResizableHeader({
     <th 
       {...props}
       style={{ ...style, width: width ? `${width}px` : undefined, minWidth: width ? '50px' : undefined }}
-      className={cn("relative group/resizer select-none", className)}
+      className={cn(SIATC_THEME.TABLE.HEADER_TH, "relative group/resizer select-none", className)}
     >
       <div className="flex items-center h-full w-full gap-1">
         {children}

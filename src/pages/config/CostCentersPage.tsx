@@ -25,6 +25,7 @@ import { SIATCButton } from '../../components/siatc/SIATCButton';
 import { SIATCBadge } from '../../components/siatc/SIATCBadge';
 import { 
     SIATCTable, 
+    SIATCTableHeader,
     SIATCTableRow, 
     SIATCTableCell, 
     SIATCTableFooter 
@@ -170,11 +171,11 @@ export default function CostCentersPage() {
                         <SIATCTable>
                             <thead>
                                 <tr className={SIATC_THEME.TABLE.HEADER_ROW}>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left w-48">Código SAP</th>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left">Nombre del Centro</th>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left w-64">Gerencia Vinculada</th>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-center w-40">Estado</th>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-right w-28">Acciones</th>
+                                    <SIATCTableHeader className="text-left w-48">Código SAP</SIATCTableHeader>
+                                    <SIATCTableHeader className="text-left">Nombre del Centro</SIATCTableHeader>
+                                    <SIATCTableHeader className="text-left w-64">Gerencia Vinculada</SIATCTableHeader>
+                                    <SIATCTableHeader className="text-center w-40">Estado</SIATCTableHeader>
+                                    <SIATCTableHeader className="text-right w-28">Acciones</SIATCTableHeader>
                                 </tr>
                             </thead>
                             <tbody>

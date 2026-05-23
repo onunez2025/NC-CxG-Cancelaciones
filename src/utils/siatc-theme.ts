@@ -54,7 +54,7 @@ export const SIATC_THEME = {
 
     // 2. FUNDAMENTOS DE LAYOUT (Compatibilidad EBM)
     LAYOUT: {
-        PAGE_WRAPPER: "flex flex-col h-full bg-cb-bg min-h-0 animate-in fade-in duration-500 p-4 space-y-4",
+        PAGE_WRAPPER: "flex flex-col h-full bg-cb-bg min-h-0 animate-in fade-in duration-500 pt-4 px-4 pb-1.5 space-y-4",
         HEADER_WRAPPER: "flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0 px-1",
         CONTENT_CONTAINER: "flex-1 min-h-0 flex flex-col bg-white border border-cb-border rounded-cb-card shadow-cb-level-1 overflow-hidden",
         MAX_WIDTH: "mx-auto max-w-7xl w-full",
@@ -64,6 +64,7 @@ export const SIATC_THEME = {
         SIDEBAR_ITEM_INACTIVE: "group/item flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300 relative overflow-hidden text-muted-foreground hover:bg-muted hover:text-foreground hover:translate-x-1",
         METRIC_RIBBON: "bg-white dark:bg-cb-bg border border-cb-border rounded-cb-card px-6 py-2 shadow-cb-level-1 flex items-center justify-between shrink-0 h-[55px]",
         SEARCH_BAR_WRAPPER: "p-4 border-b border-cb-border bg-cb-bg/30 flex items-center justify-between shrink-0",
+        VIEWPORT: "flex-1 overflow-y-auto px-8 pb-2.5 flex flex-col custom-scrollbar relative",
     },
 
     // 3. TIPOGRAFÍA Y TEXTO (Compatibilidad EBM)
@@ -71,9 +72,9 @@ export const SIATC_THEME = {
         PAGE_TITLE: CRYPTO_BLUE_TOKENS.TYPOGRAPHY.H1,
         PAGE_SUBTITLE: CRYPTO_BLUE_TOKENS.TYPOGRAPHY.BODY_SMALL,
         SECTION_TITLE: "text-base font-bold text-cb-text-primary tracking-tight",
-        TABLE_HEADER: CRYPTO_BLUE_TOKENS.TYPOGRAPHY.CAPTION,
+        TABLE_HEADER: "font-sans font-semibold text-[11px] leading-[1.5] uppercase tracking-[0.06em] text-cb-slate",
         BADGE_TEXT: "text-[10px] font-bold tracking-widest uppercase",
-        FOOTER_STATS: "text-[11px] font-bold text-cb-neutral tracking-[0.1em] uppercase opacity-80",
+        FOOTER_STATS: "text-[11px] font-bold text-cb-slate tracking-[0.1em] uppercase opacity-95",
         TINY_MONO: CRYPTO_BLUE_TOKENS.TYPOGRAPHY.MONO_SMALL,
     },
 
@@ -81,11 +82,11 @@ export const SIATC_THEME = {
     TABLE: {
         TABLE_ELEMENT: "w-full text-sm text-left border-collapse min-w-[1000px]",
         HEADER_ROW: "sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b border-cb-border shadow-sm",
-        HEADER_TH: "px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left",
+        HEADER_TH: "px-6 py-2.5 font-sans font-semibold text-[11px] uppercase tracking-[0.06em] text-cb-slate text-left",
         BODY_ROW: "h-[64px] group hover:bg-cb-bg transition-colors border-b border-cb-border/60",
         CELL: "px-6 py-4 align-middle font-sans text-cb-text-primary",
         SCROLL_AREA: "flex-1 overflow-auto relative custom-scrollbar",
-        FOOTER: "px-6 py-4 border-t border-cb-border bg-cb-bg/30 flex items-center justify-between shrink-0",
+        FOOTER: "px-6 py-2 border-t border-cb-border bg-cb-bg/30 flex items-center justify-between shrink-0",
     },
 
     // 5. COMPONENTES DE INTERACCIÓN

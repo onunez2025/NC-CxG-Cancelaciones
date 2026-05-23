@@ -25,6 +25,7 @@ import { SIATCButton } from '../../components/siatc/SIATCButton';
 import { SIATCBadge } from '../../components/siatc/SIATCBadge';
 import { 
     SIATCTable, 
+    SIATCTableHeader,
     SIATCTableRow, 
     SIATCTableCell, 
     SIATCTableFooter 
@@ -188,11 +189,11 @@ export default function AccountsPage() {
                         <SIATCTable>
                             <thead>
                                 <tr className={SIATC_THEME.TABLE.HEADER_ROW}>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left w-48">Plan Contable (SAP)</th>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left">Denominación de Cuenta</th>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-center w-64">Naturaleza</th>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-center w-40">Disponibilidad</th>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-right w-28">Acciones</th>
+                                    <SIATCTableHeader className="text-left w-48">Plan Contable (SAP)</SIATCTableHeader>
+                                    <SIATCTableHeader className="text-left">Denominación de Cuenta</SIATCTableHeader>
+                                    <SIATCTableHeader className="text-center w-64">Naturaleza</SIATCTableHeader>
+                                    <SIATCTableHeader className="text-center w-40">Disponibilidad</SIATCTableHeader>
+                                    <SIATCTableHeader className="text-right w-28">Acciones</SIATCTableHeader>
                                 </tr>
                             </thead>
                             <tbody>

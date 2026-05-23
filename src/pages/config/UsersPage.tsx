@@ -31,6 +31,7 @@ import { SIATCButton } from '../../components/siatc/SIATCButton';
 import { SIATCBadge } from '../../components/siatc/SIATCBadge';
 import { 
     SIATCTable, 
+    SIATCTableHeader,
     SIATCTableRow, 
     SIATCTableCell, 
     SIATCTableFooter 
@@ -236,7 +237,7 @@ export default function UsersPage() {
                         <SIATCTable>
                             <thead>
                                 <tr className={SIATC_THEME.TABLE.HEADER_ROW}>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left">
+                                    <SIATCTableHeader className="text-left">
                                         <div className="flex items-center justify-between gap-2 group/header">
                                             <div className="flex items-center gap-2 cursor-pointer flex-1" onClick={() => handleSort('username')}>
                                                 <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Responsable / ID</span>
@@ -260,14 +261,14 @@ export default function UsersPage() {
                                                 )}
                                             </div>
                                         </div>
-                                    </th>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left cursor-pointer" onClick={() => handleSort('email')}>
+                                    </SIATCTableHeader>
+                                    <SIATCTableHeader className="text-left cursor-pointer" onClick={() => handleSort('email')}>
                                         <div className="flex items-center gap-2">
                                             <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Correo Corporativo</span>
                                             <SortIcon column="email" />
                                         </div>
-                                    </th>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left">
+                                    </SIATCTableHeader>
+                                    <SIATCTableHeader className="text-left">
                                         <div className="flex items-center justify-between gap-2 group/header">
                                             <div className="flex items-center gap-2 cursor-pointer flex-1" onClick={() => handleSort('rol')}>
                                                 <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Perfil de Seguridad</span>
@@ -294,11 +295,11 @@ export default function UsersPage() {
                                                 )}
                                             </div>
                                         </div>
-                                    </th>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-center">
+                                    </SIATCTableHeader>
+                                    <SIATCTableHeader className="text-center">
                                         <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Alcance Ecosistema</span>
-                                    </th>
-                                    <th className="px-6 py-4 w-28 text-right font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral">Acciones</th>
+                                    </SIATCTableHeader>
+                                    <SIATCTableHeader className="w-28 text-right">Acciones</SIATCTableHeader>
                                 </tr>
                             </thead>
                             <tbody>

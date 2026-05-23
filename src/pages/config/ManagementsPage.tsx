@@ -21,6 +21,7 @@ import { SIATC_THEME } from '../../utils/siatc-theme';
 import { SIATCButton } from '../../components/siatc/SIATCButton';
 import { 
     SIATCTable, 
+    SIATCTableHeader,
     SIATCTableRow, 
     SIATCTableCell, 
     SIATCTableFooter 
@@ -163,9 +164,9 @@ export default function ManagementsPage() {
                         <SIATCTable>
                             <thead>
                                 <tr className={SIATC_THEME.TABLE.HEADER_ROW}>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left w-48">Código identificador</th>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left">Denominación gerencial</th>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-right w-28">Acciones</th>
+                                    <SIATCTableHeader className="text-left w-48">Código identificador</SIATCTableHeader>
+                                    <SIATCTableHeader className="text-left">Denominación gerencial</SIATCTableHeader>
+                                    <SIATCTableHeader className="text-right w-28">Acciones</SIATCTableHeader>
                                 </tr>
                             </thead>
                             <tbody>

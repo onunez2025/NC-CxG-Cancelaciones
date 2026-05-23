@@ -9,6 +9,7 @@ import { SIATCButton } from '../../components/siatc/SIATCButton';
 import { SIATCBadge } from '../../components/siatc/SIATCBadge';
 import { 
     SIATCTable, 
+    SIATCTableHeader,
     SIATCTableRow, 
     SIATCTableCell, 
     SIATCTableFooter 
@@ -153,11 +154,11 @@ export default function AuditLogPage() {
                         <SIATCTable>
                             <thead>
                                 <tr className={SIATC_THEME.TABLE.HEADER_ROW}>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left w-48">Fecha y Hora</th>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left w-64">Usuario Responsable</th>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left w-40">Operación</th>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left w-56">Ref. Entidad</th>
-                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left">Payload / Detalle Técnico</th>
+                                    <SIATCTableHeader className="text-left w-48">Fecha y Hora</SIATCTableHeader>
+                                    <SIATCTableHeader className="text-left w-64">Usuario Responsable</SIATCTableHeader>
+                                    <SIATCTableHeader className="text-left w-40">Operación</SIATCTableHeader>
+                                    <SIATCTableHeader className="text-left w-56">Ref. Entidad</SIATCTableHeader>
+                                    <SIATCTableHeader className="text-left">Payload / Detalle Técnico</SIATCTableHeader>
                                 </tr>
                             </thead>
                             <tbody>
