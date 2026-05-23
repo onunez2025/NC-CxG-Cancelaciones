@@ -62,7 +62,7 @@ export const CxGNCPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
   const [globalStats, setGlobalStats] = useState({ registrado: 0, aprobado: 0, asignado: 0, validado: 0, cerrado: 0 });
-  const [showKpiCards, setShowKpiCards] = useState(true);
+  const [showKpiCards, setShowKpiCards] = useState(false);
   const pageSize = 20;
   const [data, setData] = useState<CxGNC[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -711,7 +711,7 @@ export const CxGNCPage = () => {
       {/* KPI Cards */}
       <div className={cn(
         "shrink-0 overflow-hidden transition-all duration-300 ease-in-out",
-        showKpiCards ? "max-h-[100px] mb-2 opacity-100" : "max-h-0 mb-0 opacity-0"
+        showKpiCards ? "max-h-[110px] pt-1 mb-2 opacity-100" : "max-h-0 mb-0 opacity-0"
       )}>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 pb-1">
           {[
