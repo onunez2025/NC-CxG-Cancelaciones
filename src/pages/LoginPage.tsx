@@ -75,7 +75,7 @@ export function LoginPage() {
                         <span className="text-2xl font-bold tracking-tight">Mesa de Atención</span>
                     </div>
                     <h1 className="text-5xl font-bold mb-4 leading-tight">
-                        Sistema Gestión de Atención
+                        Sistema<br />Gestión de<br />Atención
                     </h1>
                     <div className="text-slate-400 text-lg max-w-md space-y-6">
                         <p>Plataforma integral para la gestión y seguimiento en la atención de servicios.</p>
