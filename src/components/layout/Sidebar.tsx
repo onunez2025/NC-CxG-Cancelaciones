@@ -62,8 +62,8 @@ export function Sidebar({ className }: { className?: string }) {
                     <img src="/Logo.png" alt="Logo" className="h-full w-full object-contain" />
                 </div>
                 <div className="flex flex-col">
-                    <h1 className="font-bold text-xl leading-none tracking-tight text-foreground uppercase">NC-CxG</h1>
-                    <p className="text-[10px] font-black text-primary tracking-[0.2em] uppercase mt-1 opacity-70">Cancelaciones</p>
+                    <h1 className="font-bold text-base leading-none tracking-tight text-foreground uppercase">Mesa de Atención</h1>
+                    <p className="text-[10px] font-black text-primary tracking-[0.1em] uppercase mt-1 opacity-70">Gestión y Seguimiento</p>
                 </div>
             </div>
 

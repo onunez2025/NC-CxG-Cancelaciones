@@ -76,10 +76,10 @@ export function MainLayout({ children }: MainLayoutProps) {
                                 <img src="/Logo.png" alt="Logo" className="w-7 h-7 object-contain" />
                             </div>
                             <div className="flex flex-col">
-                                <span className="font-black text-sm tracking-tight text-foreground uppercase pt-1">NC-CxG — SIATC</span>
+                                <span className="font-black text-sm tracking-tight text-foreground uppercase pt-1">Mesa de Atención</span>
                                 <div className="flex items-center gap-2">
                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                    <span className="text-[10px] font-black text-muted-foreground tracking-widest uppercase opacity-60">Cancelaciones</span>
+                                    <span className="text-[10px] font-black text-muted-foreground tracking-widest uppercase opacity-60">Gestión y Seguimiento de Servicios</span>
                                 </div>
                             </div>
                         </div>

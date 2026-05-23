@@ -72,13 +72,13 @@ export function LoginPage() {
                         <div className="w-12 h-12 flex items-center justify-center shrink-0 overflow-hidden">
                             <img src="/Logo.png" alt="Logo" className="h-full w-full object-contain" />
                         </div>
-                        <span className="text-2xl font-bold tracking-tight">GAC</span>
+                        <span className="text-2xl font-bold tracking-tight">Mesa de Atención</span>
                     </div>
                     <h1 className="text-5xl font-bold mb-4 leading-tight">
-                        Cancelaciones,<br />CxG y<br />Notas de Crédito
+                        Sistema Gestión de Atención
                     </h1>
                     <div className="text-slate-400 text-lg max-w-md space-y-6">
-                        <p>Plataforma integral para la gestión y seguimiento operativo de devoluciones, cambios por garantía y cancelaciones.</p>
+                        <p>Plataforma integral para la gestión y seguimiento en la atención de servicios.</p>
                         <div className="flex flex-col w-fit gap-2">
                             <span className="text-2xl font-bold text-slate-100 tracking-tight">Gerencia de Atención al Cliente</span>
                             <img 
