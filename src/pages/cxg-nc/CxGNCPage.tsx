@@ -19,7 +19,8 @@ import {
   ArrowUp,
   ArrowDown,
   ArrowUpDown,
-  Filter
+  Filter,
+  LayoutGrid
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { SIATC_THEME } from '../../utils/siatc-theme';
@@ -61,6 +62,7 @@ export const CxGNCPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
   const [globalStats, setGlobalStats] = useState({ registrado: 0, aprobado: 0, asignado: 0, validado: 0, cerrado: 0 });
+  const [showKpiCards, setShowKpiCards] = useState(true);
   const pageSize = 20;
   const [data, setData] = useState<CxGNC[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -581,9 +583,9 @@ export const CxGNCPage = () => {
           {/* Header */}
           <div className={SIATC_THEME.LAYOUT.HEADER_WRAPPER}>
             <div>
-              <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Cambios por Garantías y Notas de Crédito</h1>
+              <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Cambios por Garantía y Notas de Crédito</h1>
               <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>
-                Gestión y procesamiento de documentos financieros (Cambios por Garantías y Notas de Crédito).
+                Gestión de Cambios por Garantía y Notas de Crédito.
               </p>
             </div>
         <div className="flex items-center gap-3">
@@ -638,14 +640,21 @@ export const CxGNCPage = () => {
           >
             Exportar
           </SIATCButton>
+          <SIATCButton 
+            variant="primary" 
+            icon={Plus}
+            onClick={() => setIsModalOpen(true)}
+          >
+            Registrar
+          </SIATCButton>
           <div className="relative" ref={columnDropdownRef}>
             <SIATCButton 
               variant="secondary" 
               icon={Columns}
               onClick={() => setIsColumnDropdownOpen(!isColumnDropdownOpen)}
-            >
-              Columnas
-            </SIATCButton>
+              className="!px-2.5"
+              title="Columnas"
+            />
             
             {isColumnDropdownOpen && (
               <div className="absolute right-0 mt-2 w-64 bg-card border border-border rounded-xl shadow-lg z-50 p-2 flex flex-col gap-1">
@@ -690,18 +699,21 @@ export const CxGNCPage = () => {
             )}
           </div>
           <SIATCButton 
-            variant="primary" 
-            icon={Plus}
-            onClick={() => setIsModalOpen(true)}
-          >
-            Registrar
-          </SIATCButton>
+            variant="secondary" 
+            icon={LayoutGrid}
+            onClick={() => setShowKpiCards(!showKpiCards)}
+            className={cn("!px-2.5", showKpiCards && "bg-primary/10 text-primary border-primary/30 hover:bg-primary/20")}
+            title={showKpiCards ? "Ocultar Tarjetas" : "Mostrar Tarjetas"}
+          />
         </div>
       </div>
 
       {/* KPI Cards */}
-      <div className="shrink-0 mb-2">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className={cn(
+        "shrink-0 overflow-hidden transition-all duration-300 ease-in-out",
+        showKpiCards ? "max-h-[100px] mb-2 opacity-100" : "max-h-0 mb-0 opacity-0"
+      )}>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 pb-1">
           {[
             { label: 'Total', value: kpiStats.total, icon: BarChart3, color: 'text-cb-neutral', bg: 'bg-white dark:bg-cb-bg', border: 'border-cb-border', filter: 'TODOS' as const },
             { label: 'Registrado', value: kpiStats.registrado, icon: FileText, color: 'text-[#DF2935]', bg: 'bg-white dark:bg-cb-bg', border: 'border-cb-border', filter: 'REGISTRADO' as const },
