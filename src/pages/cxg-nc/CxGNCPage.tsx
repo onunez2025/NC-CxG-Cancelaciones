@@ -711,7 +711,7 @@ export const CxGNCPage = () => {
       {/* KPI Cards */}
       <div className={cn(
         "shrink-0 overflow-hidden transition-all duration-300 ease-in-out",
-        showKpiCards ? "max-h-[110px] pt-1 pl-1 mb-2 opacity-100" : "max-h-0 mb-0 opacity-0"
+        showKpiCards ? "max-h-[110px] pt-1 pl-2 mb-2 opacity-100" : "max-h-0 mb-0 opacity-0"
       )}>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 pb-1">
           {[
