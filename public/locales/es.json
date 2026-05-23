@@ -397,7 +397,7 @@
         "title": "Bandeja de Emergencias",
         "subtitle": "Gestión de incidentes críticos y atención técnica prioritaria.",
         "search_placeholder": "Buscar por Ticket, Cliente o Técnico...",
-        "new": "Nueva Emergencia",
+        "new": "Registrar",
         "table": {
             "ticket": "TICKET",
             "tipo": "TIPO",

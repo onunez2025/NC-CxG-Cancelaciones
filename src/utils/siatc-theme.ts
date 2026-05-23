@@ -23,9 +23,9 @@ const CRYPTO_BLUE_TOKENS = {
     },
     TYPOGRAPHY: {
         DISPLAY: "font-sans font-bold tracking-[-0.02em] text-[40px] leading-[1.2] text-cb-text-primary",
-        H1: "font-sans font-bold tracking-[-0.02em] text-[32px] leading-[1.2] text-cb-text-primary",
-        H2: "font-sans font-bold tracking-[-0.01em] text-[24px] leading-[1.3] text-cb-text-primary",
-        H3: "font-sans font-bold text-[18px] leading-[1.4] text-cb-text-primary",
+        H1: "font-sans font-bold tracking-[-0.02em] text-[18px] leading-[1.2] text-cb-text-primary",
+        H2: "font-sans font-bold tracking-[-0.01em] text-[15px] leading-[1.3] text-cb-text-primary",
+        H3: "font-sans font-bold text-[13px] leading-[1.4] text-cb-text-primary",
         BODY: "font-sans font-normal text-[16px] leading-[1.5] text-cb-text-primary",
         BODY_SMALL: "font-sans font-normal text-[14px] leading-[1.5] text-cb-text-secondary",
         CAPTION: "font-sans font-medium text-[12px] leading-[1.5] uppercase tracking-[0.06em] text-cb-neutral",
@@ -90,13 +90,13 @@ export const SIATC_THEME = {
 
     // 5. COMPONENTES DE INTERACCIÓN
     COMPONENTS: {
-        BUTTON_PRIMARY: "h-[44px] px-5 inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-cb-btn hover:bg-primary/90 transition-all active:scale-95 font-bold text-sm shadow-sm",
-        BUTTON_SECONDARY: "h-[44px] px-5 inline-flex items-center justify-center gap-2 bg-white text-cb-text-primary border border-cb-border rounded-cb-btn hover:bg-cb-bg transition-all active:scale-95 font-bold text-sm",
-        BUTTON_SUCCESS: "h-[44px] px-5 inline-flex items-center justify-center gap-2 bg-[#05B169] text-white rounded-cb-btn hover:bg-[#05B169]/90 transition-all active:scale-95 font-bold text-sm shadow-sm",
-        BUTTON_DANGER: "h-[44px] px-5 inline-flex items-center justify-center gap-2 bg-[#DF2935] text-white rounded-cb-btn hover:bg-[#DF2935]/90 transition-all active:scale-95 font-bold text-sm shadow-sm",
-        BUTTON_INFO: "h-[44px] px-5 inline-flex items-center justify-center gap-2 bg-cb-blue text-white rounded-cb-btn hover:bg-cb-blue/90 transition-all active:scale-95 font-bold text-sm shadow-sm",
-        BUTTON_GHOST: "h-[44px] px-5 inline-flex items-center justify-center gap-2 bg-transparent text-cb-text-secondary rounded-cb-btn hover:bg-cb-bg transition-all active:scale-95 font-bold text-sm",
-        INPUT: "h-[44px] w-full px-4 bg-white border border-cb-border rounded-cb-btn focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium placeholder:text-cb-neutral/40",
+        BUTTON_PRIMARY: "h-[36px] px-4 inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-cb-btn hover:bg-primary/90 transition-all active:scale-95 font-bold text-sm shadow-sm",
+        BUTTON_SECONDARY: "h-[36px] px-4 inline-flex items-center justify-center gap-2 bg-white text-cb-text-primary border border-cb-border rounded-cb-btn hover:bg-cb-bg transition-all active:scale-95 font-bold text-sm",
+        BUTTON_SUCCESS: "h-[36px] px-4 inline-flex items-center justify-center gap-2 bg-[#05B169] text-white rounded-cb-btn hover:bg-[#05B169]/90 transition-all active:scale-95 font-bold text-sm shadow-sm",
+        BUTTON_DANGER: "h-[36px] px-4 inline-flex items-center justify-center gap-2 bg-[#DF2935] text-white rounded-cb-btn hover:bg-[#DF2935]/90 transition-all active:scale-95 font-bold text-sm shadow-sm",
+        BUTTON_INFO: "h-[36px] px-4 inline-flex items-center justify-center gap-2 bg-cb-blue text-white rounded-cb-btn hover:bg-cb-blue/90 transition-all active:scale-95 font-bold text-sm shadow-sm",
+        BUTTON_GHOST: "h-[36px] px-4 inline-flex items-center justify-center gap-2 bg-transparent text-cb-text-secondary rounded-cb-btn hover:bg-cb-bg transition-all active:scale-95 font-bold text-sm",
+        INPUT: "h-[36px] w-full px-4 bg-white border border-cb-border rounded-cb-btn focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium placeholder:text-cb-neutral/40",
         MODAL_CONTENT: "bg-white rounded-cb-modal border border-cb-border shadow-cb-level-3 p-6 overflow-hidden",
         CARD_CONTAINER: "bg-white dark:bg-cb-bg border border-cb-border rounded-cb-card shadow-cb-level-1",
         KPI_CARD_CONTAINER: "bg-white dark:bg-cb-bg border border-cb-border rounded-cb-card h-[121px] py-2.5 px-6 shadow-cb-level-1 flex flex-col justify-between",

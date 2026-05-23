@@ -489,7 +489,7 @@ export const CancellationsPage = () => {
             icon={MapPin}
             onClick={() => navigate('/cancelaciones/mapa')}
           >
-            Mapa de Hoy
+            Mapa
           </SIATCButton>
           <SIATCButton 
             variant="secondary" 
@@ -527,7 +527,7 @@ export const CancellationsPage = () => {
               icon={Plus}
               onClick={() => setIsCreateModalOpen(true)}
             >
-              Nueva Cancelación
+              Registrar
             </SIATCButton>
           )}
         </div>

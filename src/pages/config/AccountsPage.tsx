@@ -157,7 +157,7 @@ export default function AccountsPage() {
                     onClick={handleCreate}
                     icon={Plus}
                 >
-                    Nueva Cuenta
+                    Nuevo
                 </SIATCButton>
             </div>
 

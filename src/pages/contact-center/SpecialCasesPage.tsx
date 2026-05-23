@@ -248,7 +248,7 @@ export const SpecialCasesPage = () => {
               icon={Plus}
               onClick={() => setIsModalOpen(true)}
             >
-              Nuevo Caso
+              Registrar
             </SIATCButton>
           )}
         </div>

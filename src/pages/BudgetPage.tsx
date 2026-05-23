@@ -20,6 +20,8 @@ import { useAuth } from '../hooks/useAuth';
 import type { Budget, AccountingAccount, Management, CostCenter } from '../types';
 import { Modal } from '../components/common/Modal';
 import { ConfirmDialog } from '../components/common/ConfirmDialog';
+import { SIATC_THEME } from '../utils/siatc-theme';
+import { cn } from '../utils/cn';
 
 // Removed static MONTHS array
 
@@ -273,21 +275,23 @@ export function BudgetPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-
                     {hasPermission('budget.create') && (
                         <button
                             onClick={handleCreate}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-all font-bold text-sm shadow-sm"
+                            className={SIATC_THEME.COMPONENTS.BUTTON_PRIMARY}
                         >
                             <Plus className="w-4 h-4" />
-                            Nuevo Registro
+                            Nuevo
                         </button>
                     )}
 
                     {isAdministrador && (
                         <button
                             onClick={handleDeleteAll}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-destructive/10 text-destructive hover:bg-destructive/20 rounded-md transition-colors font-medium shadow-sm"
+                            className={cn(
+                                SIATC_THEME.COMPONENTS.BUTTON_DANGER,
+                                "bg-destructive/10 text-destructive border-none shadow-none hover:bg-destructive/20"
+                            )}
                             title="Eliminar Todo (Temporal)"
                         >
                             <Trash2 className="w-4 h-4" />
@@ -298,7 +302,7 @@ export function BudgetPage() {
                     {hasPermission('budget.create') && (
                         <button
                             onClick={() => setIsBulkModalOpen(true)}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90 transition-colors font-medium shadow-sm"
+                            className={SIATC_THEME.COMPONENTS.BUTTON_SECONDARY}
                             title="Carga Masiva (Excel)"
                         >
                             <Upload className="w-4 h-4" />

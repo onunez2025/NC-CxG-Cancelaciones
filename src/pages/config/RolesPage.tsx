@@ -146,7 +146,7 @@ export default function RolesPage() {
                         onClick={handleCreate}
                         icon={Plus}
                     >
-                        Nuevo Rol
+                        Nuevo
                     </SIATCButton>
                 )}
             </div>

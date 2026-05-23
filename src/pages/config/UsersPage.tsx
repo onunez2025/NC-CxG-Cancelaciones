@@ -204,7 +204,7 @@ export default function UsersPage() {
                 </div>
                 {hasPermission('config.users') && (
                     <SIATCButton onClick={openNew} icon={Plus}>
-                        Nuevo Usuario
+                        Nuevo
                     </SIATCButton>
                 )}
             </div>

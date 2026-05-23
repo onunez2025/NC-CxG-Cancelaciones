@@ -5,7 +5,7 @@ import {
   Loader2,
   FileSpreadsheet,
   UserPlus,
-  DollarSign,
+  Plus,
   Calendar,
   CheckCircle2,
   XCircle,
@@ -691,10 +691,10 @@ export const CxGNCPage = () => {
           </div>
           <SIATCButton 
             variant="primary" 
-            icon={DollarSign}
+            icon={Plus}
             onClick={() => setIsModalOpen(true)}
           >
-            Nueva Solicitud
+            Registrar
           </SIATCButton>
         </div>
       </div>

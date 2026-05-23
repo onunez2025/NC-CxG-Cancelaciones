@@ -132,7 +132,7 @@ export default function ManagementsPage() {
                     onClick={handleCreate}
                     icon={Plus}
                 >
-                    Nueva Gerencia
+                    Nuevo
                 </SIATCButton>
             </div>
 

@@ -139,7 +139,7 @@ export default function CostCentersPage() {
                     onClick={handleCreate}
                     icon={Plus}
                 >
-                    Nuevo CeCo
+                    Nuevo
                 </SIATCButton>
             </div>
 
