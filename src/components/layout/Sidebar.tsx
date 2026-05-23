@@ -59,7 +59,7 @@ export function Sidebar({ className }: { className?: string }) {
             {/* Header / Logo: SIATC High Density */}
             <div className="p-6 flex items-center gap-4 border-b border-border/50 bg-gradient-to-br from-primary/5 to-transparent">
                 <div className="w-12 h-12 flex items-center justify-center shrink-0 overflow-hidden bg-white rounded-2xl shadow-lg shadow-primary/5 border border-primary/10 p-1.5 transition-transform hover:scale-105">
-                    <img src="/nc-logo.png" alt="NC Logo" className="h-full w-full object-contain" />
+                    <img src="/Logo.png" alt="Logo" className="h-full w-full object-contain" />
                 </div>
                 <div className="flex flex-col">
                     <h1 className="font-bold text-xl leading-none tracking-tight text-foreground uppercase">NC-CxG</h1>

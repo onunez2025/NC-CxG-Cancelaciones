@@ -40,9 +40,9 @@ const ProtectedRoute = () => {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-6">
-          <img src="/ebm-logo-.png" alt="EBM Logo" className="w-16 h-16 object-contain animate-pulse" />
+          <img src="/Logo.png" alt="Logo" className="w-16 h-16 object-contain animate-pulse" />
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-muted-foreground font-medium animate-pulse">Cargando EBM...</p>
+          <p className="text-muted-foreground font-medium animate-pulse">Cargando...</p>
         </div>
       </div>
     );
