@@ -30,67 +30,55 @@ export default function ConfigLayout() {
             return <Navigate to={filteredItems[0].to} replace />;
         }
     }
-
     return (
-        <div className="flex-1 h-full overflow-hidden flex flex-col p-1 lg:p-2 bg-slate-50/50">
-            <div className="grid grid-cols-1 lg:grid-cols-[18rem_1fr] gap-2 h-full min-h-0 w-full">
+        <div className="flex-1 h-full overflow-hidden flex flex-col p-4 bg-cb-bg">
+            <div className="grid grid-cols-1 lg:grid-cols-[18rem_1fr] gap-4 h-full min-h-0 w-full">
                 {/* SIATC Premium Sidebar */}
-                <aside className="shrink-0 flex flex-col min-h-0 h-fit lg:h-full group">
-                    <div className={cn(
-                        "bg-card rounded-[2rem] border border-border/50 shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden flex flex-col h-full backdrop-blur-sm",
-                        SIATC_THEME.EFFECTS.GLASS_PANEL
-                    )}>
-                        <div className="p-6 border-b border-border/50 bg-gradient-to-br from-primary/5 to-transparent">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2.5 bg-primary text-white rounded-2xl shadow-lg shadow-primary/20 ring-4 ring-primary/5">
-                                    <Settings2 className="w-5 h-5 stroke-[2.5]" />
-                                </div>
-                                <div className="flex flex-col">
-                                    <span className="text-[10px] font-black text-primary tracking-[0.2em] leading-none uppercase">Módulo de</span>
-                                    <span className="text-lg font-bold text-foreground tracking-tight">Configuración</span>
-                                </div>
+                <aside className={SIATC_THEME.LAYOUT.SIDEBAR_CONTAINER + " h-full overflow-hidden"}>
+                    <div className="p-6 border-b border-cb-border bg-gradient-to-br from-primary/5 to-transparent">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2.5 bg-primary text-white rounded-cb-btn shadow-lg shadow-primary/20 ring-4 ring-primary/5">
+                                <Settings2 className="w-5 h-5 stroke-[2.5]" />
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-[10px] font-black text-primary tracking-[0.2em] leading-none uppercase">Módulo de</span>
+                                <span className="text-lg font-bold text-cb-text-primary tracking-tight">Configuración</span>
                             </div>
                         </div>
+                    </div>
 
-                        <nav className="flex-1 p-3 space-y-1 overflow-y-auto custom-scrollbar">
-                            <p className="text-[10px] font-black text-muted-foreground tracking-[0.2em] px-4 py-3 opacity-60 uppercase">Control Gestión</p>
-                            {filteredItems.map((item) => (
-                                <NavLink
-                                    key={item.to}
-                                    to={item.to}
-                                    className={({ isActive }) => cn(
-                                        "group/item flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300 relative overflow-hidden",
-                                        isActive
-                                            ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25 translate-x-1"
-                                            : "text-muted-foreground hover:bg-muted hover:text-foreground hover:translate-x-1"
-                                    )}
-                                >
-                                    <div className="flex items-center gap-3 relative z-10">
-                                        <item.icon className={cn(
-                                            "w-5 h-5 transition-transform duration-500",
-                                            "group-hover/item:scale-110"
-                                        )} />
-                                        <span className="tracking-tight">{item.label}</span>
-                                    </div>
-                                    <ChevronRight className={cn(
-                                        "w-4 h-4 transition-all duration-300 opacity-0 -translate-x-2 relative z-10",
-                                        "group-hover/item:opacity-100 group-hover/item:translate-x-0"
-                                    )} />
-                                </NavLink>
-                            ))}
-                        </nav>
-
-                        {/* Sidebar Footer Info */}
-                        <div className="p-4 bg-muted/30 border-t border-border/50">
-                            <div className="p-4 bg-background rounded-2xl border border-border/50 shadow-sm">
-                                <div className="flex items-center gap-2 mb-1.5 font-bold text-[10px] text-primary tracking-widest uppercase">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                                    Sistema SIATC
+                    <nav className="flex-1 p-3 space-y-1 overflow-y-auto custom-scrollbar">
+                        <p className="text-[10px] font-black text-cb-neutral tracking-[0.2em] px-4 py-3 opacity-60 uppercase">Control Gestión</p>
+                        {filteredItems.map((item) => (
+                            <NavLink
+                                key={item.to}
+                                to={item.to}
+                                className={({ isActive }) => cn(
+                                    isActive
+                                        ? SIATC_THEME.LAYOUT.SIDEBAR_ITEM_ACTIVE
+                                        : SIATC_THEME.LAYOUT.SIDEBAR_ITEM_INACTIVE,
+                                    "flex items-center justify-between"
+                                )}
+                            >
+                                <div className="flex items-center gap-3 relative z-10">
+                                    <item.icon className="w-5 h-5 transition-transform duration-500 group-hover:scale-110" />
+                                    <span className="tracking-tight">{item.label}</span>
                                 </div>
-                                <p className="text-[10px] text-muted-foreground font-black tracking-widest leading-relaxed uppercase opacity-60">
-                                    NC-CXG v1.0.0 • PILOT
-                                </p>
+                                <ChevronRight className="w-4 h-4 transition-all duration-300 opacity-0 -translate-x-2 relative z-10 group-hover:opacity-100 group-hover:translate-x-0" />
+                            </NavLink>
+                        ))}
+                    </nav>
+
+                    {/* Sidebar Footer Info */}
+                    <div className="p-4 bg-cb-bg/30 border-t border-cb-border">
+                        <div className="p-4 bg-white dark:bg-cb-bg rounded-cb-card border border-cb-border shadow-cb-level-1">
+                            <div className="flex items-center gap-2 mb-1.5 font-bold text-[10px] text-primary tracking-widest uppercase">
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                                Sistema SIATC
                             </div>
+                            <p className="text-[10px] text-cb-neutral font-black tracking-widest leading-relaxed uppercase opacity-60">
+                                NC-CXG v1.0.0 • PILOT
+                            </p>
                         </div>
                     </div>
                 </aside>

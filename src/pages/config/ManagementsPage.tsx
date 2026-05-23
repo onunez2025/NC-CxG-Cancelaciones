@@ -21,7 +21,6 @@ import { SIATC_THEME } from '../../utils/siatc-theme';
 import { SIATCButton } from '../../components/siatc/SIATCButton';
 import { 
     SIATCTable, 
-    SIATCTableHeader, 
     SIATCTableRow, 
     SIATCTableCell, 
     SIATCTableFooter 
@@ -140,74 +139,74 @@ export default function ManagementsPage() {
             {/* Content Container */}
             <div className={SIATC_THEME.LAYOUT.CONTENT_CONTAINER}>
                 {/* Search / Filters */}
-                <div className="p-4 border-b border-border bg-muted/20">
+                <div className="p-4 border-b border-cb-border bg-cb-bg/30">
                     <div className="relative max-w-md">
-                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-cb-text-secondary/55" />
                         <input
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             placeholder="Buscar por código o nombre..."
-                            className={SIATC_THEME.COMPONENTS.INPUT}
+                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-cb-border rounded-cb-btn focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium placeholder:text-cb-neutral/40"
                         />
                     </div>
                 </div>
 
                 {/* Table Area */}
-                <SIATCTable>
+                <div className={SIATC_THEME.TABLE.SCROLL_AREA}>
                     {isLoading ? (
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-card/50 backdrop-blur-sm z-50">
                             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
                             <span className="text-sm font-medium text-muted-foreground mt-4 tracking-[0.2em]">Cargando gerencias...</span>
                         </div>
                     ) : (
-                        <>
-                            <thead className={SIATC_THEME.TABLE.HEADER_ROW}>
-                                <tr className="border-b border-border">
-                                    <SIATCTableHeader className="w-48">Código identificador</SIATCTableHeader>
-                                    <SIATCTableHeader>Denominación gerencial</SIATCTableHeader>
-                                    <SIATCTableHeader className="w-28 text-right italic uppercase">Acciones</SIATCTableHeader>
+                        <SIATCTable>
+                            <thead>
+                                <tr className={SIATC_THEME.TABLE.HEADER_ROW}>
+                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left w-48">Código identificador</th>
+                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left">Denominación gerencial</th>
+                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-right w-28">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-border">
+                            <tbody>
                                 {filteredManagements.length === 0 ? (
                                     <tr>
                                         <td colSpan={3} className="px-6 py-20 text-center opacity-60">
                                             <div className="flex flex-col items-center gap-3">
-                                                <Activity className="w-12 h-12 text-muted-foreground/20" />
-                                                <p className="text-sm font-medium text-muted-foreground italic">No se encontraron gerencias registradas</p>
+                                                <Activity className="w-12 h-12 text-cb-text-secondary opacity-40" />
+                                                <p className="text-sm font-medium text-cb-text-secondary italic">No se encontraron gerencias registradas</p>
                                             </div>
                                         </td>
                                     </tr>
                                 ) : (
                                     filteredManagements.map((mgmt) => (
-                                        <SIATCTableRow key={mgmt.id}>
+                                        <SIATCTableRow key={mgmt.id} className={SIATC_THEME.TABLE.BODY_ROW}>
                                             <SIATCTableCell>
-                                                <div className="flex items-center gap-2 font-mono text-primary font-bold text-[11px] uppercase bg-primary/5 px-3 py-1.5 rounded-xl border border-primary/20 w-fit shadow-sm group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
+                                                <div className="flex items-center gap-2 font-mono text-primary font-bold text-[11px] uppercase bg-primary/5 px-3 py-1.5 rounded-cb-btn border border-primary/20 w-fit shadow-sm group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
                                                     <Hash className="w-3.5 h-3.5 opacity-50" />
                                                     {mgmt.code}
                                                 </div>
                                             </SIATCTableCell>
                                             <SIATCTableCell>
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-all border border-transparent group-hover:border-primary/20">
+                                                    <div className="w-9 h-9 rounded-cb-btn bg-cb-bg flex items-center justify-center text-cb-text-secondary group-hover:bg-primary/10 group-hover:text-primary transition-all border border-cb-border">
                                                         <Building className="w-4.5 h-4.5" />
                                                     </div>
-                                                    <span className="font-bold text-foreground text-sm tracking-tight">{mgmt.name}</span>
+                                                    <span className="font-bold text-cb-text-primary text-sm tracking-tight">{mgmt.name}</span>
                                                 </div>
                                             </SIATCTableCell>
                                             <SIATCTableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <button
                                                         onClick={() => handleEdit(mgmt)}
-                                                        className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-all active:scale-90"
+                                                        className="p-2 text-cb-text-secondary hover:text-primary hover:bg-cb-bg rounded-cb-btn transition-all"
                                                         title="Editar"
                                                     >
                                                         <Edit2 className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(mgmt.id)}
-                                                        className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all active:scale-90"
+                                                        className="p-2 text-cb-text-secondary hover:text-destructive hover:bg-cb-bg rounded-cb-btn transition-all"
                                                         title="Eliminar"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
@@ -218,10 +217,10 @@ export default function ManagementsPage() {
                                     ))
                                 )}
                             </tbody>
-                        </>
+                        </SIATCTable>
                     )}
-                </SIATCTable>
-                
+                </div>
+
                 {/* Footer Stats */}
                 <SIATCTableFooter 
                     totalRecords={filteredManagements.length}

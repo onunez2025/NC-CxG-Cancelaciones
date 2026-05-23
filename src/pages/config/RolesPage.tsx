@@ -169,7 +169,7 @@ export default function RolesPage() {
                             const platformPermissions = role.permissions.filter(perm => availablePermissions.some(p => p.id === perm));
                             
                             return (
-                            <div key={role.id} className="group bg-card rounded-[2rem] border border-border/50 shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:border-primary/20 transition-all duration-300 relative overflow-hidden flex flex-col h-full bg-card/50 backdrop-blur-sm">
+                            <div key={role.id} className="group bg-white dark:bg-cb-bg border border-cb-border rounded-cb-card shadow-cb-level-1 hover:shadow-cb-level-2 hover:border-primary/20 transition-all duration-300 relative overflow-hidden flex flex-col h-full">
                                 {/* Visual Accent */}
                                 <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
                                     <Shield className="w-20 h-20 rotate-12" />
@@ -178,14 +178,14 @@ export default function RolesPage() {
                                 <div className="p-6 pb-4 space-y-4 flex-1">
                                     <div className="flex items-start justify-between">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 transition-transform group-hover:scale-110">
+                                            <div className="w-11 h-11 rounded-cb-btn bg-primary/10 flex items-center justify-center border border-primary/20 transition-transform group-hover:scale-110 shrink-0">
                                                 <Shield className="w-5 h-5 text-primary" />
                                             </div>
                                             <div>
-                                                <h3 className="font-bold text-foreground text-sm tracking-tight">
+                                                <h3 className="font-bold text-cb-text-primary text-sm tracking-tight">
                                                     {toTitleCase(role.name)}
                                                 </h3>
-                                                <p className="text-[10px] font-bold text-muted-foreground flex items-center gap-1.5 mt-0.5">
+                                                <p className="text-[10px] font-bold text-cb-text-secondary flex items-center gap-1.5 mt-0.5">
                                                     <ListChecks className="w-3 h-3 text-primary/60" />
                                                     {platformPermissions.length} Permisos autorizados
                                                 </p>
@@ -194,11 +194,11 @@ export default function RolesPage() {
                                         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all -mr-1">
                                             {hasPermission('config.roles') && (
                                                 <>
-                                                    <button onClick={() => handleEdit(role)} className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-lg transition-all" title="Editar Rol">
+                                                    <button onClick={() => handleEdit(role)} className="p-2 text-cb-text-secondary hover:text-primary hover:bg-cb-bg rounded-cb-btn transition-all" title="Editar Rol">
                                                         <Edit2 className="w-4 h-4" />
                                                     </button>
                                                     {role.id !== 'admin' && (
-                                                        <button onClick={() => handleDelete(role.id)} className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/5 rounded-lg transition-all" title="Eliminar Rol">
+                                                        <button onClick={() => handleDelete(role.id)} className="p-2 text-cb-text-secondary hover:text-destructive hover:bg-cb-bg rounded-cb-btn transition-all" title="Eliminar Rol">
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>
                                                     )}
@@ -209,22 +209,22 @@ export default function RolesPage() {
 
                                     {/* Permissions Matrix Snapshot */}
                                     <div className="space-y-2">
-                                        <p className="text-[9px] font-black text-muted-foreground tracking-widest pl-1 uppercase opacity-60">Vista rápida de facultades:</p>
+                                        <p className="text-[9px] font-black text-cb-neutral tracking-widest pl-1 uppercase opacity-60">Vista rápida de facultades:</p>
                                         <div className="flex flex-wrap gap-1.5 max-h-[140px] overflow-y-auto pr-2 custom-scrollbar-thin">
                                             {platformPermissions.length === 0 ? (
-                                                <span className="text-[10px] text-muted-foreground italic font-medium px-1">Sin facultades administrativas...</span>
+                                                <span className="text-[10px] text-cb-text-secondary italic font-medium px-1">Sin facultades administrativas...</span>
                                             ) : (
                                                 platformPermissions.slice(0, 15).map(perm => {
                                                     const label = availablePermissions.find(p => p.id === perm)?.label || perm;
                                                     return (
-                                                        <span key={perm} className="px-2 py-0.5 rounded-lg text-[9px] font-black bg-muted/60 text-muted-foreground border border-border tracking-tight group-hover:bg-primary/5 group-hover:border-primary/10 group-hover:text-primary transition-all">
+                                                        <span key={perm} className="px-2 py-0.5 rounded-cb-chip text-[9px] font-bold bg-cb-bg text-cb-text-secondary border border-cb-border tracking-tight group-hover:bg-primary/5 group-hover:border-primary/10 group-hover:text-primary transition-all">
                                                             {label}
                                                         </span>
                                                     );
                                                 })
                                             )}
                                             {platformPermissions.length > 15 && (
-                                                <span className="px-2 py-0.5 rounded-lg text-[9px] font-black bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+                                                <span className="px-2 py-0.5 rounded-cb-chip text-[9px] font-bold bg-primary text-primary-foreground shadow-lg shadow-primary/20">
                                                     +{platformPermissions.length - 15} más
                                                 </span>
                                             )}
@@ -236,7 +236,7 @@ export default function RolesPage() {
                                 <div className="p-4 pt-0">
                                     <button 
                                         onClick={() => handleEdit(role)}
-                                        className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-border bg-muted/40 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all text-[10px] font-black tracking-[0.2em] group/btn uppercase"
+                                        className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-cb-btn border border-cb-border bg-cb-bg/30 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all text-[10px] font-black tracking-[0.2em] group/btn uppercase"
                                     >
                                         Configurar Matriz
                                         <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />

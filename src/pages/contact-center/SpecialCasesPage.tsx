@@ -254,21 +254,23 @@ export const SpecialCasesPage = () => {
         </div>
       </div>
 
-      <div className={SIATC_THEME.LAYOUT.CONTENT_CONTAINER}>
-        {/* Search & Filters */}
-        <div className="px-6 py-4 border-b border-border">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+      {/* Filters Area */}
+      <div className="shrink-0 flex flex-col gap-2 mb-2">
+        <div className="bg-white dark:bg-cb-bg border border-cb-border rounded-cb-card p-2 flex items-center flex-wrap gap-2 shadow-cb-level-1">
+          <div className="relative flex-1 min-w-[300px]">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-cb-text-secondary/55" />
             <input 
               type="text"
               placeholder="Buscar por ticket, motivo o comentario..."
-              className={SIATC_THEME.COMPONENTS.INPUT + " pl-10"}
+              className="w-full pl-10 pr-4 py-2 bg-transparent border-none focus:ring-0 text-sm text-cb-text-primary placeholder:text-cb-neutral/40 outline-none"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
+      </div>
 
+      <div className={SIATC_THEME.LAYOUT.CONTENT_CONTAINER}>
         {/* Table Area */}
         <div className={SIATC_THEME.TABLE.SCROLL_AREA}>
           {isLoading ? (
@@ -292,30 +294,30 @@ export const SpecialCasesPage = () => {
               </thead>
               <tbody>
                 {data.map((item) => (
-                  <SIATCTableRow key={item.id}>
+                  <SIATCTableRow key={item.id} className={SIATC_THEME.TABLE.BODY_ROW}>
                     <SIATCTableCell>
-                      <span className="text-[13px] font-mono font-black tracking-tight text-primary">#{item.ticket}</span>
+                      <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>#{item.ticket}</span>
                     </SIATCTableCell>
                     <SIATCTableCell>
-                      <div className="font-bold text-foreground line-clamp-1">{item.motivo}</div>
+                      <div className="text-xs font-medium text-cb-text-primary max-w-[200px] truncate">{item.motivo}</div>
                     </SIATCTableCell>
                     <SIATCTableCell>
                       <div className="flex items-center gap-2">
-                        <User className="w-3.5 h-3.5 text-muted-foreground" />
-                        <span className="text-xs">{item.creado_por}</span>
+                        <User className="w-3.5 h-3.5 text-cb-text-secondary" />
+                        <span className="text-xs text-cb-text-secondary">{item.creado_por}</span>
                       </div>
                     </SIATCTableCell>
                     <SIATCTableCell>
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Calendar className="w-3.5 h-3.5" />
-                        <span className="text-xs">{new Date(item.fecha).toLocaleDateString()}</span>
+                      <div className="flex items-center gap-2 text-cb-text-secondary">
+                        <Calendar className="w-3.5 h-3.5 text-cb-text-secondary" />
+                        <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>{new Date(item.fecha).toLocaleDateString('es-PE')}</span>
                       </div>
                     </SIATCTableCell>
                     <SIATCTableCell>
-                      <div className="flex items-center gap-2 text-primary font-bold">
-                        <Calendar className="w-3.5 h-3.5" />
-                        <span className="text-xs">
-                          {item.fecha_visita ? new Date(item.fecha_visita).toLocaleDateString() : 'N/A'}
+                      <div className="flex items-center gap-2 text-cb-text-primary">
+                        <Calendar className="w-3.5 h-3.5 text-cb-text-secondary" />
+                        <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>
+                          {item.fecha_visita ? new Date(item.fecha_visita).toLocaleDateString('es-PE') : '—'}
                         </span>
                       </div>
                     </SIATCTableCell>
@@ -371,7 +373,7 @@ export const SpecialCasesPage = () => {
                 ))}
                 {data.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="py-12 text-center text-muted-foreground italic">
+                    <td colSpan={8} className="py-12 text-center text-cb-text-secondary italic text-xs">
                       No se encontraron casos especiales.
                     </td>
                   </tr>

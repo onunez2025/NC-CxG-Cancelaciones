@@ -6,6 +6,7 @@ import {
 import { useAuth } from '../hooks/useAuth';
 import { UsersService } from '../services/usersService';
 import { cn } from '../utils/cn';
+import { SIATC_THEME } from '../utils/siatc-theme';
 
 /**
  * Compresses and resizes an image file to a base64 DataURL.
@@ -147,19 +148,19 @@ export function ProfilePage() {
         .split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
 
     return (
-        <div className="h-full overflow-y-auto pr-2 pb-8">
-            <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in zoom-in-95">
+        <div className={SIATC_THEME.LAYOUT.PAGE_WRAPPER}>
+            <div className="max-w-5xl mx-auto space-y-8 w-full">
                 {/* Header */}
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight">Mi Perfil</h1>
-                    <p className="text-muted-foreground">Gestiona tu información personal y credenciales.</p>
+                    <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Mi Perfil</h1>
+                    <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>Gestiona tu información personal y credenciales.</p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                     {/* Left Column: Profile Card */}
                     <div className="lg:col-span-1 space-y-4">
-                        <div className="bg-card border rounded-lg shadow-sm overflow-hidden transition-all hover:shadow-md">
+                        <div className="bg-white dark:bg-cb-bg border border-cb-border rounded-cb-card shadow-cb-level-1 overflow-hidden transition-all hover:shadow-cb-level-2">
                             {/* Gradient banner */}
                             <div className="h-24 bg-gradient-to-br from-primary/80 to-primary relative overflow-hidden">
                                 <div className="absolute inset-0 bg-white/10 opacity-30 backdrop-blur-3xl" />
@@ -168,17 +169,17 @@ export function ProfilePage() {
                             {/* Avatar */}
                             <div className="flex flex-col items-center -mt-14 px-6 pb-6">
                                 <div className="relative group">
-                                    <div className="w-28 h-28 rounded-full border-4 border-card bg-muted flex items-center justify-center overflow-hidden shadow-xl ring-2 ring-primary/20">
+                                    <div className="w-28 h-28 rounded-full border-4 border-white dark:border-cb-bg bg-cb-bg flex items-center justify-center overflow-hidden shadow-xl ring-2 ring-primary/20">
                                         {formData.avatar_url ? (
                                             <img src={formData.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                                         ) : (
-                                            <span className="text-3xl font-bold text-muted-foreground select-none">{initials}</span>
+                                            <span className="text-3xl font-bold text-cb-text-secondary select-none">{initials}</span>
                                         )}
                                     </div>
                                     <button
                                         type="button"
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="absolute bottom-1 right-1 p-2 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 hover:scale-110 transition-all duration-200 ring-2 ring-background"
+                                        className="absolute bottom-1 right-1 p-2 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 hover:scale-110 transition-all duration-200 ring-2 ring-white dark:ring-cb-bg"
                                         title="Cambiar foto de perfil"
                                     >
                                         <Camera className="w-4 h-4" />
@@ -192,11 +193,11 @@ export function ProfilePage() {
                                     />
                                 </div>
 
-                                <h2 className="mt-4 text-xl font-bold tracking-tight text-foreground">{user.full_name || user.username}</h2>
+                                <h2 className="mt-4 text-xl font-bold tracking-tight text-cb-text-primary">{user.full_name || user.username}</h2>
                                 <p className="text-sm text-primary font-medium">@{user.username}</p>
 
                                 {/* Role badge */}
-                                <div className="mt-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 dark:bg-primary/30 text-primary dark:text-primary text-xs font-bold border border-blue-100 dark:border-blue-800">
+                                <div className="mt-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">
                                     <Shield className="w-3.5 h-3.5" />
                                     {user.role_name || 'Sin rol'}
                                 </div>
@@ -204,36 +205,36 @@ export function ProfilePage() {
                         </div>
 
                         {/* Quick Info Card */}
-                        <div className="bg-card border rounded-lg shadow-sm p-6 space-y-5 transition-all hover:shadow-md">
-                            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Información</h3>
+                        <div className="bg-white dark:bg-cb-bg border border-cb-border rounded-cb-card p-6 space-y-5 shadow-cb-level-1 transition-all hover:shadow-cb-level-2">
+                            <h3 className="text-xs font-bold text-cb-neutral uppercase tracking-wider">Información</h3>
 
                             <div className="space-y-4">
                                 <div className="flex items-center gap-4 group">
-                                    <div className="w-10 h-10 rounded-md bg-primary/10 dark:bg-primary/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:bg-primary transition-all">
-                                        <Mail className="w-5 h-5 text-primary dark:text-primary" />
+                                    <div className="w-10 h-10 rounded-cb-btn bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-all">
+                                        <Mail className="w-5 h-5 text-primary" />
                                     </div>
                                     <div className="overflow-hidden">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Email</p>
-                                        <p className="text-sm font-bold truncate text-foreground">{user.email}</p>
+                                        <p className="text-[10px] text-cb-text-secondary uppercase tracking-wider font-bold">Email</p>
+                                        <p className="text-sm font-bold truncate text-cb-text-primary">{user.email}</p>
                                     </div>
                                 </div>
 
                                 <div className="flex items-center gap-4 group">
-                                    <div className="w-10 h-10 rounded-md bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:bg-purple-100 transition-all">
+                                    <div className="w-10 h-10 rounded-cb-btn bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-all">
                                         <Building2 className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                                     </div>
                                     <div className="overflow-hidden">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Gerencia</p>
-                                        <p className="text-sm font-bold truncate text-foreground">{(user as any).management_name || user.management_id}</p>
+                                        <p className="text-[10px] text-cb-text-secondary uppercase tracking-wider font-bold">Gerencia</p>
+                                        <p className="text-sm font-bold truncate text-cb-text-primary">{(user as any).management_name || user.management_id}</p>
                                     </div>
                                 </div>
 
                                 <div className="flex items-center gap-4 group">
-                                    <div className="w-10 h-10 rounded-md bg-green-50 dark:bg-green-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:bg-green-100 transition-all">
+                                    <div className="w-10 h-10 rounded-cb-btn bg-green-50 dark:bg-green-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-all">
                                         <BadgeCheck className="w-5 h-5 text-green-600 dark:text-green-400" />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Estado</p>
+                                        <p className="text-[10px] text-cb-text-secondary uppercase tracking-wider font-bold">Estado</p>
                                         <p className="text-sm font-bold text-green-600 dark:text-green-400">Activo</p>
                                     </div>
                                 </div>
@@ -245,55 +246,55 @@ export function ProfilePage() {
                     <div className="lg:col-span-2 space-y-6">
 
                         {/* Account Settings Card */}
-                        <div className="bg-card border rounded-lg shadow-sm transition-all hover:shadow-md">
-                            <div className="px-6 py-5 border-b border-border bg-muted/30">
-                                <h3 className="text-sm font-bold flex items-center gap-2 text-foreground">
+                        <div className="bg-white dark:bg-cb-bg border border-cb-border rounded-cb-card shadow-cb-level-1 transition-all hover:shadow-cb-level-2">
+                            <div className="px-6 py-5 border-b border-cb-border bg-cb-bg/30">
+                                <h3 className="text-sm font-bold flex items-center gap-2 text-cb-text-primary">
                                     <User className="w-4 h-4 text-primary" />
                                     Cuenta
                                 </h3>
-                                <p className="text-xs text-muted-foreground mt-1">Tu nombre de usuario y correo electrónico.</p>
+                                <p className="text-xs text-cb-text-secondary mt-1">Tu nombre de usuario y correo electrónico.</p>
                             </div>
 
                             <div className="p-6 space-y-5">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                     <div>
-                                        <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2 block">
+                                        <label className="text-[11px] font-bold text-cb-text-secondary uppercase tracking-wider mb-2 block">
                                             Usuario
                                         </label>
                                         <div className="relative">
-                                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted-foreground">
+                                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-cb-text-secondary">
                                                 <User className="w-4 h-4" />
                                             </div>
                                             <input
                                                 type="text"
                                                 value={formData.username}
                                                 disabled
-                                                className="block w-full pl-10 pr-3 py-2.5 bg-muted/60 border-transparent rounded-md text-muted-foreground text-sm font-medium cursor-not-allowed"
+                                                className="block w-full pl-10 pr-3 py-2.5 bg-cb-bg border border-cb-border rounded-cb-btn text-cb-text-secondary text-sm font-medium cursor-not-allowed"
                                             />
                                         </div>
                                     </div>
 
                                     <div>
-                                        <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2 block">
+                                        <label className="text-[11px] font-bold text-cb-text-secondary uppercase tracking-wider mb-2 block">
                                             Email
                                         </label>
                                         <div className="relative">
-                                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted-foreground">
+                                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-cb-text-secondary">
                                                 <Mail className="w-4 h-4" />
                                             </div>
                                             <input
                                                 type="email"
                                                 value={formData.email}
                                                 disabled
-                                                className="block w-full pl-10 pr-3 py-2.5 bg-muted/60 border-transparent rounded-md text-muted-foreground text-sm font-medium cursor-not-allowed"
+                                                className="block w-full pl-10 pr-3 py-2.5 bg-cb-bg border border-cb-border rounded-cb-btn text-cb-text-secondary text-sm font-medium cursor-not-allowed"
                                             />
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="p-3 bg-primary/5 dark:bg-primary/20 rounded-lg border border-blue-100 dark:border-blue-900/50">
-                                    <p className="text-[11px] text-primary dark:text-primary font-medium flex items-center gap-2">
-                                        <AlertCircle className="w-3.5 h-3.5 inline" />
+                                <div className="p-3 bg-cb-bg rounded-cb-btn border border-cb-border">
+                                    <p className="text-[11px] text-primary font-medium flex items-center gap-2">
+                                        <AlertCircle className="w-3.5 h-3.5 inline animate-pulse" />
                                         Estos campos son de solo lectura. Si necesitas un cambio, contacta al administrador del sistema.
                                     </p>
                                 </div>
@@ -302,23 +303,23 @@ export function ProfilePage() {
 
                         {/* Security Card */}
                         <form onSubmit={handleSubmit}>
-                            <div className="bg-card border rounded-lg shadow-sm transition-all hover:shadow-md">
-                                <div className="px-6 py-5 border-b border-border bg-muted/30">
-                                    <h3 className="text-sm font-bold flex items-center gap-2 text-foreground">
+                            <div className="bg-white dark:bg-cb-bg border border-cb-border rounded-cb-card shadow-cb-level-1 transition-all hover:shadow-cb-level-2">
+                                <div className="px-6 py-5 border-b border-cb-border bg-cb-bg/30">
+                                    <h3 className="text-sm font-bold flex items-center gap-2 text-cb-text-primary">
                                         <Lock className="w-4 h-4 text-primary" />
                                         Seguridad
                                     </h3>
-                                    <p className="text-xs text-muted-foreground mt-1">Cambia tu contraseña de acceso.</p>
+                                    <p className="text-xs text-cb-text-secondary mt-1">Cambia tu contraseña de acceso.</p>
                                 </div>
 
                                 <div className="p-6 space-y-5">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                         <div>
-                                            <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2 block">
+                                            <label className="text-[11px] font-bold text-cb-text-secondary uppercase tracking-wider mb-2 block">
                                                 Nueva Contraseña
                                             </label>
                                             <div className="relative">
-                                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted-foreground">
+                                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-cb-text-secondary">
                                                     <Lock className="w-4 h-4" />
                                                 </div>
                                                 <input
@@ -327,18 +328,18 @@ export function ProfilePage() {
                                                     value={formData.password}
                                                     onChange={handleChange}
                                                     placeholder="••••••••"
-                                                    className="block w-full pl-10 pr-3 py-2.5 bg-background border rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-bold"
+                                                    className="block w-full pl-10 pr-3 py-2.5 bg-white border border-cb-border rounded-cb-btn focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium"
                                                     minLength={4}
                                                 />
                                             </div>
                                         </div>
 
                                         <div>
-                                            <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-2 block">
+                                            <label className="text-[11px] font-bold text-cb-text-secondary uppercase tracking-wider mb-2 block">
                                                 Confirmar Contraseña
                                             </label>
                                             <div className="relative">
-                                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted-foreground">
+                                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-cb-text-secondary">
                                                     <Shield className="w-4 h-4" />
                                                 </div>
                                                 <input
@@ -348,7 +349,7 @@ export function ProfilePage() {
                                                     onChange={handleChange}
                                                     placeholder="••••••••"
                                                     className={cn(
-                                                        "block w-full pl-10 pr-3 py-2.5 bg-background border rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-bold",
+                                                        "block w-full pl-10 pr-3 py-2.5 bg-white border border-cb-border rounded-cb-btn focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium",
                                                         formData.confirmPassword && formData.password !== formData.confirmPassword && "border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50 dark:bg-red-900/10"
                                                     )}
                                                     minLength={4}
@@ -357,7 +358,7 @@ export function ProfilePage() {
                                         </div>
                                     </div>
 
-                                    <p className="text-[11px] text-muted-foreground font-medium">
+                                    <p className="text-[11px] text-cb-text-secondary font-medium">
                                         Deja los campos vacíos para mantener tu contraseña actual. Mínimo 4 caracteres.
                                     </p>
                                 </div>
@@ -366,10 +367,10 @@ export function ProfilePage() {
                             {/* Status Message */}
                             {status !== 'idle' && (
                                 <div className={cn(
-                                    "mt-5 p-4 rounded-md flex items-center gap-3 text-sm font-bold shadow-sm animate-in fade-in zoom-in-95 duration-300",
+                                    "mt-5 p-4 rounded-cb-btn flex items-center gap-3 text-sm font-bold shadow-cb-level-1 animate-in fade-in zoom-in-95 duration-300",
                                     status === 'success'
-                                        ? "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800"
-                                        : "bg-red-50 text-destructive dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800"
+                                        ? "bg-[#E6F6EF] text-[#05B169] border border-[#E6F6EF]"
+                                        : "bg-[#FDECEE] text-[#DF2935] border border-[#FDECEE]"
                                 )}>
                                     {status === 'success' ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> : <AlertCircle className="w-5 h-5 flex-shrink-0" />}
                                     {message}
@@ -382,10 +383,8 @@ export function ProfilePage() {
                                     type="submit"
                                     disabled={isSaving}
                                     className={cn(
-                                        "px-8 py-3.5 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-md shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2",
-                                        isSaving
-                                            ? "opacity-60 cursor-not-allowed"
-                                            : "hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-500/40 active:translate-y-0"
+                                        SIATC_THEME.COMPONENTS.BUTTON_PRIMARY,
+                                        isSaving && "opacity-60 cursor-not-allowed"
                                     )}
                                 >
                                     {isSaving ? (

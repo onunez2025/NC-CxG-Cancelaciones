@@ -22,6 +22,7 @@ import { ProgramaSupervisoresService } from '../../services/programaSupervisores
 import { PreferencesService } from '../../services/preferencesService';
 import { toTitleCase } from '../../utils/formatters';
 import type { ProgramaSupervisor } from '../../types';
+import { SIATC_THEME } from '../../utils/siatc-theme';
 
 interface Empleado {
     id: string;
@@ -323,12 +324,12 @@ export default function ProgramaSupervisoresPage() {
     }
 
     return (
-        <div className="flex flex-col h-full p-6 space-y-6">
+        <div className={SIATC_THEME.LAYOUT.PAGE_WRAPPER}>
             {/* Header Area */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className={SIATC_THEME.LAYOUT.HEADER_WRAPPER}>
                 <div>
-                    <h1 className="text-2xl font-black tracking-tight text-foreground uppercase text-primary">Programa Supervisores</h1>
-                    <p className="text-muted-foreground text-sm">Visualización diaria del calendario y programación de labores.</p>
+                    <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Programa Supervisores</h1>
+                    <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>Visualización diaria del calendario y programación de labores.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="flex bg-muted/50 p-1 rounded-lg border border-border/50 bg-card">
@@ -385,7 +386,7 @@ export default function ProgramaSupervisoresPage() {
 
             {/* Search & Filters */}
             <div className="flex flex-col gap-3">
-                <div className="bg-card p-3 rounded-lg border border-border flex flex-col sm:flex-row items-center gap-3 shadow-sm">
+                <div className={cn(SIATC_THEME.COMPONENTS.CARD_CONTAINER, "p-3 flex flex-col sm:flex-row items-center gap-3")}>
                     <div className="relative w-full max-w-md flex items-center">
                         <div className="absolute left-3.5 text-muted-foreground">
                             <Search className="w-4 h-4" />
@@ -431,9 +432,9 @@ export default function ProgramaSupervisoresPage() {
                 </div>
 
                 {showFilters && (
-                    <div className="bg-card p-4 rounded-lg border border-border grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 shadow-sm">
+                    <div className={cn(SIATC_THEME.COMPONENTS.CARD_CONTAINER, "p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 shadow-sm")}>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-black text-muted-foreground tracking-wider uppercase">Desde</label>
+                            <label className="text-[10px] font-bold text-cb-text-secondary tracking-wider uppercase">Desde</label>
                             <input 
                                 type="date" 
                                 value={advancedFilters.startDate}
@@ -442,7 +443,7 @@ export default function ProgramaSupervisoresPage() {
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-black text-muted-foreground tracking-wider uppercase">Hasta</label>
+                            <label className="text-[10px] font-bold text-cb-text-secondary tracking-wider uppercase">Hasta</label>
                             <input 
                                 type="date" 
                                 value={advancedFilters.endDate}
@@ -451,7 +452,7 @@ export default function ProgramaSupervisoresPage() {
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-black text-muted-foreground tracking-wider uppercase">Empleado</label>
+                            <label className="text-[10px] font-bold text-cb-text-secondary tracking-wider uppercase">Empleado</label>
                             <Combobox 
                                 options={empleados.map(e => ({ id: e.id, name: e.name }))}
                                 value={advancedFilters.empleadoId}
@@ -466,16 +467,16 @@ export default function ProgramaSupervisoresPage() {
             </div>
 
             {/* Content Area */}
-            <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden flex flex-col flex-1 min-h-[500px]">
+            <div className={SIATC_THEME.LAYOUT.CONTENT_CONTAINER}>
                 {viewMode === 'table' ? (
                     <div className="flex flex-col h-full justify-between flex-1">
-                        <div className="overflow-x-auto flex-1 custom-scrollbar">
-                            <table className="w-full text-[13px] text-left border-collapse min-w-[700px] table-fixed">
-                                <thead className="bg-muted/50 text-muted-foreground font-bold border-b border-border sticky top-0 z-10 backdrop-blur-sm">
+                        <div className={SIATC_THEME.TABLE.SCROLL_AREA}>
+                            <table className={SIATC_THEME.TABLE.TABLE_ELEMENT}>
+                                <thead className={SIATC_THEME.TABLE.HEADER_ROW}>
                                     <tr>
                                         <ResizableHeader columnId="empleado" width={widths.empleado} onResizeStart={onResizeStart} className="px-4 py-3 border-r border-border group/header">
                                             <div className="flex items-center justify-between gap-1 w-full overflow-hidden">
-                                                <span className="truncate pr-1">Empleado</span>
+                                                <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Empleado</span>
                                                 <button onClick={(e) => { e.stopPropagation(); handleSort('empleado_name'); }} className="p-1 hover:bg-primary/10 rounded-md transition-colors shrink-0">
                                                     <SortIcon column="empleado_name" />
                                                 </button>
@@ -483,7 +484,7 @@ export default function ProgramaSupervisoresPage() {
                                         </ResizableHeader>
                                         <ResizableHeader columnId="labor" width={widths.labor} onResizeStart={onResizeStart} className="px-4 py-3 border-r border-border group/header">
                                             <div className="flex items-center justify-between gap-1 w-full overflow-hidden">
-                                                <span className="truncate pr-1">Labor</span>
+                                                <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Labor</span>
                                                 <button onClick={(e) => { e.stopPropagation(); handleSort('labor'); }} className="p-1 hover:bg-primary/10 rounded-md transition-colors shrink-0">
                                                     <SortIcon column="labor" />
                                                 </button>
@@ -491,13 +492,13 @@ export default function ProgramaSupervisoresPage() {
                                         </ResizableHeader>
                                         <ResizableHeader columnId="fecha" width={widths.fecha} onResizeStart={onResizeStart} className="px-4 py-3 border-r border-border group/header">
                                             <div className="flex items-center justify-between gap-1 w-full overflow-hidden">
-                                                <span className="truncate pr-1">Fecha</span>
+                                                <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Fecha</span>
                                                 <button onClick={(e) => { e.stopPropagation(); handleSort('fecha_labor'); }} className="p-1 hover:bg-primary/10 rounded-md transition-colors shrink-0">
                                                     <SortIcon column="fecha_labor" />
                                                 </button>
                                             </div>
                                         </ResizableHeader>
-                                        <th className="px-4 py-3 text-center w-28">Acciones</th>
+                                        <th className={cn(SIATC_THEME.TABLE.HEADER_TH, "text-center w-28")}>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-card divide-y divide-border">
@@ -512,19 +513,21 @@ export default function ProgramaSupervisoresPage() {
                                         </tr>
                                     ) : programa.length === 0 ? (
                                         <tr>
-                                            <td colSpan={4} className="px-4 py-16 text-center text-muted-foreground">No se encontraron registros de programación.</td>
+                                            <td colSpan={4} className="px-4 py-16 text-center text-muted-foreground text-xs">No se encontraron registros de programación.</td>
                                         </tr>
                                     ) : (
-                                        programa.map((row, index) => (
-                                            <tr key={row.id} className={cn("transition-colors group hover:bg-muted/5", index % 2 === 0 ? "bg-card" : "bg-muted/10")}>
-                                                <td className="px-4 py-2.5 border-r border-border truncate">{renderEmployeeVisual(row.empleado_name, row.empleado_estado, row.empleado_subarea)}</td>
-                                                <td className="px-4 py-2.5 border-r border-border truncate">
+                                        programa.map((row) => (
+                                            <tr key={row.id} className={SIATC_THEME.TABLE.BODY_ROW}>
+                                                <td className={cn(SIATC_THEME.TABLE.CELL, "border-r border-border/40 truncate")}>{renderEmployeeVisual(row.empleado_name, row.empleado_estado, row.empleado_subarea)}</td>
+                                                <td className={cn(SIATC_THEME.TABLE.CELL, "border-r border-border/40 truncate")}>
                                                     <span className="px-2 py-0.5 rounded border text-[11px] font-bold shadow-sm" style={getLaborStyle(row.labor)}>{row.labor}</span>
                                                 </td>
-                                                <td className="px-4 py-2.5 border-r border-border text-foreground truncate">
-                                                    {row.fecha_labor ? row.fecha_labor.split('-').reverse().join('/') : '-'}
+                                                <td className={cn(SIATC_THEME.TABLE.CELL, "border-r border-border/40 text-foreground truncate")}>
+                                                    <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>
+                                                        {row.fecha_labor ? row.fecha_labor.split('-').reverse().join('/') : '-'}
+                                                    </span>
                                                 </td>
-                                                <td className="px-4 py-2.5 text-center">
+                                                <td className={cn(SIATC_THEME.TABLE.CELL, "text-center")}>
                                                     <button onClick={() => handleOpenDetails(row)} className="p-1.5 text-primary hover:bg-primary/10 rounded transition-colors inline-flex items-center gap-1.5 text-xs font-bold" title="Ver Detalles">
                                                         <Eye className="w-4 h-4" /> <span>Detalle</span>
                                                     </button>

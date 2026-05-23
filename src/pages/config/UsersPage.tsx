@@ -21,8 +21,6 @@ import { UsersService } from '../../services/usersService';
 import { RolesService } from '../../services/rolesService';
 import { ManagementsService } from '../../services/managementsService';
 import type { User, Role, Management } from '../../types';
-import { useTableResizer } from '../../hooks/useTableResizer';
-import { ResizableHeader } from '../../components/common/ResizableHeader';
 import { useAuth } from '../../hooks/useAuth';
 import { cn } from '../../utils/cn';
 import { toTitleCase } from '../../utils/formatters';
@@ -60,14 +58,6 @@ export default function UsersPage() {
     // Pagination State (SIATC Standard)
     const [currentPage, setCurrentPage] = useState(1);
     const recordsPerPage = 10;
-
-    // Resizing logic
-    const { widths, onResizeStart } = useTableResizer('ebm_users_column_widths', {
-        usuario: 280,
-        email: 220,
-        rol: 160,
-        apps: 220
-    });
 
     useEffect(() => { loadData(); }, []);
 
@@ -222,31 +212,31 @@ export default function UsersPage() {
             {/* Content Container */}
             <div className={SIATC_THEME.LAYOUT.CONTENT_CONTAINER}>
                 {/* Search / Filters */}
-                <div className="p-4 border-b border-border bg-muted/20">
+                <div className="p-4 border-b border-cb-border bg-cb-bg/30">
                     <div className="relative max-w-md">
-                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-cb-text-secondary/55" />
                         <input
                             type="text"
                             value={search}
                             onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
                             placeholder="Buscar por nombre, usuario o email..."
-                            className={SIATC_THEME.COMPONENTS.INPUT}
+                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-cb-border rounded-cb-btn focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium placeholder:text-cb-neutral/40"
                         />
                     </div>
                 </div>
 
                 {/* Table Area */}
-                <SIATCTable>
+                <div className={SIATC_THEME.TABLE.SCROLL_AREA}>
                     {isLoading ? (
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-card/50 backdrop-blur-sm z-50">
                             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
                             <span className="text-sm font-medium text-muted-foreground mt-4 tracking-[0.2em]">Sincronizando con el directorio...</span>
                         </div>
                     ) : (
-                        <>
-                            <thead className={SIATC_THEME.TABLE.HEADER_ROW}>
-                                <tr className="border-b border-border">
-                                    <ResizableHeader columnId="usuario" width={widths.usuario} onResizeStart={onResizeStart} className="px-6 py-4">
+                        <SIATCTable>
+                            <thead>
+                                <tr className={SIATC_THEME.TABLE.HEADER_ROW}>
+                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left">
                                         <div className="flex items-center justify-between gap-2 group/header">
                                             <div className="flex items-center gap-2 cursor-pointer flex-1" onClick={() => handleSort('username')}>
                                                 <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Responsable / ID</span>
@@ -270,14 +260,14 @@ export default function UsersPage() {
                                                 )}
                                             </div>
                                         </div>
-                                    </ResizableHeader>
-                                    <ResizableHeader columnId="email" width={widths.email} onResizeStart={onResizeStart} className="px-6 py-4">
-                                        <div className="flex items-center justify-between gap-2 group/header cursor-pointer" onClick={() => handleSort('email')}>
+                                    </th>
+                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left cursor-pointer" onClick={() => handleSort('email')}>
+                                        <div className="flex items-center gap-2">
                                             <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Correo Corporativo</span>
                                             <SortIcon column="email" />
                                         </div>
-                                    </ResizableHeader>
-                                    <ResizableHeader columnId="rol" width={widths.rol} onResizeStart={onResizeStart} className="px-6 py-4">
+                                    </th>
+                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-left">
                                         <div className="flex items-center justify-between gap-2 group/header">
                                             <div className="flex items-center gap-2 cursor-pointer flex-1" onClick={() => handleSort('rol')}>
                                                 <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Perfil de Seguridad</span>
@@ -304,53 +294,53 @@ export default function UsersPage() {
                                                 )}
                                             </div>
                                         </div>
-                                    </ResizableHeader>
-                                    <ResizableHeader columnId="apps" width={widths.apps} onResizeStart={onResizeStart} className="px-6 py-4 text-center">
+                                    </th>
+                                    <th className="px-6 py-4 font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral text-center">
                                         <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Alcance Ecosistema</span>
-                                    </ResizableHeader>
-                                    <th className="px-6 py-4 w-28 bg-muted/30 text-right italic font-medium text-[10px] text-muted-foreground uppercase tracking-widest">Acciones</th>
+                                    </th>
+                                    <th className="px-6 py-4 w-28 text-right font-sans font-medium text-[12px] uppercase tracking-[0.06em] text-cb-neutral">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-border">
+                            <tbody>
                                 {paginatedRecords.length === 0 ? (
                                     <tr>
                                         <td colSpan={5} className="px-6 py-20 text-center opacity-60">
                                             <div className="flex flex-col items-center gap-3">
-                                                <Activity className="w-12 h-12 text-muted-foreground/20" />
-                                                <p className="text-sm font-medium text-muted-foreground">No se encontraron registros</p>
+                                                <Activity className="w-12 h-12 text-cb-text-secondary opacity-40" />
+                                                <p className="text-sm font-medium text-cb-text-secondary">No se encontraron registros</p>
                                             </div>
                                         </td>
                                     </tr>
                                 ) : (
                                     paginatedRecords.map((user) => (
-                                        <SIATCTableRow key={user.id}>
+                                        <SIATCTableRow key={user.id} className={SIATC_THEME.TABLE.BODY_ROW}>
                                             <SIATCTableCell>
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-extrabold text-xs border border-primary/20 shadow-inner shrink-0 group-hover:scale-110 transition-transform">
+                                                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs border border-primary/20 shrink-0">
                                                         {user.username?.substring(0, 2).toUpperCase()}
                                                     </div>
                                                     <div className="min-w-0">
-                                                        <div className="font-bold text-foreground text-sm truncate tracking-tight">
+                                                        <div className="text-xs font-medium text-cb-text-primary truncate">
                                                             {toTitleCase(user.full_name || user.username)}
                                                         </div>
-                                                        <div className={SIATC_THEME.TYPOGRAPHY.TINY_MONO + " text-muted-foreground truncate uppercase opacity-60 mt-0.5"}>
+                                                        <div className={SIATC_THEME.TYPOGRAPHY.TINY_MONO + " opacity-65 mt-0.5"}>
                                                             ID: {user.username}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </SIATCTableCell>
-                                            <SIATCTableCell className="font-medium text-muted-foreground truncate">
-                                                {user.email}
+                                            <SIATCTableCell>
+                                                <span className="text-xs text-cb-text-secondary">{user.email}</span>
                                             </SIATCTableCell>
                                             <SIATCTableCell>
-                                                <SIATCBadge variant="info" icon={ShieldCheck}>
+                                                <SIATCBadge variant="info">
                                                     {user.role_name || 'Invitado'}
                                                 </SIATCBadge>
                                             </SIATCTableCell>
                                             <SIATCTableCell>
                                                 <div className="flex flex-wrap gap-1">
                                                     {(user.apps || 'CXG').split(',').map(app => (
-                                                        <span key={app} className="px-2 py-0.5 rounded-lg text-[9px] font-black tracking-tighter border bg-primary/5 text-primary border-primary/10">
+                                                        <span key={app} className="px-2 py-0.5 rounded-cb-chip text-[9px] font-bold tracking-tighter border bg-primary/5 text-primary border-primary/10">
                                                             {app.trim()}
                                                         </span>
                                                     ))}
@@ -362,14 +352,14 @@ export default function UsersPage() {
                                                         <>
                                                             <button
                                                                 onClick={() => openEdit(user)}
-                                                                className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-all active:scale-90"
+                                                                className="p-2 text-cb-text-secondary hover:text-primary hover:bg-cb-bg rounded-cb-btn transition-all"
                                                                 title="Editar"
                                                             >
                                                                 <Edit2 className="w-4 h-4" />
                                                             </button>
                                                             <button
                                                                 onClick={() => handleDelete(user.id)}
-                                                                className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all active:scale-90"
+                                                                className="p-2 text-cb-text-secondary hover:text-destructive hover:bg-cb-bg rounded-cb-btn transition-all"
                                                                 title="Revocar"
                                                             >
                                                                 <Trash2 className="w-4 h-4" />
@@ -382,10 +372,10 @@ export default function UsersPage() {
                                     ))
                                 )}
                             </tbody>
-                        </>
+                        </SIATCTable>
                     )}
-                </SIATCTable>
-                
+                </div>
+
                 {/* Footer SIATC Standard */}
                 <SIATCTableFooter 
                     totalRecords={filtered.length} 

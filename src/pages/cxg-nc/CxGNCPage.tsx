@@ -21,6 +21,7 @@ import {
   ArrowUpDown,
   Filter
 } from 'lucide-react';
+import { cn } from '../../utils/cn';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 import { SIATCButton } from '../../components/siatc/SIATCButton';
 import { SIATCBadge } from '../../components/siatc/SIATCBadge';
@@ -699,32 +700,39 @@ export const CxGNCPage = () => {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 px-1 shrink-0">
-        {[
-          { label: 'Total', value: kpiStats.total, icon: BarChart3, color: 'text-slate-600 dark:text-slate-400', bg: 'bg-slate-50 dark:bg-slate-800/50', border: 'border-slate-200 dark:border-slate-700', filter: 'TODOS' as const },
-          { label: 'Registrado', value: kpiStats.registrado, icon: FileText, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-500/10', border: 'border-amber-200 dark:border-amber-500/20', filter: 'REGISTRADO' as const },
-          { label: 'Aprobado', value: kpiStats.aprobado, icon: ShieldCheck, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-500/10', border: 'border-blue-200 dark:border-blue-500/20', filter: 'APROBADO_SUP' as const },
-          { label: 'Asignado', value: kpiStats.asignado, icon: UserPlus, color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-500/10', border: 'border-purple-200 dark:border-purple-500/20', filter: 'ASIGNADO' as const },
-          { label: 'Cerrado', value: kpiStats.cerrado, icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-500/10', border: 'border-emerald-200 dark:border-emerald-500/20', filter: 'CERRADO' as const },
-        ].map((kpi) => (
-          <button
-            key={kpi.label}
-            onClick={() => setStatusFilter(kpi.filter)}
-            className={`flex items-center gap-3 p-3 rounded-2xl border transition-all duration-300 hover:shadow-md hover:scale-[1.02] active:scale-95 group ${
-              statusFilter === kpi.filter
-                ? `${kpi.bg} ${kpi.border} shadow-md ring-2 ring-primary/10`
-                : 'bg-card border-border/50 hover:border-border'
-            }`}
-          >
-            <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${kpi.bg} ${kpi.color} shrink-0 transition-transform group-hover:scale-110`}>
-              <kpi.icon className="w-4.5 h-4.5" />
-            </div>
-            <div className="flex flex-col items-start min-w-0">
-              <span className="text-lg font-black text-foreground leading-none">{kpi.value}</span>
-              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground truncate">{kpi.label}</span>
-            </div>
-          </button>
-        ))}
+      <div className="shrink-0 mb-2">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {[
+            { label: 'Total', value: kpiStats.total, icon: BarChart3, color: 'text-cb-neutral', bg: 'bg-white dark:bg-cb-bg', border: 'border-cb-border', filter: 'TODOS' as const },
+            { label: 'Registrado', value: kpiStats.registrado, icon: FileText, color: 'text-[#DF2935]', bg: 'bg-white dark:bg-cb-bg', border: 'border-cb-border', filter: 'REGISTRADO' as const },
+            { label: 'Aprobado', value: kpiStats.aprobado, icon: ShieldCheck, color: 'text-cb-blue', bg: 'bg-white dark:bg-cb-bg', border: 'border-cb-border', filter: 'APROBADO_SUP' as const },
+            { label: 'Asignado', value: kpiStats.asignado, icon: UserPlus, color: 'text-primary', bg: 'bg-white dark:bg-cb-bg', border: 'border-cb-border', filter: 'ASIGNADO' as const },
+            { label: 'Cerrado', value: kpiStats.cerrado, icon: CheckCircle2, color: 'text-[#05B169]', bg: 'bg-white dark:bg-cb-bg', border: 'border-cb-border', filter: 'CERRADO' as const },
+          ].map((kpi) => {
+            const active = statusFilter === kpi.filter;
+            return (
+              <div
+                key={kpi.label}
+                onClick={() => setStatusFilter(kpi.filter)}
+                className={cn(
+                  "py-1.5 px-4 h-[60px] cursor-pointer select-none flex items-center justify-between gap-3 transition-all",
+                  SIATC_THEME.TOKENS.RADIUS.CARD,
+                  SIATC_THEME.TOKENS.ELEVATION.LEVEL_1,
+                  kpi.bg,
+                  active ? "ring-2 ring-primary ring-offset-2 dark:ring-offset-background border-primary/50 shadow-md transform scale-[1.02]" : "hover:border-cb-border-hover"
+                )}
+              >
+                <div className="space-y-0.5">
+                  <p className={cn("text-[10px] font-bold uppercase tracking-tighter opacity-80", kpi.color)}>{kpi.label}</p>
+                  <p className="text-base font-bold text-cb-text-primary leading-none">{kpi.value}</p>
+                </div>
+                <div className={cn("p-1.5 rounded-lg bg-white/50 dark:bg-black/20", kpi.color)}>
+                  <kpi.icon className="w-4.5 h-4.5" />
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <div className={SIATC_THEME.LAYOUT.CONTENT_CONTAINER}>
@@ -960,12 +968,12 @@ export const CxGNCPage = () => {
                       case 'ticket': return <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>#{item.correlativo}</span>;
                       case 'tienda': return (
                         <SIATCTooltip content={item.tienda || ''} position="bottom">
-                          <div className="text-xs font-semibold text-foreground truncate max-w-[120px]">{item.tienda || '—'}</div>
+                          <div className="text-xs text-cb-text-secondary truncate max-w-[120px]">{item.tienda || '—'}</div>
                         </SIATCTooltip>
                       );
                       case 'cliente': return (
                         <SIATCTooltip content={item.cliente || ''} position="bottom">
-                          <div className="font-bold text-foreground truncate max-w-[140px]">{item.cliente}</div>
+                          <div className="text-xs font-medium text-foreground truncate max-w-[140px]">{item.cliente}</div>
                         </SIATCTooltip>
                       );
                       case 'codigo_producto': return <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>{item.codigo_producto || '—'}</span>;
@@ -976,21 +984,18 @@ export const CxGNCPage = () => {
                       );
                       case 'creado_por': return (
                         <SIATCTooltip content={item.creado_por || ''} position="bottom">
-                          <div className="text-[10px] font-black uppercase text-muted-foreground truncate max-w-[120px]">{item.creado_por || '—'}</div>
+                          <div className="text-xs text-cb-text-secondary truncate max-w-[120px]">{item.creado_por || '—'}</div>
                         </SIATCTooltip>
                       );
                       case 'supervisor': return (
                         <SIATCTooltip content={item.supervisor || ''} position="bottom">
-                          <div className="text-[10px] font-black uppercase text-primary/80 truncate max-w-[120px]">{item.supervisor || '—'}</div>
+                          <div className="text-xs text-cb-text-secondary truncate max-w-[120px]">{item.supervisor || '—'}</div>
                         </SIATCTooltip>
                       );
                       case 'fecha_creacion': return (
-                        <SIATCTooltip content={fullDate(item.fecha)} position="bottom">
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <Calendar className="w-3.5 h-3.5" />
-                            <span className="text-xs">{new Date(item.fecha).toLocaleDateString('es-PE')}</span>
-                          </div>
-                        </SIATCTooltip>
+                        <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>
+                          {item.fecha ? new Date(item.fecha).toLocaleDateString('es-PE') : '—'}
+                        </span>
                       );
                       case 'aprobado': return (
                         <div className="flex flex-col gap-1">

@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   XCircle,
   MoreVertical,
-  Calendar,
   Loader2,
   FileSpreadsheet,
   Eye,
@@ -17,6 +16,7 @@ import {
   UserPlus,
   MapPin
 } from 'lucide-react';
+import { cn } from '../../utils/cn';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 import { SIATCButton } from '../../components/siatc/SIATCButton';
 import { SIATCBadge } from '../../components/siatc/SIATCBadge';
@@ -533,59 +533,62 @@ export const CancellationsPage = () => {
         </div>
       </div>
 
-      <div className={SIATC_THEME.LAYOUT.CONTENT_CONTAINER}>
-        {/* Search & Filters */}
-        <div className="px-6 py-4 border-b border-border flex flex-col gap-4">
-          <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+      {/* Filters Area */}
+      <div className="shrink-0 flex flex-col gap-2 mb-2">
+        <div className={cn(SIATC_THEME.COMPONENTS.CARD_CONTAINER, "p-2 flex items-center flex-wrap gap-2")}>
+          <div className="relative flex-1 min-w-[300px]">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-cb-text-secondary/55" />
             <input 
               type="text"
               placeholder="Buscar por ticket, cliente, motivo o autorizador..."
-              className={`${SIATC_THEME.COMPONENTS.INPUT} pl-10`}
+              className="w-full pl-10 pr-4 py-2 bg-transparent border-none focus:ring-0 text-sm text-cb-text-primary placeholder:text-cb-neutral/40 outline-none"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-border/50">
-            <div className="flex items-center gap-2">
-              <span className="text-[9px] font-black uppercase text-muted-foreground tracking-tighter">Estado:</span>
-              <select 
-                className="bg-transparent border-none text-xs font-bold text-foreground focus:ring-0 cursor-pointer"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-              >
-                <option value="TODOS">TODOS LOS ESTADOS</option>
-                <option value="REGISTRADO">REGISTRADO</option>
-                <option value="APROBADO_SUP">APROBADO POR SUP.</option>
-                <option value="ASIGNADO">ASIGNADO</option>
-                <option value="VALIDADO">VALIDADO CLIENTE</option>
-                <option value="CERRADO">CERRADO</option>
-              </select>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <span className="text-[9px] font-black uppercase text-muted-foreground tracking-tighter">Desde:</span>
-              <input 
-                type="date" 
-                className="bg-transparent border-none text-xs font-bold text-foreground focus:ring-0 cursor-pointer"
-                value={dateRange.start}
-                onChange={(e) => setDateRange({...dateRange, start: e.target.value})}
-              />
-            </div>
+          <div className="w-px h-6 bg-cb-border mx-1 hidden sm:block" />
 
-            <div className="flex items-center gap-2">
-              <span className="text-[9px] font-black uppercase text-muted-foreground tracking-tighter">Hasta:</span>
-              <input 
-                type="date" 
-                className="bg-transparent border-none text-xs font-bold text-foreground focus:ring-0 cursor-pointer"
-                value={dateRange.end}
-                onChange={(e) => setDateRange({...dateRange, end: e.target.value})}
-              />
-            </div>
+          <select 
+            className="bg-transparent border-none px-3 py-1.5 text-sm font-bold text-cb-text-primary focus:ring-0 outline-none cursor-pointer"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="TODOS">Filtro Estado</option>
+            <option value="REGISTRADO">REGISTRADO</option>
+            <option value="APROBADO_SUP">APROBADO POR SUP.</option>
+            <option value="ASIGNADO">ASIGNADO</option>
+            <option value="VALIDADO">VALIDADO CLIENTE</option>
+            <option value="CERRADO">CERRADO</option>
+          </select>
+
+          <div className="w-px h-6 bg-cb-border mx-1 hidden sm:block" />
+
+          <div className="flex items-center gap-2 px-2">
+            <span className="text-xs font-bold text-cb-text-secondary">Desde:</span>
+            <input 
+              type="date" 
+              className="bg-transparent border-none text-xs font-bold text-cb-text-primary focus:ring-0 cursor-pointer"
+              value={dateRange.start}
+              onChange={(e) => setDateRange({...dateRange, start: e.target.value})}
+            />
+          </div>
+
+          <div className="w-px h-6 bg-cb-border mx-1 hidden sm:block" />
+
+          <div className="flex items-center gap-2 px-2">
+            <span className="text-xs font-bold text-cb-text-secondary">Hasta:</span>
+            <input 
+              type="date" 
+              className="bg-transparent border-none text-xs font-bold text-cb-text-primary focus:ring-0 cursor-pointer"
+              value={dateRange.end}
+              onChange={(e) => setDateRange({...dateRange, end: e.target.value})}
+            />
           </div>
         </div>
+      </div>
 
+      <div className={SIATC_THEME.LAYOUT.CONTENT_CONTAINER}>
         {/* Table Area */}
         <div className={SIATC_THEME.TABLE.SCROLL_AREA}>
           {isLoading ? (
@@ -619,19 +622,18 @@ export const CancellationsPage = () => {
                       <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>#{item.ticket}</span>
                     </SIATCTableCell>
                     <SIATCTableCell>
-                      <div className="font-bold text-foreground italic max-w-[200px] truncate">{item.cliente}</div>
+                      <div className="text-xs font-medium text-foreground max-w-[200px] truncate">{item.cliente}</div>
                     </SIATCTableCell>
                     <SIATCTableCell>
-                      <span className="text-muted-foreground text-xs">{item.motivo}</span>
+                      <span className="text-xs text-cb-text-secondary">{item.motivo}</span>
                     </SIATCTableCell>
                     <SIATCTableCell>
-                      <span className="text-xs text-muted-foreground">{item.autorizador || '—'}</span>
+                      <span className="text-xs text-cb-text-secondary">{item.autorizador || '—'}</span>
                     </SIATCTableCell>
                     <SIATCTableCell>
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Calendar className="w-3.5 h-3.5" />
-                        <span className="text-xs">{new Date(item.fecha_generado).toLocaleDateString()}</span>
-                      </div>
+                      <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>
+                        {new Date(item.fecha_generado).toLocaleDateString('es-PE')}
+                      </span>
                     </SIATCTableCell>
                     <SIATCTableCell>
                       <SIATCBadge variant={getEstadoBadgeVariant(item.estado)}>
@@ -639,10 +641,10 @@ export const CancellationsPage = () => {
                       </SIATCBadge>
                     </SIATCTableCell>
                     <SIATCTableCell>
-                      <span className="text-xs font-bold text-rose-500 whitespace-nowrap">{item.vali_motivo_real || '—'}</span>
+                      <span className="text-xs font-semibold text-rose-500 whitespace-nowrap">{item.vali_motivo_real || '—'}</span>
                     </SIATCTableCell>
                     <SIATCTableCell>
-                      <span className="text-xs text-muted-foreground">{item.asignado_a || '—'}</span>
+                      <span className="text-xs text-cb-text-secondary">{item.asignado_a || '—'}</span>
                     </SIATCTableCell>
                     <SIATCTableCell className="text-right" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                       <div className="flex justify-end gap-1">

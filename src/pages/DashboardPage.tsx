@@ -14,6 +14,7 @@ import { useAuth } from '../hooks/useAuth';
 import { cn } from '../utils/cn';
 import { ncService } from '../services/ncService';
 import type { Cancellation, CxGNC } from '../services/ncService';
+import { SIATC_THEME } from '../utils/siatc-theme';
 
 export function DashboardPage() {
     const navigate = useNavigate();
@@ -62,15 +63,15 @@ export function DashboardPage() {
     }
 
     return (
-        <div className="flex flex-col h-full gap-6 animate-in fade-in duration-500 p-1">
+        <div className={SIATC_THEME.LAYOUT.PAGE_WRAPPER}>
             {/* Header */}
-            <div className="flex items-center justify-between px-1">
+            <div className={SIATC_THEME.LAYOUT.HEADER_WRAPPER}>
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2 text-slate-800 dark:text-white">
+                    <h1 className={cn(SIATC_THEME.TYPOGRAPHY.PAGE_TITLE, "flex items-center gap-2")}>
                         <LayoutDashboard className="w-6 h-6 text-primary" />
                         Panel de Control
                     </h1>
-                    <p className="text-slate-500 text-sm font-medium">Bienvenido, {user?.username || 'Administrador'}</p>
+                    <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>Bienvenido, {user?.username || 'Administrador'}</p>
                 </div>
             </div>
 
@@ -104,9 +105,9 @@ export function DashboardPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Recent Activity */}
-                <div className="bg-card border rounded-2xl p-6 shadow-sm flex flex-col min-h-[400px]">
+                <div className={cn(SIATC_THEME.COMPONENTS.CARD_CONTAINER, "p-6 flex flex-col min-h-[400px]")}>
                     <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-sm font-bold flex items-center gap-2 text-slate-800 dark:text-white uppercase tracking-wider">
+                        <h3 className={cn(SIATC_THEME.TYPOGRAPHY.SECTION_TITLE, "flex items-center gap-2")}>
                             <Clock className="w-4 h-4 text-primary" />
                             Actividad Reciente
                         </h3>
@@ -123,12 +124,12 @@ export function DashboardPage() {
                             <div key={item.id} className="flex items-center gap-4 p-3 rounded-xl border border-border/40 hover:bg-muted/30 transition-colors">
                                 <div className={cn(
                                     "p-2 rounded-lg",
-                                    item.estado === 'REGISTRADO' ? "bg-amber-100 text-amber-600" : "bg-emerald-100 text-emerald-600"
+                                    item.estado === 'REGISTRADO' ? "bg-rose-50 text-rose-600 dark:bg-rose-900/20" : "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20"
                                 )}>
                                     <AlertCircle className="w-4 h-4" />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-xs font-bold text-foreground truncate">{item.cliente}</p>
+                                    <p className="text-xs font-semibold text-foreground truncate">{item.cliente}</p>
                                     <p className="text-[10px] text-muted-foreground">{item.motivo}</p>
                                 </div>
                                 <div className="text-right">
@@ -146,9 +147,9 @@ export function DashboardPage() {
                 </div>
 
                 {/* Docs Summary */}
-                <div className="bg-card border rounded-2xl p-6 shadow-sm flex flex-col min-h-[400px]">
+                <div className={cn(SIATC_THEME.COMPONENTS.CARD_CONTAINER, "p-6 flex flex-col min-h-[400px]")}>
                     <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-sm font-bold flex items-center gap-2 text-slate-800 dark:text-white uppercase tracking-wider">
+                        <h3 className={cn(SIATC_THEME.TYPOGRAPHY.SECTION_TITLE, "flex items-center gap-2")}>
                             <FileText className="w-4 h-4 text-primary" />
                             Resumen de Documentos
                         </h3>
@@ -165,21 +166,21 @@ export function DashboardPage() {
                             <div key={item.id} className="flex items-center gap-4 p-3 rounded-xl border border-border/40 hover:bg-muted/30 transition-colors">
                                 <div className={cn(
                                     "p-2 rounded-lg",
-                                    item.tipo === 'NC' ? "bg-blue-100 text-blue-600" : "bg-violet-100 text-violet-600"
+                                    item.tipo === 'NC' ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20" : "bg-violet-50 text-violet-600 dark:bg-violet-900/20"
                                 )}>
                                     <DollarSign className="w-4 h-4" />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-xs font-bold text-foreground truncate">{item.cliente}</p>
+                                    <p className="text-xs font-semibold text-foreground truncate">{item.cliente}</p>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-[9px] font-black bg-muted px-1.5 py-0.5 rounded uppercase">{item.tipo}</span>
+                                        <span className="text-[9px] font-bold bg-muted px-1.5 py-0.5 rounded uppercase text-muted-foreground">{item.tipo}</span>
                                         <span className="text-[10px] text-muted-foreground">ID: {item.correlativo}</span>
                                     </div>
                                 </div>
                                 <div className="text-right">
                                     <div className="flex items-center justify-end gap-1">
                                          {item.estado === 'CERRADO' ? <CheckCircle2 className="w-3 h-3 text-emerald-500" /> : <Clock className="w-3 h-3 text-amber-500" />}
-                                         <span className="text-[10px] font-bold uppercase opacity-60">{item.estado}</span>
+                                         <span className="text-[10px] font-medium uppercase opacity-80">{item.estado}</span>
                                     </div>
                                 </div>
                             </div>
@@ -195,16 +196,16 @@ function KPICard({ icon: Icon, label, value, sub, color, bgColor }: {
     icon: any; label: string; value: string; sub: string; color: string; bgColor: string;
 }) {
     return (
-        <div className="bg-card border rounded-3xl h-[140px] py-4 px-6 shadow-sm flex flex-col justify-between hover:shadow-lg hover:shadow-primary/5 transition-all group">
+        <div className={SIATC_THEME.COMPONENTS.KPI_CARD_CONTAINER}>
             <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{label}</span>
-                <div className={cn("p-3 rounded-2xl group-hover:scale-110 transition-transform", bgColor)}>
+                <span className={SIATC_THEME.COMPONENTS.KPI_CARD_LABEL}>{label}</span>
+                <div className={cn("p-2.5 rounded-xl transition-transform", bgColor)}>
                     <Icon className={cn("w-5 h-5", color)} />
                 </div>
             </div>
             <div className="space-y-1">
-                <p className="text-2xl font-black tracking-tight text-slate-800 dark:text-white uppercase">{value}</p>
-                <p className="text-[11px] font-medium text-slate-400">{sub}</p>
+                <p className={SIATC_THEME.COMPONENTS.KPI_CARD_VALUE}>{value}</p>
+                <p className={SIATC_THEME.COMPONENTS.KPI_CARD_SUB}>{sub}</p>
             </div>
         </div>
     );
