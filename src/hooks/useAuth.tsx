@@ -54,7 +54,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     setUser(data.user);
                     StorageService.setCurrentUser(data.user);
                 } else {
-                    setUser(null);
                     StorageService.remove('current_user');
                     StorageService.remove('auth_token');
                     window.location.href = '/login?expired=true';
@@ -92,7 +91,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         const resetTimer = () => {
             timeoutId = setTimeout(() => {
-                logout();
+                StorageService.remove('current_user');
+                StorageService.remove('auth_token');
                 window.location.href = '/login?expired=true';
             }, 30 * 60 * 1000); // 30 minutes
         };
