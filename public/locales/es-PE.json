@@ -47,7 +47,7 @@
         "error": "Error al actualizar el perfil"
     },
     "auth": {
-        "subtitle": "Ingresa tus credenciales para continuar",
+        "subtitle": "Ingresa tus credenciales para acceder al sistema",
         "username": "Usuario",
         "password": "Contraseña",
         "rememberMe": "Recordarme",
