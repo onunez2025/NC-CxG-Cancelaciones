@@ -57,6 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     setUser(null);
                     StorageService.remove('current_user');
                     StorageService.remove('auth_token');
+                    window.location.href = '/login?expired=true';
                 }
             } catch (error) {
                 console.error("Session validation error", error);
@@ -92,6 +93,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const resetTimer = () => {
             timeoutId = setTimeout(() => {
                 logout();
+                window.location.href = '/login?expired=true';
             }, 30 * 60 * 1000); // 30 minutes
         };
 
