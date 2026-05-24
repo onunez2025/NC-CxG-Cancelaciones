@@ -52,6 +52,10 @@
         "rememberMe": "Remember me",
         "forgotPassword": "Forgot password?",
         "loginButton": "Login",
+        "sessionExpired": {
+            "title": "Session expired",
+            "message": "For security, your session has ended. Please enter your credentials again."
+        },
         "errors": {
             "invalid": "Invalid credentials",
             "inactive": "User inactive. Contact administrator."

@@ -29,7 +29,7 @@ export const apiClient = async (url: string, options: RequestInit = {}) => {
         StorageService.remove('current_user');
         StorageService.remove('auth_token');
         // Force a reload to return to login. We would ideally dispatch an event.
-        window.location.href = '/login';
+        window.location.href = '/login?expired=true';
     }
 
     return response;

@@ -127,6 +127,7 @@ export const SIATC_THEME = {
         CARD: "w-full max-w-md bg-white dark:bg-cb-bg border border-cb-border rounded-cb-modal shadow-cb-level-3 p-8 relative z-10 mx-auto",
         TITLE: "text-3xl font-bold tracking-tight text-cb-text-primary",
         SUBTITLE: "mt-2 text-cb-text-secondary text-sm",
+        ALERT_EXPIRED: "p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-500 text-sm flex items-start gap-3 animate-in fade-in slide-in-from-top-2",
         INPUT_WRAPPER: "relative rounded-cb-btn shadow-sm",
         INPUT: "block w-full pl-10 pr-3 py-2.5 bg-white dark:bg-cb-bg border border-cb-border rounded-cb-btn focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none text-sm font-medium",
     }

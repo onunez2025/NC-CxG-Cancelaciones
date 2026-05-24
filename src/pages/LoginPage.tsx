@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../context/ThemeContext';
@@ -12,6 +12,8 @@ export function LoginPage() {
     const { t, i18n } = useTranslation();
     const { login } = useAuth();
     const { theme, setTheme } = useTheme();
+    const [searchParams] = useSearchParams();
+    const isExpired = searchParams.get('expired') === 'true';
     const navigate = useNavigate();
 
     const [username, setUsername] = useState('');
@@ -122,6 +124,16 @@ export function LoginPage() {
                             {t('auth.subtitle')}
                         </p>
                     </div>
+
+                    {isExpired && (
+                        <div className={SIATC_THEME.LOGIN_LAYOUT.ALERT_EXPIRED}>
+                            <Lock className="w-5 h-5 shrink-0 mt-0.5" />
+                            <div>
+                                <p className="font-bold">{t('auth.sessionExpired.title')}</p>
+                                <p className="opacity-90">{t('auth.sessionExpired.message')}</p>
+                            </div>
+                        </div>
+                    )}
 
                     <div className={SIATC_THEME.LOGIN_LAYOUT.CARD}>
                         <form onSubmit={handleLogin} className="space-y-6">
