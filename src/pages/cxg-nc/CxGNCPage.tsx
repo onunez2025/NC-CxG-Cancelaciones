@@ -38,8 +38,7 @@ import {
 } from '../../components/siatc/table/SIATCTable';
 import { 
   ncService, 
-  type CxGNC,
-  type CxGNCMotivo
+  type CxGNC
 } from '../../services/ncService';
 import { auditService } from '../../services/auditService';
 import { useAuth } from '../../hooks/useAuth';
