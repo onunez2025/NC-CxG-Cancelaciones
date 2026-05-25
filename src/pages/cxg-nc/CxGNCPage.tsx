@@ -335,7 +335,8 @@ export const CxGNCPage = () => {
         cliente: formData.cliente,
         estado: 'REGISTRADO',
         ticket: formData.ticket,
-        observacion: formData.observacion
+        observacion: formData.observacion,
+        ...(formData.parent_id ? { parent_id: formData.parent_id } : {})
       });
       
       await auditService.logAction({
@@ -344,7 +345,7 @@ export const CxGNCPage = () => {
         Accion: 'CREATE',
         Entidad: 'CXG_NC',
         EntidadID: 'NEW',
-        Detalle: `Solicitud de ${formData.tipo} creada para ${formData.cliente} (Ticket: ${formData.ticket})`
+        Detalle: `Solicitud de ${formData.tipo} creada para ${formData.cliente} (Ticket: ${formData.ticket})${formData.parent_id ? ` (Reintento de ${formData.parent_id})` : ''}`
       });
 
       setIsModalOpen(false);
@@ -353,7 +354,8 @@ export const CxGNCPage = () => {
         tipo: 'CXG', 
         cliente: '', 
         ticket: '',
-        observacion: ''
+        observacion: '',
+        parent_id: undefined
       });
     } catch (error: any) {
       console.error(error);
@@ -374,12 +376,23 @@ export const CxGNCPage = () => {
         return;
       }
 
+      // Check for existing requests for this ticket
+      const existingRequests = await ncService.getCxGNC({ search: formData.ticket, pageSize: 50 });
+      const ticketRequests = existingRequests.data.filter(r => r.ticket === formData.ticket);
+      
+      const hasActiveRequest = ticketRequests.some(r => r.estado !== 'RECHAZADO');
+      if (hasActiveRequest) {
+        setIsTicketValidated(false);
+        toast.error('Solicitud Existente', 'Este ticket ya cuenta con una solicitud de CxG/NC en proceso o aprobada.');
+        return;
+      }
+
       setFormData({
         ...formData,
         cliente: ticketInfo.cliente
       });
       setIsTicketValidated(true);
-      toast.success('Éxito', 'Ticket encontrado y válido');
+      toast.success('Éxito', 'Ticket encontrado y válido para nueva solicitud');
     } catch (error: any) {
       console.error("Lookup error:", error);
       setIsTicketValidated(false);
@@ -580,6 +593,20 @@ export const CxGNCPage = () => {
             onManage: () => {
               setSelectedRecord(detailData);
               setIsGestionModalOpen(true);
+            },
+            canClone: detailData?.estado === 'RECHAZADO' && !detailData?.child_id && hasPermission('cxg.cxg_nc.create'),
+            onClone: () => {
+              setFormData({
+                tipo: detailData.tipo || 'CXG',
+                ticket: detailData.ticket || '',
+                cliente: detailData.cliente || '',
+                observacion: detailData.observacion || '',
+                parent_id: detailData.id
+              });
+              setIsTicketValidated(true);
+              setIsDetailOpen(false);
+              setDetailData(null);
+              setIsModalOpen(true);
             }
           }}
         />

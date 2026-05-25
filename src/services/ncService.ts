@@ -69,6 +69,8 @@ export interface CxGNC {
     codigo_producto?: string;
     producto?: string;
     supervisor?: string;
+    parent_id?: string;
+    child_id?: string;
 }
 
 export interface HistorialEntry {

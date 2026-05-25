@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, DollarSign, ShieldCheck, UserPlus, CheckCircle2, ArrowLeft, Wrench, XCircle, FileText } from 'lucide-react';
+import { Loader2, DollarSign, ShieldCheck, UserPlus, CheckCircle2, ArrowLeft, Wrench, XCircle, FileText, RefreshCw } from 'lucide-react';
 import { SIATCBadge } from '../../../components/siatc/SIATCBadge';
 import { SIATCButton } from '../../../components/siatc/SIATCButton';
 import { ncService, type CxGNC, type EquipmentHistoryEntry } from '../../../services/ncService';
@@ -17,6 +17,8 @@ interface CxGNCDetailViewProps {
     onAssign?: () => void;
     canManage?: boolean;
     onManage?: () => void;
+    canClone?: boolean;
+    onClone?: () => void;
   };
 }
 
@@ -125,10 +127,24 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, is
               Gestionar Solicitud
             </SIATCButton>
           )}
+          {actions?.canClone && (
+            <SIATCButton variant="warning" size="sm" icon={RefreshCw} onClick={actions.onClone}>
+              Volver a intentar (Clonar)
+            </SIATCButton>
+          )}
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        {detailData.parent_id && (
+          <div className="max-w-4xl mx-auto w-full">
+            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 p-3 rounded-lg text-sm flex items-center gap-2">
+              <RefreshCw className="w-4 h-4" />
+              <span>Esta solicitud fue derivada a partir de la solicitud rechazada <strong>#{detailData.parent_id}</strong>.</span>
+            </div>
+          </div>
+        )}
+        
         {/* Process Timeline Steps */}
         <div className="grid grid-cols-4 gap-2 px-2 max-w-3xl mx-auto w-full">
           {[
