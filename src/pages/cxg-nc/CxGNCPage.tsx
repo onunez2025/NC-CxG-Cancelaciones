@@ -162,7 +162,34 @@ export const CxGNCPage = () => {
   const [isAprobarOpen, setIsAprobarOpen] = useState(false);
   const [aprobarForm, setAprobarForm] = useState({ aprobado: '' as 'true' | 'false' | '', motivo: '', observacion: '' });
   const [isAprobarSubmitting, setIsAprobarSubmitting] = useState(false);
-  const [cxgMotivos, setCxgMotivos] = useState<CxGNCMotivo[]>([]);
+
+  const MOTIVOS_APROBADO = [
+    "FALLAS REITERATIVAS",
+    "FALLA REINCIDENTE",
+    "FALLA DE FABRICA",
+    "MALA INSTALACIÓN SOLE",
+    "MALA REVISIÓN SOLE",
+    "NO HAY STOCK DE REPUESTOS",
+    "FALTA DE ACCESORIOS",
+    "ACUERDO COMERCIAL",
+    "PRODUCTO MAL ETIQUETADO"
+  ];
+
+  const MOTIVOS_RECHAZADO = [
+    "CORRESPONDE REPARACION",
+    "FUERA DE GARANTÍA",
+    "REQUIERE MANTENIMIENTO",
+    "MANIPULACION DE TERCEROS",
+    "MALA INSTALACIÓN DEL CLIENTE",
+    "FALLA NO ATRIBUIBLE A CALIDAD DE PRODUCTO",
+    "DAÑOS EN TRANSPORTE DE TERCEROS",
+    "AREA NO HABILITADA",
+    "HAY REPUESTOS ALTERNATIVOS",
+    "INSATISFACCIÓN CON EL PRODUCTO",
+    "INSATISFACCIÓN CON LA ATENCIÓN",
+    "PRODUCTO NO PRESENTA FALLAS DE FABRICA",
+    "AMERITA NOTA DE CREDITO"
+  ];
 
   // Ticket Validation State
   const [isTicketValidated, setIsTicketValidated] = useState(false);
@@ -282,18 +309,9 @@ export const CxGNCPage = () => {
   }, [currentPage, searchTerm, activeTab, statusFilter, sortConfig, columnFilters]);
 
   useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        const cxgMot = await ncService.getCxGNCMotivos();
-        setCxgMotivos(cxgMot);
-      } catch (error) {
-        console.error('Error fetching motives:', error);
-      }
-    };
     if (hasPermission('cxg.cxg_nc.assign')) {
       fetchAnalysts();
     }
-    fetchInitialData();
   }, []);
 
   useEffect(() => {
@@ -1166,7 +1184,7 @@ export const CxGNCPage = () => {
               variant="primary" 
               onClick={handleAprobar} 
               isLoading={isAprobarSubmitting}
-              disabled={!aprobarForm.aprobado || (aprobarForm.aprobado === 'false' && !aprobarForm.observacion)}
+              disabled={!aprobarForm.aprobado || !aprobarForm.motivo || (aprobarForm.aprobado === 'false' && !aprobarForm.observacion)}
             >
               Confirmar Evaluación
             </SIATCButton>
@@ -1185,7 +1203,7 @@ export const CxGNCPage = () => {
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => setAprobarForm({ ...aprobarForm, aprobado: 'true' })}
+                onClick={() => setAprobarForm({ ...aprobarForm, aprobado: 'true', motivo: '' })}
                 className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all font-bold text-sm ${
                   aprobarForm.aprobado === 'true'
                     ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-lg shadow-emerald-500/10'
@@ -1197,7 +1215,7 @@ export const CxGNCPage = () => {
               </button>
               <button
                 type="button"
-                onClick={() => setAprobarForm({ ...aprobarForm, aprobado: 'false' })}
+                onClick={() => setAprobarForm({ ...aprobarForm, aprobado: 'false', motivo: '' })}
                 className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all font-bold text-sm ${
                   aprobarForm.aprobado === 'false'
                     ? 'border-rose-500 bg-rose-50 text-rose-700 shadow-lg shadow-rose-500/10'
@@ -1216,10 +1234,14 @@ export const CxGNCPage = () => {
               className={SIATC_THEME.COMPONENTS.INPUT}
               value={aprobarForm.motivo}
               onChange={(e) => setAprobarForm({ ...aprobarForm, motivo: e.target.value })}
+              disabled={!aprobarForm.aprobado}
             >
               <option value="">Seleccione un motivo...</option>
-              {cxgMotivos.map(m => (
-                <option key={m.id} value={m.motivo}>{m.motivo}</option>
+              {aprobarForm.aprobado === 'true' && MOTIVOS_APROBADO.map(m => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+              {aprobarForm.aprobado === 'false' && MOTIVOS_RECHAZADO.map(m => (
+                <option key={m} value={m}>{m}</option>
               ))}
             </select>
           </div>
