@@ -283,6 +283,7 @@ export const SpecialCasesPage = () => {
               <thead>
                 <tr className={SIATC_THEME.TABLE.HEADER_ROW}>
                   <SIATCTableHeader>TICKET</SIATCTableHeader>
+                  <SIATCTableHeader>PRODUCTO</SIATCTableHeader>
                   <SIATCTableHeader>MOTIVO</SIATCTableHeader>
                   <SIATCTableHeader>CREADO POR</SIATCTableHeader>
                   <SIATCTableHeader>FECHA REGISTRO</SIATCTableHeader>
@@ -299,7 +300,13 @@ export const SpecialCasesPage = () => {
                       <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>#{item.ticket}</span>
                     </SIATCTableCell>
                     <SIATCTableCell>
-                      <div className="text-xs font-medium text-cb-text-primary max-w-[200px] truncate">{item.motivo}</div>
+                      <div className="flex flex-col max-w-[200px]">
+                        <span className="text-xs font-bold text-cb-text-primary truncate" title={item.codigo_producto}>{item.codigo_producto || 'N/A'}</span>
+                        <span className="text-[10px] text-cb-text-secondary truncate" title={item.producto}>{item.producto || 'Sin descripción'}</span>
+                      </div>
+                    </SIATCTableCell>
+                    <SIATCTableCell>
+                      <div className="text-xs font-medium text-cb-text-primary max-w-[150px] truncate" title={item.motivo}>{item.motivo}</div>
                     </SIATCTableCell>
                     <SIATCTableCell>
                       <div className="flex items-center gap-2">
@@ -373,7 +380,7 @@ export const SpecialCasesPage = () => {
                 ))}
                 {data.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="py-12 text-center text-cb-text-secondary italic text-xs">
+                    <td colSpan={9} className="py-12 text-center text-cb-text-secondary italic text-xs">
                       No se encontraron casos especiales.
                     </td>
                   </tr>

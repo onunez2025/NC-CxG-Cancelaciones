@@ -67,6 +67,8 @@ export interface SpecialCase {
     motivo_rechazo?: string;
     fecha_visita?: string;
     service_status?: string;
+    codigo_producto?: string;
+    producto?: string;
 }
 
 export interface SpecialCaseMotivo {
