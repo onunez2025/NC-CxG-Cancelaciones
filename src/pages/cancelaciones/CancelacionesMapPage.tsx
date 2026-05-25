@@ -33,6 +33,7 @@ interface MapData {
   distrito: string;
   latitud: string;
   longitud: string;
+  tecnico?: string | null;
 }
 
 export const CancelacionesMapPage = () => {
@@ -114,6 +115,9 @@ export const CancelacionesMapPage = () => {
                           <p className="text-xs text-slate-600 dark:text-slate-300 mb-1"><b>Cliente:</b> {item.cliente}</p>
                           <p className="text-xs text-slate-600 dark:text-slate-300 mb-1"><b>Asunto:</b> {item.asunto}</p>
                           <p className="text-xs text-slate-600 dark:text-slate-300 mb-1"><b>Distrito:</b> {item.distrito || 'No especificado'}</p>
+                          {item.tecnico && (
+                            <p className="text-xs text-slate-600 dark:text-slate-300 mb-1"><b>Técnico:</b> {item.tecnico}</p>
+                          )}
                           <p className="text-xs text-red-600 dark:text-red-400 font-semibold"><b>Motivo:</b> {item.motivo}</p>
                         </div>
                       </Popup>

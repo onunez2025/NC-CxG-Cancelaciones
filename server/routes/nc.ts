@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
 import { verifyPermission } from '../middleware/auth.js';
+import { fsmApiService } from '../services/fsmApiService.js';
 
 const router = Router();
 
@@ -278,6 +279,8 @@ router.get('/cancelaciones/mapa/hoy', verifyPermission('cxg.cancelaciones.view')
                 t.NombreCliente as cliente,
                 t.Asunto as asunto,
                 ISNULL(t.ComentarioProgramador, 'Sin motivo especificado') as motivo,
+                t.CodigoTecnico as CodigoTecnico,
+                t.NombreTecnico as NombreTecnico,
                 t.Distrito as distrito,
                 t.Latitud as latitud,
                 t.Longitud as longitud
@@ -287,7 +290,34 @@ router.get('/cancelaciones/mapa/hoy', verifyPermission('cxg.cancelaciones.view')
               AND t.Latitud IS NOT NULL AND t.Latitud <> ''
               AND t.Longitud IS NOT NULL AND t.Longitud <> ''
         `);
-        res.json(result.recordset);
+        const records = result.recordset;
+
+        // 2. Identify tickets that are missing technician information
+        const ticketsWithoutTechnician = records
+            .filter(r => !r.CodigoTecnico && !r.NombreTecnico) // Using the fact that in Dashboard_FSM these might be null
+            .map(r => r.ticket);
+
+        if (ticketsWithoutTechnician.length > 0) {
+            try {
+                const techniciansMap = await fsmApiService.getTechniciansForTickets(ticketsWithoutTechnician);
+                // 3. Inject technician names back into the results
+                records.forEach(r => {
+                    if (techniciansMap[r.ticket]) {
+                        r.tecnico = techniciansMap[r.ticket];
+                    } else {
+                        r.tecnico = null;
+                    }
+                });
+            } catch (err) {
+                console.error('Failed to fetch missing technicians from FSM API:', err);
+                // Proceed without breaking the map if FSM API fails
+                records.forEach(r => {
+                    if (!r.tecnico) r.tecnico = null;
+                });
+            }
+        }
+
+        res.json(records);
     } catch (error: any) {
         console.error('Error fetching today cancellations map:', error);
         res.status(500).json({ error: error.message });
