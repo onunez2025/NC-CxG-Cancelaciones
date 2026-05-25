@@ -71,7 +71,9 @@ router.get('/', async (req: Request, res: Response) => {
                     n.Revisado_por as revisado_por,
                     n.Motivo_Rechazo as motivo_rechazo,
                     t.FechaVisita as fecha_visita,
-                    t.Estado as service_status
+                    t.Estado as service_status,
+                    t.CodigoExternoEquipo as codigo_producto,
+                    t.NombreEquipo as producto
                 FROM [dbo].[GAC_APP_TB_CASOS_ESPECIALES] n
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
                 ${whereClause}
