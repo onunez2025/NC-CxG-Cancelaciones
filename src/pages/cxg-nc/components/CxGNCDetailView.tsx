@@ -128,7 +128,7 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, is
             </SIATCButton>
           )}
           {actions?.canClone && (
-            <SIATCButton variant="warning" size="sm" icon={RefreshCw} onClick={actions.onClone}>
+            <SIATCButton variant="secondary" size="sm" icon={RefreshCw} onClick={actions.onClone}>
               Volver a intentar (Clonar)
             </SIATCButton>
           )}
