@@ -211,7 +211,7 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, is
             </div>
 
             {/* Evaluation Data (Aprobación/Rechazo) */}
-            {(detailData.aprobado === 'true' || detailData.aprobado === 'false') && (
+            {((detailData.aprobado === 'true' || detailData.aprobado === 'false') && detailData.aprobado_el) && (
               <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
                 <h3 className="text-xs font-black uppercase tracking-widest text-primary mb-4">Datos de Evaluación</h3>
                 <div className="space-y-3">
@@ -263,7 +263,7 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, is
             )}
 
             {/* Gestion Data (Procesado) */}
-            {(detailData.procesado === 'true' || detailData.procesado === 'false') && (
+            {((detailData.procesado === 'true' || detailData.procesado === 'false') && detailData.procesado_el) && (
               <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
                 <h3 className="text-xs font-black uppercase tracking-widest text-primary mb-4">Datos de Procesamiento</h3>
                 <div className="space-y-3">
