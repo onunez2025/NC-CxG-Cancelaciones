@@ -294,7 +294,7 @@ router.get('/cancelaciones/mapa/hoy', verifyPermission('cxg.cancelaciones.view')
 
         // 2. Identify tickets that are missing technician information
         const ticketsWithoutTechnician = records
-            .filter(r => !r.CodigoTecnico && !r.NombreTecnico) // Using the fact that in Dashboard_FSM these might be null
+            .filter(r => !r.CodigoTecnico || String(r.CodigoTecnico).trim() === '' || String(r.CodigoTecnico) === '0' || !r.NombreTecnico || String(r.NombreTecnico).trim() === '')
             .map(r => r.ticket);
 
         if (ticketsWithoutTechnician.length > 0) {
