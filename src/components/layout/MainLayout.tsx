@@ -115,7 +115,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                             </NavLink>
                         )}
 
-                        <AppSwitcher currentAppId="cxg" />
+                        <AppSwitcher currentAppId="mesa-atencion" />
 
                         <div className="w-px h-6 bg-border/50 mx-1" />
 
