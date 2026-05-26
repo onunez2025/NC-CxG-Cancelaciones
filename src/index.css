@@ -36,6 +36,12 @@
     --ring: 218 25% 40%;
 
     --radius: 0.5rem;
+
+    /* Custom SIATC variables for light mode */
+    --cb-bg: #F9FAFB;
+    --cb-text-primary: #1A1C1E;
+    --cb-text-secondary: #515254;
+    --cb-border: #E2E4E9;
   }
 
   .dark {
@@ -66,6 +72,12 @@
     --border: 211 68% 20%;
     --input: 211 68% 20%;
     --ring: 218 25% 55%;
+
+    /* Custom SIATC variables for dark mode */
+    --cb-bg: #0A1929;
+    --cb-text-primary: #F9FAFB;
+    --cb-text-secondary: #8A919E;
+    --cb-border: #1E293B;
   }
 }
 

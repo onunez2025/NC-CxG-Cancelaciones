@@ -60,10 +60,10 @@ export default {
                     success: '#05B169',
                     error: '#DF2935',
                     warning: '#F0AD4E',
-                    bg: '#F9FAFB',
-                    'text-primary': '#1A1C1E',
-                    'text-secondary': '#515254',
-                    border: '#E2E4E9',
+                    bg: 'var(--cb-bg)',
+                    'text-primary': 'var(--cb-text-primary)',
+                    'text-secondary': 'var(--cb-text-secondary)',
+                    border: 'var(--cb-border)',
                 }
             },
             borderRadius: {
