@@ -119,12 +119,10 @@ export function ProfilePage() {
             const savedUser = await UsersService.saveUser(updatedUser);
 
             // Merge only visual/profile fields — preserve session state
-            // (avoids re-triggering requires_password_change redirect)
             const mergedUser = {
                 ...user,
                 avatar_url: savedUser.avatar_url,
                 full_name: savedUser.full_name,
-                // If user changed their password from this page, clear the flag
                 requires_password_change: formData.password ? false : user.requires_password_change
             };
             login(mergedUser);
@@ -147,39 +145,43 @@ export function ProfilePage() {
     const initials = (user.full_name || user.username || '??')
         .split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
 
+    const t = SIATC_THEME.PROFILE_LAYOUT;
+
     return (
-        <div className={SIATC_THEME.LAYOUT.PAGE_WRAPPER}>
-            <div className="max-w-5xl mx-auto space-y-8 w-full">
+        <div className={t.PAGE_WRAPPER}>
+            <div className={t.INNER_CONTAINER}>
                 {/* Header */}
-                <div>
-                    <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Mi Perfil</h1>
-                    <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>Gestiona tu información personal y credenciales.</p>
+                <div className={SIATC_THEME.LAYOUT.HEADER_WRAPPER}>
+                    <div>
+                        <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Mi Perfil</h1>
+                        <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>Gestiona tu información personal y credenciales.</p>
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className={t.GRID}>
 
                     {/* Left Column: Profile Card */}
-                    <div className="lg:col-span-1 space-y-4">
-                        <div className="bg-white dark:bg-cb-bg border border-cb-border rounded-cb-card shadow-cb-level-1 overflow-hidden transition-all hover:shadow-cb-level-2">
+                    <div className={t.LEFT_COLUMN}>
+                        <div className={cn(SIATC_THEME.COMPONENTS.CARD_CONTAINER, "overflow-hidden hover:-translate-y-0.5 transition-all duration-300")}>
                             {/* Gradient banner */}
-                            <div className="h-24 bg-gradient-to-br from-primary/80 to-primary relative overflow-hidden">
-                                <div className="absolute inset-0 bg-white/10 opacity-30 backdrop-blur-3xl" />
+                            <div className={t.BANNER}>
+                                <div className={t.BANNER_OVERLAY} />
                             </div>
 
                             {/* Avatar */}
-                            <div className="flex flex-col items-center -mt-14 px-6 pb-6">
+                            <div className={t.AVATAR_CONTAINER}>
                                 <div className="relative group">
-                                    <div className="w-28 h-28 rounded-full border-4 border-white dark:border-cb-bg bg-cb-bg flex items-center justify-center overflow-hidden shadow-xl ring-2 ring-primary/20">
+                                    <div className={t.AVATAR_RING}>
                                         {formData.avatar_url ? (
                                             <img src={formData.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                                         ) : (
-                                            <span className="text-3xl font-bold text-cb-text-secondary select-none">{initials}</span>
+                                            <span className="text-3xl font-bold text-cb-neutral select-none">{initials}</span>
                                         )}
                                     </div>
                                     <button
                                         type="button"
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="absolute bottom-1 right-1 p-2 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 hover:scale-110 transition-all duration-200 ring-2 ring-white dark:ring-cb-bg"
+                                        className={t.CAMERA_BUTTON}
                                         title="Cambiar foto de perfil"
                                     >
                                         <Camera className="w-4 h-4" />
@@ -197,7 +199,7 @@ export function ProfilePage() {
                                 <p className="text-sm text-primary font-medium">@{user.username}</p>
 
                                 {/* Role badge */}
-                                <div className="mt-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20">
+                                <div className={t.ROLE_BADGE}>
                                     <Shield className="w-3.5 h-3.5" />
                                     {user.role_name || 'Sin rol'}
                                 </div>
@@ -205,37 +207,37 @@ export function ProfilePage() {
                         </div>
 
                         {/* Quick Info Card */}
-                        <div className="bg-white dark:bg-cb-bg border border-cb-border rounded-cb-card p-6 space-y-5 shadow-cb-level-1 transition-all hover:shadow-cb-level-2">
+                        <div className={cn(SIATC_THEME.COMPONENTS.CARD_CONTAINER, t.QUICK_INFO_CARD)}>
                             <h3 className="text-xs font-bold text-cb-neutral uppercase tracking-wider">Información</h3>
 
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-4 group">
-                                    <div className="w-10 h-10 rounded-cb-btn bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-all">
-                                        <Mail className="w-5 h-5 text-primary" />
+                            <div className={t.INFO_LIST}>
+                                <div className={t.INFO_ITEM}>
+                                    <div className={cn(t.INFO_ITEM_ICON_BASE, t.INFO_ITEM_ICON_PRIMARY)}>
+                                        <Mail className="w-5 h-5" />
                                     </div>
-                                    <div className="overflow-hidden">
-                                        <p className="text-[10px] text-cb-text-secondary uppercase tracking-wider font-bold">Email</p>
-                                        <p className="text-sm font-bold truncate text-cb-text-primary">{user.email}</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-4 group">
-                                    <div className="w-10 h-10 rounded-cb-btn bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-all">
-                                        <Building2 className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                                    </div>
-                                    <div className="overflow-hidden">
-                                        <p className="text-[10px] text-cb-text-secondary uppercase tracking-wider font-bold">Gerencia</p>
-                                        <p className="text-sm font-bold truncate text-cb-text-primary">{(user as any).management_name || user.management_id}</p>
+                                    <div className={t.INFO_ITEM_DETAILS}>
+                                        <p className={t.INFO_ITEM_LABEL}>Email</p>
+                                        <p className={t.INFO_ITEM_VALUE}>{user.email}</p>
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-4 group">
-                                    <div className="w-10 h-10 rounded-cb-btn bg-green-50 dark:bg-green-900/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-all">
-                                        <BadgeCheck className="w-5 h-5 text-green-600 dark:text-green-400" />
+                                <div className={t.INFO_ITEM}>
+                                    <div className={cn(t.INFO_ITEM_ICON_BASE, t.INFO_ITEM_ICON_PURPLE)}>
+                                        <Building2 className="w-5 h-5" />
                                     </div>
-                                    <div>
-                                        <p className="text-[10px] text-cb-text-secondary uppercase tracking-wider font-bold">Estado</p>
-                                        <p className="text-sm font-bold text-green-600 dark:text-green-400">Activo</p>
+                                    <div className={t.INFO_ITEM_DETAILS}>
+                                        <p className={t.INFO_ITEM_LABEL}>Gerencia</p>
+                                        <p className={t.INFO_ITEM_VALUE}>{(user as any).management_name || user.management_id || 'Sin gerencia'}</p>
+                                    </div>
+                                </div>
+
+                                <div className={t.INFO_ITEM}>
+                                    <div className={cn(t.INFO_ITEM_ICON_BASE, t.INFO_ITEM_ICON_EMERALD)}>
+                                        <BadgeCheck className="w-5 h-5" />
+                                    </div>
+                                    <div className={t.INFO_ITEM_DETAILS}>
+                                        <p className={t.INFO_ITEM_LABEL}>Estado</p>
+                                        <p className={t.INFO_ITEM_VALUE_SUCCESS}>Activo</p>
                                     </div>
                                 </div>
                             </div>
@@ -243,58 +245,58 @@ export function ProfilePage() {
                     </div>
 
                     {/* Right Column: Edit Form */}
-                    <div className="lg:col-span-2 space-y-6">
+                    <div className={t.RIGHT_COLUMN}>
 
                         {/* Account Settings Card */}
-                        <div className="bg-white dark:bg-cb-bg border border-cb-border rounded-cb-card shadow-cb-level-1 transition-all hover:shadow-cb-level-2">
-                            <div className="px-6 py-5 border-b border-cb-border bg-cb-bg/30">
-                                <h3 className="text-sm font-bold flex items-center gap-2 text-cb-text-primary">
+                        <div className={SIATC_THEME.COMPONENTS.CARD_CONTAINER}>
+                            <div className={t.FORM_SECTION_HEADER}>
+                                <h3 className={t.FORM_SECTION_TITLE}>
                                     <User className="w-4 h-4 text-primary" />
                                     Cuenta
                                 </h3>
-                                <p className="text-xs text-cb-text-secondary mt-1">Tu nombre de usuario y correo electrónico.</p>
+                                <p className={t.FORM_SECTION_SUBTITLE}>Tu nombre de usuario y correo electrónico.</p>
                             </div>
 
                             <div className="p-6 space-y-5">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <div className={t.FORM_GRID}>
                                     <div>
-                                        <label className="text-[11px] font-bold text-cb-text-secondary uppercase tracking-wider mb-2 block">
+                                        <label className={t.FIELD_LABEL}>
                                             Usuario
                                         </label>
-                                        <div className="relative">
-                                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-cb-text-secondary">
+                                        <div className={t.FIELD_WRAPPER}>
+                                            <div className={t.FIELD_ICON}>
                                                 <User className="w-4 h-4" />
                                             </div>
                                             <input
                                                 type="text"
                                                 value={formData.username}
                                                 disabled
-                                                className="block w-full pl-10 pr-3 py-2.5 bg-cb-bg border border-cb-border rounded-cb-btn text-cb-text-secondary text-sm font-medium cursor-not-allowed"
+                                                className={t.INPUT_DISABLED}
                                             />
                                         </div>
                                     </div>
 
                                     <div>
-                                        <label className="text-[11px] font-bold text-cb-text-secondary uppercase tracking-wider mb-2 block">
+                                        <label className={t.FIELD_LABEL}>
                                             Email
                                         </label>
-                                        <div className="relative">
-                                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-cb-text-secondary">
+                                        <div className={t.FIELD_WRAPPER}>
+                                            <div className={t.FIELD_ICON}>
                                                 <Mail className="w-4 h-4" />
                                             </div>
                                             <input
                                                 type="email"
                                                 value={formData.email}
                                                 disabled
-                                                className="block w-full pl-10 pr-3 py-2.5 bg-cb-bg border border-cb-border rounded-cb-btn text-cb-text-secondary text-sm font-medium cursor-not-allowed"
+                                                className={t.INPUT_DISABLED}
                                             />
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="p-3 bg-cb-bg rounded-cb-btn border border-cb-border">
-                                    <p className="text-[11px] text-primary font-medium flex items-center gap-2">
-                                        <AlertCircle className="w-3.5 h-3.5 inline animate-pulse" />
+                                <div className={t.READONLY_ALERT}>
+                                    <p className={t.READONLY_ALERT_TEXT}>
+                                        <AlertCircle className="w-3.5 h-3.5 inline" />
                                         Estos campos son de solo lectura. Si necesitas un cambio, contacta al administrador del sistema.
                                     </p>
                                 </div>
@@ -302,24 +304,24 @@ export function ProfilePage() {
                         </div>
 
                         {/* Security Card */}
-                        <form onSubmit={handleSubmit}>
-                            <div className="bg-white dark:bg-cb-bg border border-cb-border rounded-cb-card shadow-cb-level-1 transition-all hover:shadow-cb-level-2">
-                                <div className="px-6 py-5 border-b border-cb-border bg-cb-bg/30">
-                                    <h3 className="text-sm font-bold flex items-center gap-2 text-cb-text-primary">
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div className={SIATC_THEME.COMPONENTS.CARD_CONTAINER}>
+                                <div className={t.FORM_SECTION_HEADER}>
+                                    <h3 className={t.FORM_SECTION_TITLE}>
                                         <Lock className="w-4 h-4 text-primary" />
                                         Seguridad
                                     </h3>
-                                    <p className="text-xs text-cb-text-secondary mt-1">Cambia tu contraseña de acceso.</p>
+                                    <p className={t.FORM_SECTION_SUBTITLE}>Cambia tu contraseña de acceso.</p>
                                 </div>
 
                                 <div className="p-6 space-y-5">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                    <div className={t.FORM_GRID}>
                                         <div>
-                                            <label className="text-[11px] font-bold text-cb-text-secondary uppercase tracking-wider mb-2 block">
+                                            <label className={t.FIELD_LABEL}>
                                                 Nueva Contraseña
                                             </label>
-                                            <div className="relative">
-                                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-cb-text-secondary">
+                                            <div className={t.FIELD_WRAPPER}>
+                                                <div className={t.FIELD_ICON}>
                                                     <Lock className="w-4 h-4" />
                                                 </div>
                                                 <input
@@ -328,18 +330,18 @@ export function ProfilePage() {
                                                     value={formData.password}
                                                     onChange={handleChange}
                                                     placeholder="••••••••"
-                                                    className="block w-full pl-10 pr-3 py-2.5 bg-white border border-cb-border rounded-cb-btn focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium"
+                                                    className={t.INPUT_ACTIVE}
                                                     minLength={4}
                                                 />
                                             </div>
                                         </div>
 
                                         <div>
-                                            <label className="text-[11px] font-bold text-cb-text-secondary uppercase tracking-wider mb-2 block">
+                                            <label className={t.FIELD_LABEL}>
                                                 Confirmar Contraseña
                                             </label>
-                                            <div className="relative">
-                                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-cb-text-secondary">
+                                            <div className={t.FIELD_WRAPPER}>
+                                                <div className={t.FIELD_ICON}>
                                                     <Shield className="w-4 h-4" />
                                                 </div>
                                                 <input
@@ -349,8 +351,8 @@ export function ProfilePage() {
                                                     onChange={handleChange}
                                                     placeholder="••••••••"
                                                     className={cn(
-                                                        "block w-full pl-10 pr-3 py-2.5 bg-white border border-cb-border rounded-cb-btn focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium",
-                                                        formData.confirmPassword && formData.password !== formData.confirmPassword && "border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50 dark:bg-red-900/10"
+                                                        t.INPUT_ACTIVE,
+                                                        formData.confirmPassword && formData.password !== formData.confirmPassword && t.INPUT_ERROR
                                                     )}
                                                     minLength={4}
                                                 />
@@ -358,7 +360,7 @@ export function ProfilePage() {
                                         </div>
                                     </div>
 
-                                    <p className="text-[11px] text-cb-text-secondary font-medium">
+                                    <p className={t.FORM_NOTE}>
                                         Deja los campos vacíos para mantener tu contraseña actual. Mínimo 4 caracteres.
                                     </p>
                                 </div>
@@ -367,10 +369,8 @@ export function ProfilePage() {
                             {/* Status Message */}
                             {status !== 'idle' && (
                                 <div className={cn(
-                                    "mt-5 p-4 rounded-cb-btn flex items-center gap-3 text-sm font-bold shadow-cb-level-1 animate-in fade-in zoom-in-95 duration-300",
-                                    status === 'success'
-                                        ? "bg-[#E6F6EF] text-[#05B169] border border-[#E6F6EF]"
-                                        : "bg-[#FDECEE] text-[#DF2935] border border-[#FDECEE]"
+                                    t.STATUS_ALERT_BASE,
+                                    status === 'success' ? t.STATUS_ALERT_SUCCESS : t.STATUS_ALERT_ERROR
                                 )}>
                                     {status === 'success' ? <CheckCircle className="w-5 h-5 flex-shrink-0" /> : <AlertCircle className="w-5 h-5 flex-shrink-0" />}
                                     {message}
@@ -378,12 +378,13 @@ export function ProfilePage() {
                             )}
 
                             {/* Save Button */}
-                            <div className="flex justify-end mt-6">
+                            <div className="flex justify-end">
                                 <button
                                     type="submit"
                                     disabled={isSaving}
                                     className={cn(
                                         SIATC_THEME.COMPONENTS.BUTTON_PRIMARY,
+                                        "px-8",
                                         isSaving && "opacity-60 cursor-not-allowed"
                                     )}
                                 >
@@ -396,10 +397,11 @@ export function ProfilePage() {
                                 </button>
                             </div>
                         </form>
-
                     </div>
                 </div>
             </div>
         </div>
     );
 }
+
+export default ProfilePage;
