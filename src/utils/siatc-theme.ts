@@ -81,7 +81,7 @@ export const SIATC_THEME = {
     // 4. TABLAS (Arquitectura de Filas 64px)
     TABLE: {
         TABLE_ELEMENT: "w-full text-sm text-left border-collapse min-w-[1000px]",
-        HEADER_ROW: "sticky top-0 z-20 bg-card/95 backdrop-blur-sm border-b border-cb-border shadow-sm",
+        HEADER_ROW: "sticky top-0 z-20 bg-card border-b border-cb-border shadow-sm",
         HEADER_TH: "px-6 py-2.5 font-sans font-semibold text-[11px] uppercase tracking-[0.06em] text-cb-slate text-left",
         BODY_ROW: "h-[64px] group hover:bg-cb-bg transition-colors border-b border-cb-border/60",
         CELL: "px-6 py-4 align-middle font-sans text-cb-text-primary",

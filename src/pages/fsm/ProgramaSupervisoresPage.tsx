@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { 
-    Download, Search, X, 
+    Download, Search, X, Plus, Edit, Trash2,
     User, SlidersHorizontal, ChevronUp, ChevronDown, 
     Calendar as CalendarIcon, Table as TableIcon, Eye
 } from 'lucide-react';
@@ -11,6 +11,8 @@ import { ResizableHeader } from '../../components/common/ResizableHeader';
 import { apiClient, API_BASE_URL } from '../../services/apiClient';
 import { cn } from '../../utils/cn';
 import { Combobox } from '../../components/common/Combobox';
+import { ConfirmDialog } from '../../components/common/ConfirmDialog';
+import { Modal } from '../../components/common/Modal';
 import { 
     format, eachDayOfInterval, 
     addWeeks, subWeeks, 
@@ -31,22 +33,59 @@ interface Empleado {
     subarea: string;
 }
 
+const LABORES_OPCIONES = [
+    'Atención Emergencias',
+    'Atención en Puerta',
+    'Atención VIP',
+    'Charla de 5min',
+    'Atención Presencial',
+    'Atención Festivo',
+    'Aprobaciones C4C',
+    'Atención 6 a 9 pm',
+    'Encargado de Flota'
+];
+
 export default function ProgramaSupervisoresPage() {
     const { user } = useAuth();
     const isAdmin = (user?.role_name || '').trim().toLowerCase() === 'administrador';
 
-    // RBAC Permissions (Read-only view permission check)
-    // Supports 'cxg.programa_supervisores.view'
+    // RBAC Permissions
     const canView = user?.permissions?.includes('cxg.programa_supervisores.view') || isAdmin;
+    const canCreate = user?.permissions?.includes('cxg.programa_supervisores.create') || isAdmin;
+    const canEdit = user?.permissions?.includes('cxg.programa_supervisores.edit') || isAdmin;
+    const canDelete = user?.permissions?.includes('cxg.programa_supervisores.delete') || isAdmin;
 
     // View Mode
-    const [viewMode, setViewMode] = useState<'table' | 'calendar'>('table');
-    const [calendarView, setCalendarView] = useState<'day' | 'week' | 'workWeek'>('week');
+    const [viewMode, setViewMode] = useState<'table' | 'calendar'>('calendar');
+    const [calendarView, setCalendarView] = useState<'day' | 'week' | 'workWeek'>('day');
 
     // Data States
     const [programa, setPrograma] = useState<ProgramaSupervisor[]>([]);
     const [laborColors, setLaborColors] = useState<LaborColor[]>([]);
     const [empleados, setEmpleados] = useState<Empleado[]>([]);
+    const [totalItems, setTotalItems] = useState(0);
+
+    // Form / Modal States
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [formData, setFormData] = useState({
+        empleado_id: '',
+        fecha_labor: new Date().toISOString().split('T')[0],
+        labor: ''
+    });
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const [actionLoading, setActionLoading] = useState(false);
+
+    // Confirm Dialog State
+    const [confirmConfig, setConfirmConfig] = useState<{
+        isOpen: boolean;
+        title: string;
+        message: string;
+        onConfirm: () => void;
+        variant?: 'danger' | 'info' | 'warning';
+    }>({
+        isOpen: false, title: '', message: '', onConfirm: () => {},
+    });
     
     // Resizing logic
     const { widths, onResizeStart } = useTableResizer('prog_sup_column_widths', {
@@ -170,6 +209,7 @@ export default function ProgramaSupervisoresPage() {
             
             setPrograma(data);
             setTotalPages(metadata.totalPages);
+            setTotalItems(metadata.total || 0);
             setPage(metadata.page);
         } catch (error) {
             console.error('Error fetching programa', error);
@@ -255,6 +295,74 @@ export default function ProgramaSupervisoresPage() {
             color: preset.text,
             borderColor: `${preset.text}33`
         };
+    };
+
+    const handleOpenModal = (item?: ProgramaSupervisor) => {
+        setErrorMsg(null);
+        if (item) {
+            setEditingId(item.id);
+            setFormData({
+                empleado_id: item.empleado_id,
+                fecha_labor: item.fecha_labor ? (item.fecha_labor.includes('T') ? item.fecha_labor.split('T')[0] : item.fecha_labor) : '',
+                labor: item.labor
+            });
+        } else {
+            setEditingId(null);
+            setFormData({
+                empleado_id: '',
+                fecha_labor: new Date().toISOString().split('T')[0],
+                labor: ''
+            });
+        }
+        setIsModalOpen(true);
+    };
+
+    const handleEditFromDetails = () => {
+        if (selectedDetails) {
+            const item = selectedDetails;
+            setIsDetailsOpen(false);
+            handleOpenModal(item);
+        }
+    };
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setErrorMsg(null);
+        if (!formData.empleado_id || !formData.fecha_labor || !formData.labor) {
+            setErrorMsg("Todos los campos son obligatorios.");
+            return;
+        }
+
+        setActionLoading(true);
+        try {
+            await ProgramaSupervisoresService.savePrograma({
+                id: editingId || undefined,
+                ...formData
+            });
+            await fetchData();
+            setIsModalOpen(false);
+        } catch (err: any) {
+            setErrorMsg(err.message);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        setConfirmConfig({
+            isOpen: true,
+            title: 'Confirmar eliminación',
+            message: '¿Estás seguro de que deseas eliminar este registro? Esta acción no se puede deshacer.',
+            variant: 'danger',
+            onConfirm: async () => {
+                try {
+                    await ProgramaSupervisoresService.deletePrograma(id);
+                    fetchData();
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        });
     };
 
     const handleOpenDetails = (item: ProgramaSupervisor) => {
@@ -381,6 +489,14 @@ export default function ProgramaSupervisoresPage() {
                     >
                         <Download className="w-4 h-4" /> Exportar
                     </button>
+                    {canCreate && (
+                        <button
+                            onClick={() => handleOpenModal()}
+                            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md shadow-sm text-sm font-bold hover:opacity-95 transition-all"
+                        >
+                            <Plus className="w-4 h-4" /> Nuevo Registro
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -528,9 +644,21 @@ export default function ProgramaSupervisoresPage() {
                                                     </span>
                                                 </td>
                                                 <td className={cn(SIATC_THEME.TABLE.CELL, "text-center")}>
-                                                    <button onClick={() => handleOpenDetails(row)} className="p-1.5 text-primary hover:bg-primary/10 rounded transition-colors inline-flex items-center gap-1.5 text-xs font-bold" title="Ver Detalles">
-                                                        <Eye className="w-4 h-4" /> <span>Detalle</span>
-                                                    </button>
+                                                    <div className="flex items-center justify-center gap-1">
+                                                        <button onClick={() => handleOpenDetails(row)} className="p-1.5 text-primary hover:bg-primary/10 rounded transition-colors inline-flex items-center gap-1" title="Ver Detalles">
+                                                            <Eye className="w-4 h-4" />
+                                                        </button>
+                                                        {canEdit && (
+                                                            <button onClick={() => handleOpenModal(row)} className="p-1.5 text-blue-600 hover:bg-blue-500/10 rounded transition-colors inline-flex items-center gap-1" title="Editar">
+                                                                <Edit className="w-4 h-4" />
+                                                            </button>
+                                                        )}
+                                                        {canDelete && (
+                                                            <button onClick={() => handleDelete(row.id)} className="p-1.5 text-red-600 hover:bg-red-500/10 rounded transition-colors inline-flex items-center gap-1" title="Eliminar">
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))
@@ -538,13 +666,17 @@ export default function ProgramaSupervisoresPage() {
                                 </tbody>
                             </table>
                         </div>
-                        {!loading && totalPages > 1 && (
+                        {!loading && (
                             <div className="px-4 py-3 border-t border-border flex items-center justify-between bg-muted/20">
-                                <div className="text-[12px] text-muted-foreground font-medium">Página <span className="font-bold text-foreground">{page}</span> de <span className="font-bold text-foreground">{totalPages}</span></div>
-                                <div className="flex gap-2">
-                                    <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-4 py-1.5 bg-background border border-border rounded-md text-[12px] font-bold disabled:opacity-30 hover:bg-muted transition-all shadow-sm">Anterior</button>
-                                    <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-4 py-1.5 bg-background border border-border rounded-md text-[12px] font-bold disabled:opacity-30 hover:bg-muted transition-all shadow-sm">Siguiente</button>
+                                <div className="text-[12px] text-muted-foreground font-medium">
+                                    Total registros: <span className="font-bold text-foreground">{totalItems}</span> | Página <span className="font-bold text-foreground">{page}</span> de <span className="font-bold text-foreground">{totalPages}</span>
                                 </div>
+                                {totalPages > 1 && (
+                                    <div className="flex gap-2">
+                                        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-4 py-1.5 bg-background border border-border rounded-md text-[12px] font-bold disabled:opacity-30 hover:bg-muted transition-all shadow-sm">Anterior</button>
+                                        <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-4 py-1.5 bg-background border border-border rounded-md text-[12px] font-bold disabled:opacity-30 hover:bg-muted transition-all shadow-sm">Siguiente</button>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
@@ -690,11 +822,89 @@ export default function ProgramaSupervisoresPage() {
                             </div>
                             <div className="flex justify-end gap-3 pt-4 border-t border-border">
                                 <button onClick={() => setIsDetailsOpen(false)} className="px-5 py-2 text-sm font-bold bg-muted hover:bg-muted/80 text-foreground rounded-md transition-all">Cerrar</button>
+                                {canEdit && (
+                                    <button onClick={handleEditFromDetails} className="flex items-center gap-2 px-5 py-2 text-sm font-bold bg-primary text-primary-foreground rounded-md shadow-sm hover:opacity-95 transition-all">
+                                        <Edit className="w-4 h-4" /><span>Editar</span>
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
             )}
+
+            {/* Form Modal */}
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title={editingId ? 'Editar Programación' : 'Nueva Programación'}
+                size="md"
+            >
+                <form onSubmit={handleSave} className="space-y-4">
+                    {errorMsg && (
+                        <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-md">
+                            {errorMsg}
+                        </div>
+                    )}
+                    <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Empleado</label>
+                        <Combobox 
+                            options={empleados.map(e => ({ id: e.id, name: e.name }))} 
+                            value={formData.empleado_id} 
+                            onChange={val => setFormData({...formData, empleado_id: val})} 
+                            placeholder="Seleccionar empleado..." 
+                            className="w-full" 
+                        />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Fecha Labor</label>
+                            <input 
+                                type="date" 
+                                value={formData.fecha_labor} 
+                                onChange={e => setFormData({...formData, fecha_labor: e.target.value})} 
+                                className="w-full h-[38px] px-3 bg-background border border-input rounded-md text-sm outline-none focus:ring-1 focus:ring-primary shadow-sm" 
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Labor</label>
+                            <Combobox 
+                                options={LABORES_OPCIONES.map(l => ({ id: l, name: l }))} 
+                                value={formData.labor} 
+                                onChange={val => setFormData({...formData, labor: val})} 
+                                placeholder="Seleccionar labor..." 
+                                className="w-full" 
+                            />
+                        </div>
+                    </div>
+                    <div className="pt-4 border-t border-border flex justify-end gap-3">
+                        <button 
+                            type="button" 
+                            onClick={() => setIsModalOpen(false)} 
+                            className="px-4 py-2 text-sm font-medium bg-muted hover:bg-muted/80 text-foreground rounded-md transition-all border border-border"
+                        >
+                            Cancelar
+                        </button>
+                        <button 
+                            type="submit" 
+                            disabled={actionLoading} 
+                            className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md shadow-sm hover:opacity-95 transition-all flex items-center gap-2"
+                        >
+                            {actionLoading && <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>}
+                            {editingId ? 'Actualizar' : 'Crear Registro'}
+                        </button>
+                    </div>
+                </form>
+            </Modal>
+
+            <ConfirmDialog 
+                isOpen={confirmConfig.isOpen} 
+                onClose={() => setConfirmConfig({ ...confirmConfig, isOpen: false })}
+                onConfirm={confirmConfig.onConfirm}
+                title={confirmConfig.title} 
+                message={confirmConfig.message} 
+                variant={confirmConfig.variant} 
+            />
         </div>
     );
 }
