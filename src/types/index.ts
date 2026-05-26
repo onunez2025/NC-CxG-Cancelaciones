@@ -33,7 +33,7 @@ export type Permission =
     | 'cxg.cancelaciones.view' | 'cxg.cancelaciones.create' | 'cxg.cancelaciones.assign' | 'cxg.cancelaciones.gestionar' | 'cxg.cancelaciones.process'
     | 'cxg.cxg_nc.view' | 'cxg.cxg_nc.create' | 'cxg.cxg_nc.approve' | 'cxg.cxg_nc.assign' | 'cxg.cxg_nc.gestionar' | 'cxg.cxg_nc.process'
     | 'cxg.fsm.view'
-    | 'cxg.programa_supervisores.view'
+    | 'cxg.programa_supervisores.view' | 'cxg.programa_supervisores.create' | 'cxg.programa_supervisores.edit' | 'cxg.programa_supervisores.delete'
     | 'cxg.casos_especiales.view' | 'cxg.casos_especiales.create' | 'cxg.casos_especiales.gestionar'
     | 'cxg.emergencias.view' | 'cxg.emergencias.create' | 'cxg.emergencias.verify' | 'cxg.emergencias.process'
     | 'cxg.reportes.exportar'

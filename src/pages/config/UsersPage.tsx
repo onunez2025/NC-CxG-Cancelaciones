@@ -221,7 +221,7 @@ export default function UsersPage() {
                             value={search}
                             onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
                             placeholder="Buscar por nombre, usuario o email..."
-                            className="w-full pl-10 pr-4 py-2.5 bg-white border border-cb-border rounded-cb-btn focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium placeholder:text-cb-neutral/40"
+                            className="w-full pl-10 pr-4 py-2.5 bg-card text-cb-text-primary border border-cb-border rounded-cb-btn focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium placeholder:text-cb-neutral/40"
                         />
                     </div>
                 </div>

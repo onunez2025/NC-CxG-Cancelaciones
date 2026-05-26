@@ -57,6 +57,9 @@ export class RolesService {
             
             { group: 'Horarios Visitas', id: 'cxg.fsm.view', label: 'Ver Horarios Visitas' },
             { group: 'Prog. Supervisores', id: 'cxg.programa_supervisores.view', label: 'Ver Programación Supervisores' },
+            { group: 'Prog. Supervisores', id: 'cxg.programa_supervisores.create', label: 'Crear Programación Supervisores' },
+            { group: 'Prog. Supervisores', id: 'cxg.programa_supervisores.edit', label: 'Editar Programación Supervisores' },
+            { group: 'Prog. Supervisores', id: 'cxg.programa_supervisores.delete', label: 'Eliminar Programación Supervisores' },
             
             { group: 'Contact Center', id: 'cxg.casos_especiales.view', label: 'Ver Casos Especiales' },
             { group: 'Contact Center', id: 'cxg.casos_especiales.create', label: 'Registrar Casos Especiales' },

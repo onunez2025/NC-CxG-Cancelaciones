@@ -30,4 +30,28 @@ export class ProgramaSupervisoresService {
         if (!response.ok) throw new Error('Error al cargar programa de supervisores');
         return response.json();
     }
+
+  static async savePrograma(data: Partial<ProgramaSupervisor>): Promise<{ id: string }> {
+    const url = data.id ? `${API_URL}/${data.id}` : API_URL;
+    const method = data.id ? 'PUT' : 'POST';
+
+    const response = await apiClient(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Error al guardar programa');
+    }
+    return response.json();
+  }
+
+  static async deletePrograma(id: string): Promise<void> {
+    const response = await apiClient(`${API_URL}/${id}`, {
+      method: 'DELETE'
+    });
+    if (!response.ok) throw new Error('Error al eliminar programa');
+  }
 }

@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
+import { verifyPermission } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -124,6 +125,79 @@ router.get('/empleados', async (req: Request, res: Response) => {
         res.json(data);
     } catch (error: any) {
         console.error('Error fetching employees for dropdown:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// POST a new supervisor schedule
+router.post('/', verifyPermission('cxg.programa_supervisores.create'), async (req: Request, res: Response) => {
+    try {
+        const { empleado_id, fecha_labor, labor } = req.body;
+        const pool = await getDbConnection();
+        const id = Math.random().toString(16).substring(2, 10);
+        const creadoPor = (req as any).user?.full_name || (req as any).user?.username || 'Sistema';
+
+        await pool.request()
+            .input('id', sql.VarChar, id)
+            .input('empleado', sql.VarChar, empleado_id)
+            .input('fecha', sql.Date, fecha_labor)
+            .input('labor', sql.VarChar, labor)
+            .input('creadoPor', sql.VarChar, creadoPor)
+            .query(`
+                INSERT INTO [dbo].[GAC_APP_TB_EMPLEADOS_CALENDARIO_LABORES] 
+                ([ID_empleado_calendario_labores], Empleado, Fecha_Labor, Labor, Creado_por, Creado_el)
+                VALUES (@id, @empleado, @fecha, @labor, @creadoPor, GETDATE())
+            `);
+        
+        res.status(201).json({ id });
+    } catch (error: any) {
+        console.error('Error creating supervisor schedule:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// PUT (update) an existing supervisor schedule
+router.put('/:id', verifyPermission('cxg.programa_supervisores.edit'), async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { empleado_id, fecha_labor, labor } = req.body;
+        const pool = await getDbConnection();
+        const modificadoPor = (req as any).user?.full_name || (req as any).user?.username || 'Sistema';
+
+        const result = await pool.request()
+            .input('id', sql.VarChar, id)
+            .input('empleado', sql.VarChar, empleado_id)
+            .input('fecha', sql.Date, fecha_labor)
+            .input('labor', sql.VarChar, labor)
+            .input('modificadoPor', sql.VarChar, modificadoPor)
+            .query(`
+                UPDATE [dbo].[GAC_APP_TB_EMPLEADOS_CALENDARIO_LABORES]
+                SET Empleado = @empleado, Fecha_Labor = @fecha, Labor = @labor,
+                    Modificado_por = @modificadoPor, Modificado_el = GETDATE()
+                WHERE [ID_empleado_calendario_labores] = @id
+            `);
+        
+        if (result.rowsAffected[0] === 0) return res.status(404).json({ error: 'Registro no encontrado' });
+        res.json({ success: true });
+    } catch (error: any) {
+        console.error('Error updating supervisor schedule:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// DELETE a supervisor schedule
+router.delete('/:id', verifyPermission('cxg.programa_supervisores.delete'), async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const pool = await getDbConnection();
+        const result = await pool.request()
+            .input('id', sql.VarChar, id)
+            .query('DELETE FROM [dbo].[GAC_APP_TB_EMPLEADOS_CALENDARIO_LABORES] WHERE [ID_empleado_calendario_labores] = @id');
+        
+        if (result.rowsAffected[0] === 0) return res.status(404).json({ error: 'Registro no encontrado' });
+        res.status(204).send();
+    } catch (error: any) {
+        console.error('Error deleting supervisor schedule:', error);
         res.status(500).json({ error: error.message });
     }
 });
