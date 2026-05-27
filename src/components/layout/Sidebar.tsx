@@ -59,7 +59,7 @@ export function Sidebar({ className }: { className?: string }) {
                     <img src="/Logo.png" alt="Logo" className="h-full w-full object-contain" />
                 </div>
                 <div className="flex flex-col min-w-0">
-                    <h1 className="font-bold text-[13px] leading-none tracking-tight text-foreground uppercase whitespace-nowrap">Mesa de Atención</h1>
+                    <h1 className="font-bold text-lg leading-none tracking-tight text-foreground uppercase truncate">M. Atención</h1>
                     <p className="text-[9px] font-black text-primary tracking-[0.05em] uppercase mt-1 opacity-70 whitespace-nowrap">Gestión y Seguimiento</p>
                 </div>
             </div>
