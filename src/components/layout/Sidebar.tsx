@@ -13,7 +13,6 @@ import {
     Calendar
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
-import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
 import type { Permission } from '../../types';
 
@@ -22,7 +21,6 @@ import { SIATC_THEME } from '../../utils/siatc-theme';
 
 export function Sidebar({ className }: { className?: string }) {
     const { t, i18n } = useTranslation();
-    const { theme } = useTheme();
     const { logout, hasPermission } = useAuth();
 
     const toggleLanguage = () => {
@@ -52,8 +50,7 @@ export function Sidebar({ className }: { className?: string }) {
 
     return (
         <div className={cn(
-            "flex flex-col h-full border-r border-border/50 transition-all duration-500",
-            theme === 'dark' ? "bg-card text-card-foreground" : "bg-white text-slate-800",
+            SIATC_THEME.LAYOUT.SIDEBAR_INNER,
             className
         )}>
             {/* Header / Logo: SIATC High Density */}
