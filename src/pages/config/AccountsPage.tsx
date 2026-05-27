@@ -141,7 +141,7 @@ export default function AccountsPage() {
     };
 
     return (
-        <div className={SIATC_THEME.LAYOUT.PAGE_WRAPPER}>
+        <div className="flex flex-col h-full space-y-4 min-h-0 animate-in fade-in duration-500">
             {/* Header: SIATC Standard */}
             <div className={SIATC_THEME.LAYOUT.HEADER_WRAPPER}>
                 <div className="space-y-1">
