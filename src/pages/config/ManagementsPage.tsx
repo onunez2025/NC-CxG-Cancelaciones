@@ -35,6 +35,10 @@ export default function ManagementsPage() {
     const [editingMgmt, setEditingMgmt] = useState<Management | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const recordsPerPage = 10;
+
     const [formData, setFormData] = useState<Partial<Management>>({
         name: '',
         code: ''
@@ -60,6 +64,10 @@ export default function ManagementsPage() {
         m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         m.code.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    // Pagination Logic
+    const totalPages = Math.ceil(filteredManagements.length / recordsPerPage);
+    const paginatedManagements = filteredManagements.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage);
 
     const handleCreate = () => {
         setEditingMgmt(null);
@@ -146,7 +154,7 @@ export default function ManagementsPage() {
                         <input
                             type="text"
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                             placeholder="Buscar por código o nombre..."
                             className="w-full pl-10 pr-4 py-2.5 bg-card text-cb-text-primary border border-cb-border rounded-cb-btn focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium placeholder:text-cb-neutral/40"
                         />
@@ -170,7 +178,7 @@ export default function ManagementsPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredManagements.length === 0 ? (
+                                {paginatedManagements.length === 0 ? (
                                     <tr>
                                         <td colSpan={3} className="px-6 py-20 text-center opacity-60">
                                             <div className="flex flex-col items-center gap-3">
@@ -180,7 +188,7 @@ export default function ManagementsPage() {
                                         </td>
                                     </tr>
                                 ) : (
-                                    filteredManagements.map((mgmt) => (
+                                    paginatedManagements.map((mgmt) => (
                                         <SIATCTableRow key={mgmt.id} className={SIATC_THEME.TABLE.BODY_ROW}>
                                             <SIATCTableCell>
                                                 <div className="flex items-center gap-2 font-mono text-primary font-bold text-[11px] uppercase bg-primary/5 px-3 py-1.5 rounded-cb-btn border border-primary/20 w-fit shadow-sm group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
@@ -225,7 +233,10 @@ export default function ManagementsPage() {
                 {/* Footer Stats */}
                 <SIATCTableFooter 
                     totalRecords={filteredManagements.length}
-                    showPaging={false}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                    label="Total gerencias"
                 />
             </div>
 

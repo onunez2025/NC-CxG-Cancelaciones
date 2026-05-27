@@ -39,6 +39,10 @@ export default function AccountsPage() {
     const [editingAccount, setEditingAccount] = useState<AccountingAccount | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const recordsPerPage = 10;
+
     // Form state
     const [formData, setFormData] = useState<Partial<AccountingAccount>>({
         code: '',
@@ -73,6 +77,10 @@ export default function AccountsPage() {
         acc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         acc.code.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    // Pagination Logic
+    const totalPages = Math.ceil(filteredAccounts.length / recordsPerPage);
+    const paginatedAccounts = filteredAccounts.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage);
 
     const handleCreate = () => {
         setEditingAccount(null);
@@ -171,7 +179,7 @@ export default function AccountsPage() {
                         <input
                             type="text"
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                             placeholder="Buscar por código contable o nombre..."
                             className="w-full pl-10 pr-4 py-2.5 bg-card text-cb-text-primary border border-cb-border rounded-cb-btn focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium placeholder:text-cb-neutral/40"
                         />
@@ -197,7 +205,7 @@ export default function AccountsPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredAccounts.length === 0 ? (
+                                {paginatedAccounts.length === 0 ? (
                                     <tr>
                                         <td colSpan={5} className="px-6 py-20 text-center opacity-60">
                                             <div className="flex flex-col items-center gap-3">
@@ -207,7 +215,7 @@ export default function AccountsPage() {
                                         </td>
                                     </tr>
                                 ) : (
-                                    filteredAccounts.map((account) => (
+                                    paginatedAccounts.map((account) => (
                                         <SIATCTableRow key={account.id} className={SIATC_THEME.TABLE.BODY_ROW}>
                                             <SIATCTableCell>
                                                 <div className="flex items-center gap-2 font-mono text-primary font-bold text-[11px] uppercase bg-primary/5 px-3 py-1.5 rounded-cb-btn border border-primary/20 w-fit shadow-sm group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
@@ -266,7 +274,10 @@ export default function AccountsPage() {
                 {/* Footer Stats */}
                 <SIATCTableFooter 
                     totalRecords={filteredAccounts.length}
-                    showPaging={false}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                    label="Total cuentas"
                 />
             </div>
 

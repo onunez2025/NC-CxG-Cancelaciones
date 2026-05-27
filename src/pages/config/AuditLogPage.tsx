@@ -91,11 +91,11 @@ export default function AuditLogPage() {
             {/* Header: SIATC Standard */}
             <div className={SIATC_THEME.LAYOUT.HEADER_WRAPPER}>
                 <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
-                        <Terminal className="w-4 h-4" />
+                    <div className="flex items-center gap-2 text-sm text-cb-text-secondary font-medium">
+                        <Terminal className="w-4 h-4 text-cb-neutral" />
                         <span>Configuración</span>
                         <ChevronRight className="w-3 h-3 opacity-50" />
-                        <span className="text-foreground">Auditoría</span>
+                        <span className="text-cb-text-primary">Auditoría</span>
                     </div>
                     <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Bitácora de Seguridad</h1>
                     <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>Registro centralizado e inmutable de acciones críticas e intentos de acceso</p>
@@ -154,11 +154,21 @@ export default function AuditLogPage() {
                         <SIATCTable>
                             <thead>
                                 <tr className={SIATC_THEME.TABLE.HEADER_ROW}>
-                                    <SIATCTableHeader className="text-left w-48">Fecha y Hora</SIATCTableHeader>
-                                    <SIATCTableHeader className="text-left w-64">Usuario Responsable</SIATCTableHeader>
-                                    <SIATCTableHeader className="text-left w-40">Operación</SIATCTableHeader>
-                                    <SIATCTableHeader className="text-left w-56">Ref. Entidad</SIATCTableHeader>
-                                    <SIATCTableHeader className="text-left">Payload / Detalle Técnico</SIATCTableHeader>
+                                    <SIATCTableHeader className="text-left w-48">
+                                        <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Fecha y Hora</span>
+                                    </SIATCTableHeader>
+                                    <SIATCTableHeader className="text-left w-64">
+                                        <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Usuario Responsable</span>
+                                    </SIATCTableHeader>
+                                    <SIATCTableHeader className="text-left w-40">
+                                        <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Operación</span>
+                                    </SIATCTableHeader>
+                                    <SIATCTableHeader className="text-left w-56">
+                                        <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Ref. Entidad</span>
+                                    </SIATCTableHeader>
+                                    <SIATCTableHeader className="text-left">
+                                        <span className={SIATC_THEME.TYPOGRAPHY.TABLE_HEADER}>Payload / Detalle Técnico</span>
+                                    </SIATCTableHeader>
                                 </tr>
                             </thead>
                             <tbody>
