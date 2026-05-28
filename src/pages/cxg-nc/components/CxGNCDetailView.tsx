@@ -223,6 +223,14 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, is
                     <span className="text-sm font-black text-amber-600">#{detailData.ticket_desinstalacion}</span>
                   </div>
                 )}
+                {detailData.observacion_inicial && (
+                  <div className="flex justify-between items-start gap-4 border-t border-slate-200 dark:border-slate-700/50 pt-3 mt-3">
+                    <span className="text-xs font-bold text-muted-foreground uppercase whitespace-nowrap">Observación Inicial</span>
+                    <span className="text-sm text-right italic font-semibold text-foreground max-w-[250px] break-words">
+                      {detailData.observacion_inicial}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
