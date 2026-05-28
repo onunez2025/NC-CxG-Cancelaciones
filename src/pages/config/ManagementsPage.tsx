@@ -15,10 +15,10 @@ import { ManagementsService } from '../../services/managementsService';
 import type { Management } from '../../types';
 import { Modal } from '../../components/common/Modal';
 import { useDialog } from '../../context/DialogContext';
+import { cn } from '../../utils/cn';
 
 // SIATC DESIGN SYSTEM IMPORTS
 import { SIATC_THEME } from '../../utils/siatc-theme';
-import { SIATCButton } from '../../components/siatc/SIATCButton';
 import { 
     SIATCTable, 
     SIATCTableHeader,
@@ -137,18 +137,19 @@ export default function ManagementsPage() {
                     <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Estructura de Gerencias</h1>
                     <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>Administra los niveles jerárquicos y unidades de negocio</p>
                 </div>
-                <SIATCButton 
+                <button 
                     onClick={handleCreate}
-                    icon={Plus}
+                    className={SIATC_THEME.COMPONENTS.BUTTON_PRIMARY}
                 >
+                    <Plus className="w-4 h-4" />
                     Nuevo
-                </SIATCButton>
+                </button>
             </div>
 
             {/* Content Container */}
             <div className={SIATC_THEME.LAYOUT.CONTENT_CONTAINER}>
                 {/* Search / Filters */}
-                <div className="p-4 border-b border-cb-border bg-cb-bg/30">
+                <div className={SIATC_THEME.LAYOUT.SEARCH_BAR_WRAPPER}>
                     <div className="relative max-w-md">
                         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-cb-text-secondary/55" />
                         <input
@@ -156,7 +157,7 @@ export default function ManagementsPage() {
                             value={searchTerm}
                             onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                             placeholder="Buscar por código o nombre..."
-                            className="w-full pl-10 pr-4 py-2.5 bg-card text-cb-text-primary border border-cb-border rounded-cb-btn focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium placeholder:text-cb-neutral/40"
+                            className={SIATC_THEME.COMPONENTS.INPUT}
                         />
                     </div>
                 </div>
@@ -253,7 +254,7 @@ export default function ManagementsPage() {
                                 type="text"
                                 value={formData.code || ''}
                                 onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                                className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all uppercase placeholder:text-muted-foreground/30 relative z-10"
+                                className={cn(SIATC_THEME.COMPONENTS.INPUT, "font-mono font-bold")}
                                 placeholder="Ej: AT01"
                                 required
                             />
@@ -264,7 +265,7 @@ export default function ManagementsPage() {
                                 type="text"
                                 value={formData.name || ''}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground/30"
+                                className={SIATC_THEME.COMPONENTS.INPUT}
                                 placeholder="Ej: Gerencia de Atención al Cliente"
                                 required
                             />
@@ -272,22 +273,20 @@ export default function ManagementsPage() {
                     </div>
 
                     <div className="flex items-center gap-3 pt-4 border-t border-border mt-2">
-                        <SIATCButton
-                            type="button"
-                            variant="secondary"
+                        <button 
+                            type="button" 
                             onClick={() => setIsModalOpen(false)}
-                            className="flex-1"
+                            className={SIATC_THEME.COMPONENTS.BUTTON_SECONDARY}
                         >
                             Cancelar
-                        </SIATCButton>
-                        <SIATCButton
-                            type="submit"
-                            variant="success"
-                            icon={Check}
-                            className="flex-1"
+                        </button>
+                        <button 
+                            type="submit" 
+                            className={SIATC_THEME.COMPONENTS.BUTTON_PRIMARY}
                         >
-                            {editingMgmt ? 'Guardar cambios' : 'Confirmar registro'}
-                        </SIATCButton>
+                            <Check className="w-4 h-4" />
+                            {editingMgmt ? 'Guardar Cambios' : 'Confirmar Registro'}
+                        </button>
                     </div>
                 </form>
             </Modal>

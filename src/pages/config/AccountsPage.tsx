@@ -21,8 +21,6 @@ import { cn } from '../../utils/cn';
 
 // SIATC DESIGN SYSTEM IMPORTS
 import { SIATC_THEME } from '../../utils/siatc-theme';
-import { SIATCButton } from '../../components/siatc/SIATCButton';
-import { SIATCBadge } from '../../components/siatc/SIATCBadge';
 import { 
     SIATCTable, 
     SIATCTableHeader,
@@ -162,12 +160,13 @@ export default function AccountsPage() {
                     <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Plan de Cuentas SAP</h1>
                     <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>Administra la categorización financiera y asignación contable del ERP</p>
                 </div>
-                <SIATCButton 
+                <button 
                     onClick={handleCreate}
-                    icon={Plus}
+                    className={SIATC_THEME.COMPONENTS.BUTTON_PRIMARY}
                 >
+                    <Plus className="w-4 h-4" />
                     Nuevo
-                </SIATCButton>
+                </button>
             </div>
 
             {/* Content Container */}
@@ -236,13 +235,9 @@ export default function AccountsPage() {
                                             </SIATCTableCell>
                                             <SIATCTableCell className="text-center">
                                                 {account.is_active ? (
-                                                    <SIATCBadge variant="success">
-                                                        Habilitada
-                                                    </SIATCBadge>
+                                                    <span className={cn(SIATC_THEME.STATES.BADGE_BASE, SIATC_THEME.STATES.SUCCESS)}>Habilitada</span>
                                                 ) : (
-                                                    <SIATCBadge variant="danger">
-                                                        Bloqueada
-                                                    </SIATCBadge>
+                                                    <span className={cn(SIATC_THEME.STATES.BADGE_BASE, SIATC_THEME.STATES.ERROR)}>Bloqueada</span>
                                                 )}
                                             </SIATCTableCell>
                                             <SIATCTableCell className="text-right">
@@ -363,22 +358,20 @@ export default function AccountsPage() {
                     </div>
 
                     <div className="flex items-center gap-3 pt-4 border-t border-border mt-2">
-                        <SIATCButton
-                            type="button"
-                            variant="secondary"
+                        <button 
+                            type="button" 
                             onClick={() => setIsModalOpen(false)}
-                            className="flex-1"
+                            className={SIATC_THEME.COMPONENTS.BUTTON_SECONDARY}
                         >
                             Cancelar
-                        </SIATCButton>
-                        <SIATCButton
-                            type="submit"
-                            variant="success"
-                            icon={Check}
-                            className="flex-1"
+                        </button>
+                        <button 
+                            type="submit" 
+                            className={SIATC_THEME.COMPONENTS.BUTTON_PRIMARY}
                         >
-                            {editingAccount ? 'Guardar cambios' : 'Abrir cuenta SAP'}
-                        </SIATCButton>
+                            <Check className="w-4 h-4" />
+                            {editingAccount ? 'Guardar Cambios' : 'Abrir Cuenta SAP'}
+                        </button>
                     </div>
                 </form>
             </Modal>

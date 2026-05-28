@@ -10,7 +10,9 @@ import {
     Activity,
     Hash,
     Database,
-    Check
+    Check,
+    CheckCircle,
+    XCircle
 } from 'lucide-react';
 import { CostCentersService } from '../../services/costCentersService';
 import { ManagementsService } from '../../services/managementsService';
@@ -21,8 +23,6 @@ import { cn } from '../../utils/cn';
 
 // SIATC DESIGN SYSTEM IMPORTS
 import { SIATC_THEME } from '../../utils/siatc-theme';
-import { SIATCButton } from '../../components/siatc/SIATCButton';
-import { SIATCBadge } from '../../components/siatc/SIATCBadge';
 import { 
     SIATCTable, 
     SIATCTableHeader,
@@ -144,18 +144,19 @@ export default function CostCentersPage() {
                     <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Centros de Coste (CeCo)</h1>
                     <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>Administra la estructura organizacional y asignación presupuestaria</p>
                 </div>
-                <SIATCButton 
+                <button 
                     onClick={handleCreate}
-                    icon={Plus}
+                    className={SIATC_THEME.COMPONENTS.BUTTON_PRIMARY}
                 >
+                    <Plus className="w-4 h-4" />
                     Nuevo
-                </SIATCButton>
+                </button>
             </div>
 
             {/* Content Container */}
             <div className={SIATC_THEME.LAYOUT.CONTENT_CONTAINER}>
                 {/* Search / Filters */}
-                <div className="p-4 border-b border-cb-border bg-cb-bg/30">
+                <div className={SIATC_THEME.LAYOUT.SEARCH_BAR_WRAPPER}>
                     <div className="relative max-w-md">
                         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-cb-text-secondary/55" />
                         <input
@@ -163,7 +164,7 @@ export default function CostCentersPage() {
                             value={searchTerm}
                             onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                             placeholder="Buscar por código SAP o nombre..."
-                            className="w-full pl-10 pr-4 py-2.5 bg-card text-cb-text-primary border border-cb-border rounded-cb-btn focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-medium placeholder:text-cb-neutral/40"
+                            className={SIATC_THEME.COMPONENTS.INPUT}
                         />
                     </div>
                 </div>
@@ -177,8 +178,8 @@ export default function CostCentersPage() {
                         </div>
                     ) : (
                         <SIATCTable>
-                            <thead>
-                                <tr className={SIATC_THEME.TABLE.HEADER_ROW}>
+                            <thead className={SIATC_THEME.TABLE.HEADER_ROW}>
+                                <tr>
                                     <SIATCTableHeader className="text-left w-48">Código SAP</SIATCTableHeader>
                                     <SIATCTableHeader className="text-left">Nombre del Centro</SIATCTableHeader>
                                     <SIATCTableHeader className="text-left w-64">Gerencia Vinculada</SIATCTableHeader>
@@ -223,13 +224,15 @@ export default function CostCentersPage() {
                                             </SIATCTableCell>
                                             <SIATCTableCell className="text-center">
                                                 {ceco.is_active ? (
-                                                    <SIATCBadge variant="success">
+                                                    <span className={cn(SIATC_THEME.STATES.BADGE_BASE, SIATC_THEME.STATES.SUCCESS)}>
+                                                        <CheckCircle className="w-3 h-3 stroke-[3]" />
                                                         Operativo
-                                                    </SIATCBadge>
+                                                    </span>
                                                 ) : (
-                                                    <SIATCBadge variant="danger">
+                                                    <span className={cn(SIATC_THEME.STATES.BADGE_BASE, SIATC_THEME.STATES.ERROR)}>
+                                                        <XCircle className="w-3 h-3 stroke-[3]" />
                                                         Suspendido
-                                                    </SIATCBadge>
+                                                    </span>
                                                 )}
                                             </SIATCTableCell>
                                             <SIATCTableCell className="text-right">
@@ -282,7 +285,7 @@ export default function CostCentersPage() {
                                 required
                                 value={formData.code || ''}
                                 onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                                className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all uppercase placeholder:text-muted-foreground/30 relative z-10"
+                                className={cn(SIATC_THEME.COMPONENTS.INPUT, "font-mono font-bold")}
                                 placeholder="Ej: 10001"
                             />
                         </div>
@@ -294,7 +297,7 @@ export default function CostCentersPage() {
                                 required
                                 value={formData.name || ''}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                className="w-full h-11 px-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground/30"
+                                className={SIATC_THEME.COMPONENTS.INPUT}
                                 placeholder="Ej: Operaciones Logísticas"
                             />
                         </div>
@@ -306,7 +309,7 @@ export default function CostCentersPage() {
                                 <select
                                     value={formData.management_id || ''}
                                     onChange={(e) => setFormData({ ...formData, management_id: e.target.value })}
-                                    className="w-full h-12 pl-10 pr-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer"
+                                    className={cn(SIATC_THEME.COMPONENTS.INPUT, "pl-10 appearance-none cursor-pointer")}
                                     required
                                 >
                                     <option value="" disabled>Seleccionar gerencia de origen...</option>
@@ -346,22 +349,20 @@ export default function CostCentersPage() {
                     </div>
 
                     <div className="flex items-center gap-3 pt-4 border-t border-border mt-2">
-                        <SIATCButton
-                            type="button"
-                            variant="secondary"
+                        <button 
+                            type="button" 
                             onClick={() => setIsModalOpen(false)}
-                            className="flex-1"
+                            className={SIATC_THEME.COMPONENTS.BUTTON_SECONDARY}
                         >
                             Cancelar
-                        </SIATCButton>
-                        <SIATCButton
-                            type="submit"
-                            variant="success"
-                            icon={Check}
-                            className="flex-1"
+                        </button>
+                        <button 
+                            type="submit" 
+                            className={SIATC_THEME.COMPONENTS.BUTTON_PRIMARY}
                         >
-                            {editingCeco ? 'Guardar cambios' : 'Registrar CeCo'}
-                        </SIATCButton>
+                            <Check className="w-4 h-4" />
+                            {editingCeco ? 'Guardar Cambios' : 'Registrar CeCo'}
+                        </button>
                     </div>
                 </form>
             </Modal>

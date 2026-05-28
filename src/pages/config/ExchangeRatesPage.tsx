@@ -12,10 +12,10 @@ import {
     Save
 } from 'lucide-react';
 import { ExchangeRatesService } from '../../services/exchangeRatesService';
+import { cn } from '../../utils/cn';
 
 // SIATC DESIGN SYSTEM IMPORTS
 import { SIATC_THEME } from '../../utils/siatc-theme';
-import { SIATCButton } from '../../components/siatc/SIATCButton';
 
 const MONTHS = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -66,11 +66,11 @@ export default function ExchangeRatesPage() {
             {/* Header: SIATC Standard */}
             <div className={SIATC_THEME.LAYOUT.HEADER_WRAPPER}>
                 <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
-                        <Calculator className="w-4 h-4" />
+                    <div className="flex items-center gap-2 text-sm text-cb-text-secondary font-medium">
+                        <Calculator className="w-4 h-4 text-cb-neutral" />
                         <span>Configuración</span>
                         <ChevronRightIcon className="w-3 h-3 opacity-50" />
-                        <span className="text-foreground">Tipos de Cambio</span>
+                        <span className="text-cb-text-primary">Tipos de Cambio</span>
                     </div>
                     <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>Paridad Cambiaria</h1>
                     <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>Define el valor del USD frente al PEN para proyecciones presupuestarias</p>
@@ -78,10 +78,10 @@ export default function ExchangeRatesPage() {
 
                 <div className="flex flex-col sm:flex-row items-center gap-4">
                     {/* Year Selector Premium */}
-                    <div className="flex items-center bg-white dark:bg-cb-bg border border-cb-border rounded-cb-btn p-1 shadow-cb-level-1">
+                    <div className="flex items-center bg-card border border-cb-border rounded-xl p-1 shadow-sm">
                         <button
                             onClick={() => setSelectedYear(y => y - 1)}
-                            className="p-2 hover:bg-cb-bg rounded-cb-btn transition-all text-cb-text-secondary hover:text-cb-text-primary active:scale-95"
+                            className="p-2 hover:bg-cb-bg/50 rounded-lg transition-all text-cb-text-secondary hover:text-cb-text-primary active:scale-95"
                         >
                             <ChevronLeft className="w-4 h-4" />
                         </button>
@@ -91,21 +91,29 @@ export default function ExchangeRatesPage() {
                         </div>
                         <button
                             onClick={() => setSelectedYear(y => y + 1)}
-                            className="p-2 hover:bg-cb-bg rounded-cb-btn transition-all text-cb-text-secondary hover:text-cb-text-primary active:scale-95"
+                            className="p-2 hover:bg-cb-bg/50 rounded-lg transition-all text-cb-text-secondary hover:text-cb-text-primary active:scale-95"
                         >
                             <ChevronRight className="w-4 h-4" />
                         </button>
                     </div>
 
-                    <SIATCButton
+                    <button
                         onClick={handleSave}
-                        isLoading={isSaving}
-                        variant={savedSuccessfully ? "success" : "primary"}
-                        icon={savedSuccessfully ? Check : Save}
-                        className="w-full sm:w-auto"
+                        disabled={isSaving}
+                        className={cn(
+                            savedSuccessfully ? SIATC_THEME.COMPONENTS.BUTTON_SUCCESS : SIATC_THEME.COMPONENTS.BUTTON_PRIMARY,
+                            "w-full sm:w-auto"
+                        )}
                     >
+                        {isSaving ? (
+                            <div className="w-4.5 h-4.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        ) : savedSuccessfully ? (
+                            <Check className="w-4 h-4 stroke-[3]" />
+                        ) : (
+                            <Save className="w-4 h-4" />
+                        )}
                         {savedSuccessfully ? 'Actualizado' : 'Guardar Cambios'}
-                    </SIATCButton>
+                    </button>
                 </div>
             </div>
 
@@ -115,8 +123,8 @@ export default function ExchangeRatesPage() {
                     {/* Insights SIATC Banner */}
                     <div className="relative group overflow-hidden">
                         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-transparent opacity-50" />
-                        <div className="relative bg-white dark:bg-cb-bg border border-cb-border p-6 rounded-cb-card flex flex-col md:flex-row items-start md:items-center gap-6 shadow-cb-level-1 transition-all">
-                            <div className="p-4 bg-primary/10 rounded-cb-btn text-primary ring-4 ring-primary/5 shadow-inner">
+                        <div className={cn(SIATC_THEME.COMPONENTS.CARD_CONTAINER, "p-6 flex flex-col md:flex-row items-start md:items-center gap-6 group-hover:shadow-md transition-all")}>
+                            <div className="p-4 bg-primary/10 rounded-2xl text-primary ring-4 ring-primary/5 shadow-inner">
                                 <TrendingUp className="w-7 h-7 shrink-0" />
                             </div>
                             <div className="space-y-1.5 flex-1">
@@ -139,7 +147,7 @@ export default function ExchangeRatesPage() {
                         {MONTHS.map((month, index) => (
                             <div key={month} className="group/card relative">
                                 <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/30 to-transparent rounded-3xl opacity-0 group-hover/card:opacity-100 transition-opacity blur-sm pointer-events-none" />
-                                <div className="relative p-5 bg-white dark:bg-cb-bg border border-cb-border rounded-cb-card transition-all group-focus-within/card:border-primary/50 group-focus-within/card:ring-4 group-focus-within/card:ring-primary/5">
+                                <div className={cn(SIATC_THEME.COMPONENTS.CARD_CONTAINER, "p-5 transition-all group-focus-within/card:border-primary/50 group-focus-within/card:ring-4 group-focus-within/card:ring-primary/5")}>
                                     <div className="flex justify-between items-center mb-5">
                                         <div className="flex items-center gap-2">
                                             <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
@@ -162,7 +170,7 @@ export default function ExchangeRatesPage() {
                                             min="0"
                                             value={rates[index] || ''}
                                             onChange={(e) => handleRateChange(index, e.target.value)}
-                                            className="w-full h-16 pl-10 pr-4 bg-cb-bg/50 border border-cb-border rounded-cb-btn text-3xl font-mono font-bold focus:outline-none focus:bg-white focus:border-primary text-cb-text-primary transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                            className="w-full h-16 pl-10 pr-4 bg-cb-bg/50 border border-cb-border rounded-cb-btn text-3xl font-mono font-bold focus:outline-none focus:bg-card focus:border-primary text-cb-text-primary transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                             placeholder="0.000"
                                         />
                                         <div className="absolute right-4 top-1/2 -translate-y-1/2">
@@ -180,7 +188,7 @@ export default function ExchangeRatesPage() {
                     </div>
 
                     {/* Safety Disclaimer */}
-                    <div className="flex items-center gap-4 p-5 bg-[#FFF4E5] text-[#F0AD4E] border border-[#F0AD4E]/20 rounded-cb-btn text-[10px] font-bold tracking-widest justify-center mx-auto max-w-2xl text-center leading-relaxed uppercase">
+                    <div className="flex items-center gap-4 p-5 rounded-cb-btn border border-cb-border bg-cb-bg/30 text-[10px] font-bold tracking-widest justify-center mx-auto max-w-2xl text-center leading-relaxed uppercase">
                         <Info className="w-4 h-4 shrink-0" />
                         Los cambios realizados son de carácter retroactivo para ejercicios no cerrados. Verifique con el área contable antes de persistir cambios.
                     </div>
