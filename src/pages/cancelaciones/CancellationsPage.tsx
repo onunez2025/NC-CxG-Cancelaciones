@@ -130,6 +130,12 @@ export const CancellationsPage = () => {
   const [validarForm, setValidarForm] = useState({ resultado: '' as 'REAL' | 'FALSA' | '', observacion: '', motivo_real: '' });
   const [isValidarSubmitting, setIsValidarSubmitting] = useState(false);
 
+  // Bulk approval state
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [bulkForm, setBulkForm] = useState({ aprobado: '' as 'APROBADO' | 'RECHAZADO' | '', observacion: '' });
+  const [isBulkSubmitting, setIsBulkSubmitting] = useState(false);
+
   // Registration state
   const [formData, setFormData] = useState({
     tienda: '',
@@ -234,6 +240,7 @@ export const CancellationsPage = () => {
 
   useEffect(() => {
     if (currentPage !== 1) setCurrentPage(1);
+    setSelectedIds([]);
   }, [searchTerm, statusFilter, showOnlyMine, sortConfig, columnFilters]);
 
   // Click outside to close filter dropdown
@@ -449,6 +456,36 @@ export const CancellationsPage = () => {
     }
   };
 
+  const handleAprobarMasivo = async () => {
+    if (selectedIds.length === 0 || !bulkForm.aprobado) return;
+    setIsBulkSubmitting(true);
+    try {
+      await ncService.aprobarMasivoCancellations({
+        ids: selectedIds,
+        aprobado: bulkForm.aprobado as 'APROBADO' | 'RECHAZADO',
+        observacion: bulkForm.observacion,
+        usuario: user?.full_name || user?.username || 'Sistema'
+      });
+
+      await auditService.logAction({
+        UsuarioID: user?.id || '0',
+        UsuarioNombre: user?.username || 'Sistema',
+        Accion: bulkForm.aprobado === 'APROBADO' ? 'APPROVE' : 'REJECT',
+        Entidad: 'CANCELACIONES',
+        EntidadID: selectedIds.join(','),
+        Detalle: `Aprobación en masivo (${selectedIds.length} registros) evaluada como ${bulkForm.aprobado} por el supervisor. Obs: ${bulkForm.observacion}`
+      });
+
+      setIsBulkModalOpen(false);
+      setSelectedIds([]);
+      fetchData();
+    } catch (error) {
+      console.error('Error in bulk approval:', error);
+    } finally {
+      setIsBulkSubmitting(false);
+    }
+  };
+
   const handleValidarCliente = async () => {
     if (!validarClienteItem || !validarForm.resultado) return;
     setIsValidarSubmitting(true);
@@ -553,6 +590,18 @@ export const CancellationsPage = () => {
           >
             Exportar
           </SIATCButton>
+          {canGestionar && selectedIds.length > 0 && (
+            <SIATCButton 
+              variant="primary" 
+              icon={CheckCircle2}
+              onClick={() => {
+                setBulkForm({ aprobado: '', observacion: '' });
+                setIsBulkModalOpen(true);
+              }}
+            >
+              Aprobar Masivo ({selectedIds.length})
+            </SIATCButton>
+          )}
           {canCreate && (
             <SIATCButton 
               variant="primary" 
@@ -646,6 +695,34 @@ export const CancellationsPage = () => {
             <SIATCTable>
               <thead>
                 <tr className={SIATC_THEME.TABLE.HEADER_ROW}>
+                  {canGestionar && (
+                    <SIATCTableHeader className="w-10 text-center p-0">
+                      <div className="flex items-center justify-center h-full w-full py-2 pl-3">
+                        <input 
+                          type="checkbox"
+                          className="rounded border-slate-300 text-primary focus:ring-primary/20 focus:ring-offset-0 h-4 w-4 bg-transparent cursor-pointer"
+                          checked={
+                            displayedCancellations.filter(item => item.estado === 'REGISTRADO').length > 0 &&
+                            displayedCancellations.filter(item => item.estado === 'REGISTRADO').every(item => selectedIds.includes(item.id))
+                          }
+                          onChange={(e) => {
+                            const selectableCancellations = displayedCancellations.filter(item => item.estado === 'REGISTRADO');
+                            if (e.target.checked) {
+                              setSelectedIds(prev => {
+                                const newIds = selectableCancellations.map(item => item.id);
+                                return [...new Set([...prev, ...newIds])];
+                              });
+                            } else {
+                              setSelectedIds(prev => {
+                                const newIds = selectableCancellations.map(item => item.id);
+                                return prev.filter(id => !newIds.includes(id));
+                              });
+                            }
+                          }}
+                        />
+                      </div>
+                    </SIATCTableHeader>
+                  )}
                   {AVAILABLE_COLUMNS.map(col => {
                     const colId = col.id;
                     const label = col.label;
@@ -759,13 +836,34 @@ export const CancellationsPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {displayedCancellations.map((item) => (
-                  <SIATCTableRow 
-                    key={item.id}
-                    onClick={() => handleViewDetail(item.id)}
-                    className="cursor-pointer"
-                  >
-                    <SIATCTableCell>
+                {displayedCancellations.map((item) => {
+                  const canSelect = item.estado === 'REGISTRADO';
+                  return (
+                    <SIATCTableRow 
+                      key={item.id}
+                      onClick={() => handleViewDetail(item.id)}
+                      className="cursor-pointer"
+                    >
+                      {canGestionar && (
+                        <SIATCTableCell className="text-center p-0" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                          <div className="flex items-center justify-center h-full w-full py-2 pl-3">
+                            <input 
+                              type="checkbox"
+                              disabled={!canSelect}
+                              className="rounded border-slate-300 text-primary focus:ring-primary/20 focus:ring-offset-0 h-4 w-4 bg-transparent cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                              checked={selectedIds.includes(item.id)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedIds(prev => [...prev, item.id]);
+                                } else {
+                                  setSelectedIds(prev => prev.filter(id => id !== item.id));
+                                }
+                              }}
+                            />
+                          </div>
+                        </SIATCTableCell>
+                      )}
+                      <SIATCTableCell>
                       <span className={SIATC_THEME.TYPOGRAPHY.TINY_MONO}>#{item.ticket}</span>
                     </SIATCTableCell>
                     <SIATCTableCell>
@@ -840,7 +938,8 @@ export const CancellationsPage = () => {
                       </div>
                     </SIATCTableCell>
                   </SIATCTableRow>
-                ))}
+                  );
+                })}
               </tbody>
             </SIATCTable>
           )}
@@ -1142,6 +1241,72 @@ export const CancellationsPage = () => {
               placeholder="¿Por qué se aprueba o rechaza esta solicitud? (Temas varios, error humano, etc.)"
               value={aprobarForm.observacion}
               onChange={(e) => setAprobarForm({...aprobarForm, observacion: e.target.value})}
+            />
+          </div>
+        </div>
+      </SIATCModalWrapper>
+
+      {/* ====== MODAL: Aprobación en Masivo ====== */}
+      <SIATCModalWrapper
+        isOpen={isBulkModalOpen}
+        onClose={() => setIsBulkModalOpen(false)}
+        title="Evaluación Masiva de Solicitudes"
+        subtitle={`Se evaluarán ${selectedIds.length} solicitudes seleccionadas`}
+        footer={
+          <>
+            <SIATCButton variant="ghost" onClick={() => setIsBulkModalOpen(false)}>Cancelar</SIATCButton>
+            <SIATCButton 
+              variant="primary" 
+              onClick={handleAprobarMasivo} 
+              isLoading={isBulkSubmitting}
+              disabled={!bulkForm.aprobado}
+            >
+              Confirmar Evaluación Masiva
+            </SIATCButton>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div className="p-3 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/25 rounded-xl text-xs text-amber-700 dark:text-amber-300">
+            <strong>Atención:</strong> Esta acción se aplicará a las {selectedIds.length} solicitudes de cancelación en estado <strong>REGISTRADO</strong> que ha seleccionado.
+          </div>
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-3 block tracking-widest pl-4">¿Las solicitudes de cancelación proceden?</label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setBulkForm({ ...bulkForm, aprobado: 'APROBADO' })}
+                className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                  bulkForm.aprobado === 'APROBADO'
+                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10'
+                    : 'border-slate-100 dark:border-slate-800 text-slate-400'
+                }`}
+              >
+                <CheckCircle2 className="w-6 h-6" />
+                <span className="text-xs font-bold">APROBAR</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setBulkForm({ ...bulkForm, aprobado: 'RECHAZADO' })}
+                className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                  bulkForm.aprobado === 'RECHAZADO'
+                    ? 'border-rose-500 bg-rose-50 text-rose-700 dark:bg-rose-500/10'
+                    : 'border-slate-100 dark:border-slate-800 text-slate-400'
+                }`}
+              >
+                <XCircle className="w-6 h-6" />
+                <span className="text-xs font-bold">RECHAZAR</span>
+              </button>
+            </div>
+          </div>
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">Observaciones Masivas</label>
+            <textarea 
+              className={SIATC_THEME.COMPONENTS.INPUT}
+              rows={3}
+              placeholder="¿Por qué se aprueban o rechazan estas solicitudes en bloque? (Temas varios, error humano, etc.)"
+              value={bulkForm.observacion}
+              onChange={(e) => setBulkForm({...bulkForm, observacion: e.target.value})}
             />
           </div>
         </div>

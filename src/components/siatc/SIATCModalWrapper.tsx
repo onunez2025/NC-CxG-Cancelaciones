@@ -68,13 +68,13 @@ export const SIATCModalWrapper: React.FC<SIATCModalWrapperProps> = ({
             <div
                 className={cn(
                     SIATC_THEME.COMPONENTS.MODAL_CONTENT,
-                    'w-full animate-in zoom-in-95 slide-in-from-bottom-4 duration-300',
+                    'w-full max-h-[90vh] flex flex-col animate-in zoom-in-95 slide-in-from-bottom-4 duration-300',
                     sizeClass,
                     className
                 )}
             >
                 {/* Header del Modal */}
-                <div className="flex items-start justify-between mb-6">
+                <div className="flex items-start justify-between mb-6 shrink-0">
                     <div>
                         <h2 className={cn(SIATC_THEME.TYPOGRAPHY.PAGE_TITLE, 'text-xl')}>
                             {title}
@@ -95,13 +95,13 @@ export const SIATCModalWrapper: React.FC<SIATCModalWrapperProps> = ({
 
                 {/* Cuerpo del Modal */}
                 {/* NOTA: Los <input> dentro de este wrapper DEBEN usar h-12 (via SIATC_THEME.COMPONENTS.INPUT) */}
-                <div className="space-y-4">
+                <div className="space-y-4 overflow-y-auto flex-1 pr-1">
                     {children}
                 </div>
 
                 {/* Footer del Modal */}
                 {footer && (
-                    <div className="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 shrink-0">
                         {footer}
                     </div>
                 )}

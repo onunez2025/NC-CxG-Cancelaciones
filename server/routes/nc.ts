@@ -1590,6 +1590,63 @@ router.post('/cxg-nc/:id/gestionar', verifyPermission('cxg.cxg_nc.process'), asy
 });
 
 // ─────────────────────────────────────────────
+// CANCELACIONES: Aprobar Solicitud en Masivo (Supervisor)
+// ─────────────────────────────────────────────
+
+router.post('/cancelaciones/aprobar-masivo', verifyPermission('cxg.cancelaciones.gestionar'), async (req: Request, res: Response) => {
+    try {
+        const { ids, aprobado, observacion, usuario } = req.body;
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ error: 'IDs de cancelaciones requeridos' });
+        }
+        if (!aprobado) {
+            return res.status(400).json({ error: 'Estado de aprobación requerido' });
+        }
+
+        const pool = await getDbConnection();
+        const request = pool.request();
+
+        // Parametrize IDs dynamically
+        const idParams = ids.map((id, index) => {
+            const paramName = `id_${index}`;
+            request.input(paramName, sql.VarChar, id);
+            return `@${paramName}`;
+        });
+
+        request.input('aprobado', sql.VarChar, aprobado);
+        request.input('obs', sql.VarChar, observacion || '');
+        request.input('por', sql.VarChar, usuario || '');
+
+        const query = `
+            UPDATE [dbo].[GAC_APP_TB_CANCELACIONES] 
+            SET 
+                Apro_Solicitud = @aprobado,
+                Apro_Obs = @obs,
+                Apro_Por = @por,
+                Apro_El = GETDATE(),
+                Estado_Proceso = CASE WHEN @aprobado = 'APROBADO' THEN 'APROBADO_SUP' ELSE 'CERRADO' END
+            WHERE ID_Cancelados IN (${idParams.join(',')})
+              AND Estado_Proceso = 'REGISTRADO'
+        `;
+
+        const result = await request.query(query);
+
+        // Audit log for this bulk operation
+        await logAudit(req, `APPROVE_MASIVO_${aprobado}`, 'CANCELACIONES', ids.join(','), {
+            ids,
+            aprobado,
+            observacion,
+            rowsAffected: result.rowsAffected[0]
+        });
+
+        res.json({ message: 'Solicitudes procesadas en masivo correctamente', rowsAffected: result.rowsAffected[0] });
+    } catch (error: any) {
+        console.error('Error in bulk approval:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ─────────────────────────────────────────────
 // CANCELACIONES: Aprobar Solicitud (Supervisor)
 // ─────────────────────────────────────────────
 

@@ -350,6 +350,14 @@ export const ncService = {
         if (!response.ok) throw new Error('Error al evaluar solicitud');
     },
 
+    async aprobarMasivoCancellations(data: { ids: string[]; aprobado: 'APROBADO' | 'RECHAZADO'; observacion: string; usuario: string }): Promise<void> {
+        const response = await apiClient(`${API_BASE_URL}/cancelaciones/aprobar-masivo`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Error al evaluar solicitudes en masivo');
+    },
+
     async aprobarSolicitudCxGNC(id: string, data: { aprobado: 'true' | 'false'; motivo?: string; observacion: string; usuario: string }): Promise<void> {
         const response = await apiClient(`${API_BASE_URL}/cxg-nc/${id}/aprobar-solicitud`, {
             method: 'POST',
