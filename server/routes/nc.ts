@@ -266,6 +266,56 @@ router.get('/cancelaciones/motivos', verifyPermission('cxg.cancelaciones.view'),
 });
 
 // ─────────────────────────────────────────────
+// CANCELACIONES: Unique Values for Autocomplete
+// ─────────────────────────────────────────────
+
+router.get('/cancelaciones/unique-values', verifyPermission('cxg.cancelaciones.view'), async (req: Request, res: Response) => {
+    try {
+        const column = req.query.column as string;
+        const search = req.query.search as string || '';
+        if (!column) return res.status(400).json({ error: 'Column is required' });
+
+        const columnMap: Record<string, string> = {
+            ticket: 'c.Ticket',
+            cliente: 't.NombreCliente',
+            motivo: 'ISNULL(m.Motivo, c.Motivo_Cancelacion)',
+            autorizador: 'c.Autorizador_Cancelacion',
+            estado: 'c.Estado_Proceso',
+            vali_motivo_real: 'c.Vali_Motivo_Real',
+            asignado_a: 'c.Asignado_a'
+        };
+
+        const dbCol = columnMap[column];
+        if (!dbCol) return res.status(400).json({ error: 'Invalid column' });
+
+        const pool = await getDbConnection();
+        const request = pool.request();
+        
+        let whereClause = `WHERE ${dbCol} IS NOT NULL AND ${dbCol} <> ''`;
+        if (search) {
+            whereClause += ` AND ${dbCol} LIKE @search`;
+            request.input('search', sql.VarChar, `%${search}%`);
+        }
+
+        const query = `
+            SELECT DISTINCT TOP 50
+                ${dbCol} as value
+            FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
+            LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
+            LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] m ON c.Motivo_Cancelacion = m.ID_Cancelados_motivo
+            ${whereClause}
+            ORDER BY value ASC
+        `;
+
+        const result = await request.query(query);
+        res.json(result.recordset.map(r => r.value));
+    } catch (error: any) {
+        console.error('Error fetching unique values for cancellations:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ─────────────────────────────────────────────
 // CANCELACIONES: Mapa de Hoy
 // ─────────────────────────────────────────────
 
@@ -394,10 +444,63 @@ router.get('/cancelaciones', verifyPermission('cxg.cancelaciones.view'), async (
         const search = req.query.search as string || '';
         const estado = req.query.estado as string || '';
         const asignado_a = req.query.asignado_a as string || '';
+        const sortBy = req.query.sortBy as string || 'fecha_generado';
+        const sortOrder = req.query.sortOrder as string || 'DESC';
         const offset = (page - 1) * pageSize;
 
         const pool = await getDbConnection();
         
+        const filterMappings: Record<string, string> = {
+            ticket: 'c.Ticket',
+            cliente: 't.NombreCliente',
+            motivo: 'ISNULL(m.Motivo, c.Motivo_Cancelacion)',
+            autorizador: 'c.Autorizador_Cancelacion',
+            fecha_generado: 'c.Generado_el',
+            estado: 'c.Estado_Proceso',
+            vali_motivo_real: 'c.Vali_Motivo_Real',
+            asignado_a: 'c.Asignado_a'
+        };
+
+        const validSortCols = ['ticket', 'cliente', 'motivo', 'autorizador', 'fecha_generado', 'estado', 'vali_motivo_real', 'asignado_a'];
+        const sortCol = validSortCols.includes(sortBy) ? filterMappings[sortBy] : 'c.Generado_el';
+        const orderDir = sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+        // Parse dynamic column filters from req.query
+        const dynamicFilters: { col: string; val: string; type: 'date' | 'string'; op: 'gte' | 'lte' | 'eq' }[] = [];
+
+        for (const key in req.query) {
+            if (key.startsWith('filter_')) {
+                const colKey = key.replace('filter_', '');
+                
+                // Date range filters
+                if (colKey.endsWith('_start') || colKey.endsWith('_end')) {
+                    const baseColKey = colKey.replace(/_(start|end)$/, '');
+                    const dbCol = filterMappings[baseColKey];
+                    const value = req.query[key] as string;
+                    if (dbCol && value) {
+                        dynamicFilters.push({
+                            col: dbCol,
+                            val: value,
+                            type: 'date',
+                            op: colKey.endsWith('_start') ? 'gte' : 'lte'
+                        });
+                    }
+                    continue;
+                }
+
+                const dbCol = filterMappings[colKey];
+                const value = req.query[key] as string;
+                if (dbCol && value) {
+                    dynamicFilters.push({
+                        col: dbCol,
+                        val: value,
+                        type: 'string',
+                        op: 'eq'
+                    });
+                }
+            }
+        }
+
         let whereClause = 'WHERE 1=1';
         if (search) {
             whereClause += ` AND (c.Ticket LIKE @search OR t.NombreCliente LIKE @search OR m.Motivo LIKE @search OR c.Autorizador_Cancelacion LIKE @search OR c.Asignado_a LIKE @search)`;
@@ -418,6 +521,19 @@ router.get('/cancelaciones', verifyPermission('cxg.cancelaciones.view'), async (
             whereClause += ` AND c.Asignado_a = @asignado_a`;
         }
 
+        // Add dynamic filters to where clause
+        dynamicFilters.forEach((f, idx) => {
+            if (f.type === 'date') {
+                if (f.op === 'gte') {
+                    whereClause += ` AND CAST(${f.col} AS DATE) >= @fval${idx}`;
+                } else {
+                    whereClause += ` AND CAST(${f.col} AS DATE) <= @fval${idx}`;
+                }
+            } else {
+                whereClause += ` AND ${f.col} = @fval${idx}`;
+            }
+        });
+
         // Get total count for pagination
         const countRequest = pool.request().input('search', sql.VarChar, `%${search}%`);
         if (estado && estado !== 'TODOS' && estado !== 'PENDIENTE' && estado !== 'EN GESTION' && estado !== 'APROBADO' && estado !== 'RECHAZADO') {
@@ -426,11 +542,18 @@ router.get('/cancelaciones', verifyPermission('cxg.cancelaciones.view'), async (
         if (asignado_a) {
             countRequest.input('asignado_a', sql.VarChar, asignado_a);
         }
+        dynamicFilters.forEach((f, idx) => {
+            if (f.type === 'date') {
+                countRequest.input(`fval${idx}`, sql.Date, f.val);
+            } else {
+                countRequest.input(`fval${idx}`, sql.VarChar, f.val);
+            }
+        });
 
         const countResult = await countRequest.query(`
             SELECT COUNT(*) as total 
             FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
-            ${search ? 'LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket' : ''}
+            LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
             LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] m ON c.Motivo_Cancelacion = m.ID_Cancelados_motivo
             ${whereClause}
         `);
@@ -447,6 +570,13 @@ router.get('/cancelaciones', verifyPermission('cxg.cancelaciones.view'), async (
         if (asignado_a) {
             dataRequest.input('asignado_a', sql.VarChar, asignado_a);
         }
+        dynamicFilters.forEach((f, idx) => {
+            if (f.type === 'date') {
+                dataRequest.input(`fval${idx}`, sql.Date, f.val);
+            } else {
+                dataRequest.input(`fval${idx}`, sql.VarChar, f.val);
+            }
+        });
 
         const result = await dataRequest.query(`
             SELECT 
@@ -479,7 +609,7 @@ router.get('/cancelaciones', verifyPermission('cxg.cancelaciones.view'), async (
             LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
             LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] m ON c.Motivo_Cancelacion = m.ID_Cancelados_motivo
             ${whereClause}
-            ORDER BY c.Generado_el DESC
+            ORDER BY ${sortCol} ${orderDir}
             OFFSET @offset ROWS
             FETCH NEXT @pageSize ROWS ONLY
         `);

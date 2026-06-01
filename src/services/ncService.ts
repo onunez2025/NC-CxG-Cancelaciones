@@ -145,6 +145,9 @@ export const ncService = {
         search?: string;
         estado?: string;
         asignado_a?: string;
+        sortBy?: string;
+        sortOrder?: 'asc' | 'desc';
+        filters?: Record<string, string>;
     }): Promise<PaginatedResponse<Cancellation>> {
         const queryParams = new URLSearchParams();
         if (params?.page) queryParams.append('page', params.page.toString());
@@ -152,9 +155,28 @@ export const ncService = {
         if (params?.search) queryParams.append('search', params.search);
         if (params?.estado && params.estado !== 'TODOS') queryParams.append('estado', params.estado);
         if (params?.asignado_a) queryParams.append('asignado_a', params.asignado_a);
+        if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
+        if (params?.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+        
+        if (params?.filters) {
+            for (const [key, value] of Object.entries(params.filters)) {
+                if (value) {
+                    queryParams.append(`filter_${key}`, value);
+                }
+            }
+        }
 
         const response = await apiClient(`${API_BASE_URL}/cancelaciones?${queryParams.toString()}`);
         if (!response.ok) throw new Error('Error al obtener cancelaciones');
+        return response.json();
+    },
+
+    async getUniqueCancellationColumnValues(column: string, search?: string): Promise<string[]> {
+        const queryParams = new URLSearchParams({ column });
+        if (search) queryParams.append('search', search);
+        
+        const response = await apiClient(`${API_BASE_URL}/cancelaciones/unique-values?${queryParams.toString()}`);
+        if (!response.ok) throw new Error('Error al obtener valores únicos de cancelaciones');
         return response.json();
     },
 

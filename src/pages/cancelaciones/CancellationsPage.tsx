@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
   Plus,
   Search, 
@@ -13,7 +13,13 @@ import {
   User,
   AlertTriangle,
   UserPlus,
-  MapPin
+  MapPin,
+  ArrowUp,
+  ArrowDown,
+  ArrowUpDown,
+  Filter,
+  Eraser,
+  Inbox
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { SIATC_THEME } from '../../utils/siatc-theme';
@@ -62,7 +68,6 @@ export const CancellationsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
   const pageSize = 20;
-  const [dateRange, setDateRange] = useState({ start: '', end: '' });
   const [statusFilter, setStatusFilter] = useState<string>('TODOS');
   const [cancellations, setCancellations] = useState<Cancellation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,6 +75,27 @@ export const CancellationsPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [motivos, setMotivos] = useState<{ id: string; motivo: string }[]>([]);
+
+  // Sorting & Filtering State
+  const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' } | null>(null);
+  const [columnFilters, setColumnFilters] = useState<Record<string, string>>({});
+  const [activeFilterCol, setActiveFilterCol] = useState<string | null>(null);
+  const [filterSearchTerm, setFilterSearchTerm] = useState('');
+  const [filterSuggestions, setFilterSuggestions] = useState<string[]>([]);
+  const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
+
+  const filterDropdownRef = useRef<HTMLDivElement>(null);
+
+  const AVAILABLE_COLUMNS = [
+    { id: 'ticket', label: 'TICKET' },
+    { id: 'cliente', label: 'CLIENTE' },
+    { id: 'motivo', label: 'MOTIVO' },
+    { id: 'autorizador', label: 'AUTORIZADOR' },
+    { id: 'fecha_generado', label: 'FECHA' },
+    { id: 'estado', label: 'ESTADO' },
+    { id: 'vali_motivo_real', label: 'MOTIVO REAL' },
+    { id: 'asignado_a', label: 'ASIGNADO A' }
+  ];
   
   // Detail modal state
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -119,7 +145,10 @@ export const CancellationsPage = () => {
         pageSize, 
         search: searchTerm,
         estado: statusFilter !== 'TODOS' ? statusFilter : undefined,
-        asignado_a: showOnlyMine ? user?.full_name : undefined
+        asignado_a: showOnlyMine ? user?.full_name : undefined,
+        sortBy: sortConfig?.key,
+        sortOrder: sortConfig?.direction,
+        filters: columnFilters
       });
       setCancellations(response.data);
       setTotalRecords(response.total);
@@ -130,16 +159,112 @@ export const CancellationsPage = () => {
     }
   };
 
+  const handleSort = (colId: string) => {
+    setSortConfig(current => {
+      if (!current || current.key !== colId) return { key: colId, direction: 'asc' };
+      if (current.direction === 'asc') return { key: colId, direction: 'desc' };
+      return null;
+    });
+  };
+
+  const toggleFilter = (colId: string) => {
+    if (activeFilterCol === colId) {
+      setActiveFilterCol(null);
+    } else {
+      setActiveFilterCol(colId);
+      setFilterSearchTerm('');
+      setFilterSuggestions([]);
+    }
+  };
+
+  const fetchSuggestions = async (colId: string, search: string) => {
+    if (colId === 'estado') {
+      setFilterSuggestions(['REGISTRADO', 'APROBADO_SUP', 'ASIGNADO', 'VALIDADO', 'CERRADO'].filter(s => s.toLowerCase().includes(search.toLowerCase())));
+      return;
+    }
+    setIsFetchingSuggestions(true);
+    try {
+      const suggestions = await ncService.getUniqueCancellationColumnValues(colId, search);
+      setFilterSuggestions(suggestions);
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+      setFilterSuggestions([]);
+    } finally {
+      setIsFetchingSuggestions(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeFilterCol && activeFilterCol !== 'fecha_generado') {
+      const timer = setTimeout(() => {
+        fetchSuggestions(activeFilterCol, filterSearchTerm);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [filterSearchTerm, activeFilterCol]);
+
+  const applyFilter = (colId: string, value: string) => {
+    setColumnFilters(prev => {
+      const next = { ...prev };
+      if (value) {
+        next[colId] = value;
+      } else {
+        delete next[colId];
+      }
+      return next;
+    });
+    setActiveFilterCol(null);
+  };
+
+  const handleClearFilters = () => {
+    setSearchTerm('');
+    setStatusFilter('TODOS');
+    setShowOnlyMine(false);
+    setSortConfig(null);
+    setColumnFilters({});
+    setCurrentPage(1);
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchData();
     }, 500);
     return () => clearTimeout(timer);
-  }, [currentPage, searchTerm, statusFilter, showOnlyMine]);
+  }, [currentPage, searchTerm, statusFilter, showOnlyMine, sortConfig, columnFilters]);
 
   useEffect(() => {
     if (currentPage !== 1) setCurrentPage(1);
-  }, [searchTerm, statusFilter, showOnlyMine]);
+  }, [searchTerm, statusFilter, showOnlyMine, sortConfig, columnFilters]);
+
+  // Click outside to close filter dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
+        setActiveFilterCol(null);
+      }
+    };
+    if (activeFilterCol) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [activeFilterCol]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isDetailOpen) { setIsDetailOpen(false); setDetailData(null); }
+        else if (isCreateModalOpen) setIsCreateModalOpen(false);
+        else if (isGestionarOpen) setIsGestionarOpen(false);
+        else if (isAssignOpen) setIsAssignOpen(false);
+        else if (isAprobarSolicitudOpen) setIsAprobarSolicitudOpen(false);
+        else if (isValidarClienteOpen) setIsValidarClienteOpen(false);
+        else if (activeFilterCol) setActiveFilterCol(null);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isDetailOpen, isCreateModalOpen, isGestionarOpen, isAssignOpen, isAprobarSolicitudOpen, isValidarClienteOpen, activeFilterCol]);
 
   const fetchMotivos = async () => {
     try {
@@ -484,29 +609,17 @@ export const CancellationsPage = () => {
             <option value="CERRADO">CERRADO</option>
           </select>
 
-          <div className="w-px h-6 bg-cb-border mx-1 hidden sm:block" />
-
-          <div className="flex items-center gap-2 px-2">
-            <span className="text-xs font-bold text-cb-text-secondary">Desde:</span>
-            <input 
-              type="date" 
-              className="bg-transparent border-none text-xs font-bold text-cb-text-primary focus:ring-0 cursor-pointer"
-              value={dateRange.start}
-              onChange={(e) => setDateRange({...dateRange, start: e.target.value})}
-            />
-          </div>
-
-          <div className="w-px h-6 bg-cb-border mx-1 hidden sm:block" />
-
-          <div className="flex items-center gap-2 px-2">
-            <span className="text-xs font-bold text-cb-text-secondary">Hasta:</span>
-            <input 
-              type="date" 
-              className="bg-transparent border-none text-xs font-bold text-cb-text-primary focus:ring-0 cursor-pointer"
-              value={dateRange.end}
-              onChange={(e) => setDateRange({...dateRange, end: e.target.value})}
-            />
-          </div>
+          {(searchTerm !== '' || statusFilter !== 'TODOS' || showOnlyMine || Object.keys(columnFilters).length > 0 || sortConfig !== null) && (
+            <SIATCButton 
+              variant="ghost" 
+              size="sm" 
+              icon={Eraser}
+              onClick={handleClearFilters}
+              className="ml-auto h-7 text-[10px] uppercase font-black tracking-tighter"
+            >
+              Limpiar Filtros
+            </SIATCButton>
+          )}
         </div>
       </div>
 
@@ -518,18 +631,130 @@ export const CancellationsPage = () => {
               <Loader2 className="w-8 h-8 text-primary animate-spin" />
               <p className="text-sm text-muted-foreground font-medium">Cargando registros...</p>
             </div>
+          ) : displayedCancellations.length === 0 ? (
+            <div className="h-64 flex flex-col items-center justify-center gap-4 py-12">
+              <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center">
+                <Inbox className="w-8 h-8 text-muted-foreground/40" />
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-bold text-foreground">Sin resultados</p>
+                <p className="text-xs text-muted-foreground mt-1">No se encontraron cancelaciones con los filtros actuales.</p>
+              </div>
+              <SIATCButton variant="ghost" size="sm" icon={Eraser} onClick={handleClearFilters}>Limpiar Filtros</SIATCButton>
+            </div>
           ) : (
             <SIATCTable>
               <thead>
                 <tr className={SIATC_THEME.TABLE.HEADER_ROW}>
-                  <SIATCTableHeader>TICKET</SIATCTableHeader>
-                  <SIATCTableHeader>CLIENTE</SIATCTableHeader>
-                  <SIATCTableHeader>MOTIVO</SIATCTableHeader>
-                  <SIATCTableHeader>AUTORIZADOR</SIATCTableHeader>
-                  <SIATCTableHeader>FECHA</SIATCTableHeader>
-                  <SIATCTableHeader>ESTADO</SIATCTableHeader>
-                  <SIATCTableHeader>MOTIVO REAL</SIATCTableHeader>
-                  <SIATCTableHeader>ASIGNADO A</SIATCTableHeader>
+                  {AVAILABLE_COLUMNS.map(col => {
+                    const colId = col.id;
+                    const label = col.label;
+                    return (
+                      <SIATCTableHeader key={colId} className="relative group p-0">
+                        <div className="flex items-center justify-between gap-1 px-3 py-2 w-full h-full">
+                          <div 
+                            className="flex items-center gap-1 cursor-pointer hover:text-primary transition-colors flex-1 min-w-0 font-bold"
+                            onClick={() => handleSort(colId)}
+                          >
+                            <span className="truncate leading-tight">{label}</span>
+                            {sortConfig?.key === colId ? (
+                              sortConfig.direction === 'asc' ? <ArrowUp className="w-3 h-3 shrink-0" /> : <ArrowDown className="w-3 h-3 shrink-0" />
+                            ) : (
+                              <ArrowUpDown className="w-3 h-3 opacity-0 group-hover:opacity-40 transition-opacity shrink-0" />
+                            )}
+                          </div>
+                          <button 
+                            className={`p-1 rounded shrink-0 hover:bg-muted/50 transition-colors ${columnFilters[colId] || columnFilters[`${colId}_start`] || columnFilters[`${colId}_end`] ? 'text-primary bg-primary/10' : 'text-muted-foreground opacity-30 hover:opacity-100'}`}
+                            onClick={(e) => { e.stopPropagation(); toggleFilter(colId); }}
+                          >
+                            <Filter className="w-3 h-3" />
+                          </button>
+                          {activeFilterCol === colId && (
+                            <div 
+                              ref={filterDropdownRef}
+                              className="absolute top-full left-0 mt-1 w-72 bg-card border border-border rounded-xl shadow-lg z-50 p-2 font-normal text-left"
+                              onClick={e => e.stopPropagation()}
+                            >
+                              <div className="flex flex-col gap-2">
+                                {colId === 'fecha_generado' ? (
+                                  <div className="flex flex-col gap-2 p-1">
+                                    <div className="flex flex-col gap-1">
+                                      <span className="text-[10px] font-black uppercase text-muted-foreground">Desde</span>
+                                      <input 
+                                        type="date"
+                                        className={`${SIATC_THEME.COMPONENTS.INPUT} h-8 text-xs font-semibold`}
+                                        value={columnFilters[`${colId}_start`] || ''}
+                                        onChange={(e) => {
+                                           const val = e.target.value;
+                                           setColumnFilters(prev => ({ ...prev, [`${colId}_start`]: val }));
+                                        }}
+                                      />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                      <span className="text-[10px] font-black uppercase text-muted-foreground">Hasta</span>
+                                      <input 
+                                        type="date"
+                                        className={`${SIATC_THEME.COMPONENTS.INPUT} h-8 text-xs font-semibold`}
+                                        value={columnFilters[`${colId}_end`] || ''}
+                                        onChange={(e) => {
+                                           const val = e.target.value;
+                                           setColumnFilters(prev => ({ ...prev, [`${colId}_end`]: val }));
+                                        }}
+                                      />
+                                    </div>
+                                    <SIATCButton 
+                                      variant="primary" 
+                                      size="sm" 
+                                      className="mt-2"
+                                      onClick={() => setActiveFilterCol(null)}
+                                    >
+                                      Aplicar Rango
+                                    </SIATCButton>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <input 
+                                      type="text" 
+                                      className={`${SIATC_THEME.COMPONENTS.INPUT} h-8 text-xs font-semibold`}
+                                      placeholder={`Buscar en ${label}...`}
+                                      value={filterSearchTerm}
+                                      onChange={(e) => setFilterSearchTerm(e.target.value)}
+                                      autoFocus
+                                    />
+                                    <div className="max-h-56 overflow-y-auto flex flex-col gap-1 pr-1 custom-scrollbar">
+                                      {isFetchingSuggestions ? (
+                                        <div className="text-xs text-muted-foreground p-2 text-center flex items-center justify-center gap-2"><Loader2 className="w-3 h-3 animate-spin"/> Cargando...</div>
+                                      ) : filterSuggestions.length === 0 ? (
+                                        <div className="text-xs text-muted-foreground p-2 text-center">Sin resultados</div>
+                                      ) : (
+                                        <>
+                                          <button 
+                                            className={`text-left px-2 py-1.5 text-xs rounded hover:bg-muted/50 leading-tight ${!columnFilters[colId] ? 'bg-primary/5 text-primary font-bold' : 'text-muted-foreground'}`}
+                                            onClick={() => applyFilter(colId, '')}
+                                          >
+                                            (Todos los valores)
+                                          </button>
+                                          {filterSuggestions.map(val => (
+                                            <button 
+                                              key={val}
+                                              className={`text-left px-2 py-1.5 text-xs rounded hover:bg-muted/50 break-words leading-tight ${columnFilters[colId] === val ? 'bg-primary/10 text-primary font-bold' : 'text-foreground'}`}
+                                              onClick={() => applyFilter(colId, val)}
+                                            >
+                                              {val}
+                                            </button>
+                                          ))}
+                                        </>
+                                      )}
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </SIATCTableHeader>
+                    );
+                  })}
                   <SIATCTableHeader className="text-right">ACCIONES</SIATCTableHeader>
                 </tr>
               </thead>
