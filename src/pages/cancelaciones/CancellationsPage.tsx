@@ -1,11 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Plus,
   Search, 
   RefreshCw, 
   CheckCircle2,
   XCircle,
-  MoreVertical,
   Loader2,
   FileSpreadsheet,
   Eye,
@@ -34,103 +33,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { UsersService } from '../../services/usersService';
 import type { User as SystemUser } from '../../types';
 import { useNavigate } from 'react-router-dom';
-
-// ---- Dropdown Menu Component ----
-const ActionsMenu = ({ 
-  onViewDetail, 
-  onEvaluar,
-  onAsignar,
-  onValidar,
-  onGestionar, 
-  estado,
-  permissions
-}: { 
-  onViewDetail: () => void; 
-  onEvaluar: () => void;
-  onAsignar: () => void;
-  onValidar: () => void;
-  onGestionar: () => void; 
-  estado: string;
-  permissions: {
-    canEvaluar: boolean;
-    canAssign: boolean;
-    canValidar: boolean;
-    canGestionar: boolean;
-  };
-}) => {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  return (
-    <div ref={ref} className="relative">
-      <SIATCButton 
-        variant="ghost" 
-        size="sm" 
-        icon={MoreVertical} 
-        onClick={() => setOpen(!open)} 
-      />
-      {open && (
-        <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xl z-50 py-1 animate-in fade-in zoom-in-95 duration-150">
-          <button 
-            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-            onClick={() => { onViewDetail(); setOpen(false); }}
-          >
-            <Eye className="w-4 h-4 text-blue-500" />
-            Ver Detalle
-          </button>
-          
-          {permissions.canEvaluar && estado === 'REGISTRADO' && (
-            <button 
-              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-              onClick={() => { onEvaluar(); setOpen(false); }}
-            >
-              <UserCheck className="w-4 h-4 text-emerald-500" />
-              Evaluar Solicitud
-            </button>
-          )}
-
-          {permissions.canAssign && estado === 'APROBADO_SUP' && (
-            <button 
-              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-              onClick={() => { onAsignar(); setOpen(false); }}
-            >
-              <UserPlus className="w-4 h-4 text-violet-500" />
-              Asignar Analista
-            </button>
-          )}
-
-          {permissions.canValidar && estado === 'ASIGNADO' && (
-            <button 
-              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-              onClick={() => { onValidar(); setOpen(false); }}
-            >
-              <ClipboardCheck className="w-4 h-4 text-blue-500" />
-              Validar Cliente
-            </button>
-          )}
-
-          {permissions.canGestionar && estado === 'VALIDADO' && (
-            <button 
-              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-              onClick={() => { onGestionar(); setOpen(false); }}
-            >
-              <CheckCircle2 className="w-4 h-4 text-amber-500" />
-              Gestionar Cierre
-            </button>
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
+import { SIATCActionDropdown } from '../../components/siatc/SIATCActionDropdown';
 
 // ---- Detail Info Row ----
 const DetailRow = ({ icon: Icon, label, value, className }: { icon: any; label: string; value: string | null | undefined; className?: string }) => (
@@ -667,27 +570,47 @@ export const CancellationsPage = () => {
                     </SIATCTableCell>
                     <SIATCTableCell className="text-right" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                       <div className="flex justify-end gap-1">
-                        <ActionsMenu 
-                          estado={item.estado}
-                          permissions={{
-                            canEvaluar: canGestionar, // Supervisors evaluate (REGISTRADO -> APROBADO_SUP)
-                            canAssign: canAssign, // Supervisors assign
-                            canValidar: canProcess && (item.asignado_a === user?.full_name || canAssign || user?.role_name === 'Administrador'), // Only assigned analyst can validate
-                            canGestionar: canProcess && (item.asignado_a === user?.full_name || canAssign || user?.role_name === 'Administrador') // Only assigned analyst can close
-                          }}
-                          onViewDetail={() => handleViewDetail(item.id)}
-                          onEvaluar={() => {
-                            setAprobarSolicitudItem(item);
-                            setAprobarForm({ aprobado: '', observacion: '' });
-                            setIsAprobarSolicitudOpen(true);
-                          }}
-                          onAsignar={() => handleOpenAssign(item)}
-                          onValidar={() => {
-                            setValidarClienteItem(item);
-                            setValidarForm({ resultado: '', observacion: '', motivo_real: '' });
-                            setIsValidarClienteOpen(true);
-                          }}
-                          onGestionar={() => handleOpenGestionar(item)}
+                        <SIATCActionDropdown 
+                          actions={[
+                            {
+                              label: 'Ver Detalle',
+                              icon: Eye,
+                              onClick: () => handleViewDetail(item.id)
+                            },
+                            {
+                              label: 'Evaluar Solicitud',
+                              icon: UserCheck,
+                              variant: 'success',
+                              show: canGestionar && item.estado === 'REGISTRADO',
+                              onClick: () => {
+                                setAprobarSolicitudItem(item);
+                                setAprobarForm({ aprobado: '', observacion: '' });
+                                setIsAprobarSolicitudOpen(true);
+                              }
+                            },
+                            {
+                              label: 'Asignar Analista',
+                              icon: UserPlus,
+                              show: canAssign && item.estado === 'APROBADO_SUP',
+                              onClick: () => handleOpenAssign(item)
+                            },
+                            {
+                              label: 'Validar Cliente',
+                              icon: ClipboardCheck,
+                              show: canProcess && item.estado === 'ASIGNADO' && (item.asignado_a === user?.full_name || canAssign || user?.role_name === 'Administrador'),
+                              onClick: () => {
+                                setValidarClienteItem(item);
+                                setValidarForm({ resultado: '', observacion: '', motivo_real: '' });
+                                setIsValidarClienteOpen(true);
+                              }
+                            },
+                            {
+                              label: 'Gestionar Cierre',
+                              icon: CheckCircle2,
+                              show: canProcess && item.estado === 'VALIDADO' && (item.asignado_a === user?.full_name || canAssign || user?.role_name === 'Administrador'),
+                              onClick: () => handleOpenGestionar(item)
+                            }
+                          ]}
                         />
                       </div>
                     </SIATCTableCell>
