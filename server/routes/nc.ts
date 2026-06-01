@@ -1160,29 +1160,40 @@ router.post('/cancelaciones', verifyPermission('cxg.cancelaciones.create'), asyn
         // Generate a short UUID-like ID to match existing format
         const id = Math.random().toString(16).substring(2, 10);
 
+        // Check user role for auto-approval
+        const creatorRole = req.user?.role_name || '';
+        const roleClean = creatorRole.trim();
+        // Auto approve if role is 'Asesor CC', 'SupervisorCC', or 'Supervisor'
+        const autoApprove = ['Asesor CC', 'SupervisorCC', 'Supervisor'].includes(roleClean);
+        const estadoProceso = autoApprove ? 'APROBADO_SUP' : 'REGISTRADO';
+
         await pool.request()
             .input('id', sql.VarChar, id)
             .input('ticket', sql.VarChar, ticket || '')
             .input('motivo', sql.VarChar, motive)
             .input('autorizador', sql.VarChar, usuario || 'Sistema')
+            .input('estado', sql.VarChar, estadoProceso)
+            .input('aproSolicitud', sql.VarChar, autoApprove ? 'APROBADO' : null)
+            .input('aproObs', sql.VarChar, autoApprove ? 'Aprobado automáticamente por rol del creador' : null)
+            .input('aproPor', sql.VarChar, autoApprove ? (usuario || 'Sistema') : null)
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_CANCELACIONES] 
-                (ID_Cancelados, Ticket, Motivo_Cancelacion, Autorizador_Cancelacion, Generado_el, Estado_Proceso, Creado_por)
-                VALUES (@id, @ticket, @motivo, @autorizador, GETDATE(), 'REGISTRADO', @autorizador)
+                (ID_Cancelados, Ticket, Motivo_Cancelacion, Autorizador_Cancelacion, Generado_el, Estado_Proceso, Creado_por, Apro_Solicitud, Apro_Obs, Apro_Por, Apro_El)
+                VALUES (@id, @ticket, @motivo, @autorizador, GETDATE(), @estado, @autorizador, @aproSolicitud, @aproObs, @aproPor, ${autoApprove ? 'GETDATE()' : 'NULL'})
             `);
             
         await pool.request()
                 .input('histId', sql.VarChar, Math.random().toString(16).substring(2, 10).toUpperCase())
                 .input('id', sql.VarChar, id)
                 .input('accion', sql.VarChar, 'Creación')
-                .input('obs', sql.VarChar, observacion || 'Solicitud registrada')
+                .input('obs', sql.VarChar, observacion || (autoApprove ? 'Solicitud registrada y aprobada automáticamente' : 'Solicitud registrada'))
                 .input('usuario', sql.VarChar, usuario || 'Sistema')
                 .query(`
                     INSERT INTO [dbo].[GAC_APP_TB_HISTORIAL_CANCELACIONES]
                     (ID_Historial_Cancelacion, ID_Cancelados, Accion, Observacion, Creado_el, Creado_por)
                     VALUES (@histId, @id, @accion, @obs, GETDATE(), @usuario)
                 `);
-        res.status(201).json({ message: 'Cancelación registrada', id });
+        res.status(201).json({ message: 'Cancelación registrada', id, autoApproved: autoApprove });
     } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
