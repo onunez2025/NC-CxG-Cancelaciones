@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
-import { verifyPermission } from '../middleware/auth.js';
+import { verifyPermission, logAudit } from '../middleware/auth.js';
 import { fsmApiService } from '../services/fsmApiService.js';
 
 const router = Router();
