@@ -393,13 +393,14 @@ router.get('/cancelaciones', verifyPermission('cxg.cancelaciones.view'), async (
         const pageSize = parseInt(req.query.pageSize as string) || 20;
         const search = req.query.search as string || '';
         const estado = req.query.estado as string || '';
+        const asignado_a = req.query.asignado_a as string || '';
         const offset = (page - 1) * pageSize;
 
         const pool = await getDbConnection();
         
         let whereClause = 'WHERE 1=1';
         if (search) {
-            whereClause += ` AND (c.Ticket LIKE @search OR t.NombreCliente LIKE @search OR m.Motivo LIKE @search OR c.Autorizador_Cancelacion LIKE @search)`;
+            whereClause += ` AND (c.Ticket LIKE @search OR t.NombreCliente LIKE @search OR m.Motivo LIKE @search OR c.Autorizador_Cancelacion LIKE @search OR c.Asignado_a LIKE @search)`;
         }
         if (estado === 'PENDIENTE') {
             whereClause += ` AND (c.Gestionado IS NULL OR c.Gestionado = '') AND c.Asignado_a IS NULL`;
@@ -409,60 +410,79 @@ router.get('/cancelaciones', verifyPermission('cxg.cancelaciones.view'), async (
             whereClause += ` AND c.Gestionado = 'Si' AND c.Cancelacion_Correcta = 'Si'`;
         } else if (estado === 'RECHAZADO') {
             whereClause += ` AND c.Gestionado = 'Si' AND c.Cancelacion_Correcta = 'No'`;
+        } else if (estado && estado !== 'TODOS') {
+            whereClause += ` AND c.Estado_Proceso = @estado`;
+        }
+
+        if (asignado_a) {
+            whereClause += ` AND c.Asignado_a = @asignado_a`;
         }
 
         // Get total count for pagination
-        const countResult = await pool.request()
-            .input('search', sql.VarChar, `%${search}%`)
-            .query(`
-                SELECT COUNT(*) as total 
-                FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
-                ${search ? 'LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket' : ''}
-                LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] m ON c.Motivo_Cancelacion = m.ID_Cancelados_motivo
-                ${whereClause}
-            `);
+        const countRequest = pool.request().input('search', sql.VarChar, `%${search}%`);
+        if (estado && estado !== 'TODOS' && estado !== 'PENDIENTE' && estado !== 'EN GESTION' && estado !== 'APROBADO' && estado !== 'RECHAZADO') {
+            countRequest.input('estado', sql.VarChar, estado);
+        }
+        if (asignado_a) {
+            countRequest.input('asignado_a', sql.VarChar, asignado_a);
+        }
+
+        const countResult = await countRequest.query(`
+            SELECT COUNT(*) as total 
+            FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
+            ${search ? 'LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket' : ''}
+            LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] m ON c.Motivo_Cancelacion = m.ID_Cancelados_motivo
+            ${whereClause}
+        `);
         
         const total = countResult.recordset[0].total;
 
-        const result = await pool.request()
+        const dataRequest = pool.request()
             .input('search', sql.VarChar, `%${search}%`)
             .input('offset', sql.Int, offset)
-            .input('pageSize', sql.Int, pageSize)
-            .query(`
-                SELECT 
-                    c.ID_Cancelados as id,
-                    c.Ticket as ticket,
-                    c.Motivo_Cancelacion as motivo_cancelacion_id,
-                    ISNULL(m.Motivo, c.Motivo_Cancelacion) as motivo,
-                    c.Autorizador_Cancelacion as autorizador,
-                    c.Generado_el as fecha_generado,
-                    c.Gestionado_por as gestionado_por,
-                    c.Cancelacion_Correcta as cancelacion_correcta,
-                    c.Gestionado as gestionado,
-                    c.Observacion_Gestionado as observacion,
-                    c.Gestionado_el as fecha_gestionado,
-                    c.Asignado_a as asignado_a,
-                    c.Asignado_por as asignado_por,
-                    c.Asignado_el as fecha_asignado,
-                    ISNULL(t.NombreCliente, '') as cliente,
-                    c.Estado_Proceso as estado,
-                    c.Apro_Solicitud as apro_solicitud,
-                    c.Apro_Obs as apro_obs,
-                    c.Apro_Por as apro_por,
-                    c.Apro_El as apro_el,
-                    c.Vali_Cliente as vali_cliente,
-                    c.Vali_Obs as vali_obs,
-                    c.Vali_Por as vali_por,
-                    c.Vali_El as vali_el,
-                    c.Vali_Motivo_Real as vali_motivo_real
-                FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
-                LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
-                LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] m ON c.Motivo_Cancelacion = m.ID_Cancelados_motivo
-                ${whereClause}
-                ORDER BY c.Generado_el DESC
-                OFFSET @offset ROWS
-                FETCH NEXT @pageSize ROWS ONLY
-            `);
+            .input('pageSize', sql.Int, pageSize);
+        if (estado && estado !== 'TODOS' && estado !== 'PENDIENTE' && estado !== 'EN GESTION' && estado !== 'APROBADO' && estado !== 'RECHAZADO') {
+            dataRequest.input('estado', sql.VarChar, estado);
+        }
+        if (asignado_a) {
+            dataRequest.input('asignado_a', sql.VarChar, asignado_a);
+        }
+
+        const result = await dataRequest.query(`
+            SELECT 
+                c.ID_Cancelados as id,
+                c.Ticket as ticket,
+                c.Motivo_Cancelacion as motivo_cancelacion_id,
+                ISNULL(m.Motivo, c.Motivo_Cancelacion) as motivo,
+                c.Autorizador_Cancelacion as autorizador,
+                c.Generado_el as fecha_generado,
+                c.Gestionado_por as gestionado_por,
+                c.Cancelacion_Correcta as cancelacion_correcta,
+                c.Gestionado as gestionado,
+                c.Observacion_Gestionado as observacion,
+                c.Gestionado_el as fecha_gestionado,
+                c.Asignado_a as asignado_a,
+                c.Asignado_por as asignado_por,
+                c.Asignado_el as fecha_asignado,
+                ISNULL(t.NombreCliente, '') as cliente,
+                c.Estado_Proceso as estado,
+                c.Apro_Solicitud as apro_solicitud,
+                c.Apro_Obs as apro_obs,
+                c.Apro_Por as apro_por,
+                c.Apro_El as apro_el,
+                c.Vali_Cliente as vali_cliente,
+                c.Vali_Obs as vali_obs,
+                c.Vali_Por as vali_por,
+                c.Vali_El as vali_el,
+                c.Vali_Motivo_Real as vali_motivo_real
+            FROM [dbo].[GAC_APP_TB_CANCELACIONES] c
+            LEFT JOIN [SIATC].[Dashboard_FSM] t ON c.Ticket = t.Ticket
+            LEFT JOIN [dbo].[GAC_APP_TB_CANCELACIONES_MOTIVOS] m ON c.Motivo_Cancelacion = m.ID_Cancelados_motivo
+            ${whereClause}
+            ORDER BY c.Generado_el DESC
+            OFFSET @offset ROWS
+            FETCH NEXT @pageSize ROWS ONLY
+        `);
 
         res.json({
             data: result.recordset,

@@ -144,12 +144,14 @@ export const ncService = {
         pageSize?: number; 
         search?: string;
         estado?: string;
+        asignado_a?: string;
     }): Promise<PaginatedResponse<Cancellation>> {
         const queryParams = new URLSearchParams();
         if (params?.page) queryParams.append('page', params.page.toString());
         if (params?.pageSize) queryParams.append('pageSize', params.pageSize.toString());
         if (params?.search) queryParams.append('search', params.search);
         if (params?.estado && params.estado !== 'TODOS') queryParams.append('estado', params.estado);
+        if (params?.asignado_a) queryParams.append('asignado_a', params.asignado_a);
 
         const response = await apiClient(`${API_BASE_URL}/cancelaciones?${queryParams.toString()}`);
         if (!response.ok) throw new Error('Error al obtener cancelaciones');

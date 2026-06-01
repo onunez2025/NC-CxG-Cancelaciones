@@ -152,6 +152,9 @@ export const CancellationsPage = () => {
   const canCreate = hasPermission('cxg.cancelaciones.create');
   const canAssign = hasPermission('cxg.cancelaciones.assign');
   const canGestionar = hasPermission('cxg.cancelaciones.gestionar');
+  const canProcess = hasPermission('cxg.cancelaciones.process');
+  
+  const [showOnlyMine, setShowOnlyMine] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
@@ -212,7 +215,8 @@ export const CancellationsPage = () => {
         page: currentPage, 
         pageSize, 
         search: searchTerm,
-        estado: statusFilter !== 'TODOS' ? statusFilter : undefined
+        estado: statusFilter !== 'TODOS' ? statusFilter : undefined,
+        asignado_a: showOnlyMine ? user?.full_name : undefined
       });
       setCancellations(response.data);
       setTotalRecords(response.total);
@@ -228,11 +232,11 @@ export const CancellationsPage = () => {
       fetchData();
     }, 500);
     return () => clearTimeout(timer);
-  }, [currentPage, searchTerm, statusFilter]);
+  }, [currentPage, searchTerm, statusFilter, showOnlyMine]);
 
   useEffect(() => {
     if (currentPage !== 1) setCurrentPage(1);
-  }, [searchTerm, statusFilter]);
+  }, [searchTerm, statusFilter, showOnlyMine]);
 
   const fetchMotivos = async () => {
     try {
@@ -549,6 +553,21 @@ export const CancellationsPage = () => {
 
           <div className="w-px h-6 bg-cb-border mx-1 hidden sm:block" />
 
+          {canProcess && (
+            <>
+              <label className="flex items-center gap-2 px-2.5 py-1 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors select-none">
+                <input 
+                  type="checkbox"
+                  checked={showOnlyMine}
+                  onChange={(e) => setShowOnlyMine(e.target.checked)}
+                  className="rounded border-slate-300 text-primary focus:ring-primary/20 focus:ring-offset-0 h-4 w-4 bg-transparent cursor-pointer"
+                />
+                <span className="text-xs font-bold text-cb-text-primary whitespace-nowrap">Mis Asignados</span>
+              </label>
+              <div className="w-px h-6 bg-cb-border mx-1 hidden sm:block" />
+            </>
+          )}
+
           <select 
             className="bg-transparent border-none px-3 py-1.5 text-sm font-bold text-cb-text-primary focus:ring-0 outline-none cursor-pointer"
             value={statusFilter}
@@ -651,10 +670,10 @@ export const CancellationsPage = () => {
                         <ActionsMenu 
                           estado={item.estado}
                           permissions={{
-                            canEvaluar: canAssign, // Supervisors usually
-                            canAssign: canAssign,
-                            canValidar: canGestionar, // Analysts
-                            canGestionar: canGestionar
+                            canEvaluar: canGestionar, // Supervisors evaluate (REGISTRADO -> APROBADO_SUP)
+                            canAssign: canAssign, // Supervisors assign
+                            canValidar: canProcess && (item.asignado_a === user?.full_name || canAssign || user?.role_name === 'Administrador'), // Only assigned analyst can validate
+                            canGestionar: canProcess && (item.asignado_a === user?.full_name || canAssign || user?.role_name === 'Administrador') // Only assigned analyst can close
                           }}
                           onViewDetail={() => handleViewDetail(item.id)}
                           onEvaluar={() => {
