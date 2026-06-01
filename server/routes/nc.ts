@@ -375,6 +375,32 @@ router.get('/cancelaciones/mapa/hoy', verifyPermission('cxg.cancelaciones.view')
 });
 
 // ─────────────────────────────────────────────
+// CANCELACIONES: Obtener Analistas Activos para Asignación
+// ─────────────────────────────────────────────
+router.get('/cancelaciones/analistas', verifyPermission('cxg.cancelaciones.assign'), async (req: Request, res: Response) => {
+    try {
+        const pool = await getDbConnection();
+        const result = await pool.request().query(`
+            SELECT 
+                u.Id as id,
+                u.FullName as full_name,
+                u.Username as username,
+                u.Email as email,
+                u.RoleId as role_id,
+                r.Name as role_name,
+                CAST(u.IsActive AS BIT) as is_active
+            FROM EBM.Users u
+            LEFT JOIN EBM.Roles r ON u.RoleId = r.Id
+            WHERE u.IsActive = 1
+        `);
+        res.json(result.recordset);
+    } catch (error: any) {
+        console.error('Error fetching analysts for cancellations:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ─────────────────────────────────────────────
 // CANCELACIONES: Detail
 // ─────────────────────────────────────────────
 
@@ -1827,32 +1853,6 @@ router.get('/c4c/report/:ticketId', async (req: Request, res: Response) => {
             error: 'Failed to retrieve report from C4C',
             details: err.message
         });
-    }
-});
-
-// ─────────────────────────────────────────────
-// CANCELACIONES: Obtener Analistas Activos para Asignación
-// ─────────────────────────────────────────────
-router.get('/cancelaciones/analistas', verifyPermission('cxg.cancelaciones.assign'), async (req: Request, res: Response) => {
-    try {
-        const pool = await getDbConnection();
-        const result = await pool.request().query(`
-            SELECT 
-                u.Id as id,
-                u.FullName as full_name,
-                u.Username as username,
-                u.Email as email,
-                u.RoleId as role_id,
-                r.Name as role_name,
-                CAST(u.IsActive AS BIT) as is_active
-            FROM EBM.Users u
-            LEFT JOIN EBM.Roles r ON u.RoleId = r.Id
-            WHERE u.IsActive = 1
-        `);
-        res.json(result.recordset);
-    } catch (error: any) {
-        console.error('Error fetching analysts for cancellations:', error);
-        res.status(500).json({ error: error.message });
     }
 });
 
