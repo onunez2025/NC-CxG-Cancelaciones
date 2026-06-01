@@ -116,6 +116,9 @@ export const CancellationsPage = () => {
   const [isAssignOpen, setIsAssignOpen] = useState(false);
   const [assignItem, setAssignItem] = useState<Cancellation | null>(null);
   const [assignTo, setAssignTo] = useState('');
+  const [assignSearch, setAssignSearch] = useState('');
+  const [isAssignDropdownOpen, setIsAssignDropdownOpen] = useState(false);
+  const assignDropdownRef = useRef<HTMLDivElement>(null);
   const [isAssigning, setIsAssigning] = useState(false);
   const [systemUsers, setSystemUsers] = useState<SystemUser[]>([]);
 
@@ -256,6 +259,19 @@ export const CancellationsPage = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [activeFilterCol]);
 
+  // Click outside to close assign dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (assignDropdownRef.current && !assignDropdownRef.current.contains(event.target as Node)) {
+        setIsAssignDropdownOpen(false);
+      }
+    };
+    if (isAssignDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isAssignDropdownOpen]);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -392,6 +408,8 @@ export const CancellationsPage = () => {
   const handleOpenAssign = (item: Cancellation) => {
     setAssignItem(item);
     setAssignTo('');
+    setAssignSearch('');
+    setIsAssignDropdownOpen(false);
     setIsAssignOpen(true);
   };
 
@@ -1513,20 +1531,64 @@ export const CancellationsPage = () => {
             </div>
           </div>
 
-          <div>
+          <div ref={assignDropdownRef} className="relative">
             <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">
               Asignar a
             </label>
-            <select 
-              className={SIATC_THEME.COMPONENTS.INPUT}
-              value={assignTo}
-              onChange={(e) => setAssignTo(e.target.value)}
-            >
-              <option value="">Seleccione un analista...</option>
-              {systemUsers.map(u => (
-                <option key={u.id} value={u.full_name}>{u.full_name} ({u.username})</option>
-              ))}
-            </select>
+            <div className="relative">
+              <input 
+                type="text"
+                className={SIATC_THEME.COMPONENTS.INPUT}
+                placeholder="Escribe para buscar un analista..."
+                value={assignSearch}
+                onFocus={() => setIsAssignDropdownOpen(true)}
+                onChange={(e) => {
+                  setAssignSearch(e.target.value);
+                  setIsAssignDropdownOpen(true);
+                  if (assignTo && e.target.value !== assignTo) {
+                    setAssignTo('');
+                  }
+                }}
+              />
+              <Search className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-cb-text-secondary/55 pointer-events-none" />
+            </div>
+
+            {isAssignDropdownOpen && (
+              <div className="absolute z-50 left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-card border border-cb-border rounded-cb-btn shadow-cb-level-2 custom-scrollbar">
+                {systemUsers.filter(u => {
+                  const q = assignSearch.toLowerCase().trim();
+                  if (!q) return true;
+                  return u.full_name.toLowerCase().includes(q) || u.username.toLowerCase().includes(q);
+                }).length === 0 ? (
+                  <div className="p-3 text-xs text-muted-foreground text-center">
+                    No se encontraron analistas
+                  </div>
+                ) : (
+                  systemUsers.filter(u => {
+                    const q = assignSearch.toLowerCase().trim();
+                    if (!q) return true;
+                    return u.full_name.toLowerCase().includes(q) || u.username.toLowerCase().includes(q);
+                  }).map(u => (
+                    <div
+                      key={u.id}
+                      onClick={() => {
+                        setAssignTo(u.full_name);
+                        setAssignSearch(u.full_name);
+                        setIsAssignDropdownOpen(false);
+                      }}
+                      className={`p-2.5 text-xs cursor-pointer transition-colors flex flex-col gap-0.5 ${
+                        assignTo === u.full_name
+                          ? 'bg-primary/10 text-primary font-bold'
+                          : 'hover:bg-cb-bg text-cb-text-primary'
+                      }`}
+                    >
+                      <span className="font-semibold">{u.full_name}</span>
+                      <span className="text-[10px] text-cb-text-secondary">Usuario: {u.username}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
 
           {assignItem?.asignado_a && (
