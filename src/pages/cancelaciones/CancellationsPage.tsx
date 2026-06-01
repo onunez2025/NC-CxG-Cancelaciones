@@ -36,7 +36,6 @@ import { ncService } from '../../services/ncService';
 import type { Cancellation, CancellationDetail } from '../../services/ncService';
 import { auditService } from '../../services/auditService';
 import { useAuth } from '../../hooks/useAuth';
-import { UsersService } from '../../services/usersService';
 import type { User as SystemUser } from '../../types';
 import { useNavigate } from 'react-router-dom';
 import { SIATCActionDropdown } from '../../components/siatc/SIATCActionDropdown';
@@ -302,8 +301,9 @@ export const CancellationsPage = () => {
     fetchMotivos();
     // Only load system users for assignment dropdown if user has permission
     // Asesor CC users don't have 'ebm.config.users' so GET /api/users returns 403
+    // We now use a supervisor-friendly endpoint inside ncService
     if (canAssign) {
-      UsersService.getUsers().then(users => setSystemUsers(users.filter(u => u.is_active))).catch(console.error);
+      ncService.getAnalystsForCancellation().then(users => setSystemUsers(users.filter(u => u.is_active))).catch(console.error);
     }
   }, []);
 

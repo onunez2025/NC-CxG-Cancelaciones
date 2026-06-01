@@ -385,5 +385,11 @@ export const ncService = {
     async getC4CReport(ticketId: string): Promise<Response> {
         const response = await apiClient(`${API_BASE_URL}/c4c/report/${ticketId}`);
         return response;
+    },
+
+    async getAnalystsForCancellation(): Promise<any[]> {
+        const response = await apiClient(`${API_BASE_URL}/cancelaciones/analistas`);
+        if (!response.ok) throw new Error('Error al obtener analistas para asignación');
+        return response.json();
     }
 };
