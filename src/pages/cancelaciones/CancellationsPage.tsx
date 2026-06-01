@@ -299,13 +299,16 @@ export const CancellationsPage = () => {
 
   useEffect(() => {
     fetchMotivos();
+  }, []);
+
+  useEffect(() => {
     // Only load system users for assignment dropdown if user has permission
     // Asesor CC users don't have 'ebm.config.users' so GET /api/users returns 403
     // We now use a supervisor-friendly endpoint inside ncService
     if (canAssign) {
       ncService.getAnalystsForCancellation().then(users => setSystemUsers(users.filter(u => u.is_active))).catch(console.error);
     }
-  }, []);
+  }, [canAssign]);
 
   const handleCreate = async () => {
     setIsSubmitting(true);
@@ -411,6 +414,11 @@ export const CancellationsPage = () => {
     setAssignSearch('');
     setIsAssignDropdownOpen(false);
     setIsAssignOpen(true);
+    
+    // Fetch analysts dynamically when opening the modal to ensure fresh data and bypass any auth race conditions
+    ncService.getAnalystsForCancellation()
+      .then(users => setSystemUsers(users.filter(u => u.is_active)))
+      .catch(console.error);
   };
 
   const handleAssign = async () => {
