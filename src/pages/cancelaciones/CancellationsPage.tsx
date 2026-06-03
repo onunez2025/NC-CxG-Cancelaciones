@@ -80,7 +80,7 @@ export const CancellationsPage = () => {
 
   // Sorting & Filtering State
   const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' } | null>(null);
-  const [columnFilters, setColumnFilters] = useState<Record<string, string[]>>();
+  const [columnFilters, setColumnFilters] = useState<Record<string, string[]>>({});
   const [activeFilterCol, setActiveFilterCol] = useState<string | null>(null);
   const [filterSearchTerm, setFilterSearchTerm] = useState('');
   const [filterSuggestions, setFilterSuggestions] = useState<string[]>([]);
