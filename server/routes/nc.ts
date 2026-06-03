@@ -1470,6 +1470,22 @@ router.post('/cxg-nc/:id/aprobar-solicitud', verifyPermission('cxg.cxg_nc.approv
         const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
         const userDisplayName = req.user?.full_name || req.user?.username || usuario || 'Sistema';
 
+        let updateQuery = `
+            UPDATE [dbo].[GAC_APP_TB_CXG_NC] 
+            SET 
+                Aprobado = @aprobado,
+                Aprobado_motivo = @motivo,
+                Aprobado_observacion = @obs,
+                Aprobado_por = @por,
+                Aprobado_el = GETDATE()
+        `;
+
+        if (aprobado === 'true') {
+            updateQuery += `, Procesado_por = Creado_por `;
+        }
+
+        updateQuery += ` WHERE ID_Apro_CxG_NC = @id `;
+
         // Update main table
         await pool.request()
             .input('id', sql.VarChar, id)
@@ -1477,16 +1493,7 @@ router.post('/cxg-nc/:id/aprobar-solicitud', verifyPermission('cxg.cxg_nc.approv
             .input('motivo', sql.VarChar, motivo || null)
             .input('obs', sql.VarChar, observacion || '')
             .input('por', sql.VarChar, userDisplayName)
-            .query(`
-                UPDATE [dbo].[GAC_APP_TB_CXG_NC] 
-                SET 
-                    Aprobado = @aprobado,
-                    Aprobado_motivo = @motivo,
-                    Aprobado_observacion = @obs,
-                    Aprobado_por = @por,
-                    Aprobado_el = GETDATE()
-                WHERE ID_Apro_CxG_NC = @id
-            `);
+            .query(updateQuery);
 
         // Insert history entry
         await pool.request()
@@ -1500,6 +1507,22 @@ router.post('/cxg-nc/:id/aprobar-solicitud', verifyPermission('cxg.cxg_nc.approv
                 (ID_Historial_Apro_CxG_NC, Solicitud, Tipo, Observacion, Creado_el, Creado_por)
                 VALUES (@histId, @solicitud, @tipo, @obs, GETDATE(), @usuario)
             `);
+
+        // If approved, insert history entry for auto-assignment
+        if (aprobado === 'true') {
+            const histIdAsignar = Math.random().toString(16).substring(2, 10).toUpperCase();
+            await pool.request()
+                .input('histId', sql.VarChar, histIdAsignar)
+                .input('solicitud', sql.VarChar, id)
+                .input('tipo', sql.VarChar, 'Asignación')
+                .input('obs', sql.VarChar, 'Asignado automáticamente por defecto al creador')
+                .input('usuario', sql.VarChar, userDisplayName)
+                .query(`
+                    INSERT INTO [dbo].[GAC_APP_TB_HISTOTIAL_APROB_CXG_NC]
+                    (ID_Historial_Apro_CxG_NC, Solicitud, Tipo, Observacion, Creado_el, Creado_por)
+                    VALUES (@histId, @solicitud, @tipo, @obs, GETDATE(), @usuario)
+                `);
+        }
 
         res.json({ message: 'Solicitud evaluada correctamente' });
     } catch (error: any) {
