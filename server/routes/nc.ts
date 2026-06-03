@@ -1193,15 +1193,17 @@ router.post('/cancelaciones', verifyPermission('cxg.cancelaciones.create'), asyn
         const autoApprove = ['Asesor CC', 'SupervisorCC', 'Supervisor'].includes(roleClean);
         const estadoProceso = autoApprove ? 'APROBADO_SUP' : 'REGISTRADO';
 
+        const userDisplayName = req.user?.full_name || req.user?.username || usuario || 'Sistema';
+
         await pool.request()
             .input('id', sql.VarChar, id)
             .input('ticket', sql.VarChar, ticket || '')
             .input('motivo', sql.VarChar, motive)
-            .input('autorizador', sql.VarChar, usuario || 'Sistema')
+            .input('autorizador', sql.VarChar, userDisplayName)
             .input('estado', sql.VarChar, estadoProceso)
             .input('aproSolicitud', sql.VarChar, autoApprove ? 'APROBADO' : null)
             .input('aproObs', sql.VarChar, autoApprove ? 'Aprobado automáticamente por rol del creador' : null)
-            .input('aproPor', sql.VarChar, autoApprove ? (usuario || 'Sistema') : null)
+            .input('aproPor', sql.VarChar, autoApprove ? userDisplayName : null)
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_CANCELACIONES] 
                 (ID_Cancelados, Ticket, Motivo_Cancelacion, Autorizador_Cancelacion, Generado_el, Estado_Proceso, Creado_por, Apro_Solicitud, Apro_Obs, Apro_Por, Apro_El)
@@ -1213,7 +1215,7 @@ router.post('/cancelaciones', verifyPermission('cxg.cancelaciones.create'), asyn
                 .input('id', sql.VarChar, id)
                 .input('accion', sql.VarChar, 'Creación')
                 .input('obs', sql.VarChar, observacion || (autoApprove ? 'Solicitud registrada y aprobada automáticamente' : 'Solicitud registrada'))
-                .input('usuario', sql.VarChar, usuario || 'Sistema')
+                .input('usuario', sql.VarChar, userDisplayName)
                 .query(`
                     INSERT INTO [dbo].[GAC_APP_TB_HISTORIAL_CANCELACIONES]
                     (ID_Historial_Cancelacion, ID_Cancelados, Accion, Observacion, Creado_el, Creado_por)
@@ -1246,12 +1248,14 @@ router.post('/cancelaciones/:id/gestionar', verifyPermission('cxg.cancelaciones.
             return res.status(400).json({ error: `Acción inválida. Estado actual: ${checkState.recordset[0].Estado_Proceso}. Se requiere: VALIDADO.` });
         }
 
+        const userDisplayName = req.user?.full_name || req.user?.username || gestionado_por || 'Sistema';
+
         await pool.request()
             .input('id', sql.VarChar, id)
             .input('cancelacion_correcta', sql.VarChar, cancelacion_correcta)
             .input('motivo_correcto', sql.VarChar, motivo_correcto || null)
             .input('observacion', sql.VarChar, observacion || '')
-            .input('gestionado_por', sql.VarChar, gestionado_por || '')
+            .input('gestionado_por', sql.VarChar, userDisplayName)
             .input('gestionado', sql.VarChar, 'Si')
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_CANCELACIONES] 
@@ -1272,7 +1276,7 @@ router.post('/cancelaciones/:id/gestionar', verifyPermission('cxg.cancelaciones.
                 .input('id', sql.VarChar, id)
                 .input('accion', sql.VarChar, 'Gestión Final')
                 .input('obs', sql.VarChar, observacion || 'Se gestionó la solicitud')
-                .input('usuario', sql.VarChar, gestionado_por || 'Sistema')
+                .input('usuario', sql.VarChar, userDisplayName)
                 .query(`
                     INSERT INTO [dbo].[GAC_APP_TB_HISTORIAL_CANCELACIONES]
                     (ID_Historial_Cancelacion, ID_Cancelados, Accion, Observacion, Creado_el, Creado_por)
@@ -1299,10 +1303,12 @@ router.post('/cancelaciones/:id/asignar', verifyPermission('cxg.cancelaciones.as
             return res.status(400).json({ error: `Acción inválida. Estado actual: ${checkState.recordset[0].Estado_Proceso}. Se requiere: APROBADO_SUP.` });
         }
 
+        const userDisplayName = req.user?.full_name || req.user?.username || asignado_por || 'Sistema';
+
         await pool.request()
             .input('id', sql.VarChar, id)
             .input('asignado_a', sql.VarChar, asignado_a)
-            .input('asignado_por', sql.VarChar, asignado_por)
+            .input('asignado_por', sql.VarChar, userDisplayName)
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_CANCELACIONES] 
                 SET 
@@ -1320,7 +1326,7 @@ router.post('/cancelaciones/:id/asignar', verifyPermission('cxg.cancelaciones.as
                 .input('id', sql.VarChar, id)
                 .input('accion', sql.VarChar, 'Asignación')
                 .input('obs', sql.VarChar, 'Asignado a: ' + asignado_a)
-                .input('usuario', sql.VarChar, asignado_por || 'Sistema')
+                .input('usuario', sql.VarChar, userDisplayName)
                 .query(`
                     INSERT INTO [dbo].[GAC_APP_TB_HISTORIAL_CANCELACIONES]
                     (ID_Historial_Cancelacion, ID_Cancelados, Accion, Observacion, Creado_el, Creado_por)
@@ -1402,6 +1408,7 @@ router.post('/cxg-nc', verifyPermission('cxg.cxg_nc.create'), async (req: Reques
 
         const solicitudId = `CNC-${Date.now()}`;
         const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
+        const userDisplayName = req.user?.full_name || req.user?.username || req.body.usuario || 'Sistema';
 
         await pool.request()
             .input('id', sql.VarChar, solicitudId)
@@ -1409,7 +1416,7 @@ router.post('/cxg-nc', verifyPermission('cxg.cxg_nc.create'), async (req: Reques
             .input('tipo', sql.VarChar, tipo)
             .input('tienda', sql.VarChar, cliente)
             .input('observacion', sql.VarChar, observacion || '')
-            .input('usuario', sql.VarChar, req.body.usuario || 'Sistema')
+            .input('usuario', sql.VarChar, userDisplayName)
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_CXG_NC] 
                 (ID_Apro_CxG_NC, Ticket, Tipo, Tienda, Observacion, Creado_el, Creado_por, Procesado)
@@ -1422,7 +1429,7 @@ router.post('/cxg-nc', verifyPermission('cxg.cxg_nc.create'), async (req: Reques
             .input('solicitud', sql.VarChar, solicitudId)
             .input('tipo', sql.VarChar, 'Registro')
             .input('obs', sql.VarChar, observacion || `Solicitud de ${tipo} registrada para ${cliente}`)
-            .input('usuario', sql.VarChar, req.body.usuario || 'Sistema')
+            .input('usuario', sql.VarChar, userDisplayName)
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_HISTOTIAL_APROB_CXG_NC]
                 (ID_Historial_Apro_CxG_NC, Solicitud, Tipo, Observacion, Creado_el, Creado_por)
@@ -1461,6 +1468,7 @@ router.post('/cxg-nc/:id/aprobar-solicitud', verifyPermission('cxg.cxg_nc.approv
         }
 
         const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
+        const userDisplayName = req.user?.full_name || req.user?.username || usuario || 'Sistema';
 
         // Update main table
         await pool.request()
@@ -1468,7 +1476,7 @@ router.post('/cxg-nc/:id/aprobar-solicitud', verifyPermission('cxg.cxg_nc.approv
             .input('aprobado', sql.VarChar, aprobado) // 'Si' | 'No'
             .input('motivo', sql.VarChar, motivo || null)
             .input('obs', sql.VarChar, observacion || '')
-            .input('por', sql.VarChar, usuario || '')
+            .input('por', sql.VarChar, userDisplayName)
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_CXG_NC] 
                 SET 
@@ -1486,7 +1494,7 @@ router.post('/cxg-nc/:id/aprobar-solicitud', verifyPermission('cxg.cxg_nc.approv
             .input('solicitud', sql.VarChar, id)
             .input('tipo', sql.VarChar, 'Aprobación')
             .input('obs', sql.VarChar, `${aprobado}${motivo ? ' — Motivo: ' + motivo : ''}${observacion ? ' — ' + observacion : ''}`)
-            .input('usuario', sql.VarChar, usuario || '')
+            .input('usuario', sql.VarChar, userDisplayName)
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_HISTOTIAL_APROB_CXG_NC]
                 (ID_Historial_Apro_CxG_NC, Solicitud, Tipo, Observacion, Creado_el, Creado_por)
@@ -1525,11 +1533,12 @@ router.post('/cxg-nc/:id/asignar', verifyPermission('cxg.cxg_nc.assign'), async 
         }
 
         const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
+        const userDisplayName = req.user?.full_name || req.user?.username || asignado_por || 'Sistema';
 
         await pool.request()
             .input('id', sql.VarChar, id)
             .input('asignado_a', sql.VarChar, asignado_a)
-            .input('asignado_por', sql.VarChar, asignado_por)
+            .input('asignado_por', sql.VarChar, userDisplayName)
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_CXG_NC] 
                 SET Procesado_por = @asignado_a
@@ -1542,7 +1551,7 @@ router.post('/cxg-nc/:id/asignar', verifyPermission('cxg.cxg_nc.assign'), async 
             .input('solicitud', sql.VarChar, id)
             .input('tipo', sql.VarChar, 'Asignación')
             .input('obs', sql.VarChar, `Asignado a: ${asignado_nombre || asignado_a}`)
-            .input('usuario', sql.VarChar, asignado_por || '')
+            .input('usuario', sql.VarChar, userDisplayName)
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_HISTOTIAL_APROB_CXG_NC]
                 (ID_Historial_Apro_CxG_NC, Solicitud, Tipo, Observacion, Creado_el, Creado_por)
@@ -1581,11 +1590,12 @@ router.post('/cxg-nc/:id/gestionar', verifyPermission('cxg.cxg_nc.process'), asy
         }
 
         const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
+        const userDisplayName = req.user?.full_name || req.user?.username || gestionado_por || 'Sistema';
 
         await pool.request()
             .input('id', sql.VarChar, id)
             .input('observacion', sql.VarChar, observacion || '')
-            .input('gestionado_por', sql.VarChar, gestionado_por || '')
+            .input('gestionado_por', sql.VarChar, userDisplayName)
             .input('resultado', sql.VarChar, resultado || 'Si')
             .input('motivo', sql.VarChar, motivo || '')
             .query(`
@@ -1602,7 +1612,7 @@ router.post('/cxg-nc/:id/gestionar', verifyPermission('cxg.cxg_nc.process'), asy
             .input('solicitud', sql.VarChar, id)
             .input('tipo', sql.VarChar, 'Gestión')
             .input('obs', sql.VarChar, `${resultado === 'true' ? 'PROCESADO' : 'RECHAZADO'} — ${observacion || ''}`)
-            .input('usuario', sql.VarChar, gestionado_por || '')
+            .input('usuario', sql.VarChar, userDisplayName)
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_HISTOTIAL_APROB_CXG_NC]
                 (ID_Historial_Apro_CxG_NC, Solicitud, Tipo, Observacion, Creado_el, Creado_por)

@@ -108,12 +108,14 @@ router.post('/', async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Ticket y Motivo son requeridos' });
         }
 
+        const userDisplayName = req.user?.full_name || req.user?.username || usuario || 'Sistema';
+
         await pool.request()
             .input('id', sql.VarChar, id)
             .input('ticket', sql.VarChar, ticket)
             .input('motivo', sql.VarChar, motivo)
             .input('comentario', sql.VarChar, comentario || '')
-            .input('usuario', sql.VarChar, usuario || 'Sistema')
+            .input('usuario', sql.VarChar, userDisplayName)
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_CASOS_ESPECIALES] 
                 (ID_Casos_Especiales, Ticket, Motivo_solicitud, Comentario, Creado_el, Creado_por, Estado)
@@ -137,14 +139,16 @@ router.post('/:id/status', async (req: Request, res: Response) => {
         const { estado, revisado_por, motivo_rechazo } = req.body;
         const pool = await getDbConnection();
 
-        if (!estado || !revisado_por) {
+        const revisor = req.user?.full_name || req.user?.username || revisado_por;
+
+        if (!estado || !revisor) {
             return res.status(400).json({ error: 'Estado y revisado_por son requeridos' });
         }
 
         await pool.request()
             .input('id', sql.VarChar, id)
             .input('estado', sql.VarChar, estado)
-            .input('revisado_por', sql.VarChar, revisado_por)
+            .input('revisado_por', sql.VarChar, revisor)
             .input('motivo_rechazo', sql.VarChar, motivo_rechazo || null)
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_CASOS_ESPECIALES]

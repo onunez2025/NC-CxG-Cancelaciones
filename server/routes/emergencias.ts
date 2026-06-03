@@ -161,8 +161,7 @@ router.post('/', async (req: Request, res: Response) => {
             observacion, creado_por 
         } = req.body;
         
-        const pool = await getDbConnection();
-        const id = Math.random().toString(16).substring(2, 10);
+        const userDisplayName = req.user?.full_name || req.user?.username || creado_por || 'Sistema';
 
         await pool.request()
             .input('id', sql.VarChar, id)
@@ -176,7 +175,7 @@ router.post('/', async (req: Request, res: Response) => {
             .input('dir', sql.VarChar, direccion)
             .input('dir_ref', sql.VarChar, direccion_referencia || null)
             .input('obs', sql.VarChar, observacion)
-            .input('por', sql.VarChar, creado_por)
+            .input('por', sql.VarChar, userDisplayName)
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_EMERGENCIAS] 
                 (ID_Emergencia, Ticket, Tipo, Producto, Asesor_CC, Cliente, Telefono_1, Telefono_2, Direccion, Direccion_referencia, Observacion, Creado_el, Creado_por)
@@ -223,11 +222,13 @@ router.put('/:id/verificar', async (req: Request, res: Response) => {
         const { verificacion, motivo, usuario } = req.body;
         
         const pool = await getDbConnection();
+        const userDisplayName = req.user?.full_name || req.user?.username || usuario || 'Sistema';
+
         await pool.request()
             .input('id', sql.VarChar, id)
             .input('verificacion', sql.VarChar, verificacion)
             .input('motivo', sql.VarChar, motivo)
-            .input('usuario', sql.VarChar, usuario)
+            .input('usuario', sql.VarChar, userDisplayName)
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_EMERGENCIAS] 
                 SET 
@@ -253,11 +254,13 @@ router.put('/:id/procesar', async (req: Request, res: Response) => {
         const { procesado, motivo, usuario } = req.body;
         
         const pool = await getDbConnection();
+        const userDisplayName = req.user?.full_name || req.user?.username || usuario || 'Sistema';
+
         await pool.request()
             .input('id', sql.VarChar, id)
             .input('procesado', sql.VarChar, procesado)
             .input('motivo', sql.VarChar, motivo)
-            .input('usuario', sql.VarChar, usuario)
+            .input('usuario', sql.VarChar, userDisplayName)
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_EMERGENCIAS] 
                 SET 
