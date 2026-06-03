@@ -65,6 +65,7 @@ export const CxGNCPage = () => {
   const pageSize = 20;
   const [data, setData] = useState<CxGNC[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLookingUp, setIsLookingUp] = useState(false);
@@ -646,42 +647,62 @@ export const CxGNCPage = () => {
           <SIATCButton 
             variant="secondary" 
             icon={FileSpreadsheet}
-            onClick={() => {
-              const exportColumns = AVAILABLE_COLUMNS.filter(c => visibleColumns.includes(c.id));
-              const headers = [...exportColumns.map(c => c.label), 'ESTADO'];
-              const csvContent = [
-                headers.join(','),
-                ...displayedData.map(item => {
-                  const row = exportColumns.map(col => {
-                    switch (col.id) {
-                      case 'tipo': return item.tipo || '';
-                      case 'documento': return `"${item.documento_cliente || ''}"`;  
-                      case 'ticket': return item.correlativo || '';
-                      case 'tienda': return `"${item.tienda || ''}"`;  
-                      case 'cliente': return `"${item.cliente || ''}"`;  
-                      case 'codigo_producto': return `"${item.codigo_producto || ''}"`;
-                      case 'producto': return `"${item.producto || ''}"`;
-                      case 'creado_por': return `"${item.creado_por || ''}"`;  
-                      case 'supervisor': return `"${item.supervisor || ''}"`;  
-                      case 'fecha_creacion': return item.fecha ? new Date(item.fecha).toLocaleDateString() : '';
-                      case 'aprobado': return `"${item.aprobado === 'true' ? 'SÍ' : item.aprobado === 'false' ? 'NO' : 'PENDIENTE'} ${item.aprobado_el ? `(${new Date(item.aprobado_el).toLocaleDateString()})` : ''}"`;
-                      case 'procesado': return `"${item.procesado || 'PENDIENTE'} ${item.procesado_el ? `(${new Date(item.procesado_el).toLocaleDateString()})` : ''}"`;
-                      case 'estado': return item.estado || '';
-                      default: return '';
-                    }
-                  });
-                  return [...row, item.estado || ''].join(',');
-                })
-              ].join('\n');
-              
-              const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-              const link = document.createElement('a');
-              link.href = URL.createObjectURL(blob);
-              link.setAttribute('download', `CambiosGarantia_NotasCredito_${new Date().toISOString().split('T')[0]}.csv`);
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              toast.success('Exportación exitosa', `Se exportaron ${displayedData.length} registros con ${exportColumns.length} columnas.`);
+            isLoading={isExporting}
+            onClick={async () => {
+              setIsExporting(true);
+              try {
+                const response = await ncService.getCxGNC({ 
+                  page: 1, 
+                  pageSize: 1000000, 
+                  search: searchTerm,
+                  tipo: activeTab,
+                  estado: statusFilter,
+                  sortBy: sortConfig?.key,
+                  sortOrder: sortConfig?.direction,
+                  filters: columnFilters
+                });
+                const exportData = response.data;
+                const exportColumns = AVAILABLE_COLUMNS.filter(c => visibleColumns.includes(c.id));
+                const headers = [...exportColumns.map(c => c.label), 'ESTADO'];
+                const csvContent = [
+                  headers.join(','),
+                  ...exportData.map(item => {
+                    const row = exportColumns.map(col => {
+                      switch (col.id) {
+                        case 'tipo': return item.tipo || '';
+                        case 'documento': return `"${item.documento_cliente || ''}"`;  
+                        case 'ticket': return item.correlativo || '';
+                        case 'tienda': return `"${item.tienda || ''}"`;  
+                        case 'cliente': return `"${item.cliente || ''}"`;  
+                        case 'codigo_producto': return `"${item.codigo_producto || ''}"`;
+                        case 'producto': return `"${item.producto || ''}"`;
+                        case 'creado_por': return `"${item.creado_por || ''}"`;  
+                        case 'supervisor': return `"${item.supervisor || ''}"`;  
+                        case 'fecha_creacion': return item.fecha ? new Date(item.fecha).toLocaleDateString() : '';
+                        case 'aprobado': return `"${item.aprobado === 'true' ? 'SÍ' : item.aprobado === 'false' ? 'NO' : 'PENDIENTE'} ${item.aprobado_el ? `(${new Date(item.aprobado_el).toLocaleDateString()})` : ''}"`;
+                        case 'procesado': return `"${item.procesado || 'PENDIENTE'} ${item.procesado_el ? `(${new Date(item.procesado_el).toLocaleDateString()})` : ''}"`;
+                        case 'estado': return item.estado || '';
+                        default: return '';
+                      }
+                    });
+                    return [...row, item.estado || ''].join(',');
+                  })
+                ].join('\n');
+                
+                const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.setAttribute('download', `CambiosGarantia_NotasCredito_${new Date().toISOString().split('T')[0]}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                toast.success('Exportación exitosa', `Se exportaron ${exportData.length} registros con ${exportColumns.length} columnas.`);
+              } catch (error) {
+                console.error('Error exporting CxG/NC data:', error);
+                toast.error('Error al exportar', 'No se pudo obtener la data para la exportación.');
+              } finally {
+                setIsExporting(false);
+              }
             }}
           >
             Exportar

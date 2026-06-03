@@ -39,6 +39,7 @@ import { useAuth } from '../../hooks/useAuth';
 import type { User as SystemUser } from '../../types';
 import { useNavigate } from 'react-router-dom';
 import { SIATCActionDropdown } from '../../components/siatc/SIATCActionDropdown';
+import { useToast } from '../../context/ToastContext';
 
 // ---- Detail Info Row ----
 const DetailRow = ({ icon: Icon, label, value, className }: { icon: any; label: string; value: string | null | undefined; className?: string }) => (
@@ -56,6 +57,7 @@ const DetailRow = ({ icon: Icon, label, value, className }: { icon: any; label: 
 export const CancellationsPage = () => {
   const { user, hasPermission } = useAuth();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const canCreate = hasPermission('cxg.cancelaciones.create');
   const canAssign = hasPermission('cxg.cancelaciones.assign');
@@ -70,6 +72,7 @@ export const CancellationsPage = () => {
   const [statusFilter, setStatusFilter] = useState<string>('TODOS');
   const [cancellations, setCancellations] = useState<Cancellation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLookingUp, setIsLookingUp] = useState(false);
@@ -589,29 +592,51 @@ export const CancellationsPage = () => {
           <SIATCButton 
             variant="secondary" 
             icon={FileSpreadsheet}
-            onClick={() => {
-              const headers = ['TICKET', 'CLIENTE', 'MOTIVO', 'AUTORIZADOR', 'FECHA', 'ESTADO', 'GESTIONADO POR', 'OBSERVACIÓN'];
-              const csvContent = [
-                headers.join(','),
-                ...displayedCancellations.map(item => [
-                  item.ticket,
-                  `"${item.cliente}"`,
-                  `"${item.motivo}"`,
-                  `"${item.autorizador || ''}"`,
-                  new Date(item.fecha_generado).toLocaleDateString(),
-                  item.estado,
-                  `"${item.gestionado_por || ''}"`,
-                  `"${(item.observacion || '').replace(/"/g, '""')}"`
-                ].join(','))
-              ].join('\n');
-              
-              const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-              const link = document.createElement('a');
-              link.href = URL.createObjectURL(blob);
-              link.setAttribute('download', `Cancelaciones_${new Date().toISOString().split('T')[0]}.csv`);
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
+            isLoading={isExporting}
+            onClick={async () => {
+              setIsExporting(true);
+              try {
+                const response = await ncService.getCancellations({ 
+                  page: 1, 
+                  pageSize: 1000000, 
+                  search: searchTerm,
+                  estado: statusFilter,
+                  asignado_a: showOnlyMine ? (user?.full_name || '') : undefined,
+                  sortBy: sortConfig?.key,
+                  sortOrder: sortConfig?.direction,
+                  filters: columnFilters
+                });
+                
+                const exportData = response.data;
+                const headers = ['TICKET', 'CLIENTE', 'MOTIVO', 'AUTORIZADOR', 'FECHA', 'ESTADO', 'GESTIONADO POR', 'OBSERVACIÓN'];
+                const csvContent = [
+                  headers.join(','),
+                  ...exportData.map(item => [
+                    item.ticket,
+                    `"${item.cliente}"`,
+                    `"${item.motivo}"`,
+                    `"${item.autorizador || ''}"`,
+                    item.fecha_generado ? new Date(item.fecha_generado).toLocaleDateString() : '',
+                    item.estado,
+                    `"${item.gestionado_por || ''}"`,
+                    `"${(item.observacion || '').replace(/"/g, '""')}"`
+                  ].join(','))
+                ].join('\n');
+                
+                const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.setAttribute('download', `Cancelaciones_${new Date().toISOString().split('T')[0]}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                toast.success('Exportación exitosa', `Se exportaron ${exportData.length} registros.`);
+              } catch (error) {
+                console.error('Error exporting cancellations:', error);
+                toast.error('Error al exportar', 'No se pudo obtener la data para la exportación.');
+              } finally {
+                setIsExporting(false);
+              }
             }}
           >
             Exportar
