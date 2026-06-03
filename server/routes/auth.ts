@@ -78,6 +78,7 @@ router.post('/login', async (req: Request, res: Response) => {
                 role_name: user.role_name,
                 management_id: user.management_id,
                 username: user.username,
+                full_name: user.full_name,
                 permissions: user.permissions,
                 apps: user.apps
             },

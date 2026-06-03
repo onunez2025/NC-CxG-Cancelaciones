@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
 import { verifyPermission } from '../middleware/auth.js';
+import { getAuthenticatedUserDisplayName } from '../utils/user.js';
 
 const router = Router();
 
@@ -135,7 +136,7 @@ router.post('/', verifyPermission('cxg.programa_supervisores.create'), async (re
         const { empleado_id, fecha_labor, labor } = req.body;
         const pool = await getDbConnection();
         const id = Math.random().toString(16).substring(2, 10);
-        const creadoPor = (req as any).user?.full_name || (req as any).user?.username || 'Sistema';
+        const creadoPor = await getAuthenticatedUserDisplayName(req);
 
         await pool.request()
             .input('id', sql.VarChar, id)
@@ -162,7 +163,7 @@ router.put('/:id', verifyPermission('cxg.programa_supervisores.edit'), async (re
         const { id } = req.params;
         const { empleado_id, fecha_labor, labor } = req.body;
         const pool = await getDbConnection();
-        const modificadoPor = (req as any).user?.full_name || (req as any).user?.username || 'Sistema';
+        const modificadoPor = await getAuthenticatedUserDisplayName(req);
 
         const result = await pool.request()
             .input('id', sql.VarChar, id)

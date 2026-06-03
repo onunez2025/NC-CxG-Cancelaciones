@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
+import { getAuthenticatedUserDisplayName } from '../utils/user.js';
 
 const router = Router();
 
@@ -108,7 +109,7 @@ router.post('/', async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Ticket y Motivo son requeridos' });
         }
 
-        const userDisplayName = req.user?.full_name || req.user?.username || usuario || 'Sistema';
+        const userDisplayName = await getAuthenticatedUserDisplayName(req, usuario);
 
         await pool.request()
             .input('id', sql.VarChar, id)

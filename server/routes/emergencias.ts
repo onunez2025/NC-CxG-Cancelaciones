@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
+import { getAuthenticatedUserDisplayName } from '../utils/user.js';
 
 const router = Router();
 
@@ -161,7 +162,9 @@ router.post('/', async (req: Request, res: Response) => {
             observacion, creado_por 
         } = req.body;
         
-        const userDisplayName = req.user?.full_name || req.user?.username || creado_por || 'Sistema';
+        const pool = await getDbConnection();
+        const id = Math.random().toString(16).substring(2, 10).toUpperCase();
+        const userDisplayName = await getAuthenticatedUserDisplayName(req, creado_por);
 
         await pool.request()
             .input('id', sql.VarChar, id)
@@ -222,7 +225,7 @@ router.put('/:id/verificar', async (req: Request, res: Response) => {
         const { verificacion, motivo, usuario } = req.body;
         
         const pool = await getDbConnection();
-        const userDisplayName = req.user?.full_name || req.user?.username || usuario || 'Sistema';
+        const userDisplayName = await getAuthenticatedUserDisplayName(req, usuario);
 
         await pool.request()
             .input('id', sql.VarChar, id)
@@ -254,7 +257,7 @@ router.put('/:id/procesar', async (req: Request, res: Response) => {
         const { procesado, motivo, usuario } = req.body;
         
         const pool = await getDbConnection();
-        const userDisplayName = req.user?.full_name || req.user?.username || usuario || 'Sistema';
+        const userDisplayName = await getAuthenticatedUserDisplayName(req, usuario);
 
         await pool.request()
             .input('id', sql.VarChar, id)

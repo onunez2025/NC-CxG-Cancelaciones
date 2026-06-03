@@ -3,6 +3,7 @@ import { getDbConnection } from '../db.js';
 import sql from 'mssql';
 import { verifyPermission, logAudit } from '../middleware/auth.js';
 import { fsmApiService } from '../services/fsmApiService.js';
+import { getAuthenticatedUserDisplayName } from '../utils/user.js';
 
 const router = Router();
 
@@ -110,6 +111,42 @@ export function resolveStoreDescription(code: string | null | undefined): string
     }
     
     return 'TIENDAS VARIAS';
+}
+
+export function getSQLResolvedStoreDescription(dbCol: string): string {
+    let sqlExpr = `CASE `;
+    
+    // Add C4C_STORE_MAPPING
+    for (const [code, name] of Object.entries(C4C_STORE_MAPPING)) {
+        const escapedName = name.replace(/'/g, "''");
+        sqlExpr += `WHEN LTRIM(RTRIM(${dbCol})) = '${code}' THEN '${escapedName}' `;
+    }
+    
+    // Add wildcard rules
+    sqlExpr += `WHEN LTRIM(RTRIM(${dbCol})) LIKE '1301%' OR LTRIM(RTRIM(${dbCol})) LIKE '%2995%' THEN 'SODIMAC PERU S.A.' `;
+    sqlExpr += `WHEN LTRIM(RTRIM(${dbCol})) LIKE '1303%' OR LTRIM(RTRIM(${dbCol})) LIKE '%2211%' THEN 'PROMART - HOMECENTERS PERUANOS S.A.' `;
+    sqlExpr += `WHEN LTRIM(RTRIM(${dbCol})) LIKE '1304%' OR LTRIM(RTRIM(${dbCol})) LIKE '%3005%' THEN 'MAESTRO - TIENDA DEL MEJORAMIENTO DEL HOGAR S.A.' `;
+    sqlExpr += `WHEN LTRIM(RTRIM(${dbCol})) LIKE '1305%' OR LTRIM(RTRIM(${dbCol})) LIKE '%3381%' OR LTRIM(RTRIM(${dbCol})) LIKE '%3376%' THEN 'CASSINELLI S A' `;
+    sqlExpr += `WHEN LTRIM(RTRIM(${dbCol})) LIKE '1306%' OR LTRIM(RTRIM(${dbCol})) LIKE '%2548%' THEN 'TIENDAS POR DEPARTAMENTO RIPLEY' `;
+    sqlExpr += `WHEN LTRIM(RTRIM(${dbCol})) LIKE '1307%' OR LTRIM(RTRIM(${dbCol})) LIKE '%2295%' THEN 'SAGA FALABELLA SA' `;
+    sqlExpr += `WHEN LTRIM(RTRIM(${dbCol})) LIKE '1308%' OR LTRIM(RTRIM(${dbCol})) LIKE '%2444%' THEN 'HIPERMERCADOS TOTTUS SA' `;
+    sqlExpr += `WHEN LTRIM(RTRIM(${dbCol})) LIKE '1309%' OR LTRIM(RTRIM(${dbCol})) LIKE '%0003%' THEN 'IMPORTACIONES HIRAOKA S.A.C.' `;
+    sqlExpr += `WHEN LTRIM(RTRIM(${dbCol})) LIKE '1310%' OR LTRIM(RTRIM(${dbCol})) LIKE '%1836%' THEN 'TIENDAS PERUANAS SA - OECHSLE' `;
+    sqlExpr += `WHEN LTRIM(RTRIM(${dbCol})) LIKE '1311%' THEN 'PLAZA VEA' `;
+    sqlExpr += `WHEN LTRIM(RTRIM(${dbCol})) LIKE '1312%' THEN 'ESTILOS' `;
+    sqlExpr += `WHEN LTRIM(RTRIM(${dbCol})) LIKE '1313%' THEN 'METRO' `;
+    sqlExpr += `WHEN LTRIM(RTRIM(${dbCol})) LIKE '1314%' THEN 'TIENDA PARIS' `;
+    sqlExpr += `WHEN LTRIM(RTRIM(${dbCol})) LIKE '1315%' THEN 'TIENDA LA CURACAO' `;
+    sqlExpr += `WHEN LTRIM(RTRIM(${dbCol})) LIKE '1316%' THEN 'TIENDA EFE' `;
+    sqlExpr += `WHEN LTRIM(RTRIM(${dbCol})) LIKE '1317%' THEN 'TIENDA CARSA' `;
+    sqlExpr += `WHEN LTRIM(RTRIM(${dbCol})) LIKE '1318%' THEN 'TIENDA MARCIMEX' `;
+    
+    // Other condition: cleanCode starting with letter and not 'null'/'undefined'
+    sqlExpr += `WHEN LTRIM(RTRIM(${dbCol})) LIKE '[a-zA-Z]%' AND LTRIM(RTRIM(${dbCol})) NOT IN ('null', 'undefined') THEN LTRIM(RTRIM(${dbCol})) `;
+    
+    // Default
+    sqlExpr += `ELSE 'TIENDAS VARIAS' END`;
+    return sqlExpr;
 }
 
 // ─────────────────────────────────────────────
@@ -685,7 +722,7 @@ router.get('/cxg-nc/unique-values', verifyPermission('cxg.cxg_nc.view'), async (
             tipo: 'n.Tipo',
             documento: 't.CodigoExternoCliente',
             ticket: 'n.Ticket',
-            tienda: 'COALESCE(emp.DsEmpresa, t.IDEmpresa)',
+            tienda: getSQLResolvedStoreDescription('COALESCE(emp.DsEmpresa, t.IDEmpresa)'),
             cliente: 'COALESCE(t.NombreCliente, n.Tienda)',
             creado_por: 'n.Creado_por',
             supervisor: 'COALESCE(sup_cas.supervisor_nombre, sup_sole.supervisor_nombre)',
@@ -847,7 +884,7 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
                     t.CodigoExternoCliente as documento_cliente,
                     t.CodigoExternoEquipo as codigo_producto,
                     t.NombreEquipo as producto,
-                    COALESCE(emp.DsEmpresa, t.IDEmpresa) as tienda,
+                    ${getSQLResolvedStoreDescription('COALESCE(emp.DsEmpresa, t.IDEmpresa)')} as tienda,
                     t.NombreTecnico,
                     t.ApellidoTecnico,
                     ${supervisorSelect}
@@ -1193,7 +1230,7 @@ router.post('/cancelaciones', verifyPermission('cxg.cancelaciones.create'), asyn
         const autoApprove = ['Asesor CC', 'SupervisorCC', 'Supervisor'].includes(roleClean);
         const estadoProceso = autoApprove ? 'APROBADO_SUP' : 'REGISTRADO';
 
-        const userDisplayName = req.user?.full_name || req.user?.username || usuario || 'Sistema';
+        const userDisplayName = await getAuthenticatedUserDisplayName(req, usuario);
 
         await pool.request()
             .input('id', sql.VarChar, id)
@@ -1248,7 +1285,7 @@ router.post('/cancelaciones/:id/gestionar', verifyPermission('cxg.cancelaciones.
             return res.status(400).json({ error: `Acción inválida. Estado actual: ${checkState.recordset[0].Estado_Proceso}. Se requiere: VALIDADO.` });
         }
 
-        const userDisplayName = req.user?.full_name || req.user?.username || gestionado_por || 'Sistema';
+        const userDisplayName = await getAuthenticatedUserDisplayName(req, gestionado_por);
 
         await pool.request()
             .input('id', sql.VarChar, id)
@@ -1303,7 +1340,7 @@ router.post('/cancelaciones/:id/asignar', verifyPermission('cxg.cancelaciones.as
             return res.status(400).json({ error: `Acción inválida. Estado actual: ${checkState.recordset[0].Estado_Proceso}. Se requiere: APROBADO_SUP.` });
         }
 
-        const userDisplayName = req.user?.full_name || req.user?.username || asignado_por || 'Sistema';
+        const userDisplayName = await getAuthenticatedUserDisplayName(req, asignado_por);
 
         await pool.request()
             .input('id', sql.VarChar, id)
@@ -1408,7 +1445,7 @@ router.post('/cxg-nc', verifyPermission('cxg.cxg_nc.create'), async (req: Reques
 
         const solicitudId = `CNC-${Date.now()}`;
         const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
-        const userDisplayName = req.user?.full_name || req.user?.username || req.body.usuario || 'Sistema';
+        const userDisplayName = await getAuthenticatedUserDisplayName(req, req.body.usuario);
 
         await pool.request()
             .input('id', sql.VarChar, solicitudId)
@@ -1468,7 +1505,7 @@ router.post('/cxg-nc/:id/aprobar-solicitud', verifyPermission('cxg.cxg_nc.approv
         }
 
         const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
-        const userDisplayName = req.user?.full_name || req.user?.username || usuario || 'Sistema';
+        const userDisplayName = await getAuthenticatedUserDisplayName(req, usuario);
 
         let updateQuery = `
             UPDATE [dbo].[GAC_APP_TB_CXG_NC] 
@@ -1556,7 +1593,7 @@ router.post('/cxg-nc/:id/asignar', verifyPermission('cxg.cxg_nc.assign'), async 
         }
 
         const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
-        const userDisplayName = req.user?.full_name || req.user?.username || asignado_por || 'Sistema';
+        const userDisplayName = await getAuthenticatedUserDisplayName(req, asignado_por);
 
         await pool.request()
             .input('id', sql.VarChar, id)
@@ -1613,7 +1650,7 @@ router.post('/cxg-nc/:id/gestionar', verifyPermission('cxg.cxg_nc.process'), asy
         }
 
         const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
-        const userDisplayName = req.user?.full_name || req.user?.username || gestionado_por || 'Sistema';
+        const userDisplayName = await getAuthenticatedUserDisplayName(req, gestionado_por);
 
         await pool.request()
             .input('id', sql.VarChar, id)
