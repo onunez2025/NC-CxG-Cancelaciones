@@ -8,7 +8,7 @@ import { getAuthenticatedUserDisplayName } from '../utils/user.js';
 const router = Router();
 
 // Dictionary to map zIDLugarCompra_SDK OData codes to store names
-const C4C_STORE_MAPPING: Record<string, string> = {
+export const C4C_STORE_MAPPING: Record<string, string> = {
   "000000000000000000000000000000000000000000000000000000002995": "SODIMAC PERU S.A.",
   "000000000000000000000000000000000000000000000000000000002540": "TIENDAS VARIAS",
   "000000000000000000000000000000000000000000000000000000000003": "IMPORTACIONES HIRAOKA S.A.C.",
@@ -722,7 +722,7 @@ router.get('/cxg-nc/unique-values', verifyPermission('cxg.cxg_nc.view'), async (
             tipo: 'n.Tipo',
             documento: 't.CodigoExternoCliente',
             ticket: 'n.Ticket',
-            tienda: getSQLResolvedStoreDescription('COALESCE(emp.DsEmpresa, t.IDEmpresa)'),
+            tienda: `COALESCE(n.Lugar_Compra, ${getSQLResolvedStoreDescription('COALESCE(emp.DsEmpresa, t.IDEmpresa)')})`,
             cliente: 'COALESCE(t.NombreCliente, n.Tienda)',
             creado_por: 'COALESCE(u_creador.FullName, n.Creado_por)',
             supervisor: 'COALESCE(sup_cas.supervisor_nombre, sup_sole.supervisor_nombre)',
@@ -885,7 +885,7 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
                     t.CodigoExternoCliente as documento_cliente,
                     t.CodigoExternoEquipo as codigo_producto,
                     t.NombreEquipo as producto,
-                    ${getSQLResolvedStoreDescription('COALESCE(emp.DsEmpresa, t.IDEmpresa)')} as tienda,
+                    COALESCE(n.Lugar_Compra, ${getSQLResolvedStoreDescription('COALESCE(emp.DsEmpresa, t.IDEmpresa)')}) as tienda,
                     t.NombreTecnico,
                     t.ApellidoTecnico,
                     ${supervisorSelect}
@@ -1165,7 +1165,7 @@ router.get('/cxg-nc/:id', verifyPermission('cxg.cxg_nc.view'), async (req: Reque
                     n.Ticket_desinstalacion as ticket_desinstalacion,
                     n.Ticket as ticket,
                     COALESCE(t.ComentarioProgramador, '') as fsm_motivo_elevacion,
-                    COALESCE(emp.DsEmpresa, t.IDEmpresa) as fsm_lugar_compra,
+                    COALESCE(n.Lugar_Compra, emp.DsEmpresa, t.IDEmpresa) as fsm_lugar_compra,
                     COALESCE(sup_cas.supervisor_nombre, sup_sole.supervisor_nombre) as supervisor_asignado,
                     t.NombreCliente as fsm_cliente,
                     t.CodigoExternoEquipo as codigo_producto,
@@ -1419,7 +1419,7 @@ router.post('/cancelaciones/:id/reject', async (req: Request, res: Response) => 
 
 router.post('/cxg-nc', verifyPermission('cxg.cxg_nc.create'), async (req: Request, res: Response) => {
     try {
-        const { tipo, cliente, ticket, observacion } = req.body;
+        const { tipo, cliente, ticket, observacion, lugar_compra } = req.body;
         const pool = await getDbConnection();
 
         // 1. Check if ticket already exists in an active state
@@ -1450,6 +1450,41 @@ router.post('/cxg-nc', verifyPermission('cxg.cxg_nc.create'), async (req: Reques
         const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
         const userDisplayName = await getAuthenticatedUserDisplayName(req, req.body.usuario);
 
+        // Resolve store name via C4C OData if not provided by frontend
+        let finalLugarCompra = lugar_compra;
+        if (!finalLugarCompra && ticket) {
+            try {
+                const sapBaseUrl = process.env.SAP_BASE_URL || 'https://my361897.crm.ondemand.com/sap/c4c/odata/v1/c4codataapi';
+                const sapUser = process.env.SAP_USER || 'oscar.nunez';
+                const sapPassword = process.env.SAP_PASSWORD || '9xP6*epfuhWx4rK';
+                const authHeader = 'Basic ' + Buffer.from(`${sapUser}:${sapPassword}`).toString('base64');
+                const url = `${sapBaseUrl}/ServiceRequestCollection?$filter=ID eq '${ticket}'&$format=json`;
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': authHeader,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const body = await response.json() as any;
+                    const odataResults = body?.d?.results || [];
+                    if (odataResults.length > 0) {
+                        const sdkCode = odataResults[0].zIDLugarCompra_SDK;
+                        if (sdkCode) {
+                            const mappedStore = C4C_STORE_MAPPING[sdkCode];
+                            if (mappedStore) {
+                                finalLugarCompra = resolveStoreDescription(mappedStore);
+                            }
+                        }
+                    }
+                }
+            } catch (err: any) {
+                console.error(`[POST /cxg-nc ODATA ERROR] Failed resolving ticket ${ticket}:`, err.message);
+            }
+        }
+
         await pool.request()
             .input('id', sql.VarChar, solicitudId)
             .input('ticket', sql.VarChar, ticket || 'MT-TK-TEMP')
@@ -1457,10 +1492,11 @@ router.post('/cxg-nc', verifyPermission('cxg.cxg_nc.create'), async (req: Reques
             .input('tienda', sql.VarChar, cliente)
             .input('observacion', sql.VarChar, observacion || '')
             .input('usuario', sql.VarChar, userDisplayName)
+            .input('lugar_compra', sql.VarChar, finalLugarCompra || null)
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_CXG_NC] 
-                (ID_Apro_CxG_NC, Ticket, Tipo, Tienda, Observacion, Creado_el, Creado_por, Procesado)
-                VALUES (@id, @ticket, @tipo, @tienda, @observacion, GETDATE(), @usuario, 'false')
+                (ID_Apro_CxG_NC, Ticket, Tipo, Tienda, Observacion, Creado_el, Creado_por, Procesado, Lugar_Compra)
+                VALUES (@id, @ticket, @tipo, @tienda, @observacion, GETDATE(), @usuario, 'false', @lugar_compra)
             `);
 
         // Insert history entry

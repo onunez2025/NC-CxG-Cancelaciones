@@ -339,6 +339,7 @@ export const CxGNCPage = () => {
         estado: 'REGISTRADO',
         ticket: formData.ticket,
         observacion: formData.observacion,
+        lugar_compra: formData.lugar_compra,
         ...(formData.parent_id ? { parent_id: formData.parent_id } : {})
       });
       
@@ -358,7 +359,8 @@ export const CxGNCPage = () => {
         cliente: '', 
         ticket: '',
         observacion: '',
-        parent_id: undefined
+        parent_id: undefined,
+        lugar_compra: undefined
       });
     } catch (error: any) {
       console.error(error);
@@ -392,7 +394,8 @@ export const CxGNCPage = () => {
 
       setFormData({
         ...formData,
-        cliente: ticketInfo.cliente
+        cliente: ticketInfo.cliente,
+        lugar_compra: ticketInfo.lugar_compra
       });
       setIsTicketValidated(true);
       toast.success('Éxito', 'Ticket encontrado y válido para nueva solicitud');

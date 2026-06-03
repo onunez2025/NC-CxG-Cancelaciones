@@ -65,6 +65,7 @@ export interface CxGNC {
     // Extended fields for detail view
     fsm_cliente?: string;
     tienda?: string;
+    lugar_compra?: string;
     documento_cliente?: string;
     codigo_producto?: string;
     producto?: string;
