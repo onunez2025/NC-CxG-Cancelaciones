@@ -66,12 +66,14 @@ router.get('/', async (req: Request, res: Response) => {
                 e.Puesto as empleado_role,
                 CONVERT(VARCHAR, l.Fecha_Labor, 23) as fecha_labor,
                 l.Labor as labor,
-                l.Creado_por as creado_por,
+                COALESCE(u_creador.FullName, l.Creado_por) as creado_por,
                 CONVERT(VARCHAR, l.Creado_el, 120) as creado_el,
-                l.Modificado_por as modificado_por,
+                COALESCE(u_modificador.FullName, l.Modificado_por) as modificado_por,
                 CONVERT(VARCHAR, l.Modificado_el, 120) as modificado_el
             FROM [dbo].[GAC_APP_TB_EMPLEADOS_CALENDARIO_LABORES] l
             LEFT JOIN [dbo].[GAC_APP_TB_EMPLEADOS] e ON l.Empleado = e.ID_empleado
+            LEFT JOIN [EBM].[Users] u_creador ON u_creador.Username = l.Creado_por
+            LEFT JOIN [EBM].[Users] u_modificador ON u_modificador.Username = l.Modificado_por
             ${whereClause}
             ORDER BY ${orderColumn} ${sortOrder}
             OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY

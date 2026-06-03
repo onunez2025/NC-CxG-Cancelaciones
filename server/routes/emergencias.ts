@@ -82,7 +82,7 @@ router.get('/', async (req: Request, res: Response) => {
                     e.Proceso_el as proceso_el,
                     e.Procesado_por as procesado_por,
                     e.Creado_el as creado_el,
-                    e.Creado_por as creado_por,
+                    COALESCE(u_creador.FullName, e.Creado_por) as creado_por,
                     e.Tipo as tipo,
                     e.Producto as producto,
                     e.Asesor_CC as asesor_cc,
@@ -94,6 +94,7 @@ router.get('/', async (req: Request, res: Response) => {
                     e.Direccion_referencia as direccion_referencia,
                     e.Solicitud_repuestos as solicitud_repuestos
                 FROM [dbo].[GAC_APP_TB_EMERGENCIAS] e
+                LEFT JOIN [EBM].[Users] u_creador ON u_creador.Username = e.Creado_por
                 LEFT JOIN [dbo].[GAC_APP_TB_EMERGENCIA_VERIFICACION] ev ON e.Verificacion = ev.ID_Emergencia_Verificacion
                 LEFT JOIN [dbo].[GAC_APP_TB_EMERGENCIA_PROCESADO] ep ON e.Procesado = ep.ID_Emergencia_Procesado
                 ${whereClause}
@@ -126,18 +127,19 @@ router.get('/:id', async (req: Request, res: Response) => {
             .input('id', sql.VarChar, id)
             .query(`
                 SELECT 
-                    ID_Emergencia as id, Ticket as ticket, Observacion as observacion,
-                    Verificacion as verificacion, Verificacion_motivo as verificacion_motivo,
-                    Verificado_el as verificado_el, Verificado_por as verificado_por,
-                    Procesado as procesado, Procesado_motivo as procesado_motivo,
-                    Proceso_el as proceso_el, Procesado_por as procesado_por,
-                    Creado_el as creado_el, Creado_por as creado_por,
-                    Tipo as tipo, Producto as producto, Asesor_CC as asesor_cc,
-                    Tecnico_asignado as tecnico_asignado, Cliente as cliente,
-                    Telefono_1 as telefono_1, Telefono_2 as telefono_2,
-                    Direccion as direccion, Direccion_referencia as direccion_referencia,
-                    Solicitud_repuestos as solicitud_repuestos
-                FROM [dbo].[GAC_APP_TB_EMERGENCIAS] 
+                    e.ID_Emergencia as id, e.Ticket as ticket, e.Observacion as observacion,
+                    e.Verificacion as verificacion, e.Verificacion_motivo as verificacion_motivo,
+                    e.Verificado_el as verificado_el, e.Verificado_por as verificado_por,
+                    e.Procesado as procesado, e.Procesado_motivo as procesado_motivo,
+                    e.Proceso_el as proceso_el, e.Procesado_por as procesado_por,
+                    e.Creado_el as creado_el, COALESCE(u_creador.FullName, e.Creado_por) as creado_por,
+                    e.Tipo as tipo, e.Producto as producto, e.Asesor_CC as asesor_cc,
+                    e.Tecnico_asignado as tecnico_asignado, e.Cliente as cliente,
+                    e.Telefono_1 as telefono_1, e.Telefono_2 as telefono_2,
+                    e.Direccion as direccion, e.Direccion_referencia as direccion_referencia,
+                    e.Solicitud_repuestos as solicitud_repuestos
+                FROM [dbo].[GAC_APP_TB_EMERGENCIAS] e
+                LEFT JOIN [EBM].[Users] u_creador ON u_creador.Username = e.Creado_por
                 WHERE ID_Emergencia = @id
             `);
             

@@ -66,7 +66,7 @@ router.get('/', async (req: Request, res: Response) => {
                     n.Motivo_solicitud as motivo,
                     n.Comentario as comentario,
                     n.Creado_el as fecha,
-                    n.Creado_por as creado_por,
+                    COALESCE(u_creador.FullName, n.Creado_por) as creado_por,
                     n.Estado as estado,
                     n.Reviisado_el as revisado_el,
                     n.Revisado_por as revisado_por,
@@ -76,6 +76,7 @@ router.get('/', async (req: Request, res: Response) => {
                     t.CodigoExternoEquipo as codigo_producto,
                     t.NombreEquipo as producto
                 FROM [dbo].[GAC_APP_TB_CASOS_ESPECIALES] n
+                LEFT JOIN [EBM].[Users] u_creador ON u_creador.Username = n.Creado_por
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
                 ${whereClause}
                 ORDER BY n.Creado_el DESC

@@ -724,7 +724,7 @@ router.get('/cxg-nc/unique-values', verifyPermission('cxg.cxg_nc.view'), async (
             ticket: 'n.Ticket',
             tienda: getSQLResolvedStoreDescription('COALESCE(emp.DsEmpresa, t.IDEmpresa)'),
             cliente: 'COALESCE(t.NombreCliente, n.Tienda)',
-            creado_por: 'n.Creado_por',
+            creado_por: 'COALESCE(u_creador.FullName, n.Creado_por)',
             supervisor: 'COALESCE(sup_cas.supervisor_nombre, sup_sole.supervisor_nombre)',
             aprobado: 'n.Aprobado',
             procesado: 'n.Procesado',
@@ -749,6 +749,7 @@ router.get('/cxg-nc/unique-values', verifyPermission('cxg.cxg_nc.view'), async (
             SELECT DISTINCT TOP 50
                 ${dbCol} as value
             FROM [dbo].[GAC_APP_TB_CXG_NC] n
+            LEFT JOIN [EBM].[Users] u_creador ON u_creador.Username = n.Creado_por
             LEFT JOIN [SIATC].[Dashboard_FSM] t ON t.Ticket = CAST(n.Ticket AS NVARCHAR(255))
             LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as NVARCHAR(255))
             -- CAS Supervisor (OUTER APPLY TOP 1 with active priority and historical order)
@@ -877,7 +878,7 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
                     n.Aprobado_observacion as aprobado_observacion,
                     n.Aprobado_el as aprobado_el,
                     n.Aprobado_por as aprobado_por,
-                    n.Creado_por as creado_por,
+                    COALESCE(u_creador.FullName, n.Creado_por) as creado_por,
                     n.Procesado as procesado,
                     n.Procesado_por as procesado_por,
                     n.Procesado_el as procesado_el,
@@ -889,6 +890,7 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
                     t.ApellidoTecnico,
                     ${supervisorSelect}
                 FROM [dbo].[GAC_APP_TB_CXG_NC] n
+                LEFT JOIN [EBM].[Users] u_creador ON u_creador.Username = n.Creado_por
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON t.Ticket = CAST(n.Ticket AS NVARCHAR(255))
                 LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as NVARCHAR(255))
                 ${supervisorJoin}
@@ -1140,7 +1142,7 @@ router.get('/cxg-nc/:id', verifyPermission('cxg.cxg_nc.view'), async (req: Reque
                     n.Tipo as tipo,
                     n.Ticket as correlativo,
                     n.Creado_el as fecha,
-                    n.Creado_por as creado_por,
+                    COALESCE(u_creador.FullName, n.Creado_por) as creado_por,
                     COALESCE(t.NombreCliente, n.Tienda) as cliente,
                     n.Observacion as observacion_inicial,
                     CASE 
@@ -1169,6 +1171,7 @@ router.get('/cxg-nc/:id', verifyPermission('cxg.cxg_nc.view'), async (req: Reque
                     t.CodigoExternoEquipo as codigo_producto,
                     t.NombreEquipo as producto
                 FROM [dbo].[GAC_APP_TB_CXG_NC] n
+                LEFT JOIN [EBM].[Users] u_creador ON u_creador.Username = n.Creado_por
                 LEFT JOIN [SIATC].[Dashboard_FSM] t ON t.Ticket = CAST(n.Ticket AS NVARCHAR(255))
                 LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa as NVARCHAR(255))
                 -- CAS Supervisor (OUTER APPLY TOP 1 with active priority and historical order)
