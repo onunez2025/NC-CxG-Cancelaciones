@@ -148,7 +148,7 @@ export const ncService = {
         asignado_a?: string;
         sortBy?: string;
         sortOrder?: 'asc' | 'desc';
-        filters?: Record<string, string>;
+        filters?: Record<string, string | string[]>;
     }): Promise<PaginatedResponse<Cancellation>> {
         const queryParams = new URLSearchParams();
         if (params?.page) queryParams.append('page', params.page.toString());
@@ -161,8 +161,9 @@ export const ncService = {
         
         if (params?.filters) {
             for (const [key, value] of Object.entries(params.filters)) {
-                if (value) {
-                    queryParams.append(`filter_${key}`, value);
+                const serialized = Array.isArray(value) ? value.join(',') : value;
+                if (serialized) {
+                    queryParams.append(`filter_${key}`, serialized);
                 }
             }
         }
@@ -195,7 +196,7 @@ export const ncService = {
         estado?: string;
         sortBy?: string;
         sortOrder?: 'asc' | 'desc';
-        filters?: Record<string, string>;
+        filters?: Record<string, string | string[]>;
     }): Promise<PaginatedResponse<CxGNC>> {
         const queryParams = new URLSearchParams();
         if (params?.page) queryParams.append('page', params.page.toString());
@@ -208,8 +209,9 @@ export const ncService = {
         
         if (params?.filters) {
             for (const [key, value] of Object.entries(params.filters)) {
-                if (value) {
-                    queryParams.append(`filter_${key}`, value);
+                const serialized = Array.isArray(value) ? value.join(',') : value;
+                if (serialized) {
+                    queryParams.append(`filter_${key}`, serialized);
                 }
             }
         }

@@ -569,12 +569,14 @@ router.get('/cancelaciones', verifyPermission('cxg.cancelaciones.view'), async (
                 const dbCol = filterMappings[colKey];
                 const value = req.query[key] as string;
                 if (dbCol && value) {
-                    dynamicFilters.push({
+                    // Support multi-value: comma-separated values
+                    const vals = value.split(',').map(v => v.trim()).filter(Boolean);
+                    vals.forEach(v => dynamicFilters.push({
                         col: dbCol,
-                        val: value,
+                        val: v,
                         type: 'string',
                         op: 'eq'
-                    });
+                    }));
                 }
             }
         }
@@ -599,18 +601,39 @@ router.get('/cancelaciones', verifyPermission('cxg.cancelaciones.view'), async (
             whereClause += ` AND c.Asignado_a = @asignado_a`;
         }
 
-        // Add dynamic filters to where clause
-        dynamicFilters.forEach((f, idx) => {
+        // Add dynamic filters to where clause (group string filters by column for OR/IN semantics)
+        const stringFiltersByCol: Record<string, string[]> = {};
+        const dateFilters: typeof dynamicFilters = [];
+        dynamicFilters.forEach(f => {
             if (f.type === 'date') {
-                if (f.op === 'gte') {
-                    whereClause += ` AND CAST(${f.col} AS DATE) >= @fval${idx}`;
-                } else {
-                    whereClause += ` AND CAST(${f.col} AS DATE) <= @fval${idx}`;
-                }
+                dateFilters.push(f);
             } else {
-                whereClause += ` AND ${f.col} = @fval${idx}`;
+                if (!stringFiltersByCol[f.col]) stringFiltersByCol[f.col] = [];
+                stringFiltersByCol[f.col].push(f.val);
             }
         });
+        // Date range filters (AND)
+        let cancelDateIdx = 0;
+        dateFilters.forEach(f => {
+            if (f.op === 'gte') {
+                whereClause += ` AND CAST(${f.col} AS DATE) >= @fdate${cancelDateIdx}`;
+            } else {
+                whereClause += ` AND CAST(${f.col} AS DATE) <= @fdate${cancelDateIdx}`;
+            }
+            cancelDateIdx++;
+        });
+        // String filters: same column = OR (IN), different columns = AND
+        let cancelStrIdx = 0;
+        for (const [col, vals] of Object.entries(stringFiltersByCol)) {
+            if (vals.length === 1) {
+                whereClause += ` AND ${col} = @fstr${cancelStrIdx}`;
+                cancelStrIdx++;
+            } else {
+                const inParams = vals.map((_, vi) => `@fstr${cancelStrIdx + vi}`).join(', ');
+                whereClause += ` AND ${col} IN (${inParams})`;
+                cancelStrIdx += vals.length;
+            }
+        }
 
         // Get total count for pagination
         const countRequest = pool.request().input('search', sql.VarChar, `%${search}%`);
@@ -620,13 +643,12 @@ router.get('/cancelaciones', verifyPermission('cxg.cancelaciones.view'), async (
         if (asignado_a) {
             countRequest.input('asignado_a', sql.VarChar, asignado_a);
         }
-        dynamicFilters.forEach((f, idx) => {
-            if (f.type === 'date') {
-                countRequest.input(`fval${idx}`, sql.Date, f.val);
-            } else {
-                countRequest.input(`fval${idx}`, sql.VarChar, f.val);
-            }
-        });
+        let cancelBidx = 0;
+        dateFilters.forEach(f => { countRequest.input(`fdate${cancelBidx++}`, sql.Date, f.val); });
+        cancelBidx = 0;
+        for (const vals of Object.values(stringFiltersByCol)) {
+            vals.forEach(v => { countRequest.input(`fstr${cancelBidx++}`, sql.VarChar, v); });
+        }
 
         const countResult = await countRequest.query(`
             SELECT COUNT(*) as total 
@@ -648,13 +670,12 @@ router.get('/cancelaciones', verifyPermission('cxg.cancelaciones.view'), async (
         if (asignado_a) {
             dataRequest.input('asignado_a', sql.VarChar, asignado_a);
         }
-        dynamicFilters.forEach((f, idx) => {
-            if (f.type === 'date') {
-                dataRequest.input(`fval${idx}`, sql.Date, f.val);
-            } else {
-                dataRequest.input(`fval${idx}`, sql.VarChar, f.val);
-            }
-        });
+        cancelBidx = 0;
+        dateFilters.forEach(f => { dataRequest.input(`fdate${cancelBidx++}`, sql.Date, f.val); });
+        cancelBidx = 0;
+        for (const vals of Object.values(stringFiltersByCol)) {
+            vals.forEach(v => { dataRequest.input(`fstr${cancelBidx++}`, sql.VarChar, v); });
+        }
 
         const result = await dataRequest.query(`
             SELECT 
@@ -977,18 +998,28 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
                 const value = req.query[key] as string;
                 if (dbCol && value) {
                     if (colKey === 'aprobado' || colKey === 'procesado') {
-                        if (value === 'Pendiente') {
-                            whereClause += ` AND (${dbCol} IS NULL OR ${dbCol} = '')`;
-                        } else if (value === 'Aprobado') {
-                            whereClause += ` AND (${dbCol} = 'true' OR ${dbCol} = 'Si' OR ${dbCol} = 'APROBADO')`;
-                        } else if (value === 'Rechazado') {
-                            whereClause += ` AND (${dbCol} = 'false' OR ${dbCol} = 'No' OR ${dbCol} = 'RECHAZADO')`;
-                        }
+                        const vals = value.split(',').map(v => v.trim()).filter(Boolean);
+                        const conditions: string[] = [];
+                        if (vals.includes('Pendiente')) conditions.push(`(${dbCol} IS NULL OR ${dbCol} = '')`);
+                        if (vals.includes('Aprobado')) conditions.push(`(${dbCol} = 'true' OR ${dbCol} = 'Si' OR ${dbCol} = 'APROBADO')`);
+                        if (vals.includes('Rechazado')) conditions.push(`(${dbCol} = 'false' OR ${dbCol} = 'No' OR ${dbCol} = 'RECHAZADO')`);
+                        if (conditions.length > 0) whereClause += ` AND (${conditions.join(' OR ')})`;
                     } else {
-                        whereClause += ` AND ${dbCol} LIKE @fval${filterIndex}`;
-                        countRequest.input(`fval${filterIndex}`, sql.VarChar, `%${value}%`);
-                        dataRequest.input(`fval${filterIndex}`, sql.VarChar, `%${value}%`);
-                        filterIndex++;
+                        const vals = value.split(',').map(v => v.trim()).filter(Boolean);
+                        if (vals.length === 1) {
+                            whereClause += ` AND ${dbCol} LIKE @fval${filterIndex}`;
+                            countRequest.input(`fval${filterIndex}`, sql.VarChar, `%${vals[0]}%`);
+                            dataRequest.input(`fval${filterIndex}`, sql.VarChar, `%${vals[0]}%`);
+                            filterIndex++;
+                        } else if (vals.length > 1) {
+                            const inParams = vals.map((_, vi) => `@fval${filterIndex + vi}`).join(', ');
+                            whereClause += ` AND ${dbCol} IN (${inParams})`;
+                            vals.forEach((v, vi) => {
+                                countRequest.input(`fval${filterIndex + vi}`, sql.VarChar, v);
+                                dataRequest.input(`fval${filterIndex + vi}`, sql.VarChar, v);
+                            });
+                            filterIndex += vals.length;
+                        }
                     }
                 }
             }

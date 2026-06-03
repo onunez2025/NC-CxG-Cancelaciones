@@ -80,7 +80,7 @@ export const CancellationsPage = () => {
 
   // Sorting & Filtering State
   const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' } | null>(null);
-  const [columnFilters, setColumnFilters] = useState<Record<string, string>>({});
+  const [columnFilters, setColumnFilters] = useState<Record<string, string[]>>();
   const [activeFilterCol, setActiveFilterCol] = useState<string | null>(null);
   const [filterSearchTerm, setFilterSearchTerm] = useState('');
   const [filterSuggestions, setFilterSuggestions] = useState<string[]>([]);
@@ -216,15 +216,20 @@ export const CancellationsPage = () => {
 
   const applyFilter = (colId: string, value: string) => {
     setColumnFilters(prev => {
-      const next = { ...prev };
-      if (value) {
-        next[colId] = value;
-      } else {
+      const current = (prev || {})[colId] || [];
+      const next = { ...(prev || {}) };
+      if (!value) {
         delete next[colId];
+      } else if (current.includes(value)) {
+        const remaining = current.filter(v => v !== value);
+        if (remaining.length === 0) delete next[colId];
+        else next[colId] = remaining;
+      } else {
+        next[colId] = [...current, value];
       }
       return next;
     });
-    setActiveFilterCol(null);
+    // keep dropdown open for multi-select
   };
 
   const handleClearFilters = () => {
@@ -792,10 +797,15 @@ export const CancellationsPage = () => {
                             )}
                           </div>
                           <button 
-                            className={`p-1 rounded shrink-0 hover:bg-muted/50 transition-colors ${columnFilters[colId] || columnFilters[`${colId}_start`] || columnFilters[`${colId}_end`] ? 'text-primary bg-primary/10' : 'text-muted-foreground opacity-30 hover:opacity-100'}`}
+                            className={`p-1 rounded shrink-0 hover:bg-muted/50 transition-colors relative ${(columnFilters || {})[colId]?.length > 0 || (columnFilters || {})[`${colId}_start`] || (columnFilters || {})[`${colId}_end`] ? 'text-primary bg-primary/10' : 'text-muted-foreground opacity-30 hover:opacity-100'}`}
                             onClick={(e) => { e.stopPropagation(); toggleFilter(colId); }}
                           >
                             <Filter className="w-3 h-3" />
+                            {((columnFilters || {})[colId]?.length || 0) > 0 && (
+                              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-primary text-white text-[8px] font-black rounded-full flex items-center justify-center leading-none">
+                                {(columnFilters || {})[colId].length}
+                              </span>
+                            )}
                           </button>
                           {activeFilterCol === colId && (
                             <div 
@@ -811,10 +821,10 @@ export const CancellationsPage = () => {
                                       <input 
                                         type="date"
                                         className={`${SIATC_THEME.COMPONENTS.INPUT} h-8 text-xs font-semibold`}
-                                        value={columnFilters[`${colId}_start`] || ''}
+                                        value={(columnFilters || {})[`${colId}_start`]?.[0] || ''}
                                         onChange={(e) => {
                                            const val = e.target.value;
-                                           setColumnFilters(prev => ({ ...prev, [`${colId}_start`]: val }));
+                                           setColumnFilters(prev => ({ ...(prev || {}), [`${colId}_start`]: val ? [val] : [] }));
                                         }}
                                       />
                                     </div>
@@ -823,21 +833,29 @@ export const CancellationsPage = () => {
                                       <input 
                                         type="date"
                                         className={`${SIATC_THEME.COMPONENTS.INPUT} h-8 text-xs font-semibold`}
-                                        value={columnFilters[`${colId}_end`] || ''}
+                                        value={(columnFilters || {})[`${colId}_end`]?.[0] || ''}
                                         onChange={(e) => {
                                            const val = e.target.value;
-                                           setColumnFilters(prev => ({ ...prev, [`${colId}_end`]: val }));
+                                           setColumnFilters(prev => ({ ...(prev || {}), [`${colId}_end`]: val ? [val] : [] }));
                                         }}
                                       />
                                     </div>
-                                    <SIATCButton 
-                                      variant="primary" 
-                                      size="sm" 
-                                      className="mt-2"
-                                      onClick={() => setActiveFilterCol(null)}
-                                    >
-                                      Aplicar Rango
-                                    </SIATCButton>
+                                    <div className="flex items-center justify-between pt-1.5 mt-1 border-t border-border/60">
+                                       <button
+                                         className="text-[10px] font-bold text-muted-foreground hover:text-destructive transition-colors px-1"
+                                         onClick={() => {
+                                           setColumnFilters(prev => { const n = {...(prev || {})}; delete n[`${colId}_start`]; delete n[`${colId}_end`]; return n; });
+                                         }}
+                                       >
+                                         Limpiar
+                                       </button>
+                                       <button
+                                         className="text-[10px] font-bold text-primary hover:text-primary/80 transition-colors px-1"
+                                         onClick={() => setActiveFilterCol(null)}
+                                       >
+                                         Cerrar
+                                       </button>
+                                     </div>
                                   </div>
                                 ) : (
                                   <>
@@ -849,30 +867,55 @@ export const CancellationsPage = () => {
                                       onChange={(e) => setFilterSearchTerm(e.target.value)}
                                       autoFocus
                                     />
-                                    <div className="max-h-56 overflow-y-auto flex flex-col gap-1 pr-1 custom-scrollbar">
+                                    <div className="max-h-56 overflow-y-auto flex flex-col gap-0.5 pr-1 custom-scrollbar">
                                       {isFetchingSuggestions ? (
                                         <div className="text-xs text-muted-foreground p-2 text-center flex items-center justify-center gap-2"><Loader2 className="w-3 h-3 animate-spin"/> Cargando...</div>
                                       ) : filterSuggestions.length === 0 ? (
                                         <div className="text-xs text-muted-foreground p-2 text-center">Sin resultados</div>
                                       ) : (
                                         <>
-                                          <button 
-                                            className={`text-left px-2 py-1.5 text-xs rounded hover:bg-muted/50 leading-tight ${!columnFilters[colId] ? 'bg-primary/5 text-primary font-bold' : 'text-muted-foreground'}`}
-                                            onClick={() => applyFilter(colId, '')}
-                                          >
-                                            (Todos los valores)
-                                          </button>
-                                          {filterSuggestions.map(val => (
-                                            <button 
-                                              key={val}
-                                              className={`text-left px-2 py-1.5 text-xs rounded hover:bg-muted/50 break-words leading-tight ${columnFilters[colId] === val ? 'bg-primary/10 text-primary font-bold' : 'text-foreground'}`}
-                                              onClick={() => applyFilter(colId, val)}
-                                            >
-                                              {val}
-                                            </button>
-                                          ))}
+                                          {filterSuggestions.map(val => {
+                                            const isChecked = ((columnFilters || {})[colId] || []).includes(val);
+                                            return (
+                                              <label
+                                                key={val}
+                                                className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer hover:bg-muted/50 transition-colors ${
+                                                  isChecked ? 'bg-primary/8 text-primary' : 'text-foreground'
+                                                }`}
+                                                onClick={() => applyFilter(colId, val)}
+                                              >
+                                                <input
+                                                  type="checkbox"
+                                                  className="w-3.5 h-3.5 rounded border-border accent-primary shrink-0 cursor-pointer"
+                                                  checked={isChecked}
+                                                  onChange={() => {}}
+                                                />
+                                                <span className={`text-xs leading-tight break-words ${isChecked ? 'font-bold' : ''}`}>{val}</span>
+                                              </label>
+                                            );
+                                          })}
                                         </>
                                       )}
+                                    </div>
+                                    {/* Footer actions */}
+                                    <div className="flex items-center justify-between pt-1.5 mt-1 border-t border-border/60">
+                                      <button
+                                        className="text-[10px] font-bold text-muted-foreground hover:text-destructive transition-colors px-1"
+                                        onClick={() => {
+                                          setColumnFilters(prev => { const n = {...(prev || {})}; delete n[colId]; return n; });
+                                        }}
+                                      >
+                                        Limpiar
+                                      </button>
+                                      <span className="text-[10px] text-muted-foreground">
+                                        {((columnFilters || {})[colId]?.length || 0) > 0 ? `${(columnFilters || {})[colId].length} seleccionado(s)` : 'Ninguno'}
+                                      </span>
+                                      <button
+                                        className="text-[10px] font-bold text-primary hover:text-primary/80 transition-colors px-1"
+                                        onClick={() => setActiveFilterCol(null)}
+                                      >
+                                        Cerrar
+                                      </button>
                                     </div>
                                   </>
                                 )}
