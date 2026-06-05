@@ -36,7 +36,6 @@ import { SIATC_THEME } from '../../utils/siatc-theme';
 // ==========================================
 // SIATC CONFIGURATION MODULE VARIABLES
 // ==========================================
-const APP_IDENTIFIER = 'CXG';
 const APP_LABEL = 'Gestor NC-CxG';
 const PERMISSION_USERS = 'config.users';
 const CACHE_KEY = 'cxg_users_column_widths';
@@ -148,10 +147,9 @@ export default function UsersPage() {
 
     const filteredUsers = users
         .filter(user =>
-            (user.apps || APP_CODE_DEFAULT).split(',').some(a => a.trim().toUpperCase() === APP_IDENTIFIER.toUpperCase()) &&
-            (user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()))
+            user.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
         )
         .sort((a, b) => {
             const factor = sortOrder === 'ASC' ? 1 : -1;
