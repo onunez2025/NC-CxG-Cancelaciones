@@ -10,9 +10,11 @@ export default function ConfigLayout() {
     const { hasPermission } = useAuth();
     const location = useLocation();
 
+    const consoleUrl = import.meta.env.VITE_CONSOLE_URL || (import.meta.env.PROD ? 'https://console.siatc.cloud' : 'http://localhost:3008');
+
     const configItems = [
-        { to: '/config/users', icon: Users, label: 'Gestión de Usuarios', permission: 'config.users' as const },
-        { to: '/config/roles', icon: Shield, label: 'Perfiles y Permisos', permission: 'config.roles' as const },
+        { to: `${consoleUrl}/users`, icon: Users, label: 'Gestión de Usuarios', permission: 'config.users' as const, isExternal: true },
+        { to: `${consoleUrl}/roles`, icon: Shield, label: 'Perfiles y Permisos', permission: 'config.roles' as const, isExternal: true },
         { to: '/config/cecos', icon: Building2, label: 'Centros de Coste' },
         { to: '/config/accounts', icon: Wallet, label: 'Cuentas Contables' },
         { to: '/config/managements', icon: Briefcase, label: 'Gerencias' },
@@ -26,8 +28,12 @@ export default function ConfigLayout() {
 
     // If we are at the root /config, redirect to the first authorized item
     if (location.pathname === '/config' || location.pathname === '/config/') {
-        if (filteredItems.length > 0) {
-            return <Navigate to={filteredItems[0].to} replace />;
+        const firstLocalItem = filteredItems.find(item => !('isExternal' in item && item.isExternal));
+        if (firstLocalItem) {
+            return <Navigate to={firstLocalItem.to} replace />;
+        } else if (filteredItems.length > 0) {
+            window.location.href = filteredItems[0].to;
+            return null;
         }
     }
     return (
@@ -50,24 +56,44 @@ export default function ConfigLayout() {
 
                         <nav className="flex-1 p-3 space-y-1 overflow-y-auto custom-scrollbar">
                             <p className="text-[10px] font-black text-cb-neutral tracking-[0.2em] px-4 py-3 opacity-60 uppercase">Control Gestión</p>
-                            {filteredItems.map((item) => (
-                                <NavLink
-                                    key={item.to}
-                                    to={item.to}
-                                    className={({ isActive }) => cn(
-                                        isActive
-                                            ? SIATC_THEME.LAYOUT.SIDEBAR_ITEM_ACTIVE
-                                            : SIATC_THEME.LAYOUT.SIDEBAR_ITEM_INACTIVE,
-                                        "flex items-center justify-between group/item"
-                                    )}
-                                >
-                                    <div className="flex items-center gap-3 relative z-10">
-                                        <item.icon className="w-5 h-5 transition-transform duration-500 group-hover/item:scale-110" />
-                                        <span className="tracking-tight">{item.label}</span>
-                                    </div>
-                                    <ChevronRight className="w-4 h-4 transition-all duration-300 opacity-0 -translate-x-2 relative z-10 group-hover/item:opacity-100 group-hover/item:translate-x-0" />
-                                </NavLink>
-                            ))}
+                            {filteredItems.map((item) => {
+                                if ('isExternal' in item && item.isExternal) {
+                                    return (
+                                        <a
+                                            key={item.to}
+                                            href={item.to}
+                                            className={cn(
+                                                SIATC_THEME.LAYOUT.SIDEBAR_ITEM_INACTIVE,
+                                                "flex items-center justify-between group/item"
+                                            )}
+                                        >
+                                            <div className="flex items-center gap-3 relative z-10">
+                                                <item.icon className="w-5 h-5 transition-transform duration-500 group-hover/item:scale-110 shrink-0" />
+                                                <span className="tracking-tight">{item.label}</span>
+                                            </div>
+                                            <ChevronRight className="w-4 h-4 transition-all duration-300 opacity-0 -translate-x-2 relative z-10 group-hover/item:opacity-100 group-hover/item:translate-x-0" />
+                                        </a>
+                                    );
+                                }
+                                return (
+                                    <NavLink
+                                        key={item.to}
+                                        to={item.to}
+                                        className={({ isActive }) => cn(
+                                            isActive
+                                                ? SIATC_THEME.LAYOUT.SIDEBAR_ITEM_ACTIVE
+                                                : SIATC_THEME.LAYOUT.SIDEBAR_ITEM_INACTIVE,
+                                            "flex items-center justify-between group/item"
+                                        )}
+                                    >
+                                        <div className="flex items-center gap-3 relative z-10">
+                                            <item.icon className="w-5 h-5 transition-transform duration-500 group-hover/item:scale-110 shrink-0" />
+                                            <span className="tracking-tight">{item.label}</span>
+                                        </div>
+                                        <ChevronRight className="w-4 h-4 transition-all duration-300 opacity-0 -translate-x-2 relative z-10 group-hover/item:opacity-100 group-hover/item:translate-x-0" />
+                                    </NavLink>
+                                );
+                            })}
                         </nav>
 
                         {/* Sidebar Footer Info */}

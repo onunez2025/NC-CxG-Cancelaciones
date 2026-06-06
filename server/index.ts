@@ -107,6 +107,21 @@ app.use('/api/accounts', verifyToken, accountsRouter);
 app.use('/api/roles', verifyToken, verifyPermission('ebm.config.roles'), rolesRouter);
 app.use('/api/users', verifyToken, verifyPermission('ebm.config.users'), usersRouter);
 app.use('/api/auth', authRouter); // protect /me internally
+app.get('/api/applications', verifyToken, async (req: Request, res: Response) => {
+    try {
+        const pool = await getDbConnection();
+        const activeOnly = req.query.activeOnly === 'true';
+        let query = 'SELECT Id as id, Code as code, Label as label, Url as url, LogoUrl as logo_url, CAST(IsActive AS BIT) as is_active, DisplayOrder as display_order FROM [dbo].[GAC_APP_TB_CONSOLE_APPLICATIONS]';
+        if (activeOnly) {
+            query += ' WHERE IsActive = 1';
+        }
+        query += ' ORDER BY DisplayOrder ASC';
+        const result = await pool.request().query(query);
+        res.json(result.recordset);
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
 app.use('/api/budgets', verifyToken, budgetsRouter);
 app.use('/api/sap/uploads', verifyToken, verifyPermission('ebm.config.sap'), sapRouter);
 app.use('/api/sap/cross-reference', verifyToken, crossReferenceRouter);

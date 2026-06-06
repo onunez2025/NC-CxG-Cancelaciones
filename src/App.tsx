@@ -7,10 +7,25 @@ import { DialogProvider } from './context/DialogContext';
 import { ToastProvider } from './context/ToastContext';
 import { LoginPage } from './pages/LoginPage';
 import { ForceChangePasswordPage } from './pages/ForceChangePasswordPage';
-import UsersPage from './pages/config/UsersPage';
-import RolesPage from './pages/config/RolesPage';
+import { useEffect } from 'react';
 import AuditLogPage from './pages/config/AuditLogPage';
 import ConfigLayout from './pages/config/ConfigLayout';
+
+const consoleUrl = import.meta.env.VITE_CONSOLE_URL || (import.meta.env.PROD ? 'https://console.siatc.cloud' : 'http://localhost:3008');
+
+const ExternalRedirect = ({ url }: { url: string }) => {
+  useEffect(() => {
+    window.location.replace(url);
+  }, [url]);
+  return (
+    <div className="flex h-screen items-center justify-center bg-background">
+      <div className="flex flex-col items-center gap-6">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-muted-foreground font-medium animate-pulse">Redirigiendo a la administración central...</p>
+      </div>
+    </div>
+  );
+};
 import CostCentersPage from './pages/config/CostCentersPage';
 import AccountsPage from './pages/config/AccountsPage';
 import ManagementsPage from './pages/config/ManagementsPage';
@@ -92,8 +107,8 @@ function App() {
               <Route element={<RequirePermission permission="config.users" />}>
                 <Route path="/config" element={<ConfigLayout />}>
                   <Route index element={<Navigate to="users" replace />} />
-                  <Route path="users" element={<UsersPage />} />
-                  <Route path="roles" element={<RolesPage />} />
+                  <Route path="users" element={<ExternalRedirect url={`${consoleUrl}/users`} />} />
+                  <Route path="roles" element={<ExternalRedirect url={`${consoleUrl}/roles`} />} />
                   <Route path="audit" element={<AuditLogPage />} />
                   <Route path="cecos" element={<CostCentersPage />} />
                   <Route path="accounts" element={<AccountsPage />} />

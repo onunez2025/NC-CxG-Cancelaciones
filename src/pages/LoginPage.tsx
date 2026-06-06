@@ -1,223 +1,24 @@
-import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { useAuth } from '../hooks/useAuth';
-import { useTheme } from '../context/ThemeContext';
-import { User, Lock, Eye, EyeOff, Moon, Sun, Globe } from 'lucide-react';
-import { cn } from '../utils/cn';
-import { API_BASE_URL } from '../services/apiClient';
-import { SIATC_THEME } from '../utils/siatc-theme';
+import React, { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
-export function LoginPage() {
-    const { t, i18n } = useTranslation();
-    const { login } = useAuth();
-    const { theme, setTheme } = useTheme();
+export const LoginPage: React.FC = () => {
     const [searchParams] = useSearchParams();
     const isExpired = searchParams.get('expired') === 'true';
-    const navigate = useNavigate();
 
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-
-            if (!response.ok) {
-                const errData = await response.json();
-                throw new Error(errData.error || t('auth.errors.invalid'));
-            }
-
-            const { user, token } = await response.json();
-
-            // Success, register session in Context
-            login(user, token);
-            navigate('/dashboard');
-
-        } catch (err: any) {
-            console.error('Login error:', err);
-            setError(err.message || t('auth.errors.invalid') || 'Credenciales inválidas');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const toggleLanguage = () => {
-        i18n.changeLanguage(i18n.language === 'es' ? 'en' : 'es');
-    };
-
-    const toggleTheme = () => {
-        setTheme(theme === 'dark' ? 'light' : 'dark');
-    };
+    useEffect(() => {
+        const consoleUrl = import.meta.env.VITE_CONSOLE_URL || (import.meta.env.PROD ? 'https://console.siatc.cloud' : 'http://localhost:3008');
+        const redirectUrl = `${consoleUrl}/login?redirect=${encodeURIComponent(window.location.origin)}${isExpired ? '&expired=true' : ''}`;
+        window.location.href = redirectUrl;
+    }, [isExpired]);
 
     return (
-        <div className={SIATC_THEME.LOGIN_LAYOUT.CONTAINER}>
-            {/* Left Side - Brand / Visual */}
-            <div className={SIATC_THEME.LOGIN_LAYOUT.LEFT_PANEL}>
-                {/* Abstract Background Pattern (Matches sister project exactly) */}
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+IDxyZWN0IHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgZmlsbD0ibm9uZSIvPiA8ZyBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjIiPiA8cGF0aCBkPSJNMCAzdjU0TTMgMGg1NCIvPiA8L2c+IDwvc3ZnPg==')] bg-[size:60px_60px]" />
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-900 to-blue-900/50" />
-
-                <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="w-12 h-12 flex items-center justify-center shrink-0 overflow-hidden">
-                            <img src="/Logo.png" alt="Logo" className="h-full w-full object-contain" />
-                        </div>
-                        <span className="text-2xl font-bold tracking-tight">Mesa de Atención</span>
-                    </div>
-                    <h1 className="text-5xl font-bold mb-4 leading-tight">
-                        Sistema<br />Gestión de<br />Atención
-                    </h1>
-                    <div className="text-slate-400 text-lg max-w-md space-y-6">
-                        <p>Plataforma integral para la gestión y seguimiento en la atención de servicios.</p>
-                        <div className="flex flex-col w-fit gap-2">
-                            <span className="text-2xl font-bold text-slate-100 tracking-tight">Gerencia de Atención al Cliente</span>
-                            <img 
-                                src="/Logo - Grupo Sole - Transparente blanco-.png" 
-                                alt="Logo Grupo Sole" 
-                                className="h-auto max-w-[12rem] object-contain"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="relative z-10 text-sm text-slate-500">
-                    © 2026 GAC - Grupo Sole. Rinnai Corporation. Todos los derechos reservados.
-                </div>
-            </div>
-
-            {/* Right Side - Login Form */}
-            <div className={SIATC_THEME.LOGIN_LAYOUT.RIGHT_PANEL}>
-                {/* Top Right Controls */}
-                <div className="absolute top-6 right-6 flex items-center gap-4">
-                    <button
-                        onClick={toggleTheme}
-                        className="p-2 rounded-full hover:bg-accent text-muted-foreground transition-colors"
-                        title="Toggle Theme"
-                    >
-                        {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                    </button>
-                    <button
-                        onClick={toggleLanguage}
-                        className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border hover:bg-accent text-sm font-medium transition-colors"
-                    >
-                        <Globe className="w-4 h-4" />
-                        {i18n.language === 'es' ? 'ES' : 'EN'}
-                    </button>
-                </div>
-
-                <div className="w-full max-w-md space-y-8">
-                    <div className="text-center">
-                        <h2 className={SIATC_THEME.LOGIN_LAYOUT.TITLE}>{t('common.welcome')}</h2>
-                        <p className={SIATC_THEME.LOGIN_LAYOUT.SUBTITLE}>
-                            {t('auth.subtitle')}
-                        </p>
-                    </div>
-
-                    {isExpired && (
-                        <div className={SIATC_THEME.LOGIN_LAYOUT.ALERT_EXPIRED}>
-                            <Lock className="w-5 h-5 shrink-0 mt-0.5" />
-                            <div>
-                                <p className="font-bold">{t('auth.sessionExpired.title')}</p>
-                                <p className="opacity-90">{t('auth.sessionExpired.message')}</p>
-                            </div>
-                        </div>
-                    )}
-
-                    <div className={SIATC_THEME.LOGIN_LAYOUT.CARD}>
-                        <form onSubmit={handleLogin} className="space-y-6">
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium mb-1.5 ml-1">
-                                        {t('auth.username')}
-                                    </label>
-                                    <div className={SIATC_THEME.LOGIN_LAYOUT.INPUT_WRAPPER}>
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
-                                            <User className="w-5 h-5" />
-                                        </div>
-                                        <input
-                                            type="text"
-                                            value={username}
-                                            onChange={(e) => setUsername(e.target.value)}
-                                            className={SIATC_THEME.LOGIN_LAYOUT.INPUT}
-                                            placeholder="Usuario"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium mb-1.5 ml-1">
-                                        {t('auth.password')}
-                                    </label>
-                                    <div className={SIATC_THEME.LOGIN_LAYOUT.INPUT_WRAPPER}>
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
-                                            <Lock className="w-5 h-5" />
-                                        </div>
-                                        <input
-                                            type={showPassword ? 'text' : 'password'}
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            className={SIATC_THEME.LOGIN_LAYOUT.INPUT}
-                                            placeholder="Contraseña"
-                                            required
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground transition-colors"
-                                        >
-                                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center justify-between text-sm">
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" className="w-4 h-4 rounded border-input text-primary focus:ring-primary" />
-                                    <span className="text-muted-foreground">{t('auth.rememberMe')}</span>
-                                </label>
-                                <button
-                                    type="button"
-                                    onClick={() => setError('Por favor, contacta a tu administrador de sistemas para que te asigne una nueva contraseña temporal.')}
-                                    className="font-medium text-primary hover:text-primary/80 transition-colors bg-transparent border-none p-0 cursor-pointer"
-                                >
-                                    {t('auth.forgotPassword')}
-                                </button>
-                            </div>
-
-                            {error && (
-                                <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm font-medium text-center animate-in fade-in slide-in-from-top-1">
-                                    {error}
-                                </div>
-                            )}
-
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className={cn(
-                                    SIATC_THEME.COMPONENTS.BUTTON_PRIMARY,
-                                    "w-full flex justify-center disabled:opacity-70 disabled:cursor-not-allowed"
-                                )}
-                            >
-                                {loading ? t('common.loading') : t('auth.loginButton')}
-                            </button>
-                        </form>
-                    </div>
-                </div>
+        <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white font-sans">
+            <div className="text-center space-y-4">
+                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <p className="text-slate-400 font-medium tracking-wide">Redirigiendo al inicio de sesión centralizado...</p>
             </div>
         </div>
     );
-}
+};
+
+export default LoginPage;

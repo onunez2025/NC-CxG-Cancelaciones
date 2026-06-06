@@ -28,25 +28,65 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         const validateSession = async () => {
             try {
-                const savedUser = StorageService.getCurrentUser();
+                const getCookie = (name: string): string | null => {
+                    const value = `; ${document.cookie}`;
+                    const parts = value.split(`; ${name}=`);
+                    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+                    return null;
+                };
 
-                if (!savedUser) {
+                const decodeJwt = (t: string): any => {
+                    try {
+                        const base64Url = t.split('.')[1];
+                        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                        const jsonPayload = decodeURIComponent(window.atob(base64).split('').map((c) => {
+                            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                        }).join(''));
+                        return JSON.parse(jsonPayload);
+                    } catch (e) {
+                        return null;
+                    }
+                };
+
+                const cookieToken = getCookie('token');
+                const localToken = StorageService.getToken();
+                let activeToken = localToken;
+
+                if (cookieToken) {
+                    if (cookieToken !== localToken) {
+                        StorageService.setToken(cookieToken);
+                        activeToken = cookieToken;
+                        
+                        const payload = decodeJwt(cookieToken);
+                        if (payload) {
+                            const preHydratedUser = {
+                                id: payload.id,
+                                username: payload.username,
+                                role_id: payload.role_id,
+                                role_name: payload.role_name,
+                                permissions: payload.permissions || [],
+                                apps: payload.apps
+                            };
+                            setUser(preHydratedUser as any);
+                            StorageService.setCurrentUser(preHydratedUser as any);
+                        }
+                    }
+                } else {
+                    if (localToken) {
+                        logout();
+                        const consoleUrl = import.meta.env.VITE_CONSOLE_URL || (import.meta.env.PROD ? 'https://console.siatc.cloud' : 'http://localhost:3008');
+                        window.location.href = `${consoleUrl}/login?redirect=${encodeURIComponent(window.location.origin)}`;
+                        return;
+                    }
+                }
+
+                if (!activeToken) {
                     setIsLoading(false);
                     return;
                 }
 
-                const token = StorageService.getToken();
-                if (!token) {
-                    setIsLoading(false);
-                    return;
-                }
-
-                // Brief sync hydration for UX
-                setUser(savedUser);
-
-                // Background re-validation
                 const response = await fetch(`${API_BASE_URL}/auth/me`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: { 'Authorization': `Bearer ${activeToken}` }
                 });
 
                 if (response.ok) {
@@ -54,20 +94,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     setUser(data.user);
                     StorageService.setCurrentUser(data.user);
                 } else {
-                    StorageService.remove('current_user');
-                    StorageService.remove('auth_token');
-                    window.location.href = '/login?expired=true';
+                    logout();
+                    const consoleUrl = import.meta.env.VITE_CONSOLE_URL || (import.meta.env.PROD ? 'https://console.siatc.cloud' : 'http://localhost:3008');
+                    window.location.href = `${consoleUrl}/login?redirect=${encodeURIComponent(window.location.origin)}&expired=true`;
                 }
             } catch (error) {
-                console.error("Session validation error", error);
-                // Keep local session if backend is temporarily unreachable
+                console.error("Session validation error:", error);
             } finally {
                 setIsLoading(false);
             }
         };
 
         validateSession();
-    }, []);
+    }, [logout]);
 
     const login = useCallback((newUser: User, token?: string) => {
         setUser(newUser);
