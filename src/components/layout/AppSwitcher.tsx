@@ -3,7 +3,7 @@ import { Grid, Info } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 import { useAuth } from '../../hooks/useAuth';
-import { apiClient } from '../../services/apiClient';
+import { apiClient, API_BASE_URL } from '../../services/apiClient';
 
 interface Application {
     id: string;
@@ -29,8 +29,13 @@ export function AppSwitcher({ currentAppId }: AppSwitcherProps) {
     useEffect(() => {
         const fetchApps = async () => {
             try {
-                const data = await apiClient.get<Application[]>('/applications?activeOnly=true');
-                setApps(data);
+                const response = await apiClient(`${API_BASE_URL}/applications?activeOnly=true`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setApps(data);
+                } else {
+                    console.error("Failed to load ecosystem apps: Status", response.status);
+                }
             } catch (err) {
                 console.error("Failed to load ecosystem apps", err);
             }
@@ -61,7 +66,7 @@ export function AppSwitcher({ currentAppId }: AppSwitcherProps) {
         if (appCode === currentAppId.toUpperCase()) return false;
         
         // Super admin sees all active apps, other users only see allowed ones
-        const roleName = user?.role_name?.toLowerCase() || user?.role?.toLowerCase();
+        const roleName = user?.role_name?.toLowerCase();
         const isSuperAdmin = roleName === 'administrador' || roleName === 'console.administrador';
         if (isSuperAdmin) return true;
         

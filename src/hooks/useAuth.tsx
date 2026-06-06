@@ -25,6 +25,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    const login = useCallback((newUser: User, token?: string) => {
+        setUser(newUser);
+        StorageService.setCurrentUser(newUser);
+        if (token) {
+            StorageService.setToken(token);
+        }
+    }, []);
+
+    const logout = useCallback(() => {
+        setUser(null);
+        StorageService.remove('current_user');
+        StorageService.remove('auth_token');
+    }, []);
+
     useEffect(() => {
         const validateSession = async () => {
             try {
@@ -107,20 +121,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         validateSession();
     }, [logout]);
-
-    const login = useCallback((newUser: User, token?: string) => {
-        setUser(newUser);
-        StorageService.setCurrentUser(newUser);
-        if (token) {
-            StorageService.setToken(token);
-        }
-    }, []);
-
-    const logout = useCallback(() => {
-        setUser(null);
-        StorageService.remove('current_user');
-        StorageService.remove('auth_token');
-    }, []);
 
     // --- Inactivity Logout Logic (30 Minutes) ---
     useEffect(() => {
