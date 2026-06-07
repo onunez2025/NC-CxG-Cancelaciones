@@ -240,7 +240,7 @@ app.listen(port, () => {
     prewarmCache().catch(err => console.error('[Cache] Pre-warm error on startup:', err));
 });
 
-const APP_CODE = process.env.APP_CODE || 'MESA';
+const APP_CODE = process.env.APP_CODE || 'CXG';
 
 interface AppMeta { label: string; logoUrl: string; url: string; }
 let appMeta: AppMeta | null = null;

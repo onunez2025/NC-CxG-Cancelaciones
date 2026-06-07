@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-const APP_CODE = import.meta.env.VITE_APP_CODE || 'MESA';
+const APP_CODE = import.meta.env.VITE_APP_CODE || 'CXG';
 const API_BASE_URL = '/api';
 
 interface AppConfig {
