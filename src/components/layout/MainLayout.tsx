@@ -6,6 +6,7 @@ import { AppSwitcher } from './AppSwitcher';
 import { cn } from '../../utils/cn';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../hooks/useAuth';
+import { useAppConfig } from '../../context/AppConfigContext';
 
 // SIATC PREMIUM MASTER — MainLayout v2.0 (Platinum)
 import { SIATC_THEME } from '../../utils/siatc-theme';
@@ -18,6 +19,8 @@ export function MainLayout({ children }: MainLayoutProps) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const { theme, setTheme } = useTheme();
     const { user, hasPermission } = useAuth();
+    const appConfig = useAppConfig();
+    const logoUrl = appConfig?.logoUrl || '/Logo.png';
 
     const toggleTheme = () => {
         setTheme(theme === 'dark' ? 'light' : 'dark');
@@ -73,7 +76,7 @@ export function MainLayout({ children }: MainLayoutProps) {
 
                         <div className="flex items-center gap-4 group cursor-default">
                             <div className="w-12 h-12 rounded-[1.25rem] bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/10 shadow-lg shadow-slate-200/40 dark:shadow-none flex items-center justify-center group-hover:scale-110 transition-all duration-500">
-                                <img src="/Logo.png" alt="Logo" className="w-7 h-7 object-contain" />
+                                <img src={logoUrl} alt="Logo" className="w-7 h-7 object-contain" />
                             </div>
                             <div className="flex flex-col">
                                 <span className="font-black text-sm tracking-tight text-foreground uppercase pt-1">Mesa de Atención</span>

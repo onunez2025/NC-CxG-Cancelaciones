@@ -3,6 +3,7 @@ import { ErrorBoundary } from './components/common/ErrorBoundary';
 // import { useTranslation } from 'react-i18next';
 import { MainLayout } from './components/layout/MainLayout';
 import { AuthProvider, useAuth } from './hooks/useAuth';
+import { useAppConfig } from './context/AppConfigContext';
 import { DialogProvider } from './context/DialogContext';
 import { ToastProvider } from './context/ToastContext';
 import { LoginPage } from './pages/LoginPage';
@@ -50,12 +51,14 @@ import { NotFound } from './pages/NotFound';
 const ProtectedRoute = () => {
   const { user, isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
+  const appConfig = useAppConfig();
+  const logoUrl = appConfig?.logoUrl || '/Logo.png';
 
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-6">
-          <img src="/Logo.png" alt="Logo" className="w-16 h-16 object-contain animate-pulse" />
+          <img src={logoUrl} alt="Logo" className="w-16 h-16 object-contain animate-pulse" />
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           <p className="text-muted-foreground font-medium animate-pulse">Cargando...</p>
         </div>

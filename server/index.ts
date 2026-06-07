@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { getDbConnection } from './db.js'; // Ensure extension when running under tsx module resolution
 
@@ -186,7 +187,30 @@ if (process.env.NODE_ENV === 'production') {
     app.use(express.static(staticPath));
     app.use((req, res, next) => {
         if (!req.path.startsWith('/api')) {
-            res.sendFile(path.join(staticPath, 'index.html'));
+            const indexPath = path.join(staticPath, 'index.html');
+            try {
+                let html = fs.readFileSync(indexPath, 'utf-8');
+                if (appMeta) {
+                    const ogTags = [
+                        `<meta property="og:type" content="website" />`,
+                        `<meta property="og:title" content="${appMeta.label} - SIATC" />`,
+                        `<meta property="og:description" content="${appMeta.label} - Plataforma de gestión SIATC." />`,
+                        `<meta property="og:image" content="${appMeta.logoUrl}" />`,
+                        `<meta property="og:url" content="${appMeta.url}" />`,
+                        `<meta name="twitter:card" content="summary_large_image" />`,
+                        `<meta name="twitter:title" content="${appMeta.label} - SIATC" />`,
+                        `<meta name="twitter:image" content="${appMeta.logoUrl}" />`,
+                        `<link rel="icon" type="image/png" href="${appMeta.logoUrl}" />`,
+                    ].join('\n    ');
+                    html = html.replace(/<meta property="og:[^"]+"[^>]*\/>/g, '');
+                    html = html.replace(/<link rel="icon"[^>]*\/>/g, '');
+                    html = html.replace('<title>', `${ogTags}\n  <title>`);
+                }
+                res.setHeader('Content-Type', 'text/html');
+                res.send(html);
+            } catch {
+                res.sendFile(indexPath);
+            }
         } else {
             next();
         }
@@ -204,6 +228,9 @@ app.listen(port, () => {
     console.log(`Backend Server listening on port ${port} in ${process.env.NODE_ENV || 'development'} mode`);
     console.log(`Azure Status Check available at: http://localhost:${port}/api/status`);
 
+    // Fetch app metadata from DB for OG tags
+    fetchAppMeta();
+
     // Ensure SQL Views are always up-to-date (CREATE OR ALTER — idempotent)
     setupSapViews()
         .then(() => console.log('[Views] SQL Views initialized/updated.'))
@@ -212,3 +239,24 @@ app.listen(port, () => {
     // Pre-warm the SAP cross-reference cache in background
     prewarmCache().catch(err => console.error('[Cache] Pre-warm error on startup:', err));
 });
+
+const APP_CODE = process.env.APP_CODE || 'MESA';
+
+interface AppMeta { label: string; logoUrl: string; url: string; }
+let appMeta: AppMeta | null = null;
+
+async function fetchAppMeta(): Promise<void> {
+    try {
+        const pool = await getDbConnection();
+        const result = await pool.request()
+            .input('code', APP_CODE)
+            .query(`SELECT Label, LogoUrl, Url FROM [dbo].[GAC_APP_TB_CONSOLE_APPLICATIONS] WHERE UPPER(Code) = UPPER(@code)`);
+        if (result.recordset.length > 0) {
+            const row = result.recordset[0];
+            appMeta = { label: row.Label, logoUrl: row.LogoUrl, url: row.Url };
+            console.log(`[AppConfig] Loaded meta for ${APP_CODE}: ${appMeta.label}`);
+        }
+    } catch (err: any) {
+        console.warn('[AppConfig] Could not fetch app meta from DB:', err.message);
+    }
+}

@@ -17,11 +17,14 @@ import { useAuth } from '../../hooks/useAuth';
 import type { Permission } from '../../types';
 
 // SIATC DESIGN SYSTEM IMPORTS
+import { useAppConfig } from '../../context/AppConfigContext';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 
 export function Sidebar({ className }: { className?: string }) {
     const { t, i18n } = useTranslation();
     const { logout, hasPermission } = useAuth();
+    const appConfig = useAppConfig();
+    const logoUrl = appConfig?.logoUrl || '/Logo.png';
 
     const toggleLanguage = () => {
         i18n.changeLanguage(i18n.language === 'es' ? 'en' : 'es');
@@ -56,7 +59,7 @@ export function Sidebar({ className }: { className?: string }) {
             {/* Header / Logo: SIATC High Density */}
             <div className="p-6 flex items-center gap-4 border-b border-border/50 bg-gradient-to-br from-primary/5 to-transparent">
                 <div className="w-12 h-12 flex items-center justify-center shrink-0 overflow-hidden transition-transform hover:scale-105">
-                    <img src="/Logo.png" alt="Logo" className="h-full w-full object-contain" />
+                    <img src={logoUrl} alt="Logo" className="h-full w-full object-contain" />
                 </div>
                 <div className="flex flex-col min-w-0">
                     <h1 className="font-bold text-lg leading-none tracking-tight text-foreground uppercase truncate">M. Atención</h1>

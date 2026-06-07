@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../context/ThemeContext';
+import { useAppConfig } from '../context/AppConfigContext';
 import { User, Lock, Eye, EyeOff, Moon, Sun, Globe } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { API_BASE_URL } from '../services/apiClient';
@@ -12,6 +13,8 @@ export function LoginPage() {
     const { t, i18n } = useTranslation();
     const { login } = useAuth();
     const { theme, setTheme } = useTheme();
+    const appConfig = useAppConfig();
+    const logoUrl = appConfig?.logoUrl || '/Logo.png';
     const [searchParams] = useSearchParams();
     const isExpired = searchParams.get('expired') === 'true';
     const navigate = useNavigate();
@@ -72,7 +75,7 @@ export function LoginPage() {
                 <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="w-12 h-12 flex items-center justify-center shrink-0 overflow-hidden">
-                            <img src="/Logo.png" alt="Logo" className="h-full w-full object-contain" />
+                            <img src={logoUrl} alt="Logo" className="h-full w-full object-contain" />
                         </div>
                         <span className="text-2xl font-bold tracking-tight">Mesa de Atención</span>
                     </div>
