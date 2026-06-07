@@ -138,8 +138,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         const resetTimer = () => {
             timeoutId = setTimeout(() => {
-                StorageService.remove('current_user');
-                StorageService.remove('auth_token');
+                logout();
                 window.location.href = '/login?expired=true';
             }, 30 * 60 * 1000); // 30 minutes
         };
