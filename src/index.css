@@ -1,84 +1,127 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@custom-variant dark (&:where(.dark, .dark *));
 
-@layer base {
-  :root {
-    /* Crypto Blue Core Palette */
-    --background: 210 20% 98%;    /* #F9FAFB */
-    --foreground: 211 68% 6%;     /* #050F1A */
+@theme {
+  --font-sans: var(--font-sans, 'DM Sans'), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono, 'JetBrains Mono'), monospace;
 
-    --card: 0 0% 100%;            /* #FFFFFF */
-    --card-foreground: 211 68% 6%;
+  --font-title: var(--font-title, var(--font-sans));
+  --font-subtitle: var(--font-subtitle, var(--font-sans));
+  --font-header: var(--font-header, var(--font-sans));
+  --font-sidebar: var(--font-sidebar, var(--font-sans));
+  --font-table-data: var(--font-table-data, var(--font-sans));
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 211 68% 6%;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 
-    --primary: 218 25% 40%;       /* #4C5F80 - Coinbase Blue */
-    --primary-foreground: 0 0% 100%;
+  --radius-lg: var(--radius, 12px);
+  --radius-md: calc(var(--radius, 12px) - 4px);
+  --radius-sm: calc(var(--radius, 12px) - 8px);
 
-    --secondary: 221 9% 39%;      /* #5B616E - Cool Slate */
-    --secondary-foreground: 0 0% 100%;
+  --radius-cb-chip: var(--radius-chip, 4px);
+  --radius-cb-btn: var(--radius-button, 8px);
+  --radius-cb-input: var(--radius-input, 8px);
+  --radius-cb-card: var(--radius-card, 12px);
+  --radius-cb-modal: var(--radius-modal, 16px);
 
-    --muted: 218 11% 84%;         /* #D1D5DB - Border/Muted */
-    --muted-foreground: 219 9% 58%; /* #8A919E - Neutral */
+  --color-cb-blue: #4C5F80;
+  --color-cb-slate: #5B616E;
+  --color-cb-neutral: #8A919E;
+  --color-cb-success: #05B169;
+  --color-cb-error: #DF2935;
+  --color-cb-warning: #F0AD4E;
+  --color-cb-bg: var(--cb-bg);
+  --color-cb-text-primary: var(--cb-text-primary);
+  --color-cb-text-secondary: var(--cb-text-secondary);
+  --color-cb-border: var(--cb-border);
 
-    --accent: 218 25% 40%;
-    --accent-foreground: 0 0% 100%;
+  --shadow-cb-level-1: var(--shadow-level-1, 0 1px 3px rgba(5,15,26,0.06));
+  --shadow-cb-level-2: var(--shadow-level-2, 0 4px 12px rgba(5,15,26,0.08));
+  --shadow-cb-level-3: var(--shadow-level-3, 0 12px 24px rgba(5,15,26,0.12));
+}
 
-    --destructive: 356 73% 52%;   /* #DF2935 - Error */
-    --destructive-foreground: 0 0% 100%;
+:root {
+  --background: #F9FAFB;
+  --foreground: #050F1A;
+  --card: #FFFFFF;
+  --card-foreground: #050F1A;
+  --popover: #FFFFFF;
+  --popover-foreground: #050F1A;
+  --primary: #4C5F80;
+  --primary-foreground: #FFFFFF;
+  --secondary: #5B616E;
+  --secondary-foreground: #FFFFFF;
+  --muted: #D1D5DB;
+  --muted-foreground: #8A919E;
+  --accent: #4C5F80;
+  --accent-foreground: #FFFFFF;
+  --destructive: #DF2935;
+  --destructive-foreground: #FFFFFF;
+  --border: #D1D5DB;
+  --input: #D1D5DB;
+  --ring: #4C5F80;
 
-    --border: 218 11% 84%;        /* #D1D5DB */
-    --input: 218 11% 84%;
-    --ring: 218 25% 40%;
+  --radius: 0.5rem;
+  --radius-chip: 4px;
+  --radius-button: 8px;
+  --radius-input: 8px;
+  --radius-card: 12px;
+  --radius-modal: 16px;
+  
+  --transition-duration: 300ms;
 
-    --radius: 0.5rem;
+  /* Custom SIATC variables for light mode */
+  --cb-bg: #F9FAFB;
+  --cb-text-primary: #1A1C1E;
+  --cb-text-secondary: #515254;
+  --cb-border: #E2E4E9;
+}
 
-    /* Custom SIATC variables for light mode */
-    --cb-bg: #F9FAFB;
-    --cb-text-primary: #1A1C1E;
-    --cb-text-secondary: #515254;
-    --cb-border: #E2E4E9;
-  }
+.dark {
+  --background: #050F1A;
+  --foreground: #F9FAFB;
+  --card: #111C2A;
+  --card-foreground: #F9FAFB;
+  --popover: #111C2A;
+  --popover-foreground: #F9FAFB;
+  --primary: #707F99;
+  --primary-foreground: #050F1A;
+  --secondary: #8A919E;
+  --secondary-foreground: #050F1A;
+  --muted: #1E293B;
+  --muted-foreground: #8A919E;
+  --accent: #707F99;
+  --accent-foreground: #050F1A;
+  --destructive: #DF2935;
+  --destructive-foreground: #FFFFFF;
+  --border: #1E293B;
+  --input: #1E293B;
+  --ring: #707F99;
 
-  .dark {
-    --background: 211 68% 6%;     /* #050F1A */
-    --foreground: 210 20% 98%;
-
-    --card: 211 68% 10%;          /* Darker shade of near black */
-    --card-foreground: 210 20% 98%;
-
-    --popover: 211 68% 10%;
-    --popover-foreground: 210 20% 98%;
-
-    --primary: 218 25% 55%;       /* Slightly lighter for dark mode */
-    --primary-foreground: 211 68% 6%;
-
-    --secondary: 219 9% 58%;
-    --secondary-foreground: 211 68% 6%;
-
-    --muted: 211 68% 15%;
-    --muted-foreground: 219 9% 48%;
-
-    --accent: 218 25% 55%;
-    --accent-foreground: 211 68% 6%;
-
-    --destructive: 356 73% 45%;
-    --destructive-foreground: 210 20% 98%;
-
-    --border: 211 68% 20%;
-    --input: 211 68% 20%;
-    --ring: 218 25% 55%;
-
-    /* Custom SIATC variables for dark mode */
-    --cb-bg: #050F1A;
-    --cb-text-primary: #F9FAFB;
-    --cb-text-secondary: #8A919E;
-    --cb-border: #1E293B;
-  }
+  /* Custom SIATC variables for dark mode */
+  --cb-bg: #050F1A;
+  --cb-text-primary: #F9FAFB;
+  --cb-text-secondary: #8A919E;
+  --cb-border: #1E293B;
 }
 
 
