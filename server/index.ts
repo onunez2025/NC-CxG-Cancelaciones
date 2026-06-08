@@ -1,7 +1,9 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import sql from 'mssql';
-import dotenv from 'dotenv';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
@@ -29,8 +31,6 @@ import emergenciasRouter from './routes/emergencias.js';
 import programaSupervisoresRouter from './routes/programaSupervisores.js';
 import { verifyToken, verifyPermission } from './middleware/auth.js';
 import { setupSapViews } from './setup_sap_views.js';
-
-dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3001;
