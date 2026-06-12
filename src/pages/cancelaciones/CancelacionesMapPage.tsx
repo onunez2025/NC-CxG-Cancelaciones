@@ -80,7 +80,7 @@ export const CancelacionesMapPage = () => {
         </div>
       </div>
 
-      <div className={`${SIATC_THEME.LAYOUT.CONTENT_CONTAINER} p-0 overflow-hidden flex flex-col h-[calc(100vh-200px)] min-h-[500px]`}>
+      <div className={`${SIATC_THEME.LAYOUT.CONTENT_CONTAINER} p-0 overflow-hidden flex flex-col h-[calc(100vh-220px)] lg:h-[calc(100vh-200px)] min-h-[400px] lg:min-h-[500px]`}>
         {isLoading ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-3">
             <Loader2 className="w-8 h-8 text-primary animate-spin" />
@@ -128,7 +128,7 @@ export const CancelacionesMapPage = () => {
             </MapContainer>
             
             {/* Legend / Stats overlay */}
-            <div className="absolute bottom-6 right-6 z-[1000] bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-4 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 pointer-events-auto">
+            <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 left-4 sm:left-auto z-[1000] bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-4 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 pointer-events-auto">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
                   <MapPin className="w-5 h-5 text-red-600 dark:text-red-400" />

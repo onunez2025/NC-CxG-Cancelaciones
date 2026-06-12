@@ -147,6 +147,7 @@ export const CancellationsPage = () => {
     ticket: '',
     motivo: ''
   });
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -578,7 +579,7 @@ export const CancellationsPage = () => {
             Administración y seguimiento de solicitudes de cancelación y reversiones en tiempo real.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <SIATCButton 
             variant="secondary" 
             icon={RefreshCw}
@@ -672,59 +673,72 @@ export const CancellationsPage = () => {
 
       {/* Filters Area */}
       <div className="shrink-0 flex flex-col gap-2 mb-2">
-        <div className={cn(SIATC_THEME.COMPONENTS.CARD_CONTAINER, "p-2 flex items-center flex-wrap gap-2")}>
-          <div className="relative flex-1 min-w-[300px]">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-cb-text-secondary/55" />
-            <input 
-              type="text"
-              placeholder="Buscar por ticket, cliente, motivo o autorizador..."
-              className="w-full pl-10 pr-4 py-2 bg-transparent border-none focus:ring-0 text-sm text-cb-text-primary placeholder:text-cb-neutral/40 outline-none"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+        <div className={cn(SIATC_THEME.COMPONENTS.CARD_CONTAINER, "p-2 flex flex-col gap-2")}>
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-cb-text-secondary/55" />
+              <input 
+                type="text"
+                placeholder="Buscar por ticket, cliente, motivo o autorizador..."
+                className="w-full pl-10 pr-4 py-2 bg-transparent border-none focus:ring-0 text-sm text-cb-text-primary placeholder:text-cb-neutral/40 outline-none"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <SIATCButton 
+              variant="secondary" 
+              icon={Filter}
+              onClick={() => setShowMobileFilters(!showMobileFilters)}
+              className={cn("md:hidden !px-3 shrink-0", showMobileFilters && "bg-primary/10 text-primary border-primary/30")}
             />
           </div>
 
-          <div className="w-px h-6 bg-cb-border mx-1 hidden sm:block" />
+          <div className={cn(
+            "flex-wrap items-center gap-2 pt-2 border-t border-border/50 md:border-t-0 md:pt-0",
+            showMobileFilters ? "flex" : "hidden md:flex"
+          )}>
+            <div className="w-px h-6 bg-cb-border mx-1 hidden md:block" />
 
-          {canProcess && (
-            <>
-              <label className="flex items-center gap-2 px-2.5 py-1 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors select-none">
-                <input 
-                  type="checkbox"
-                  checked={showOnlyMine}
-                  onChange={(e) => setShowOnlyMine(e.target.checked)}
-                  className="rounded border-slate-300 text-primary focus:ring-primary/20 focus:ring-offset-0 h-4 w-4 bg-transparent cursor-pointer"
-                />
-                <span className="text-xs font-bold text-cb-text-primary whitespace-nowrap">Mis Asignados</span>
-              </label>
-              <div className="w-px h-6 bg-cb-border mx-1 hidden sm:block" />
-            </>
-          )}
+            {canProcess && (
+              <>
+                <label className="flex items-center gap-2 px-2.5 py-1 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors select-none">
+                  <input 
+                    type="checkbox"
+                    checked={showOnlyMine}
+                    onChange={(e) => setShowOnlyMine(e.target.checked)}
+                    className="rounded border-slate-300 text-primary focus:ring-primary/20 focus:ring-offset-0 h-4 w-4 bg-transparent cursor-pointer"
+                  />
+                  <span className="text-xs font-bold text-cb-text-primary whitespace-nowrap">Mis Asignados</span>
+                </label>
+                <div className="w-px h-6 bg-cb-border mx-1 hidden md:block" />
+              </>
+            )}
 
-          <select 
-            className="bg-transparent border-none px-3 py-1.5 text-sm font-bold text-cb-text-primary focus:ring-0 outline-none cursor-pointer"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="TODOS">Filtro Estado</option>
-            <option value="REGISTRADO">REGISTRADO</option>
-            <option value="APROBADO_SUP">APROBADO POR SUP.</option>
-            <option value="ASIGNADO">ASIGNADO</option>
-            <option value="VALIDADO">VALIDADO CLIENTE</option>
-            <option value="CERRADO">CERRADO</option>
-          </select>
-
-          {(searchTerm !== '' || statusFilter !== 'TODOS' || showOnlyMine || Object.keys(columnFilters).length > 0 || sortConfig !== null) && (
-            <SIATCButton 
-              variant="ghost" 
-              size="sm" 
-              icon={Eraser}
-              onClick={handleClearFilters}
-              className="ml-auto h-7 text-[10px] uppercase font-black tracking-tighter"
+            <select 
+              className="bg-transparent border-none px-3 py-1.5 text-sm font-bold text-cb-text-primary focus:ring-0 outline-none cursor-pointer"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
             >
-              Limpiar Filtros
-            </SIATCButton>
-          )}
+              <option value="TODOS">Filtro Estado</option>
+              <option value="REGISTRADO">REGISTRADO</option>
+              <option value="APROBADO_SUP">APROBADO POR SUP.</option>
+              <option value="ASIGNADO">ASIGNADO</option>
+              <option value="VALIDADO">VALIDADO CLIENTE</option>
+              <option value="CERRADO">CERRADO</option>
+            </select>
+
+            {(searchTerm !== '' || statusFilter !== 'TODOS' || showOnlyMine || Object.keys(columnFilters).length > 0 || sortConfig !== null) && (
+              <SIATCButton 
+                variant="ghost" 
+                size="sm" 
+                icon={Eraser}
+                onClick={handleClearFilters}
+                className="ml-auto h-7 text-[10px] uppercase font-black tracking-tighter"
+              >
+                Limpiar Filtros
+              </SIATCButton>
+            )}
+          </div>
         </div>
       </div>
 
@@ -1300,7 +1314,7 @@ export const CancellationsPage = () => {
         <div className="space-y-4">
           <div>
             <label className="text-[10px] font-black uppercase text-muted-foreground mb-3 block tracking-widest pl-4">¿La solicitud de cancelación procede?</label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setAprobarForm({ ...aprobarForm, aprobado: 'APROBADO' })}
@@ -1366,7 +1380,7 @@ export const CancellationsPage = () => {
           </div>
           <div>
             <label className="text-[10px] font-black uppercase text-muted-foreground mb-3 block tracking-widest pl-4">¿Las solicitudes de cancelación proceden?</label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setBulkForm({ ...bulkForm, aprobado: 'APROBADO' })}
@@ -1429,7 +1443,7 @@ export const CancellationsPage = () => {
         <div className="space-y-4">
           <div>
             <label className="text-[10px] font-black uppercase text-muted-foreground mb-3 block tracking-widest pl-4">¿El cliente confirma el motivo?</label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setValidarForm({ ...validarForm, resultado: 'REAL' })}
@@ -1514,7 +1528,7 @@ export const CancellationsPage = () => {
             <label className="text-[10px] font-black uppercase text-muted-foreground mb-3 block tracking-widest pl-4">
               ¿La cancelación fue correcta?
             </label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setGestionForm({ ...gestionForm, cancelacion_correcta: 'Si', motivo_correcto: '' })}

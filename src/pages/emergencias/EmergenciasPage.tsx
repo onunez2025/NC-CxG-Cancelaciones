@@ -234,7 +234,7 @@ export const EmergenciasPage = () => {
           <h1 className={SIATC_THEME.TYPOGRAPHY.PAGE_TITLE}>{t('emergencias.title')}</h1>
           <p className={SIATC_THEME.TYPOGRAPHY.PAGE_SUBTITLE}>{t('emergencias.subtitle')}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <SIATCButton variant="secondary" icon={RefreshCw} onClick={fetchData} isLoading={isLoading}>
             {t('common.sync')}
           </SIATCButton>
@@ -413,8 +413,8 @@ export const EmergenciasPage = () => {
           </div>
         }
       >
-        <div className="grid grid-cols-2 gap-4">
-          <div className="col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="col-span-1 sm:col-span-2">
             <label className="text-[10px] font-black uppercase text-muted-foreground mb-1 block pl-4">{t('emergencias.fields.ticket')}</label>
             <input 
               className={SIATC_THEME.COMPONENTS.INPUT}
@@ -438,7 +438,7 @@ export const EmergenciasPage = () => {
               onChange={(e) => setRegisterForm({...registerForm, producto: e.target.value})}
             />
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1 sm:col-span-2">
             <label className="text-[10px] font-black uppercase text-muted-foreground mb-1 block pl-4">{t('emergencias.fields.cliente')}</label>
             <input 
               className={SIATC_THEME.COMPONENTS.INPUT}
@@ -462,7 +462,7 @@ export const EmergenciasPage = () => {
               onChange={(e) => setRegisterForm({...registerForm, telefono_2: e.target.value})}
             />
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1 sm:col-span-2">
             <label className="text-[10px] font-black uppercase text-muted-foreground mb-1 block pl-4">{t('emergencias.fields.direccion')}</label>
             <input 
               className={SIATC_THEME.COMPONENTS.INPUT}
@@ -470,7 +470,7 @@ export const EmergenciasPage = () => {
               onChange={(e) => setRegisterForm({...registerForm, direccion: e.target.value})}
             />
           </div>
-          <div className="col-span-2">
+          <div className="col-span-1 sm:col-span-2">
             <label className="text-[10px] font-black uppercase text-muted-foreground mb-1 block pl-4">{t('emergencias.fields.observacion')}</label>
             <textarea 
               className={`${SIATC_THEME.COMPONENTS.INPUT} h-20 pt-2`}
@@ -556,8 +556,8 @@ export const EmergenciasPage = () => {
         size="lg"
       >
         <div className="space-y-6">
-          <div className="grid grid-cols-3 gap-3 items-end p-4 bg-muted/30 rounded-xl border border-border/50">
-            <div className="col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end p-4 bg-muted/30 rounded-xl border border-border/50">
+            <div className="col-span-1 sm:col-span-2">
               <label className="text-[10px] font-black uppercase text-muted-foreground mb-1 block pl-4">{t('emergencias.fields.material')}</label>
               <input 
                 className={SIATC_THEME.COMPONENTS.INPUT}
@@ -654,8 +654,8 @@ export const EmergenciasPage = () => {
         size="xl"
       >
         {selectedEmergency && (
-          <div className="grid grid-cols-2 gap-6">
-            <div className="col-span-2 p-4 bg-primary/5 rounded-2xl border border-primary/20 flex items-center justify-between">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="col-span-1 sm:col-span-2 p-4 bg-primary/5 rounded-2xl border border-primary/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <span className="text-[10px] font-black uppercase text-primary/60 tracking-widest block">TICKET REFERENCIA</span>
                 <span className="text-2xl font-black text-primary">#{selectedEmergency.ticket}</span>
@@ -709,7 +709,7 @@ export const EmergenciasPage = () => {
               </div>
             </div>
 
-            <div className="col-span-2 pt-4 border-t border-border">
+            <div className="col-span-1 sm:col-span-2 pt-4 border-t border-border">
               <span className="text-[10px] font-black uppercase text-muted-foreground block mb-2">OBSERVACIONES DE CAMPO</span>
               <div className="p-4 bg-muted/20 rounded-xl italic text-sm text-foreground/80">
                 {selectedEmergency.observacion || 'Sin observaciones registradas.'}

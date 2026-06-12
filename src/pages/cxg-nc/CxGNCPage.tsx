@@ -72,6 +72,7 @@ export const CxGNCPage = () => {
   const [activeTab, setActiveTab] = useState<'TODOS' | 'NC' | 'CXG'>('TODOS');
   const [statusFilter, setStatusFilter] = useState<'TODOS' | 'REGISTRADO' | 'APROBADO_SUP' | 'ASIGNADO' | 'VALIDADO' | 'CERRADO'>('TODOS');
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   // Sorting & Filtering State
   const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' } | null>(null);
@@ -643,7 +644,7 @@ export const CxGNCPage = () => {
                 Gestión de Cambios por Garantía y Notas de Crédito.
               </p>
             </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <SIATCButton 
             variant="secondary" 
             icon={RefreshCw}
@@ -788,7 +789,7 @@ export const CxGNCPage = () => {
         "shrink-0 overflow-hidden transition-all duration-300 ease-in-out",
         showKpiCards ? "max-h-[110px] pt-1 pl-2 mb-2 opacity-100" : "max-h-0 mb-0 opacity-0"
       )}>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 pb-1">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 lg:gap-4 pb-1">
           {[
             { label: 'Total', value: kpiStats.total, icon: BarChart3, color: 'text-cb-neutral', bg: 'bg-white dark:bg-cb-bg', border: 'border-cb-border', filter: 'TODOS' as const },
             { label: 'Registrado', value: kpiStats.registrado, icon: FileText, color: 'text-[#DF2935]', bg: 'bg-white dark:bg-cb-bg', border: 'border-cb-border', filter: 'REGISTRADO' as const },
@@ -826,42 +827,55 @@ export const CxGNCPage = () => {
         {/* Tabs, Search & Filters */}
         <div className="px-6 py-4 border-b border-border flex flex-col gap-4 sticky top-0 z-20 bg-card/95 backdrop-blur-md">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex bg-muted/50 p-1 rounded-lg w-fit border border-border/50">
-              <button 
-                onClick={() => setActiveTab('TODOS')}
-                className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all flex items-center gap-2 ${activeTab === 'TODOS' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-              >
-                Todos
-                <span className={`px-1.5 py-0.5 text-[9px] rounded-md font-black ${activeTab === 'TODOS' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>{totalRecords}</span>
-              </button>
-              <button 
-                onClick={() => setActiveTab('NC')}
-                className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all flex items-center gap-2 ${activeTab === 'NC' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-              >
-                Notas de Crédito
-                <span className={`px-1.5 py-0.5 text-[9px] rounded-md font-black ${activeTab === 'NC' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>{data.filter(d => (d.tipo as string) === 'NC' || (d.tipo as string) === 'Nota de Credito').length}</span>
-              </button>
-              <button 
-                onClick={() => setActiveTab('CXG')}
-                className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all flex items-center gap-2 ${activeTab === 'CXG' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-              >
-                Cambio por Garantía
-                <span className={`px-1.5 py-0.5 text-[9px] rounded-md font-black ${activeTab === 'CXG' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>{data.filter(d => (d.tipo as string) === 'CXG' || (d.tipo as string) === 'Cambio por Garantia').length}</span>
-              </button>
+            <div className="overflow-x-auto scrollbar-none -mx-6 px-6 w-full md:w-auto">
+              <div className="flex bg-muted/50 p-1 rounded-lg w-fit border border-border/50 min-w-max">
+                <button 
+                  onClick={() => setActiveTab('TODOS')}
+                  className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all flex items-center gap-2 ${activeTab === 'TODOS' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                >
+                  Todos
+                  <span className={`px-1.5 py-0.5 text-[9px] rounded-md font-black ${activeTab === 'TODOS' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>{totalRecords}</span>
+                </button>
+                <button 
+                  onClick={() => setActiveTab('NC')}
+                  className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all flex items-center gap-2 ${activeTab === 'NC' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                >
+                  Notas de Crédito
+                  <span className={`px-1.5 py-0.5 text-[9px] rounded-md font-black ${activeTab === 'NC' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>{data.filter(d => (d.tipo as string) === 'NC' || (d.tipo as string) === 'Nota de Credito').length}</span>
+                </button>
+                <button 
+                  onClick={() => setActiveTab('CXG')}
+                  className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all flex items-center gap-2 ${activeTab === 'CXG' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                >
+                  Cambio por Garantía
+                  <span className={`px-1.5 py-0.5 text-[9px] rounded-md font-black ${activeTab === 'CXG' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>{data.filter(d => (d.tipo as string) === 'CXG' || (d.tipo as string) === 'Cambio por Garantia').length}</span>
+                </button>
+              </div>
             </div>
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input 
-                type="text"
-                placeholder="Buscar por cliente o N°..."
-                className={`${SIATC_THEME.COMPONENTS.INPUT} pl-10`}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+            <div className="flex items-center gap-2 w-full md:max-w-md">
+              <div className="relative flex-1">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input 
+                  type="text"
+                  placeholder="Buscar por cliente o N°..."
+                  className={`${SIATC_THEME.COMPONENTS.INPUT} pl-10`}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <SIATCButton
+                variant="secondary"
+                icon={Filter}
+                onClick={() => setShowMobileFilters(!showMobileFilters)}
+                className={cn("md:hidden !px-3 shrink-0", showMobileFilters && "bg-primary/10 text-primary border-primary/30")}
               />
             </div>
           </div>
           
-          <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-border/50">
+          <div className={cn(
+            "flex-wrap items-center gap-4 pt-2 border-t border-border/50",
+            showMobileFilters ? "flex" : "hidden md:flex"
+          )}>
             <div className="flex items-center gap-2">
               <span className="text-[9px] font-black uppercase text-muted-foreground tracking-tighter">Estado:</span>
               <select 
@@ -1288,7 +1302,7 @@ export const CxGNCPage = () => {
 
           <div>
             <label className="text-[10px] font-black uppercase text-muted-foreground mb-3 block tracking-widest pl-4">¿Aprueba esta solicitud?</label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setAprobarForm({ ...aprobarForm, aprobado: 'true', motivo: '' })}
@@ -1413,7 +1427,7 @@ export const CxGNCPage = () => {
 
           <div>
             <label className="text-[10px] font-black uppercase text-muted-foreground mb-3 block tracking-widest pl-4 font-bold">¿El documento es correcto?</label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setGestiónResultado('true')}
