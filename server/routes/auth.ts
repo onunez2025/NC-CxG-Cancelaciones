@@ -57,7 +57,7 @@ router.post('/login', async (req: Request, res: Response) => {
 
         // Fetch permissions for the user's role
         const permsResult = await pool.request()
-            .input('roleId', sql.Int, Number(user.role_id))
+            .input('roleId', user.role_id)
             .query('SELECT Permission FROM EBM.RolePermissions WHERE RoleId = @roleId');
 
         user.permissions = permsResult.recordset.map((p: any) => p.Permission);
@@ -139,7 +139,7 @@ router.get('/me', verifyToken, async (req: Request, res: Response) => {
         }
 
         const permsResult = await pool.request()
-            .input('roleId', sql.Int, Number(user.role_id))
+            .input('roleId', user.role_id)
             .query('SELECT Permission FROM EBM.RolePermissions WHERE RoleId = @roleId');
 
         user.permissions = permsResult.recordset.map((p: any) => p.Permission);
