@@ -245,6 +245,10 @@ if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
     process.exit(1);
 }
 
+if (process.env.NODE_ENV === 'production' && !(process.env.ALLOWED_ORIGINS || '').trim()) {
+    console.warn('⚠️  WARNING: ALLOWED_ORIGINS is not set. CORS will block all cross-origin requests in production.');
+}
+
 app.listen(port, () => {
     console.log(`Backend Server listening on port ${port} in ${process.env.NODE_ENV || 'development'} mode`);
     console.log(`Azure Status Check available at: http://localhost:${port}/api/status`);
