@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "prepare": "bash install-hooks.sh || true",
     "dev": "vite",
     "dev:server": "tsx watch server/index.ts",
     "start": "tsx server/index.ts",
