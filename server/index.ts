@@ -51,6 +51,7 @@ app.use(helmet({
             connectSrc: ["'self'"],
             fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
             objectSrc: ["'none'"],
+            upgradeInsecureRequests: [],
             frameAncestors: ["'none'"],
             formAction: ["'self'"],
             baseUri: ["'self'"],
@@ -78,7 +79,7 @@ app.use('/api/auth/login', authLimiter);
 app.use(cors({
     origin: (origin, callback) => {
         if (process.env.NODE_ENV !== 'production') return callback(null, true);
-        const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim());
+        const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
@@ -168,10 +169,12 @@ app.get('/api/config/audit-logs', verifyToken, verifyPermission('ebm.config.user
 
 app.post('/api/config/audit-logs', verifyToken, async (req: Request, res: Response) => {
     try {
-        const { UsuarioID, UsuarioNombre, Accion, Entidad, EntidadID, Detalle } = req.body;
+        const { Accion, Entidad, EntidadID, Detalle } = req.body;
+        const UsuarioID = String(req.user?.id || '');
+        const UsuarioNombre = req.user?.full_name || req.user?.username || '';
 
         // Validation
-        if (!UsuarioID || !UsuarioNombre || !Accion || !Entidad || !EntidadID) {
+        if (!UsuarioID || !Accion || !Entidad || !EntidadID) {
             return res.status(400).json({ error: 'Missing required audit log parameters' });
         }
 

@@ -9,11 +9,23 @@ if (isProduction && JWT_SECRET === 'FAIL') {
     throw new Error('CRITICAL FATAL ERROR: JWT_SECRET environment variable is completely missing in Production. The server refuses to start insecurely.');
 }
 
-// Extending Request interface to hold the decoded user payload
+interface JwtUserPayload {
+    id: string;
+    role_id: number;
+    role_name: string;
+    management_id: number | null;
+    username: string;
+    full_name?: string;
+    permissions: string[];
+    apps: string;
+    iat?: number;
+    exp?: number;
+}
+
 declare global {
     namespace Express {
         interface Request {
-            user?: any;
+            user?: JwtUserPayload;
         }
     }
 }
@@ -32,7 +44,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded; // attach the parsed user object from token to the request
+        req.user = decoded as JwtUserPayload;
         next();
     } catch (err) {
         return res.status(401).json({ error: 'Invalid or expired token.' });

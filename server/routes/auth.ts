@@ -3,6 +3,7 @@ import { getDbConnection } from '../db.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
+import sql from 'mssql';
 import { verifyToken } from '../middleware/auth.js';
 
 const router = Router();
@@ -23,11 +24,10 @@ router.post('/login', async (req: Request, res: Response) => {
         const { username, password } = parseResult.data;
 
         const pool = await getDbConnection();
-        // Extract user data joining Roles for full session payload
         const userResult = await pool.request()
-            .input('username', username)
+            .input('username', sql.NVarChar, username)
             .query(`
-                SELECT 
+                SELECT
                     u.Id as id,
                     u.FullName as full_name,
                     u.Username as username,
@@ -57,7 +57,7 @@ router.post('/login', async (req: Request, res: Response) => {
 
         // Fetch permissions for the user's role
         const permsResult = await pool.request()
-            .input('roleId', user.role_id)
+            .input('roleId', sql.Int, user.role_id)
             .query('SELECT Permission FROM EBM.RolePermissions WHERE RoleId = @roleId');
 
         user.permissions = permsResult.recordset.map((p: any) => p.Permission);
@@ -87,7 +87,6 @@ router.post('/login', async (req: Request, res: Response) => {
             { expiresIn: '24h' }
         );
 
-        // Return structured as AuthResponse
         res.json({
             user: safeUser,
             token
@@ -102,7 +101,6 @@ router.post('/login', async (req: Request, res: Response) => {
 // GET Current User (Validate Session)
 router.get('/me', verifyToken, async (req: Request, res: Response) => {
     try {
-        // userId now comes from the verified JWT payload, not an insecure header
         const userId = req.user?.id;
 
         if (!userId) {
@@ -111,23 +109,23 @@ router.get('/me', verifyToken, async (req: Request, res: Response) => {
 
         const pool = await getDbConnection();
         const userResult = await pool.request()
-            .input('id', userId)
+            .input('id', sql.UniqueIdentifier, userId)
             .query(`
-        SELECT
-        u.Id as id,
-            u.FullName as full_name,
-            u.Username as username,
-            u.Email as email,
-            u.RoleId as role_id,
-            r.Name as role_name,
-            u.ManagementId as management_id,
-            m.Name as management_name,
-            CAST(u.IsActive AS BIT) as is_active,
-            u.CreatedAt as created_at,
-            u.Language as language,
-            u.Theme as theme,
-            u.AvatarUrl as avatar_url,
-            u.Apps as apps
+                SELECT
+                    u.Id as id,
+                    u.FullName as full_name,
+                    u.Username as username,
+                    u.Email as email,
+                    u.RoleId as role_id,
+                    r.Name as role_name,
+                    u.ManagementId as management_id,
+                    m.Name as management_name,
+                    CAST(u.IsActive AS BIT) as is_active,
+                    u.CreatedAt as created_at,
+                    u.Language as language,
+                    u.Theme as theme,
+                    u.AvatarUrl as avatar_url,
+                    u.Apps as apps
                 FROM EBM.Users u
                 LEFT JOIN EBM.Roles r ON u.RoleId = r.Id
                 LEFT JOIN EBM.Managements m ON u.ManagementId = m.Id
@@ -141,7 +139,7 @@ router.get('/me', verifyToken, async (req: Request, res: Response) => {
         }
 
         const permsResult = await pool.request()
-            .input('roleId', user.role_id)
+            .input('roleId', sql.Int, user.role_id)
             .query('SELECT Permission FROM EBM.RolePermissions WHERE RoleId = @roleId');
 
         user.permissions = permsResult.recordset.map((p: any) => p.Permission);
@@ -166,7 +164,7 @@ router.post('/force-change-password', verifyToken, async (req: Request, res: Res
 
         const pool = await getDbConnection();
         const userResult = await pool.request()
-            .input('id', userId)
+            .input('id', sql.UniqueIdentifier, userId)
             .query('SELECT PasswordHash FROM EBM.Users WHERE Id = @id');
 
         const user = userResult.recordset[0];
@@ -186,8 +184,8 @@ router.post('/force-change-password', verifyToken, async (req: Request, res: Res
         const passwordHash = await bcrypt.hash(newPassword, salt);
 
         await pool.request()
-            .input('hash', passwordHash)
-            .input('id', userId)
+            .input('hash', sql.NVarChar, passwordHash)
+            .input('id', sql.UniqueIdentifier, userId)
             .query('UPDATE EBM.Users SET PasswordHash = @hash, RequiresPasswordChange = 0 WHERE Id = @id');
 
         res.json({ message: 'Contraseña actualizada exitosamente.' });
