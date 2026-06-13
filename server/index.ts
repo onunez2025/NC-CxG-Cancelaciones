@@ -42,7 +42,20 @@ app.set('trust proxy', 1);
 // Middlewares
 // Security headers
 app.use(helmet({
-    contentSecurityPolicy: false // Disabled temporarily to avoid breaking frontend assets if not fully configured
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            imgSrc: ["'self'", "data:", "https:"],
+            connectSrc: ["'self'"],
+            fontSrc: ["'self'", "data:"],
+            objectSrc: ["'none'"],
+            frameAncestors: ["'none'"],
+            formAction: ["'self'"],
+            baseUri: ["'self'"],
+        }
+    }
 }));
 
 // Rate limiting
@@ -64,15 +77,20 @@ app.use('/api/auth/login', authLimiter);
 // CORS Validation
 app.use(cors({
     origin: (origin, callback) => {
-        // En producción, permitimos cualquier origen para evitar que el middleware de CORS 
-        // intercepte y bloquee la carga de archivos estáticos (CSS/JS) con errores 500.
-        callback(null, true);
+        if (process.env.NODE_ENV !== 'production') return callback(null, true);
+        const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim());
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            console.error(`Blocked CORS attempt from: ${origin}`);
+            callback(new Error('Not allowed by CORS'));
+        }
     },
     credentials: true
 }));
 
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ limit: '2mb', extended: true }));
 
 // Public Status Route (Health Check)
 app.get('/api/status', async (req: Request, res: Response) => {

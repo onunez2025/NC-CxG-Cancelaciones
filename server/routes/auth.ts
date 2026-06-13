@@ -2,19 +2,25 @@ import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { z } from 'zod';
 import { verifyToken } from '../middleware/auth.js';
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_development_secret_do_not_use';
 
+const loginSchema = z.object({
+    username: z.string().min(1, 'Usuario requerido').max(255),
+    password: z.string().min(1, 'Contraseña requerida').max(255),
+});
+
 // POST Login Endpoint
 router.post('/login', async (req: Request, res: Response) => {
     try {
-        const { username, password } = req.body;
-
-        if (!username || !password) {
-            return res.status(400).json({ error: 'Username and password are required' });
+        const parseResult = loginSchema.safeParse(req.body);
+        if (!parseResult.success) {
+            return res.status(400).json({ error: 'Datos de login inválidos', details: parseResult.error.issues });
         }
+        const { username, password } = parseResult.data;
 
         const pool = await getDbConnection();
         // Extract user data joining Roles for full session payload
@@ -58,12 +64,7 @@ router.post('/login', async (req: Request, res: Response) => {
 
         // Compare hashed password
         const isMatch = await bcrypt.compare(password, user.password_hash);
-
-        // Handle migration edge case: if they still have a plain text password matching exactly
-        // Remove this fallback once all users are migrated.
-        const isLegacyMatch = user.password_hash === password;
-
-        if (!isMatch && !isLegacyMatch) {
+        if (!isMatch) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
@@ -172,9 +173,7 @@ router.post('/force-change-password', verifyToken, async (req: Request, res: Res
         if (!user) return res.status(400).json({ error: 'Usuario no encontrado' });
 
         const isMatch = await bcrypt.compare(currentPassword, user.PasswordHash);
-        const isLegacyMatch = user.PasswordHash === currentPassword;
-
-        if (!isMatch && !isLegacyMatch) {
+        if (!isMatch) {
             return res.status(401).json({ error: 'La contraseña actual es incorrecta' });
         }
 
