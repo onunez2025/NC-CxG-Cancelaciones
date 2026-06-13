@@ -127,7 +127,7 @@ app.use('/api/accounts', verifyToken, accountsRouter);
 app.use('/api/roles', verifyToken, verifyPermission('ebm.config.roles'), rolesRouter);
 app.use('/api/users', verifyToken, verifyPermission('ebm.config.users'), usersRouter);
 app.use('/api/auth', authRouter); // protect /me internally
-app.get('/api/applications', async (req: Request, res: Response) => {
+app.get('/api/applications', verifyToken, async (req: Request, res: Response) => {
     try {
         const pool = await getDbConnection();
         const activeOnly = req.query.activeOnly === 'true';
