@@ -23,7 +23,7 @@ export default function ConfigLayout() {
     ];
 
     const filteredItems = configItems.filter(item =>
-        !item.permission || hasPermission(item.permission as any)
+        !item.permission || hasPermission(item.permission)
     );
 
     // If we are at the root /config, redirect to the first authorized item
@@ -32,6 +32,7 @@ export default function ConfigLayout() {
         if (firstLocalItem) {
             return <Navigate to={firstLocalItem.to} replace />;
         } else if (filteredItems.length > 0) {
+            // eslint-disable-next-line react-hooks/immutability
             window.location.href = filteredItems[0].to;
             return null;
         }

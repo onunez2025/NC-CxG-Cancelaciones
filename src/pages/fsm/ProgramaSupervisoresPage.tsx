@@ -341,8 +341,8 @@ export default function ProgramaSupervisoresPage() {
             });
             await fetchData();
             setIsModalOpen(false);
-        } catch (err: any) {
-            setErrorMsg(err.message);
+        } catch (err: unknown) {
+            setErrorMsg(err instanceof Error ? err.message : 'Error desconocido');
         } finally {
             setActionLoading(false);
         }
@@ -699,7 +699,7 @@ export default function ProgramaSupervisoresPage() {
                                             <div className="fixed inset-0 z-40" onClick={() => setViewSwitcherOpen(false)} />
                                             <div className="absolute top-full left-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-xl z-50 overflow-hidden">
                                                 {[{ id: 'day', label: 'Día' }, { id: 'workWeek', label: 'Semana laboral' }, { id: 'week', label: 'Semana' }].map((opt) => (
-                                                    <button key={opt.id} onClick={() => changeCalendarView(opt.id as any)} className={cn("w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors hover:bg-muted text-left", calendarView === opt.id ? "text-primary font-bold bg-primary/5" : "text-muted-foreground")}>
+                                                    <button key={opt.id} onClick={() => changeCalendarView(opt.id as 'day' | 'workWeek' | 'week')} className={cn("w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors hover:bg-muted text-left", calendarView === opt.id ? "text-primary font-bold bg-primary/5" : "text-muted-foreground")}>
                                                         <span>{opt.label}</span>
                                                         {calendarView === opt.id && <div className="w-1.5 h-1.5 bg-primary rounded-full" />}
                                                     </button>

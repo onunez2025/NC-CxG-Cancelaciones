@@ -13,7 +13,7 @@ export class ProgramaSupervisoresService {
         empleadoId = '',
         startDate = '',
         endDate = ''
-    ): Promise<{ data: ProgramaSupervisor[], metadata: any }> {
+    ): Promise<{ data: ProgramaSupervisor[], metadata: Record<string, unknown> }> {
         const params = new URLSearchParams({
             page: page.toString(),
             limit: limit.toString(),

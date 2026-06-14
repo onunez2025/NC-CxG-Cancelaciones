@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { getDbConnection } from '../db.js';
 import {
     getRelationalTrackingData,
     getRelationalSolpedData,

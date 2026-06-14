@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -60,7 +60,7 @@ router.post('/login', async (req: Request, res: Response) => {
             .input('roleId', user.role_id)
             .query('SELECT Permission FROM EBM.RolePermissions WHERE RoleId = @roleId');
 
-        user.permissions = permsResult.recordset.map((p: any) => p.Permission);
+        user.permissions = permsResult.recordset.map((p: { Permission: string }) => p.Permission);
 
         // Compare hashed password
         const isMatch = await bcrypt.compare(password, user.password_hash);
@@ -69,7 +69,7 @@ router.post('/login', async (req: Request, res: Response) => {
         }
 
         // Return user without password
-        const { password_hash, ...safeUser } = user;
+        const { password_hash: _password_hash, ...safeUser } = user;
 
         // Generate JWT token
         const token = jwt.sign(
@@ -92,7 +92,7 @@ router.post('/login', async (req: Request, res: Response) => {
             token
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Login error:', error);
         res.status(500).json({ error: 'Internal server error during authentication' });
     }
@@ -142,11 +142,11 @@ router.get('/me', verifyToken, async (req: Request, res: Response) => {
             .input('roleId', user.role_id)
             .query('SELECT Permission FROM EBM.RolePermissions WHERE RoleId = @roleId');
 
-        user.permissions = permsResult.recordset.map((p: any) => p.Permission);
+        user.permissions = permsResult.recordset.map((p: { Permission: string }) => p.Permission);
 
         res.json({ user });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Validate session error:', error);
         res.status(500).json({ error: 'Internal server error during session validation' });
     }
@@ -189,7 +189,7 @@ router.post('/force-change-password', verifyToken, async (req: Request, res: Res
             .query('UPDATE EBM.Users SET PasswordHash = @hash, RequiresPasswordChange = 0 WHERE Id = @id');
 
         res.json({ message: 'Contraseña actualizada exitosamente.' });
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Change password error:', err);
         res.status(500).json({ error: 'Error interno del servidor' });
     }

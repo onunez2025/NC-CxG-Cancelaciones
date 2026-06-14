@@ -32,7 +32,7 @@ export const fsmApiService = {
             throw new Error(`Failed to fetch FSM token: ${response.status} ${errText}`);
         }
 
-        const data: any = await response.json();
+        const data = await response.json() as { access_token: string; expires_in?: number };
         cachedToken = data.access_token;
         // Typically expires in 3600 seconds, reduce by 60s for safety buffer
         tokenExpiresAt = Date.now() + ((data.expires_in || 3600) - 60) * 1000;
@@ -82,16 +82,16 @@ export const fsmApiService = {
                     continue;
                 }
 
-                const actData: any = await actRes.json();
+                const actData = await actRes.json() as { data?: Array<Record<string, unknown>> };
                 const personIds = new Set<string>();
                 const activityToTicketMap: Record<string, string[]> = {}; // Map personId -> array of associated ticket IDs
 
                 if (actData.data && actData.data.length > 0) {
-                    actData.data.forEach((row: any) => {
-                        const activity = row.it || row;
+                    actData.data.forEach((row: Record<string, unknown>) => {
+                        const activity = (row.it || row) as { subject?: string; code?: string; assignedPerson?: string; responsibles?: string[] };
                         // Determine which ticket this activity belongs to by checking subject
                         const matchedTicket = chunk.find(id => activity.subject?.includes(id) || activity.code?.includes(id));
-                        
+
                         const personId = activity.assignedPerson || (activity.responsibles && activity.responsibles[0]);
                         if (personId && matchedTicket) {
                             personIds.add(personId);
@@ -113,14 +113,14 @@ export const fsmApiService = {
                     });
 
                     if (personRes.ok) {
-                        const personData: any = await personRes.json();
+                        const personData = await personRes.json() as { data?: Array<Record<string, unknown>> };
                         if (personData.data && personData.data.length > 0) {
-                            personData.data.forEach((row: any) => {
-                                const person = row.it || row;
+                            personData.data.forEach((row: Record<string, unknown>) => {
+                                const person = (row.it || row) as { id?: string; firstName?: string; lastName?: string };
                                 const fullName = `${person.firstName || ''} ${person.lastName || ''}`.trim();
-                                
+
                                 // Map the full name back to the respective tickets
-                                const tickets = activityToTicketMap[person.id];
+                                const tickets = person.id ? activityToTicketMap[person.id] : undefined;
                                 if (tickets) {
                                     tickets.forEach(ticketId => {
                                         techniciansMap[ticketId] = fullName;

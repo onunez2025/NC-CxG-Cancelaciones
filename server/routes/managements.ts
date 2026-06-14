@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 
 const router = Router();
@@ -9,9 +9,9 @@ router.get('/', async (req: Request, res: Response) => {
         const pool = await getDbConnection();
         const result = await pool.request().query('SELECT Id as id, Name as name, Code as code FROM EBM.Managements');
         res.json(result.recordset);
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error fetching managements:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -34,9 +34,9 @@ router.post('/', async (req: Request, res: Response) => {
             `);
 
         res.status(201).json(result.recordset[0]);
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error creating management:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -67,9 +67,9 @@ router.put('/:id', async (req: Request, res: Response) => {
         }
 
         res.json(result.recordset[0]);
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error updating management:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -88,7 +88,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
         }
 
         res.status(204).send();
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error deleting management:', error);
 
         // Handle foreign key constraint violations
@@ -98,7 +98,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
             });
         }
 
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 

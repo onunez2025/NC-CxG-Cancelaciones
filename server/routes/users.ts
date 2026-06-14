@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
 import bcrypt from 'bcrypt';
@@ -38,9 +38,9 @@ router.get('/', async (req: Request, res: Response) => {
                 LEFT JOIN EBM.Managements m ON u.ManagementId = m.Id
             `);
         res.json(result.recordset);
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error fetching users:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -126,9 +126,9 @@ router.post('/', async (req: Request, res: Response) => {
         const createdUser = result.recordset[0];
         await logAudit(req, 'CREATE', 'USERS', username, { apps: appsToSave });
         res.status(201).json(createdUser);
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error in router.post(/):', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -176,7 +176,7 @@ router.put('/:id', async (req: Request, res: Response) => {
             const hashedPwd = await bcrypt.hash(password_hash, salt);
 
             // If the user updating is the same as the user being updated, don't force them to change it again
-            const isSelfUpdate = (req as any).user?.id === userId;
+            const isSelfUpdate = (req as { user?: { id: string } }).user?.id === userId;
             const forceChange = isSelfUpdate ? 0 : 1;
 
             queryStr += `, PasswordHash = @password, RequiresPasswordChange = ${forceChange} `;
@@ -203,12 +203,13 @@ router.put('/:id', async (req: Request, res: Response) => {
         const updatedUser = result.recordset[0];
         await logAudit(req, 'UPDATE', 'USERS', userId, { apps: appsToSave });
         res.json(updatedUser);
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error updating user:', error);
-        if (error.number === 2601 || error.number === 2627) {
+        const sqlErr = error as { number?: number };
+        if (sqlErr.number === 2601 || sqlErr.number === 2627) {
             return res.status(400).json({ error: 'El nombre de usuario o correo electrónico ya están registrados.' });
         }
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -231,9 +232,9 @@ router.delete('/:id', async (req: Request, res: Response) => {
         }
 
         res.status(204).send();
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error deleting user:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 

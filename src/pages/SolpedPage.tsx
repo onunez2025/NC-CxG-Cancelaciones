@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     FileText,
@@ -23,7 +23,7 @@ function formatCurrency(amount: number, currency: string = 'PEN'): string {
     return new Intl.NumberFormat('es-PE', { style: 'currency', currency: cur }).format(amount);
 }
 
-function formatExcelDate(value: any): string {
+function formatExcelDate(value: unknown): string {
     if (!value) return '—';
     const num = Number(value);
     if (!isNaN(num) && num > 40000 && num < 60000) {
@@ -44,12 +44,22 @@ export function SolpedPage() {
 
     const [cecoNameMap, setCecoNameMap] = useState<Map<string, string>>(new Map());
 
+    const loadData = async () => {
+        try {
+            const solpedRows = await CrossReferenceService.getSolpedData();
+            setRows(solpedRows);
+        } catch (error) {
+            console.error('Error loading solped data:', error);
+        }
+    };
+
     useEffect(() => {
         CostCentersService.getCostCenters().then(cecos => {
             const map = new Map<string, string>();
             cecos.forEach(cc => map.set(cc.code, cc.name));
             setCecoNameMap(map);
         }).catch(console.error);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         loadData();
     }, []);
 
@@ -59,17 +69,6 @@ export function SolpedPage() {
         const codes = costCenter.split(/\s*\/\s*/);
         const names = codes.map(c => cecoNameMap.get(c.trim()) || c.trim());
         return names.join(' / ');
-    };
-
-    // Load data triggered by useEffect above
-
-    const loadData = async () => {
-        try {
-            const solpedRows = await CrossReferenceService.getSolpedData();
-            setRows(solpedRows);
-        } catch (error) {
-            console.error('Error loading solped data:', error);
-        }
     };
 
     // Unique CeCos
@@ -356,7 +355,7 @@ export function SolpedPage() {
 
 // ─── Sub-components ─────────────────────────────────
 
-function KPICard({ label, value, icon: Icon, color, bgColor, active, onClick }: { label: string; value: string | number; icon: any; color: string; bgColor: string; active?: boolean; onClick?: () => void }) {
+function KPICard({ label, value, icon: Icon, color, bgColor, active, onClick }: { label: string; value: string | number; icon: React.ElementType; color: string; bgColor: string; active?: boolean; onClick?: () => void }) {
     return (
         <div
             onClick={onClick}

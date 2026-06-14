@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 
 const router = Router();
@@ -20,9 +20,9 @@ router.get('/', async (req: Request, res: Response) => {
             LEFT JOIN EBM.Managements m ON c.ManagementId = m.Id
         `);
         res.json(result.recordset);
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error fetching cost centers:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -49,9 +49,9 @@ router.post('/', async (req: Request, res: Response) => {
             `);
 
         res.status(201).json(result.recordset[0]);
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error creating cost center:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -85,9 +85,9 @@ router.put('/:id', async (req: Request, res: Response) => {
         }
 
         res.json(result.recordset[0]);
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error updating cost center:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -106,7 +106,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
         }
 
         res.status(204).send();
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error deleting cost center:', error);
 
         // Handle foreign key constraint violations
@@ -116,7 +116,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
             });
         }
 
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 

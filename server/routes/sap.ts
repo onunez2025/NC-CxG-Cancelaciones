@@ -38,11 +38,11 @@ router.get('/', async (req, res) => {
         `);
 
         const countsByType: Record<string, number> = {};
-        countsResult.recordset.forEach((r: any) => {
+        countsResult.recordset.forEach((r: { T: string; N: number }) => {
             countsByType[r.T] = r.N;
         });
 
-        const uploads = uploadsResult.recordset.map((row: any) => ({
+        const uploads = uploadsResult.recordset.map((row: { Id: string; TransactionType: string; UploadDate: string; UploadedBy: string }) => ({
             id: row.Id,
             transaction_type: row.TransactionType,
             upload_date: row.UploadDate,
@@ -92,7 +92,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         const { id, transaction_type, upload_date, uploaded_by, data } = req.body;
-        const user = (req as any).user;
+        const user = (req as { user?: { role_id?: string; management_id?: string } }).user;
 
         if (!id || !transaction_type || !data) {
             return res.status(400).json({ error: 'Missing required fields' });
@@ -101,7 +101,7 @@ router.post('/', async (req, res) => {
         const pool = await getDbConnection();
 
         // 1. Obtener CeCos autorizados para este usuario (Filtro de Seguridad)
-        let authorizedCecos = new Set<string>();
+        const authorizedCecos = new Set<string>();
         let isAdmin = false;
 
         if (user && user.role_id) {
@@ -116,7 +116,7 @@ router.post('/', async (req, res) => {
                 const cecoQuery = await pool.request()
                     .input('managementId', sql.UniqueIdentifier, String(user.management_id))
                     .query(`SELECT Code FROM EBM.CostCenters WHERE ManagementId = @managementId AND IsActive = 1`);
-                cecoQuery.recordset.forEach((r: any) => authorizedCecos.add(String(r.Code).trim()));
+                cecoQuery.recordset.forEach((r: { Code: string }) => authorizedCecos.add(String(r.Code).trim()));
             }
         }
 
@@ -144,14 +144,14 @@ router.post('/', async (req, res) => {
                 `);
 
             // --- INICIO PRECARGA PARA FILTROS EN MEMORIA ---
-            const validMe2k = new Map<string, any>(); // PoNumber -> { CostCenter, Description, VendorId }
-            const validMe5k = new Map<string, any>(); // PrNumber -> CostCenter
+            const validMe2k = new Map<string, { CostCenter: string; Description: string; VendorId: string }>(); // PoNumber -> { CostCenter, Description, VendorId }
+            const validMe5k = new Map<string, { PrNumber: string; PrItem: string; CostCenter: string }>(); // PrNumber -> CostCenter
 
             if (data.length > 0 && ['ME5A', 'KSB1', 'FBL1N'].includes(transaction_type)) {
 
                 // Cargar ME2K limitando a los CeCos del usuario si corresponde
                 let queryMe2k = `SELECT PoNumber, CostCenter, Description, VendorId FROM EBM.SAP_ME2K WHERE PoNumber IS NOT NULL`;
-                let me2kReq = transaction.request();
+                const me2kReq = transaction.request();
 
                 if (!isAdmin && authorizedCecos.size > 0) {
                     const cecosArr = Array.from(authorizedCecos);
@@ -163,7 +163,7 @@ router.post('/', async (req, res) => {
                 }
                 const me2kResult = await me2kReq.query(queryMe2k);
 
-                me2kResult.recordset.forEach((r: any) => validMe2k.set(r.PoNumber, {
+                me2kResult.recordset.forEach((r: { PoNumber: string; CostCenter: string; Description: string; VendorId: string }) => validMe2k.set(r.PoNumber, {
                     CostCenter: r.CostCenter,
                     Description: r.Description,
                     VendorId: r.VendorId
@@ -171,7 +171,7 @@ router.post('/', async (req, res) => {
 
                 // Cargar ME5K
                 let queryMe5k = `SELECT PrNumber, PrItem, CostCenter FROM EBM.SAP_ME5K WHERE PrNumber IS NOT NULL`;
-                let me5kReq = transaction.request();
+                const me5kReq = transaction.request();
 
                 if (!isAdmin && authorizedCecos.size > 0) {
                     const cecosArr = Array.from(authorizedCecos);
@@ -183,7 +183,7 @@ router.post('/', async (req, res) => {
                 }
                 const me5kResult = await me5kReq.query(queryMe5k);
 
-                me5kResult.recordset.forEach((r: any) => {
+                me5kResult.recordset.forEach((r: { PrNumber: string; PrItem: string; CostCenter: string }) => {
                     validMe5k.set(`${r.PrNumber}_${r.PrItem}`, r);
                     validMe5k.set(r.PrNumber, r); // Fallback al header
                 });
@@ -345,7 +345,7 @@ router.post('/', async (req, res) => {
 
                         // Si no hay CeCo, intentamos deducirlo por PoNumber o PurchasingDoc
                         if (!ceco) {
-                            let poList = [
+                            const poList = [
                                 String(row.po_number || '').trim(),
                                 String(row.purchasing_doc || '').trim(),
                                 String(row.reference_doc || '').trim()
@@ -429,7 +429,7 @@ router.post('/', async (req, res) => {
                             }
                         }
 
-                        let finalCeco = matchedCeco || String(row.cost_center || '').trim();
+                        const finalCeco = matchedCeco || String(row.cost_center || '').trim();
                         if (!finalCeco) continue; // Descarte estricto
                         if (!isAdmin && !authorizedCecos.has(finalCeco)) continue;
 

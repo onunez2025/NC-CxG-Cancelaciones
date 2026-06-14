@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
 import { getAuthenticatedUserDisplayName } from '../utils/user.js';
@@ -19,8 +19,8 @@ router.get('/catalogos/verificacion', async (req: Request, res: Response) => {
             FROM [dbo].[GAC_APP_TB_EMERGENCIA_VERIFICACION_MOTIVO];
         `);
         res.json({ statuses: results.recordsets[0], motives: results.recordsets[1] });
-    } catch (error: any) {
-        res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -34,8 +34,8 @@ router.get('/catalogos/procesado', async (req: Request, res: Response) => {
             FROM [dbo].[GAC_APP_TB_EMERGENCIA_PROCESADO_MOTIVO];
         `);
         res.json({ statuses: results.recordsets[0], motives: results.recordsets[1] });
-    } catch (error: any) {
-        res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -109,9 +109,9 @@ router.get('/', async (req: Request, res: Response) => {
             page,
             pageSize
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error fetching emergencies:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -147,8 +147,8 @@ router.get('/:id', async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Emergencia no encontrada' });
         }
         res.json(result.recordset[0]);
-    } catch (error: any) {
-        res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -188,8 +188,8 @@ router.post('/', async (req: Request, res: Response) => {
             `);
             
         res.status(201).json({ message: 'Emergencia registrada', id });
-    } catch (error: any) {
-        res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -212,8 +212,8 @@ router.put('/:id/asignar', async (req: Request, res: Response) => {
                 WHERE ID_Emergencia = @id
             `);
         res.json({ message: 'Técnico asignado' });
-    } catch (error: any) {
-        res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -244,8 +244,8 @@ router.put('/:id/verificar', async (req: Request, res: Response) => {
                 WHERE ID_Emergencia = @id
             `);
         res.json({ message: 'Verificación registrada' });
-    } catch (error: any) {
-        res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -276,8 +276,8 @@ router.put('/:id/procesar', async (req: Request, res: Response) => {
                 WHERE ID_Emergencia = @id
             `);
         res.json({ message: 'Procesamiento registrado' });
-    } catch (error: any) {
-        res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -298,8 +298,8 @@ router.get('/:id/repuestos', async (req: Request, res: Response) => {
                 WHERE sr.Emergencia = @id
             `);
         res.json(result.recordset);
-    } catch (error: any) {
-        res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -332,8 +332,8 @@ router.post('/:id/repuestos', async (req: Request, res: Response) => {
             .query(`UPDATE [dbo].[GAC_APP_TB_EMERGENCIAS] SET Solicitud_repuestos = 'Si' WHERE ID_Emergencia = @em_id`);
 
         res.status(201).json({ message: 'Repuesto agregado', id: solicitudId });
-    } catch (error: any) {
-        res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 

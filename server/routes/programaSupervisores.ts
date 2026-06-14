@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
 import { verifyPermission } from '../middleware/auth.js';
@@ -83,9 +83,9 @@ router.get('/', async (req: Request, res: Response) => {
             data: result.recordset,
             metadata: { total, page, limit, totalPages: Math.ceil(total / limit) }
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error fetching supervisor schedules:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -101,9 +101,9 @@ router.get('/colores', async (req: Request, res: Response) => {
             FROM [dbo].[GAC_APP_TB_PROGRAMA_SUPERVISORES_LABORES_COLORES]
         `);
         res.json(result.recordset);
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error fetching labor colors:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -126,9 +126,9 @@ router.get('/empleados', async (req: Request, res: Response) => {
         }));
         
         res.json(data);
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error fetching employees for dropdown:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -153,9 +153,9 @@ router.post('/', verifyPermission('cxg.programa_supervisores.create'), async (re
             `);
         
         res.status(201).json({ id });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error creating supervisor schedule:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -182,9 +182,9 @@ router.put('/:id', verifyPermission('cxg.programa_supervisores.edit'), async (re
         
         if (result.rowsAffected[0] === 0) return res.status(404).json({ error: 'Registro no encontrado' });
         res.json({ success: true });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error updating supervisor schedule:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -199,9 +199,9 @@ router.delete('/:id', verifyPermission('cxg.programa_supervisores.delete'), asyn
         
         if (result.rowsAffected[0] === 0) return res.status(404).json({ error: 'Registro no encontrado' });
         res.status(204).send();
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error deleting supervisor schedule:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 

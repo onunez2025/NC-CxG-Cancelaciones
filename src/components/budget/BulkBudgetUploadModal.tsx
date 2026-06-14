@@ -63,9 +63,9 @@ export function BulkBudgetUploadModal({ isOpen, onClose, onSuccess, targetYear }
             const workbook = new ExcelJS.Workbook();
             await workbook.xlsx.load(data);
             const worksheet = workbook.worksheets[0];
-            const jsonData: any[][] = [];
+            const jsonData: unknown[][] = [];
             worksheet.eachRow((row) => {
-                const rowValues = row.values as any[];
+                const rowValues = row.values as unknown[];
                 jsonData.push(rowValues.slice(1));
             });
 
@@ -196,8 +196,8 @@ export function BulkBudgetUploadModal({ isOpen, onClose, onSuccess, targetYear }
 
         try {
             const validRows = previewData.filter(r => r.isValid);
-            let currentAccounts = [...allAccounts];
-            let currentBudgets = [...allBudgets];
+            const currentAccounts = [...allAccounts];
+            const currentBudgets = [...allBudgets];
 
             for (const row of validRows) {
                 // 1. Ensure Account exists
@@ -254,9 +254,9 @@ export function BulkBudgetUploadModal({ isOpen, onClose, onSuccess, targetYear }
             setPreviewData([]);
             onSuccess();
             onClose();
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            setGlobalError(error.message || 'Error al importar datos. Revisa tu conexión o el formato.');
+            setGlobalError((error instanceof Error ? error.message : null) || 'Error al importar datos. Revisa tu conexión o el formato.');
         } finally {
             setIsLoading(false);
         }

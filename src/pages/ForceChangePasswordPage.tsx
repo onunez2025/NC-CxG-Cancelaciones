@@ -63,8 +63,8 @@ export const ForceChangePasswordPage = () => {
             // but just in case:
             navigate('/dashboard', { replace: true });
 
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Error al cambiar contraseña');
         } finally {
             setIsLoading(false);
         }

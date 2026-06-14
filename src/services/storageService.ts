@@ -41,11 +41,11 @@ export class StorageService {
         this.set('auth_token', token);
     }
 
-    static getCurrentUser(): any | null {
+    static getCurrentUser(): unknown {
         return this.get('current_user');
     }
 
-    static setCurrentUser(user: any): void {
+    static setCurrentUser(user: unknown): void {
         this.set('current_user', user);
     }
 }

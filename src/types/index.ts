@@ -134,7 +134,7 @@ export interface SAPTransactionData {
     transaction_type: 'FBL1N' | 'ME5K' | 'ME2K' | 'KSB1' | 'ME5A';
     upload_date: string;
     uploaded_by: string;
-    data: any[]; // Raw parsed data
+    data: Record<string, unknown>[]; // Raw parsed data
 }
 
 // ─────────────────────────────────────────────

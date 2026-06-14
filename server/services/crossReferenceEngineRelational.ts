@@ -2,7 +2,6 @@
  * Server-side Relational Cross-Reference Engine (5-Tables Architecture)
  */
 import { getDbConnection } from '../db.js';
-import sql from 'mssql';
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -15,11 +14,11 @@ export interface EnrichedTransaction {
     description: string;
     po_value: number;
     currency: string;
-    solped: any | null;
-    me5a: any | null;
-    release_info?: any | null;
-    ksb1_entries: any[];
-    fbl1n_entries: any[];
+    solped: Record<string, unknown> | null;
+    me5a: Record<string, unknown> | null;
+    release_info?: Record<string, unknown> | null;
+    ksb1_entries: Record<string, unknown>[];
+    fbl1n_entries: Record<string, unknown>[];
     status: 'solicitado' | 'pedido' | 'recibido' | 'facturado' | 'pagado';
     total_real_expense: number;
     total_invoiced: number;
@@ -57,8 +56,8 @@ export async function getRelationalTrackingData(): Promise<{ transactions: Enric
     const me5aResult = await pool.request().query(`SELECT PoNumber, PrNumber, Description, Quantity, UnitPrice, TotalValue, CreatedBy, PoDate, ReleaseDate FROM EBM.SAP_ME5A WHERE PoNumber IS NOT NULL`);
 
     // Indexar arreglos
-    const ksbByPo = new Map<string, any[]>();
-    ksbResult.recordset.forEach((r: any) => {
+    const ksbByPo = new Map<string, Record<string, unknown>[]>();
+    ksbResult.recordset.forEach((r: Record<string, unknown>) => {
         if (!ksbByPo.has(r.PoNumber)) ksbByPo.set(r.PoNumber, []);
         ksbByPo.get(r.PoNumber)!.push({
             cost_element: r.CostElement,
@@ -70,8 +69,8 @@ export async function getRelationalTrackingData(): Promise<{ transactions: Enric
         });
     });
 
-    const fblByPo = new Map<string, any[]>();
-    fblResult.recordset.forEach((r: any) => {
+    const fblByPo = new Map<string, Record<string, unknown>[]>();
+    fblResult.recordset.forEach((r: Record<string, unknown>) => {
         if (!fblByPo.has(r.PoNumber)) fblByPo.set(r.PoNumber, []);
         const isPaid = (r.ClearingDoc && String(r.ClearingDoc).trim() !== '');
         fblByPo.get(r.PoNumber)!.push({
@@ -86,8 +85,8 @@ export async function getRelationalTrackingData(): Promise<{ transactions: Enric
         });
     });
 
-    const solpedByPo = new Map<string, any>();
-    solpedResult.recordset.forEach((r: any) => {
+    const solpedByPo = new Map<string, Record<string, unknown>>();
+    solpedResult.recordset.forEach((r: Record<string, unknown>) => {
         if (!solpedByPo.has(r.PoNumber)) {
             const qty = Number(r.Quantity) || 0;
             const netVal = Number(r.NetValue) || 0;
@@ -104,8 +103,8 @@ export async function getRelationalTrackingData(): Promise<{ transactions: Enric
         }
     });
 
-    const me5aByPo = new Map<string, any>();
-    me5aResult.recordset.forEach((r: any) => {
+    const me5aByPo = new Map<string, Record<string, unknown>>();
+    me5aResult.recordset.forEach((r: Record<string, unknown>) => {
         if (!me5aByPo.has(r.PoNumber)) {
             me5aByPo.set(r.PoNumber, {
                 pr_number: r.PrNumber,
@@ -122,7 +121,7 @@ export async function getRelationalTrackingData(): Promise<{ transactions: Enric
 
     const enriched: EnrichedTransaction[] = [];
 
-    trackingRows.forEach((row: any) => {
+    trackingRows.forEach((row: Record<string, unknown>) => {
         const po = row.PoNumber;
         const kEntries = ksbByPo.get(po) || [];
         const fEntries = fblByPo.get(po) || [];
@@ -137,8 +136,8 @@ export async function getRelationalTrackingData(): Promise<{ transactions: Enric
         if (fEntries.some(e => e.status === 'paid')) status = 'pagado';
 
         // Parsear VendorCode a fuerza bruta para compatibilidad si viene nulo
-        let vendorCode = String(row.VendorId || '').replace(/\D/g, '');
-        let vendorName = String(row.VendorNameStr || row.VendorId || '');
+        const vendorCode = String(row.VendorId || '').replace(/\D/g, '');
+        const vendorName = String(row.VendorNameStr || row.VendorId || '');
 
         enriched.push({
             id: po,
@@ -224,7 +223,7 @@ export interface VendorSummary {
 // TODO: Expand the basic view mapping into the complete interfaces (SolpedRow/VendorSummary) if the frontend requires the deep nested arrays.
 // For now, we return a flat structure that the frontend grids can digest directly.
 
-export async function getRelationalSolpedData(): Promise<any[]> {
+export async function getRelationalSolpedData(): Promise<Record<string, unknown>[]> {
     const pool = await getDbConnection();
     const result = await pool.request().query(`SELECT * FROM EBM.vw_EBM_Solped`);
     const me5kResult = await pool.request().query(`SELECT PrNumber, PrItem, CostCenter, Description, Quantity, NetValue, Currency, RequestDate FROM EBM.SAP_ME5K WHERE PrNumber IS NOT NULL`);
@@ -233,7 +232,7 @@ export async function getRelationalSolpedData(): Promise<any[]> {
 
     // Group by PrNumber + PrItem to find true totals for distributed positions
     const positionTotals = new Map<string, { totalValue: number; originalQuantity: number }>();
-    me5kResult.recordset.forEach((r: any) => {
+    me5kResult.recordset.forEach((r: Record<string, unknown>) => {
         const key = `${r.PrNumber}_${r.PrItem}`;
         if (!positionTotals.has(key)) {
             positionTotals.set(key, { totalValue: 0, originalQuantity: Number(r.Quantity) || 0 });
@@ -241,7 +240,7 @@ export async function getRelationalSolpedData(): Promise<any[]> {
         positionTotals.get(key)!.totalValue += (Number(r.NetValue) || 0);
     });
 
-    me5kResult.recordset.forEach((r: any) => {
+    me5kResult.recordset.forEach((r: Record<string, unknown>) => {
         if (!itemsMap.has(r.PrNumber)) itemsMap.set(r.PrNumber, []);
 
         const key = `${r.PrNumber}_${r.PrItem}`;
@@ -264,7 +263,7 @@ export async function getRelationalSolpedData(): Promise<any[]> {
         });
     });
 
-    return result.recordset.map((row: any) => ({
+    return result.recordset.map((row: Record<string, unknown>) => ({
         pr_number: row.PrNumber || '',
         po_number: row.PoNumber || '',
         description: row.Description || '',
@@ -287,11 +286,11 @@ export async function getRelationalSolpedData(): Promise<any[]> {
     }));
 }
 
-export async function getRelationalVendorData(): Promise<any[]> {
+export async function getRelationalVendorData(): Promise<Record<string, unknown>[]> {
     const pool = await getDbConnection();
     const result = await pool.request().query(`SELECT * FROM EBM.vw_EBM_Vendor`);
 
-    return result.recordset.map((row: any) => ({
+    return result.recordset.map((row: Record<string, unknown>) => ({
         code: row.VendorCode || '',
         name: row.VendorName || '',
         po_count: Number(row.TotalPos) || 0,

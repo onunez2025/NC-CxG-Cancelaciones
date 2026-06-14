@@ -38,7 +38,7 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, is
         try {
           const errorData = await response.json();
           errorMessage = errorData.details || errorData.error || errorMessage;
-        } catch (_) {}
+        } catch (_) { /* intentionally empty */ }
         throw new Error(errorMessage);
       }
 
@@ -51,10 +51,10 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, is
       
       // Cleanup after some time
       setTimeout(() => window.URL.revokeObjectURL(url), 60000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       alert({
         title: 'Error de Reporte',
-        message: err.message,
+        message: err instanceof Error ? err.message : 'Error desconocido',
         type: 'error'
       });
     } finally {

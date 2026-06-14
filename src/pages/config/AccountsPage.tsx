@@ -107,8 +107,8 @@ export default function AccountsPage() {
                 try {
                     await AccountsService.deleteAccount(id);
                     await loadAccounts();
-                } catch (error: any) {
-                    alert({ title: 'Error', message: error.message || 'No se pudo eliminar el registro', type: 'error' });
+                } catch (error: unknown) {
+                    alert({ title: 'Error', message: error instanceof Error ? error.message : 'No se pudo eliminar el registro', type: 'error' });
                 }
             }
         });
@@ -124,8 +124,8 @@ export default function AccountsPage() {
             }
             setIsModalOpen(false);
             await loadAccounts();
-        } catch (error: any) {
-            alert({ title: 'Error de guardado', message: error.message || 'No se pudo procesar la solicitud', type: 'error' });
+        } catch (error: unknown) {
+            alert({ title: 'Error de guardado', message: error instanceof Error ? error.message : 'No se pudo procesar la solicitud', type: 'error' });
         }
     };
 
@@ -318,7 +318,7 @@ export default function AccountsPage() {
                                 <Database className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
                                 <select
                                     value={formData.category || 'expense'}
-                                    onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
+                                    onChange={(e) => setFormData({ ...formData, category: e.target.value as 'expense' | 'investment' | 'service' | 'other' })}
                                     className="w-full h-12 pl-10 pr-4 bg-background border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none cursor-pointer"
                                     required
                                 >

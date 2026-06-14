@@ -48,9 +48,9 @@ export function LoginPage() {
             login(user, token);
             navigate('/dashboard');
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Login error:', err);
-            setError(err.message || t('auth.errors.invalid') || 'Credenciales inválidas');
+            setError((err instanceof Error ? err.message : null) || t('auth.errors.invalid') || 'Credenciales inválidas');
         } finally {
             setLoading(false);
         }

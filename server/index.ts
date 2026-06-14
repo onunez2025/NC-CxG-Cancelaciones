@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+﻿import dotenv from 'dotenv';
 dotenv.config();
 
 import express, { Request, Response } from 'express';
@@ -109,7 +109,7 @@ app.get('/api/status', async (req: Request, res: Response) => {
             me2k_count: count.recordset[0].c,
             solped_view_count: solpedCount.recordset[0].c
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         // Obfuscate internal error in production
         const safeError = process.env.NODE_ENV === 'production' ? 'Database connection failed' : error.message;
         res.status(500).json({
@@ -138,8 +138,8 @@ app.get('/api/applications', verifyToken, async (req: Request, res: Response) =>
         query += ' ORDER BY DisplayOrder ASC';
         const result = await pool.request().query(query);
         res.json(result.recordset);
-    } catch (err: any) {
-        res.status(500).json({ error: err.message });
+    } catch (err: unknown) {
+        res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
     }
 });
 app.use('/api/budgets', verifyToken, budgetsRouter);
@@ -162,8 +162,8 @@ app.get('/api/config/audit-logs', verifyToken, verifyPermission('ebm.config.user
             ORDER BY Fecha DESC
         `);
         res.json(result.recordset);
-    } catch (error: any) {
-        res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -194,9 +194,9 @@ app.post('/api/config/audit-logs', verifyToken, async (req: Request, res: Respon
             `);
 
         res.status(201).json({ message: 'Audit log created successfully' });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error creating audit log:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -281,7 +281,7 @@ async function fetchAppMeta(): Promise<void> {
             appMeta = { label: row.Label, logoUrl: row.LogoUrl, url: row.Url };
             console.log(`[AppConfig] Loaded meta for ${APP_CODE}: ${appMeta.label}`);
         }
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.warn('[AppConfig] Could not fetch app meta from DB:', err.message);
     }
 }

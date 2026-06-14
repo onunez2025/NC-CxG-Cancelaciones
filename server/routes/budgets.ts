@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
 import { invalidateBudgetCache } from './crossReference.js';
@@ -61,8 +61,9 @@ router.get('/', async (req: Request, res: Response) => {
         `);
 
         // Group months by budgetId
+        interface BudgetMonthRow { BudgetId: string; MonthIndex: number; Amount: number; }
         const monthsMap: Record<string, number[]> = {};
-        monthsResult.recordset.forEach((row: any) => {
+        monthsResult.recordset.forEach((row: BudgetMonthRow) => {
             if (!monthsMap[row.BudgetId]) {
                 monthsMap[row.BudgetId] = Array(12).fill(0);
             }
@@ -70,15 +71,16 @@ router.get('/', async (req: Request, res: Response) => {
         });
 
         // Map back to budgets
-        const finalBudgets = budgets.map((b: any) => ({
+        interface BudgetRow { id: string; [key: string]: unknown; }
+        const finalBudgets = budgets.map((b: BudgetRow) => ({
             ...b,
             monthly_amounts: monthsMap[b.id] || Array(12).fill(0)
         }));
 
         res.json(finalBudgets);
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error fetching budgets:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -148,9 +150,9 @@ router.post('/', async (req: Request, res: Response) => {
             throw trxError;
         }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error creating budget:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -226,9 +228,9 @@ router.put('/:id', async (req: Request, res: Response) => {
             await transaction.rollback();
             throw trxError;
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error updating budget:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -267,9 +269,9 @@ router.delete('/bulk/:year/:managementId', async (req: Request, res: Response) =
             await transaction.rollback();
             throw trxError;
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error bulk deleting budgets:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -304,9 +306,9 @@ router.delete('/:id', async (req: Request, res: Response) => {
             await transaction.rollback();
             throw trxError;
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error deleting budget:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 

@@ -6,7 +6,7 @@ declare module 'react-leaflet-cluster' {
     chunkedLoading?: boolean;
     showCoverageOnHover?: boolean;
     spiderfyOnMaxZoom?: boolean;
-    [key: string]: any;
+    [key: string]: unknown;
   }
   
   const MarkerClusterGroup: React.FC<MarkerClusterGroupProps>;

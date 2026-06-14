@@ -2,10 +2,11 @@ import React from 'react';
 import { Loader2, Search } from 'lucide-react';
 import { SIATC_THEME } from '../../../utils/siatc-theme';
 import { SIATCButton } from '../../../components/siatc/SIATCButton';
+import type { CxGNC } from '../../../services/ncService';
 
 interface CxGNCFormViewProps {
-  formData: any;
-  setFormData: (data: any) => void;
+  formData: Partial<CxGNC>;
+  setFormData: (data: Partial<CxGNC>) => void;
   isSubmitting: boolean;
   isLookingUp: boolean;
   isTicketValidated: boolean;

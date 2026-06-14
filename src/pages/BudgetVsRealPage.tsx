@@ -16,7 +16,7 @@ import { ExchangeRatesService } from '../services/exchangeRatesService';
 import { useAuth } from '../hooks/useAuth';
 import type { Management, CostCenter } from '../types';
 import { cn } from '../utils/cn';
-import type { BudgetExecutionSummary } from '../utils/budgetExecution';
+import type { BudgetExecutionSummary, BudgetExecutionRow, TransactionDetail } from '../utils/budgetExecution';
 
 function formatCurrency(amount: number): string {
     return new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(amount);
@@ -95,11 +95,11 @@ export function BudgetVsRealPage() {
     };
 
     const [selectedAccountForDetail, setSelectedAccountForDetail] = useState<{
-        row: any; // Type should be BudgetExecutionRow but imports might cycle if not careful
+        row: BudgetExecutionRow;
         isOpen: boolean;
     } | null>(null);
 
-    const openDetailModal = (row: any) => {
+    const openDetailModal = (row: BudgetExecutionRow) => {
         setSelectedAccountForDetail({ row, isOpen: true });
     };
 
@@ -440,7 +440,7 @@ function TransactionDetailModal({
     onClose: () => void;
     accountName: string;
     accountCode: string;
-    details: { committed: any[]; ordered: any[]; real: any[] };
+    details: { committed: TransactionDetail[]; ordered: TransactionDetail[]; real: TransactionDetail[] };
 }) {
     const [activeTab, setActiveTab] = useState<'committed' | 'ordered' | 'real'>('committed');
 
@@ -513,7 +513,7 @@ function TransactionDetailModal({
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border/50">
-                                {items.map((item: any, idx) => (
+                                {items.map((item: TransactionDetail, idx) => (
                                     <tr key={idx} className="hover:bg-muted/30 transition-colors group">
                                         <td className="px-4 py-2 font-mono text-xs font-medium text-primary/80 align-top">
                                             {item.doc_number}

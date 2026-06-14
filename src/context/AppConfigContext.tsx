@@ -13,6 +13,7 @@ interface AppConfig {
 
 const AppConfigContext = createContext<AppConfig | null>(null);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAppConfig = () => useContext(AppConfigContext);
 
 export const AppConfigProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -23,7 +24,9 @@ export const AppConfigProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
         fetch(`${API_BASE_URL}/applications?activeOnly=true`, { headers })
             .then(r => r.ok ? r.json() : [])
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .then((apps: any[]) => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const mine = apps.find((a: any) =>
                     a.code?.toUpperCase() === APP_CODE.toUpperCase()
                 );

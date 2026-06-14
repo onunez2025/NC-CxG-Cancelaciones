@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Plus,
   Search, 
@@ -42,7 +42,7 @@ import { SIATCActionDropdown } from '../../components/siatc/SIATCActionDropdown'
 import { useToast } from '../../context/ToastContext';
 
 // ---- Detail Info Row ----
-const DetailRow = ({ icon: Icon, label, value, className }: { icon: any; label: string; value: string | null | undefined; className?: string }) => (
+const DetailRow = ({ icon: Icon, label, value, className }: { icon: React.ElementType; label: string; value: string | null | undefined; className?: string }) => (
   <div className={`flex items-start gap-3 py-3 ${className || ''}`}>
     <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 mt-0.5">
       <Icon className="w-4 h-4 text-slate-500" />
@@ -358,7 +358,7 @@ export const CancellationsPage = () => {
         ...prev,
         tienda: ticketInfo.cliente
       }));
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Lookup error:", error);
     } finally {
       setIsLookingUp(false);

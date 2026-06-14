@@ -131,9 +131,9 @@ export class SapParserService {
                     const workbook = new ExcelJS.Workbook();
                     await workbook.xlsx.load(data);
                     const sheet = workbook.worksheets[0];
-                    const jsonData: any[][] = [];
+                    const jsonData: unknown[][] = [];
                     sheet.eachRow((row) => {
-                        const rowValues = row.values as any[];
+                        const rowValues = row.values as unknown[];
                         jsonData.push(rowValues.slice(1));
                     });
 
@@ -150,7 +150,7 @@ export class SapParserService {
                     const possibleHeaders = Object.values(mapping).flat().map(h => h.toUpperCase());
 
                     for (let i = 0; i < Math.min(30, jsonData.length); i++) {
-                        const row = jsonData[i] as any[];
+                        const row = jsonData[i] as unknown[];
                         if (!row) continue;
                         let matches = 0;
                         row.forEach(cell => {
@@ -189,13 +189,13 @@ export class SapParserService {
                     });
 
                     // ── Parse all rows into objects ──────────────────
-                    const allRows = rows.map((row: any) => {
-                        const item: any = {};
+                    const allRows = rows.map((row: unknown[]) => {
+                        const item: Record<string, unknown> = {};
                         Object.entries(columnMap).forEach(([field, colIndex]) => {
                             item[field] = row[colIndex];
                         });
                         return item;
-                    }).filter((item: any) => {
+                    }).filter((item: Record<string, unknown>) => {
                         // Discard rows where every mapped field is empty
                         return Object.values(item).some(v => v !== undefined && v !== null && String(v).trim() !== '');
                     });
@@ -211,7 +211,7 @@ export class SapParserService {
                     const harvestedPOs = new Set<string>();
                     const harvestedPRs = new Set<string>();
                     const harvestedVendors = new Set<string>();
-                    let parsedData: any[];
+                    let parsedData: Record<string, unknown>[];
 
                     const isRoot = this.ROOT_TYPES.includes(type);
 
@@ -225,7 +225,7 @@ export class SapParserService {
                         }
 
                         // Helper for robust CeCo matching
-                        const matchesCeCo = (rowCeCo: any) => {
+                        const matchesCeCo = (rowCeCo: unknown) => {
                             const r = String(rowCeCo || '').trim().toUpperCase();
                             if (!r) return false;
                             if (activeCecos.has(r)) return true;
@@ -244,7 +244,7 @@ export class SapParserService {
                         if (type === 'ME5A') {
                             parsedData = allRows;
                         } else {
-                            parsedData = allRows.filter((item: any) => matchesCeCo(item.cost_center));
+                            parsedData = allRows.filter((item) => matchesCeCo(item.cost_center));
                         }
 
                         if (parsedData.length === 0) {
@@ -264,7 +264,7 @@ export class SapParserService {
                         }
 
                         // Harvest IDs for BRIDGE files
-                        parsedData.forEach((item: any) => {
+                        parsedData.forEach((item) => {
                             const po = item.po_number ? String(item.po_number).trim() : '';
                             if (po) harvestedPOs.add(po);
 
@@ -274,7 +274,7 @@ export class SapParserService {
 
                         // For ME2K: also harvest vendor codes
                         if (type === 'ME2K') {
-                            parsedData.forEach((item: any) => {
+                            parsedData.forEach((item) => {
                                 if (item.vendor_id) {
                                     const vCode = String(item.vendor_id).trim().split(/\s+/)[0].replace(/\D/g, '');
                                     if (vCode) harvestedVendors.add(vCode);
@@ -328,7 +328,7 @@ export class SapParserService {
                 const err = await response.json();
                 throw new Error(err.error || 'Failed to save SAP upload to server');
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Failed to save SAP Upload:', error);
             throw error;
         }

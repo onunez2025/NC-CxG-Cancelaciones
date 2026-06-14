@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     Users,
@@ -22,7 +22,7 @@ function formatCurrency(amount: number): string {
     return new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(amount);
 }
 
-function formatExcelDate(value: any): string {
+function formatExcelDate(value: unknown): string {
     if (!value) return '—';
     const num = Number(value);
     if (!isNaN(num) && num > 40000 && num < 60000) {
@@ -39,10 +39,6 @@ export function VendorsPage() {
     const [expandedVendor, setExpandedVendor] = useState<string | null>(null);
     const [sortBy, setSortBy] = useState<'po_total' | 'name' | 'po_count'>('po_total');
 
-    useEffect(() => {
-        loadData();
-    }, []);
-
     const loadData = async () => {
         try {
             const result = await CrossReferenceService.getVendorData();
@@ -52,9 +48,14 @@ export function VendorsPage() {
         }
     };
 
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        loadData();
+    }, []);
+
     // Sort & Filter
     const filteredVendors = useMemo(() => {
-        let result = vendors.filter(v =>
+        const result = vendors.filter(v =>
             searchTerm === '' ||
             v.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             v.code.includes(searchTerm)
@@ -118,7 +119,7 @@ export function VendorsPage() {
 
                     <select
                         value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value as any)}
+                        onChange={(e) => setSortBy(e.target.value as 'po_total' | 'name' | 'po_count')}
                         className="bg-transparent border-none px-3 py-1.5 text-sm font-bold text-slate-700 dark:text-slate-200 focus:ring-0 outline-none cursor-pointer min-w-[150px]"
                     >
                         <option value="po_total">Monto PO</option>
@@ -271,7 +272,7 @@ export function VendorsPage() {
 
 // ─── Sub-components ─────────────────────────────────
 
-function MetricCard({ icon: Icon, label, value, color }: { icon: any; label: string; value: string; color: string }) {
+function MetricCard({ icon: Icon, label, value, color }: { icon: React.ElementType; label: string; value: string; color: string }) {
     return (
         <div className={cn("py-2 px-2.5 h-[81px] rounded-xl border transition-all shadow-sm flex items-center justify-between gap-2 bg-card border-slate-100 dark:border-slate-800")}>
             <div className="flex flex-col justify-center min-w-0 space-y-1">

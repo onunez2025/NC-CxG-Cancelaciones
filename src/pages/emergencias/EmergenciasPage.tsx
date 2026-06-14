@@ -54,8 +54,8 @@ export const EmergenciasPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Catalogs
-  const [verificationCatalogs, setVerificationCatalogs] = useState<{ statuses: any[], motives: EmergencyMotive[] }>({ statuses: [], motives: [] });
-  const [processingCatalogs, setProcessingCatalogs] = useState<{ statuses: any[], motives: EmergencyMotive[] }>({ statuses: [], motives: [] });
+  const [verificationCatalogs, setVerificationCatalogs] = useState<{ statuses: { id: string; label: string }[], motives: EmergencyMotive[] }>({ statuses: [], motives: [] });
+  const [processingCatalogs, setProcessingCatalogs] = useState<{ statuses: { id: string; label: string }[], motives: EmergencyMotive[] }>({ statuses: [], motives: [] });
   
   // Form States
   const [registerForm, setRegisterForm] = useState({
@@ -112,6 +112,14 @@ export const EmergenciasPage = () => {
     }
   }, [hasPermission]);
 
+  useEffect(() => {
+    setVerifyForm(prev => ({ ...prev, motivo: '' }));
+  }, [verifyForm.verificacion]);
+
+  useEffect(() => {
+    setProcessForm(prev => ({ ...prev, motivo: '' }));
+  }, [processForm.procesado]);
+
   if (!hasPermission('cxg.emergencias.view')) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] text-center p-12">
@@ -121,14 +129,6 @@ export const EmergenciasPage = () => {
       </div>
     );
   }
-
-  useEffect(() => {
-    setVerifyForm(prev => ({ ...prev, motivo: '' }));
-  }, [verifyForm.verificacion]);
-
-  useEffect(() => {
-    setProcessForm(prev => ({ ...prev, motivo: '' }));
-  }, [processForm.procesado]);
 
   const handleRegister = async () => {
     setIsSubmitting(true);

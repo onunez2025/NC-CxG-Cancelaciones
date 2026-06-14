@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Activity,
     Search,
@@ -39,17 +39,13 @@ export function TrackingPage() {
     const [filterCurrency, setFilterCurrency] = useState<string>('all');
     const [expandedPO, setExpandedPO] = useState<string | null>(null);
 
-    const STATUS_CONFIG: Record<string, { label: string, color: string, icon: any }> = {
+    const STATUS_CONFIG: Record<string, { label: string, color: string, icon: React.ElementType }> = {
         solicitado: { label: t('tracking.status.requested'), color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', icon: FileText },
         pedido: { label: t('tracking.status.ordered'), color: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400', icon: ShoppingCart },
         recibido: { label: t('tracking.status.received'), color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400', icon: Package },
         facturado: { label: t('tracking.status.invoiced'), color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400', icon: CreditCard },
         pagado: { label: t('tracking.status.paid'), color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: CheckCircle2 },
     };
-
-    useEffect(() => {
-        loadData();
-    }, []);
 
     const loadData = async () => {
         try {
@@ -60,6 +56,11 @@ export function TrackingPage() {
             console.error("Tracking load data error", error);
         }
     };
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        loadData();
+    }, []);
 
     // Get unique CeCos for filter
     const uniqueCecos = [...new Set(transactions.map(t => t.cost_center).filter(Boolean))].sort();
@@ -431,7 +432,7 @@ export function TrackingPage() {
 // ─── Sub-components ─────────────────────────────────
 
 function MetricCard({ icon: Icon, label, value, sub, color }: {
-    icon: any;
+    icon: React.ElementType;
     label: string;
     value: string;
     sub: string;
@@ -469,7 +470,7 @@ function SourceDot({ label, active, title }: { label: string; active: boolean; t
 
 function DetailSection({ title, data, empty, released, children }: {
     title: string;
-    data: any;
+    data: unknown[];
     empty: string;
     released?: boolean;
     children: React.ReactNode;

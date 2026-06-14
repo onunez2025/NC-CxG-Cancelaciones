@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
 import { getAuthenticatedUserDisplayName } from '../utils/user.js';
@@ -18,9 +18,9 @@ router.get('/motivos', async (req: Request, res: Response) => {
             ORDER BY Motivo ASC
         `);
         res.json(result.recordset);
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error fetching special case motives:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -90,9 +90,9 @@ router.get('/', async (req: Request, res: Response) => {
             page,
             pageSize
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error fetching special cases:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -125,9 +125,9 @@ router.post('/', async (req: Request, res: Response) => {
             `);
 
         res.status(201).json({ message: 'Caso especial registrado', id });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error creating special case:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -163,9 +163,9 @@ router.post('/:id/status', async (req: Request, res: Response) => {
             `);
 
         res.json({ message: 'Estado del caso especial actualizado' });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error updating special case status:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 

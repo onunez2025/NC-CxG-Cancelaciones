@@ -29,7 +29,7 @@ let poolPromise: Promise<sql.ConnectionPool> | null = null;
  */
 export async function getDbConnection(): Promise<sql.ConnectionPool> {
     if (!poolPromise) {
-        poolPromise = new sql.ConnectionPool(sqlConfig).connect().catch((err: any) => {
+        poolPromise = new sql.ConnectionPool(sqlConfig).connect().catch((err: unknown) => {
             console.error('Database Connection Failed! Bad Config: ', err);
             poolPromise = null; // Clear so we can retry if it failed
             throw err;

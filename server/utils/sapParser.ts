@@ -96,7 +96,7 @@ export function createSapFbl1nTable() {
     return table;
 }
 
-export function parseExcelDate(val: any): Date | null {
+export function parseExcelDate(val: unknown): Date | null {
     if (!val) return null;
     const num = Number(val);
     if (!isNaN(num) && num > 40000 && num < 60000) {

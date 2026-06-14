@@ -278,13 +278,13 @@ export const ncService = {
         if (!response.ok) throw new Error('Error al rechazar cancelación');
     },
 
-    async createCancellation(data: { 
-        cliente: string; 
-        motive: string; 
-        ticket?: string; 
+    async createCancellation(data: {
+        cliente: string;
+        motive: string;
+        ticket?: string;
         observacion?: string;
         usuario?: string;
-    }): Promise<any> {
+    }): Promise<unknown> {
         const response = await apiClient(`${API_BASE_URL}/cancelaciones`, {
             method: 'POST',
             body: JSON.stringify(data)
@@ -390,7 +390,7 @@ export const ncService = {
         return response;
     },
 
-    async getAnalystsForCancellation(): Promise<any[]> {
+    async getAnalystsForCancellation(): Promise<Record<string, unknown>[]> {
         const response = await apiClient(`${API_BASE_URL}/cancelaciones/analistas`);
         if (!response.ok) throw new Error('Error al obtener analistas para asignación');
         return response.json();

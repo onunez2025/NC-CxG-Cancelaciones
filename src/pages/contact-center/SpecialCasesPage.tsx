@@ -107,7 +107,7 @@ export const SpecialCasesPage = () => {
         cliente_temp: ticketInfo.cliente,
         fecha_visita_temp: ticketInfo.fecha_visita || ''
       }));
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Lookup error:", error);
       setFormData(prev => ({ ...prev, cliente_temp: 'Ticket no encontrado' }));
     } finally {

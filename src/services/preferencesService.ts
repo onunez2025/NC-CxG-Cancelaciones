@@ -1,7 +1,7 @@
 import { apiClient, API_BASE_URL } from './apiClient';
 
 export const PreferencesService = {
-  async getPreferences(): Promise<Record<string, any>> {
+  async getPreferences(): Promise<Record<string, unknown>> {
     try {
       const res = await apiClient(`${API_BASE_URL}/user/preferences`);
       if (res.ok) return await res.json();
@@ -12,7 +12,7 @@ export const PreferencesService = {
     }
   },
 
-  async savePreference(clave: string, valor: any): Promise<boolean> {
+  async savePreference(clave: string, valor: unknown): Promise<boolean> {
     try {
       const res = await apiClient(`${API_BASE_URL}/user/preferences`, {
         method: 'POST',

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard,
@@ -193,7 +193,7 @@ export function DashboardPage() {
 }
 
 function KPICard({ icon: Icon, label, value, sub, color, bgColor }: {
-    icon: any; label: string; value: string; sub: string; color: string; bgColor: string;
+    icon: React.ElementType; label: string; value: string; sub: string; color: string; bgColor: string;
 }) {
     return (
         <div className={SIATC_THEME.COMPONENTS.KPI_CARD_CONTAINER}>

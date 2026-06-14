@@ -29,15 +29,16 @@ export default function ExchangeRatesPage() {
     const [isSaving, setIsSaving] = useState(false);
     const [savedSuccessfully, setSavedSuccessfully] = useState(false);
 
-    useEffect(() => {
-        loadRates(selectedYear);
-    }, [selectedYear]);
-
     const loadRates = (year: number) => {
         const yearRates = ExchangeRatesService.getRatesForYear(year);
         setRates(yearRates.rates);
         setSavedSuccessfully(false);
     };
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        loadRates(selectedYear);
+    }, [selectedYear]);
 
     const handleRateChange = (monthIndex: number, value: string) => {
         const numValue = parseFloat(value);

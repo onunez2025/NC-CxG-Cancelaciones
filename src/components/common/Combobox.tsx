@@ -75,8 +75,7 @@ export function Combobox({
 
         // Use requestAnimationFrame to avoid capturing the micro-scroll caused by portal
         // rendering itself, which was causing the double-click bug.
-        let rafId: number;
-        rafId = requestAnimationFrame(() => {
+        const rafId: number = requestAnimationFrame(() => {
             document.addEventListener('mousedown', handleClickOutside);
             window.addEventListener('scroll', handleScroll, true);
         });

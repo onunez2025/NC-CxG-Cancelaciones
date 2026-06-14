@@ -122,12 +122,12 @@ export interface VendorSummary {
 
 interface UploadData {
     transaction_type: string;
-    data: any[];
+    data: Record<string, unknown>[];
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────
 
-function normalizeKey(value: any): string {
+function normalizeKey(value: unknown): string {
     if (value === undefined || value === null) return '';
     return String(value).trim();
 }
@@ -145,7 +145,7 @@ function extractVendorName(vendorStr: string): string {
     return trimmed.substring(spaceIdx + 1).trim();
 }
 
-function formatExcelDate(value: any): string {
+function formatExcelDate(value: unknown): string {
     if (!value) return '';
     const num = Number(value);
     if (!isNaN(num) && num > 40000 && num < 60000) {
@@ -186,28 +186,28 @@ function smartMatch(poDesc: string, fblRef: string, fblAsig: string): boolean {
 // ─── Tracking Engine (ported from crossReferenceService.ts) ─────────
 
 export function buildTrackingData(uploads: UploadData[]): { transactions: EnrichedTransaction[]; metrics: TrackingMetrics } {
-    const me2kData = (uploads.find(u => u.transaction_type === 'ME2K')?.data || []) as any[];
-    const me5kData = (uploads.find(u => u.transaction_type === 'ME5K')?.data || []) as any[];
-    const me5aData = (uploads.find(u => u.transaction_type === 'ME5A')?.data || []) as any[];
-    const ksb1Data = (uploads.find(u => u.transaction_type === 'KSB1')?.data || []) as any[];
-    const fbl1nData = (uploads.find(u => u.transaction_type === 'FBL1N')?.data || []) as any[];
+    const me2kData = uploads.find(u => u.transaction_type === 'ME2K')?.data || [];
+    const me5kData = uploads.find(u => u.transaction_type === 'ME5K')?.data || [];
+    const me5aData = uploads.find(u => u.transaction_type === 'ME5A')?.data || [];
+    const ksb1Data = uploads.find(u => u.transaction_type === 'KSB1')?.data || [];
+    const fbl1nData = uploads.find(u => u.transaction_type === 'FBL1N')?.data || [];
 
     // Index ME5K by PO number
-    const me5kByPO = new Map<string, any>();
+    const me5kByPO = new Map<string, Record<string, unknown>>();
     me5kData.forEach(row => {
         const po = normalizeKey(row.po_number);
         if (po) me5kByPO.set(po, row);
     });
 
     // Index ME5A by PO number
-    const me5aByPO = new Map<string, any>();
+    const me5aByPO = new Map<string, Record<string, unknown>>();
     me5aData.forEach(row => {
         const po = normalizeKey(row.po_number);
         if (po) me5aByPO.set(po, row);
     });
 
     // Index KSB1 by PO number (multiple entries per PO)
-    const ksb1ByPO = new Map<string, any[]>();
+    const ksb1ByPO = new Map<string, Record<string, unknown>[]>();
     ksb1Data.forEach(row => {
         const po = normalizeKey(row.po_number);
         if (po) {
@@ -217,7 +217,7 @@ export function buildTrackingData(uploads: UploadData[]): { transactions: Enrich
     });
 
     // Index FBL1N by vendor code (multiple entries per vendor)
-    const fbl1nByVendor = new Map<string, any[]>();
+    const fbl1nByVendor = new Map<string, Record<string, unknown>[]>();
     fbl1nData.forEach(row => {
         const vendorCode = extractVendorCode(String(row.vendor_id || ''));
         if (vendorCode) {
@@ -227,7 +227,7 @@ export function buildTrackingData(uploads: UploadData[]): { transactions: Enrich
     });
 
     // Group ME2K rows by PO number
-    const me2kByPO = new Map<string, any[]>();
+    const me2kByPO = new Map<string, Record<string, unknown>[]>();
     me2kData.forEach(row => {
         const po = normalizeKey(row.po_number);
         if (po) {
@@ -247,7 +247,7 @@ export function buildTrackingData(uploads: UploadData[]): { transactions: Enrich
         const vendorName = extractVendorName(vendorRaw);
 
         // Sum PO values
-        const poValue = poRows.reduce((sum: number, r: any) => {
+        const poValue = poRows.reduce((sum: number, r: Record<string, unknown>) => {
             const orderVal = Number(r.order_value) || 0;
             if (orderVal !== 0) return sum + orderVal;
             const netPrice = Number(r.net_price) || 0;
@@ -269,7 +269,7 @@ export function buildTrackingData(uploads: UploadData[]): { transactions: Enrich
             let unitPrice = rawQty > 0 ? rawNetValue / rawQty : 0;
 
             if (rawNetValue === 0 && rawDist === 0 && prNum) {
-                const me5aMatch = me5aData.find((r: any) => String(r.pr_number || '').trim() === prNum);
+                const me5aMatch = me5aData.find((r: Record<string, unknown>) => String(r.pr_number || '').trim() === prNum);
                 if (me5aMatch) {
                     const me5aTotalValue = Number(me5aMatch.total_value) || 0;
                     const me5aUnitPrice = Number(me5aMatch.unit_price) || 0;
@@ -312,7 +312,7 @@ export function buildTrackingData(uploads: UploadData[]): { transactions: Enrich
 
         // Link KSB1
         const ksb1Rows = ksb1ByPO.get(poNumber) || [];
-        const ksb1_entries = ksb1Rows.map((r: any) => ({
+        const ksb1_entries = ksb1Rows.map((r: Record<string, unknown>) => ({
             cost_element: String(r.cost_element || ''),
             cost_element_name: String(r.cost_element_name || ''),
             amount: Number(r.amount) || 0,
@@ -320,11 +320,11 @@ export function buildTrackingData(uploads: UploadData[]): { transactions: Enrich
             description: String(r.description || ''),
             reference_doc: String(r.reference_doc || '')
         }));
-        const totalRealExpense = ksb1_entries.reduce((s: number, e: any) => s + e.amount, 0);
+        const totalRealExpense = ksb1_entries.reduce((s: number, e: { amount: number }) => s + e.amount, 0);
 
         // Link FBL1N
         const allVendorInvoices = fbl1nByVendor.get(vendorCode) || [];
-        const relatedInvoices = allVendorInvoices.filter((r: any) => {
+        const relatedInvoices = allVendorInvoices.filter((r: Record<string, unknown>) => {
             const docType = String(r.doc_type || '').trim();
             if (docType && !INVOICE_DOC_TYPES.has(docType)) return false;
             const fblPO = String(r.po_number || '').trim();
@@ -335,8 +335,8 @@ export function buildTrackingData(uploads: UploadData[]): { transactions: Enrich
         });
 
         // Group by document_number
-        const groupedByDoc = new Map<string, any[]>();
-        relatedInvoices.forEach((r: any) => {
+        const groupedByDoc = new Map<string, Record<string, unknown>[]>();
+        relatedInvoices.forEach((r: Record<string, unknown>) => {
             const docNum = String(r.document_number || '');
             if (!groupedByDoc.has(docNum)) groupedByDoc.set(docNum, []);
             groupedByDoc.get(docNum)!.push(r);
@@ -344,8 +344,8 @@ export function buildTrackingData(uploads: UploadData[]): { transactions: Enrich
 
         const docEntries = Array.from(groupedByDoc.entries()).map(([docNum, lines]) => {
             const first_line = lines[0];
-            const totalAmount = lines.reduce((sum: number, l: any) => sum + (Number(l.amount_local) || 0), 0);
-            const anyCleared = lines.some((l: any) => l.clearing_doc);
+            const totalAmount = lines.reduce((sum: number, l: Record<string, unknown>) => sum + (Number(l.amount_local) || 0), 0);
+            const anyCleared = lines.some((l: Record<string, unknown>) => l.clearing_doc);
             const ref = String(first_line.reference || '');
             return {
                 document_number: docNum,
@@ -388,7 +388,7 @@ export function buildTrackingData(uploads: UploadData[]): { transactions: Enrich
         if (poValue > 0) status = 'pedido';
         if (ksb1_entries.length > 0) status = 'recibido';
         if (fbl1n_entries.length > 0) status = 'facturado';
-        if (fbl1n_entries.some((e: any) => e.status === 'paid')) status = 'pagado';
+        if (fbl1n_entries.some((e: { status: string }) => e.status === 'paid')) status = 'pagado';
 
         enriched.push({
             id: poNumber,
@@ -430,14 +430,14 @@ export function buildTrackingData(uploads: UploadData[]): { transactions: Enrich
 // ─── Solped Engine (ported from SolpedPage.tsx loadData) ─────────────
 
 export function buildSolpedData(uploads: UploadData[]): SolpedRow[] {
-    const me5kData = (uploads.find(u => u.transaction_type === 'ME5K')?.data || []) as any[];
-    const me5aData = (uploads.find(u => u.transaction_type === 'ME5A')?.data || []) as any[];
-    const me2kData = (uploads.find(u => u.transaction_type === 'ME2K')?.data || []) as any[];
-    const ksb1Data = (uploads.find(u => u.transaction_type === 'KSB1')?.data || []) as any[];
-    const fbl1nData = (uploads.find(u => u.transaction_type === 'FBL1N')?.data || []) as any[];
+    const me5kData = uploads.find(u => u.transaction_type === 'ME5K')?.data || [];
+    const me5aData = uploads.find(u => u.transaction_type === 'ME5A')?.data || [];
+    const me2kData = uploads.find(u => u.transaction_type === 'ME2K')?.data || [];
+    const ksb1Data = uploads.find(u => u.transaction_type === 'KSB1')?.data || [];
+    const fbl1nData = uploads.find(u => u.transaction_type === 'FBL1N')?.data || [];
 
     // Index ME2K by PO
-    const me2kByPO = new Map<string, any[]>();
+    const me2kByPO = new Map<string, Record<string, unknown>[]>();
     me2kData.forEach(r => {
         const po = String(r.po_number || '').trim();
         if (po) {
@@ -447,7 +447,7 @@ export function buildSolpedData(uploads: UploadData[]): SolpedRow[] {
     });
 
     // Index KSB1 by PO
-    const ksb1ByPO = new Map<string, any[]>();
+    const ksb1ByPO = new Map<string, Record<string, unknown>[]>();
     ksb1Data.forEach(r => {
         const po = String(r.po_number || '').trim();
         if (po) {
@@ -457,7 +457,7 @@ export function buildSolpedData(uploads: UploadData[]): SolpedRow[] {
     });
 
     // Index FBL1N by vendor code + build vendor master
-    const fbl1nByVendor = new Map<string, any[]>();
+    const fbl1nByVendor = new Map<string, Record<string, unknown>[]>();
     const vendorMasterNames = new Map<string, string>();
 
     const extractFromVendorStr = (vRaw: string) => {
@@ -480,7 +480,7 @@ export function buildSolpedData(uploads: UploadData[]): SolpedRow[] {
     });
 
     // Aggregate ME5A rows by PR number
-    const me5aGrouped = new Map<string, any[]>();
+    const me5aGrouped = new Map<string, Record<string, unknown>[]>();
     me5aData.forEach(row => {
         const pr = String(row.pr_number || '').trim();
         if (pr) {
@@ -492,7 +492,7 @@ export function buildSolpedData(uploads: UploadData[]): SolpedRow[] {
     const solpedMap = new Map<string, SolpedRow>();
 
     // Helper: resolve vendor name
-    const resolveVendor = (me2kRows: any[] | undefined, prNumber: string): { code: string; name: string } => {
+    const resolveVendor = (me2kRows: Record<string, unknown>[] | undefined, prNumber: string): { code: string; name: string } => {
         let vendorCode = '';
         let vendorName = '';
         if (me2kRows && me2kRows.length > 0) {
@@ -504,7 +504,7 @@ export function buildSolpedData(uploads: UploadData[]): SolpedRow[] {
         if (!vendorName && prNumber && me5aGrouped.has(prNumber)) {
             const me5aRows = me5aGrouped.get(prNumber)!;
             const me5a = me5aRows[0];
-            let vVal = String(me5a.vendor_name || me5a.desired_vendor || '').trim();
+            const vVal = String(me5a.vendor_name || me5a.desired_vendor || '').trim();
             if (/^\d+$/.test(vVal)) {
                 vendorName = vendorMasterNames.get(vVal) || vVal;
             } else {
@@ -548,8 +548,8 @@ export function buildSolpedData(uploads: UploadData[]): SolpedRow[] {
             const ksb1Rows = poNumber ? ksb1ByPO.get(poNumber) : undefined;
             const vendor = resolveVendor(me2kRows, prNumber);
             const fbl1nRows = vendor.code ? fbl1nByVendor.get(vendor.code) : undefined;
-            const poValue = me2kRows?.reduce((sum: number, r: any) => sum + (Number(r.order_value) || Number(r.net_price) || Number(r.net_value) || 0), 0) || 0;
-            const realExpense = ksb1Rows?.reduce((sum: number, r: any) => sum + (Number(r.amount) || 0), 0) || 0;
+            const poValue = me2kRows?.reduce((sum: number, r: Record<string, unknown>) => sum + (Number(r.order_value) || Number(r.net_price) || Number(r.net_value) || 0), 0) || 0;
+            const realExpense = ksb1Rows?.reduce((sum: number, r: Record<string, unknown>) => sum + (Number(r.amount) || 0), 0) || 0;
 
             solpedMap.set(key, {
                 pr_number: prNumber,
@@ -620,7 +620,7 @@ export function buildSolpedData(uploads: UploadData[]): SolpedRow[] {
             // PR only exists in ME5A
             const poNumber = String(me5aRows[0].po_number || '').trim();
             const me2kRows = poNumber ? me2kByPO.get(poNumber) : undefined;
-            const poValue = me2kRows?.reduce((sum: number, r: any) => sum + (Number(r.order_value) || Number(r.net_price) || Number(r.net_value) || 0), 0) || 0;
+            const poValue = me2kRows?.reduce((sum: number, r: Record<string, unknown>) => sum + (Number(r.order_value) || Number(r.net_price) || Number(r.net_value) || 0), 0) || 0;
 
             let derivedCeCo = '';
             let derivedVendor = '';
@@ -697,8 +697,8 @@ export function buildSolpedData(uploads: UploadData[]): SolpedRow[] {
 // ─── Vendor Engine (ported from VendorsPage.tsx loadData) ────────────
 
 export function buildVendorData(uploads: UploadData[]): VendorSummary[] {
-    const me2kData = (uploads.find(u => u.transaction_type === 'ME2K')?.data || []) as any[];
-    const fbl1nData = (uploads.find(u => u.transaction_type === 'FBL1N')?.data || []) as any[];
+    const me2kData = uploads.find(u => u.transaction_type === 'ME2K')?.data || [];
+    const fbl1nData = uploads.find(u => u.transaction_type === 'FBL1N')?.data || [];
 
     const vendorMap = new Map<string, VendorSummary>();
 

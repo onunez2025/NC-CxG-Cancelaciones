@@ -29,7 +29,7 @@ interface AuditLog {
 const PERMISSION_AUDIT = 'config.audit';
 const CACHE_KEY = 'cxg_audit_column_widths';
 
-const normalizeLogs = (data: any[]): AuditLog[] => {
+const normalizeLogs = (data: Record<string, unknown>[]): AuditLog[] => {
     if (!Array.isArray(data)) return [];
     return data.map((item, index) => ({
         id: item.id ?? item.Id ?? index,
@@ -45,7 +45,7 @@ const normalizeLogs = (data: any[]): AuditLog[] => {
 
 export default function AuditLogPage() {
     const { hasPermission } = useAuth();
-    const canView = hasPermission(PERMISSION_AUDIT as any);
+    const canView = hasPermission(PERMISSION_AUDIT as 'config.audit');
 
     const [logs, setLogs] = useState<AuditLog[]>([]);
     const [isLoading, setIsLoading] = useState(true);

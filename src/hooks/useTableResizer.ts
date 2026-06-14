@@ -11,7 +11,7 @@ export function useTableResizer(prefKey: string, initialWidths: ColumnWidths) {
   const [isResizing, setIsResizing] = useState(false);
   
   // Debounce saving to backend
-  const saveTimeoutRef = useRef<any>(null);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     // Load saved preferences on mount

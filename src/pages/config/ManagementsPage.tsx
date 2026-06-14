@@ -91,8 +91,8 @@ export default function ManagementsPage() {
                 try {
                     await ManagementsService.deleteManagement(id);
                     await loadManagements();
-                } catch (error: any) {
-                    alert({ title: 'Error', message: error.message || 'No se pudo eliminar el registro', type: 'error' });
+                } catch (error: unknown) {
+                    alert({ title: 'Error', message: error instanceof Error ? error.message : 'No se pudo eliminar el registro', type: 'error' });
                 }
             }
         });
@@ -118,8 +118,8 @@ export default function ManagementsPage() {
 
             setIsModalOpen(false);
             await loadManagements();
-        } catch (error: any) {
-            alert({ title: 'Error de guardado', message: error.message || 'No se pudo procesar la solicitud', type: 'error' });
+        } catch (error: unknown) {
+            alert({ title: 'Error de guardado', message: error instanceof Error ? error.message : 'No se pudo procesar la solicitud', type: 'error' });
         }
     };
 

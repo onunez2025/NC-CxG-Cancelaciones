@@ -44,7 +44,7 @@ export function FileUploadPage() {
     const loadUploads = async () => {
         try {
             const data = await SapParserService.getUploads();
-            setUploads(data as any);
+            setUploads(data);
         } catch (error) {
             console.error("Error loading uploads metadata", error);
         }
@@ -123,8 +123,8 @@ export function FileUploadPage() {
             ));
             loadUploads();
             return true;
-        } catch (error: any) {
-            setFileQueue(prev => prev.map(f => f.id === item.id ? { ...f, status: 'error', message: error.message } : f));
+        } catch (error: unknown) {
+            setFileQueue(prev => prev.map(f => f.id === item.id ? { ...f, status: 'error', message: error instanceof Error ? error.message : 'Error desconocido' } : f));
             return false;
         }
     };
@@ -167,7 +167,7 @@ export function FileUploadPage() {
     const getMissingReports = () => {
         const required = ['FBL1N', 'ME5K', 'ME2K'];
         const present = new Set(uploads.map(u => u.transaction_type));
-        return required.filter(r => !present.has(r as any));
+        return required.filter(r => !present.has(r));
     };
 
     const missing = getMissingReports();
@@ -335,7 +335,7 @@ export function FileUploadPage() {
                                         </div>
                                         {upload ? (
                                             <div className="flex items-center gap-3">
-                                                <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-lg">{(upload as any).record_count ?? 0} REG.</span>
+                                                <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-lg">{(upload as { record_count?: number }).record_count ?? 0} REG.</span>
                                                 <button
                                                     onClick={() => handleDeleteUpload(upload.id)}
                                                     className="opacity-0 group-hover:opacity-100 p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-all"

@@ -59,11 +59,11 @@ interface ExchangeRate {
 
 // ─── Helpers ────────────────────────────────────────────────────────
 
-function normalize(val: any): string {
+function normalize(val: unknown): string {
     return String(val || '').trim().toUpperCase();
 }
 
-function formatDate(val: any): string {
+function formatDate(val: unknown): string {
     if (!val) return '';
     const num = Number(val);
     if (!isNaN(num) && num > 40000 && num < 60000) {
@@ -80,12 +80,12 @@ export async function calculateBudgetExecutionServer(
     managementId: string,
     costCenterId: string | 'all',
     exchangeRates: ExchangeRate[],
-    sapUploads: { transaction_type: string; data: any[] }[]
+    sapUploads: { transaction_type: string; data: Record<string, unknown>[] }[]
 ): Promise<BudgetExecutionSummary> {
     const pool = await getDbConnection();
 
     // 1. Get budgets for this year/management
-    let budgetQuery = `
+    const budgetQuery = `
         SELECT 
             b.Id as id,
             b.Year as year,
@@ -104,22 +104,22 @@ export async function calculateBudgetExecutionServer(
 
     // Get budget months
     if (budgets.length > 0) {
-        const budgetIds = budgets.map((b: any) => b.id);
-        const placeholders = budgetIds.map((_: any, i: number) => `@p${i}`).join(',');
+        const budgetIds = budgets.map((b: { id: string; [key: string]: unknown }) => b.id);
+        const placeholders = budgetIds.map((_, i: number) => `@p${i}`).join(',');
         const monthsRequest = pool.request();
         budgetIds.forEach((id: string, i: number) => monthsRequest.input(`p${i}`, id));
         const monthsResult = await monthsRequest.query(`
-            SELECT BudgetId, MonthIndex, Amount 
-            FROM EBM.BudgetMonths 
+            SELECT BudgetId, MonthIndex, Amount
+            FROM EBM.BudgetMonths
             WHERE BudgetId IN (${placeholders})
             ORDER BY MonthIndex ASC
         `);
         const monthsMap: Record<string, number[]> = {};
-        monthsResult.recordset.forEach((row: any) => {
+        monthsResult.recordset.forEach((row: { BudgetId: string; MonthIndex: number; Amount: number }) => {
             if (!monthsMap[row.BudgetId]) monthsMap[row.BudgetId] = Array(12).fill(0);
             monthsMap[row.BudgetId][row.MonthIndex] = row.Amount;
         });
-        budgets.forEach((b: any) => {
+        budgets.forEach((b: { id: string; monthly_amounts?: number[]; [key: string]: unknown }) => {
             b.monthly_amounts = monthsMap[b.id] || Array(12).fill(0);
         });
     }
@@ -164,27 +164,27 @@ export async function calculateBudgetExecutionServer(
     // 5. Filter CeCos
     const relevantCecoCodes = new Set<string>();
     if (costCenterId && costCenterId !== 'all') {
-        const ceco = allCecos.find((c: any) => c.id === costCenterId);
+        const ceco = allCecos.find((c: { id: string; management_id: string; is_active: boolean; code: string }) => c.id === costCenterId);
         if (ceco) relevantCecoCodes.add(normalize(ceco.code));
     } else {
-        allCecos.filter((c: any) => c.management_id === managementId && c.is_active)
-            .forEach((c: any) => relevantCecoCodes.add(normalize(c.code)));
+        allCecos.filter((c: { id: string; management_id: string; is_active: boolean; code: string }) => c.management_id === managementId && c.is_active)
+            .forEach((c: { id: string; management_id: string; is_active: boolean; code: string }) => relevantCecoCodes.add(normalize(c.code)));
     }
 
     // 6. Extract SAP data
     const solpedUpload = sapUploads.find(u => u.transaction_type === 'ME5K') || sapUploads.find(u => u.transaction_type === 'ME5A');
-    const solpedRows = (solpedUpload?.data || []) as any[];
+    const solpedRows = solpedUpload?.data || [];
     const me5aUpload = sapUploads.find(u => u.transaction_type === 'ME5A');
-    const me5aRows = (me5aUpload?.data || []) as any[];
-    const me5aMap = new Map<string, any>();
+    const me5aRows = me5aUpload?.data || [];
+    const me5aMap = new Map<string, Record<string, unknown>>();
     me5aRows.forEach(row => {
         const pr = normalize(row.pr_number);
         if (pr) me5aMap.set(pr, row);
     });
     const ocUpload = sapUploads.find(u => u.transaction_type === 'ME2K');
-    const ocRows = (ocUpload?.data || []) as any[];
+    const ocRows = ocUpload?.data || [];
     const realUpload = sapUploads.find(u => u.transaction_type === 'KSB1') || sapUploads.find(u => u.transaction_type === 'FBL1N');
-    const realRows = (realUpload?.data || []) as any[];
+    const realRows = realUpload?.data || [];
 
     // PO Master Map
     const poMasterMap = new Map<string, { vendor: string; solped: string; ceco: string }>();
@@ -213,7 +213,7 @@ export async function calculateBudgetExecutionServer(
 
     const findAccount = (rawCode: string) => {
         const target = normalize(rawCode);
-        return accounts.find((a: any) => {
+        return accounts.find((a: { id: string; code: string; name: string }) => {
             const accCode = normalize(a.code);
             return target === accCode || target.endsWith(accCode);
         });
@@ -237,9 +237,9 @@ export async function calculateBudgetExecutionServer(
     };
 
     // 8. Process Budgets
-    budgets.forEach((b: any) => {
+    budgets.forEach((b: { id: string; cost_center_id?: string; account_id: string; total: number; monthly_amounts?: number[]; [key: string]: unknown }) => {
         if (costCenterId && costCenterId !== 'all' && b.cost_center_id !== costCenterId) return;
-        const account = accounts.find((a: any) => a.id === b.account_id);
+        const account = accounts.find((a: { id: string; code: string; name: string }) => a.id === b.account_id);
         if (!account) return;
         const entry = getEntry(account.code);
         entry.budgeted += b.total;
@@ -250,7 +250,7 @@ export async function calculateBudgetExecutionServer(
     solpedRows.forEach(row => {
         const ceco = normalize(row.cost_center);
         if (!relevantCecoCodes.has(ceco)) return;
-        let accountCode = String(row.gl_account || row.cost_element || '').trim();
+        const accountCode = String(row.gl_account || row.cost_element || '').trim();
         const account = findAccount(accountCode);
         if (account) {
             const entry = getEntry(account.code);
@@ -285,7 +285,7 @@ export async function calculateBudgetExecutionServer(
     ocRows.forEach(row => {
         const ceco = normalize(row.cost_center);
         if (!relevantCecoCodes.has(ceco)) return;
-        let accountCode = String(row.gl_account || '').trim();
+        const accountCode = String(row.gl_account || '').trim();
         const account = findAccount(accountCode);
         if (account) {
             const entry = getEntry(account.code);
@@ -324,7 +324,7 @@ export async function calculateBudgetExecutionServer(
             }
         }
         if (!relevantCecoCodes.has(ceco)) return;
-        let accountCode = String(row.cost_element || row.gl_account || '').trim();
+        const accountCode = String(row.cost_element || row.gl_account || '').trim();
         const account = findAccount(accountCode);
         if (account) {
             const entry = getEntry(account.code);
@@ -364,7 +364,7 @@ export async function calculateBudgetExecutionServer(
     let tot_budget = 0, tot_committed = 0, tot_ordered = 0, tot_real = 0, tot_available = 0;
 
     aggregation.forEach((val, code) => {
-        const account = accounts.find((a: any) => normalize(a.code) === code);
+        const account = accounts.find((a: { id: string; code: string; name: string }) => normalize(a.code) === code);
         const name = account ? account.name : `Unknown (${code})`;
         const id = account ? account.id : code;
         const displayCode = account ? account.code : code;

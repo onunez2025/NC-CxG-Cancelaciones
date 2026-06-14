@@ -26,7 +26,7 @@ interface FSMDetailModalProps {
   ticket: FSMTracking | null;
 }
 
-const DetailSection = ({ icon: Icon, title, children, variant = 'default', index }: { icon: any, title: string, children: React.ReactNode, variant?: 'default' | 'accent' | 'highlight', index: number }) => (
+const DetailSection = ({ icon: Icon, title, children, variant = 'default', index }: { icon: React.ElementType, title: string, children: React.ReactNode, variant?: 'default' | 'accent' | 'highlight', index: number }) => (
   <div 
     className={cn(
       "rounded-[1.5rem] border transition-all duration-500 relative overflow-hidden group",
@@ -68,7 +68,7 @@ const DetailSection = ({ icon: Icon, title, children, variant = 'default', index
   </div>
 );
 
-const InfoItem = ({ label, value, icon: Icon, fullWidth = false }: { label: string, value: string | null | undefined, icon?: any, fullWidth?: boolean }) => (
+const InfoItem = ({ label, value, icon: Icon, fullWidth = false }: { label: string, value: string | null | undefined, icon?: React.ElementType, fullWidth?: boolean }) => (
   <div className={cn("flex flex-col group", fullWidth && "col-span-full")}>
     <span className="text-[8px] font-black text-muted-foreground uppercase tracking-[0.15em] mb-2 opacity-30 group-hover:opacity-80 transition-opacity flex items-center gap-2">
       {label}

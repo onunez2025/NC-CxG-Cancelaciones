@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
 import { logAudit } from '../middleware/auth.js';
@@ -25,7 +25,7 @@ router.get('/', async (req: Request, res: Response) => {
         // Group permissions by role since SQL returns flat rows
         const rolesMap = new Map();
 
-        result.recordset.forEach((row: any) => {
+        result.recordset.forEach((row: { id: string; name: string; apps: string; permission: string | null }) => {
             if (!rolesMap.has(row.id)) {
                 rolesMap.set(row.id, {
                     id: row.id,
@@ -40,9 +40,9 @@ router.get('/', async (req: Request, res: Response) => {
         });
 
         res.json(Array.from(rolesMap.values()));
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error fetching roles:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -94,9 +94,9 @@ router.post('/', async (req: Request, res: Response) => {
             throw trxError;
         }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error creating role:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -146,9 +146,9 @@ router.put('/:id', async (req: Request, res: Response) => {
             await transaction.rollback();
             throw trxError;
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error updating role:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 
@@ -178,9 +178,9 @@ router.delete('/:id', async (req: Request, res: Response) => {
             await transaction.rollback();
             throw trxError;
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error deleting role:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
 

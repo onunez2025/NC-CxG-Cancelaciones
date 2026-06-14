@@ -368,9 +368,10 @@ export const CxGNCPage = () => {
         parent_id: undefined,
         lugar_compra: undefined
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      toast.error('Error al Registrar', error.response?.data?.error || 'No se pudo registrar la solicitud. Verifique que el ticket no haya sido registrado previamente.');
+      const errMsg = (error as { response?: { data?: { error?: string } } })?.response?.data?.error;
+      toast.error('Error al Registrar', errMsg || 'No se pudo registrar la solicitud. Verifique que el ticket no haya sido registrado previamente.');
     } finally {
       setIsSubmitting(false);
     }
@@ -405,7 +406,7 @@ export const CxGNCPage = () => {
       });
       setIsTicketValidated(true);
       toast.success('Éxito', 'Ticket encontrado y válido para nueva solicitud');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Lookup error:", error);
       setIsTicketValidated(false);
       toast.error('Error de Búsqueda', 'El ticket es incorrecto o no existe');
@@ -881,7 +882,7 @@ export const CxGNCPage = () => {
               <select 
                 className="bg-transparent border-none text-xs font-bold text-foreground focus:ring-0 cursor-pointer"
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as any)}
+                onChange={(e) => setStatusFilter(e.target.value as 'TODOS' | 'REGISTRADO' | 'APROBADO_SUP' | 'ASIGNADO' | 'VALIDADO' | 'CERRADO')}
               >
                 <option value="TODOS">TODOS LOS ESTADOS</option>
                 <option value="REGISTRADO">REGISTRADO</option>

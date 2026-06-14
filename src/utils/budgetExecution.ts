@@ -74,10 +74,10 @@ export const calculateBudgetExecution = async (
     ]);
 
     // Helper: Normalize keys for robust matching
-    const normalize = (val: any) => String(val || '').trim().toUpperCase();
+    const normalize = (val: unknown) => String(val || '').trim().toUpperCase();
 
     // Helper: Format Excel date
-    const formatDate = (val: any) => {
+    const formatDate = (val: unknown) => {
         if (!val) return '';
         const num = Number(val);
         if (!isNaN(num) && num > 40000 && num < 60000) {
@@ -102,14 +102,14 @@ export const calculateBudgetExecution = async (
 
     // 3a. Committed (Solped - ME5K)
     const solpedUpload = uploads.find(u => u.transaction_type === 'ME5K') || uploads.find(u => u.transaction_type === 'ME5A');
-    const solpedRows = (solpedUpload?.data || []) as any[];
+    const solpedRows = (solpedUpload?.data || []) as Record<string, unknown>[];
 
     // Load ME5A for fallback values (Solped value rescue)
     const me5aUpload = uploads.find(u => u.transaction_type === 'ME5A');
-    const me5aRows = (me5aUpload?.data || []) as any[];
+    const me5aRows = (me5aUpload?.data || []) as Record<string, unknown>[];
 
     // Index ME5A by PR Number for fast lookup
-    const me5aMap = new Map<string, any>();
+    const me5aMap = new Map<string, Record<string, unknown>>();
     me5aRows.forEach(row => {
         const pr = normalize(row.pr_number);
         if (pr) me5aMap.set(pr, row);
@@ -117,11 +117,11 @@ export const calculateBudgetExecution = async (
 
     // 3b. Ordered (OC - ME2K)
     const ocUpload = uploads.find(u => u.transaction_type === 'ME2K');
-    const ocRows = (ocUpload?.data || []) as any[];
+    const ocRows = (ocUpload?.data || []) as Record<string, unknown>[];
 
     // 3c. Real (FBL1N / KSB1)
     const realUpload = uploads.find(u => u.transaction_type === 'KSB1') || uploads.find(u => u.transaction_type === 'FBL1N');
-    const realRows = (realUpload?.data || []) as any[];
+    const realRows = (realUpload?.data || []) as Record<string, unknown>[];
 
     // ─── NEW: Build Master PO Map for linking ───
     // Map PO Number -> { vendor, solped }
@@ -210,10 +210,10 @@ export const calculateBudgetExecution = async (
     };
 
     // 5. Process Budgets
-    allBudgets.forEach((b: any) => {
+    allBudgets.forEach((b) => {
         if (costCenterId && costCenterId !== 'all' && b.cost_center_id !== costCenterId) return;
 
-        const account = accounts.find((a: any) => a.id === b.account_id);
+        const account = accounts.find((a) => a.id === b.account_id);
         if (!account) return;
 
         const entry = getEntry(account.code); // Account codes in system are trusted
@@ -226,7 +226,7 @@ export const calculateBudgetExecution = async (
         const ceco = normalize(row.cost_center);
         if (!relevantCecoCodes.has(ceco)) return;
 
-        let accountCode = String(row.gl_account || row.cost_element || '').trim();
+        const accountCode = String(row.gl_account || row.cost_element || '').trim();
         const account = findAccount(accountCode);
 
         if (account) {
@@ -280,7 +280,7 @@ export const calculateBudgetExecution = async (
         const ceco = normalize(row.cost_center);
         if (!relevantCecoCodes.has(ceco)) return;
 
-        let accountCode = String(row.gl_account || '').trim();
+        const accountCode = String(row.gl_account || '').trim();
         const account = findAccount(accountCode);
 
         if (account) {
@@ -337,7 +337,7 @@ export const calculateBudgetExecution = async (
 
         if (!relevantCecoCodes.has(ceco)) return;
 
-        let accountCode = String(row.cost_element || row.gl_account || '').trim();
+        const accountCode = String(row.cost_element || row.gl_account || '').trim();
         const account = findAccount(accountCode);
 
         if (account) {

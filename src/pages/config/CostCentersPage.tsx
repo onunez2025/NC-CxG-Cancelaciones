@@ -108,8 +108,8 @@ export default function CostCentersPage() {
                 try {
                     await CostCentersService.deleteCostCenter(id);
                     await loadData();
-                } catch (error: any) {
-                    alert({ title: 'Error', message: error.message || 'No se pudo eliminar el registro', type: 'error' });
+                } catch (error: unknown) {
+                    alert({ title: 'Error', message: error instanceof Error ? error.message : 'No se pudo eliminar el registro', type: 'error' });
                 }
             }
         });
@@ -125,8 +125,8 @@ export default function CostCentersPage() {
             }
             setIsModalOpen(false);
             await loadData();
-        } catch (error: any) {
-             alert({ title: 'Error de guardado', message: error.message || 'No se pudo procesar la solicitud', type: 'error' });
+        } catch (error: unknown) {
+             alert({ title: 'Error de guardado', message: error instanceof Error ? error.message : 'No se pudo procesar la solicitud', type: 'error' });
         }
     };
 

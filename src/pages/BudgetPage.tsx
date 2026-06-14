@@ -156,9 +156,9 @@ export function BudgetPage() {
                 await BudgetService.deleteBudgetsBulk(selectedYear, selectedManagement);
             }
             await loadBudgets();
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            setErrorMsg(error.message);
+            setErrorMsg(error instanceof Error ? error.message : 'Error desconocido');
         } finally {
             setConfirmState({ ...confirmState, isOpen: false });
         }
@@ -191,8 +191,8 @@ export function BudgetPage() {
             }
             setIsModalOpen(false);
             await loadBudgets();
-        } catch (error: any) {
-            setErrorMsg(error.message);
+        } catch (error: unknown) {
+            setErrorMsg(error instanceof Error ? error.message : 'Error desconocido');
         }
     };
 

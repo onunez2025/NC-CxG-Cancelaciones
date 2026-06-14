@@ -59,15 +59,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     return null;
                 };
 
-                const decodeJwt = (t: string): any => {
+                const decodeJwt = (t: string): Record<string, unknown> | null => {
                     try {
                         const base64Url = t.split('.')[1];
                         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
                         const jsonPayload = decodeURIComponent(window.atob(base64).split('').map((c) => {
                             return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
                         }).join(''));
-                        return JSON.parse(jsonPayload);
-                    } catch (e) {
+                        return JSON.parse(jsonPayload) as Record<string, unknown>;
+                    } catch (_e) {
                         return null;
                     }
                 };
@@ -91,8 +91,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                                 permissions: payload.permissions || [],
                                 apps: payload.apps
                             };
-                            setUser(preHydratedUser as any);
-                            StorageService.setCurrentUser(preHydratedUser as any);
+                            setUser(preHydratedUser as unknown as User);
+                            StorageService.setCurrentUser(preHydratedUser);
                         }
                     }
                 } else {
@@ -134,7 +134,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         if (!user) return;
 
-        let timeoutId: any;
+        let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
         const resetTimer = () => {
             timeoutId = setTimeout(() => {
@@ -183,6 +183,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
     return useContext(AuthContext);
 };
