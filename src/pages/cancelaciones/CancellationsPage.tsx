@@ -315,7 +315,7 @@ export const CancellationsPage = () => {
     // Asesor CC users don't have 'ebm.config.users' so GET /api/users returns 403
     // We now use a supervisor-friendly endpoint inside ncService
     if (canAssign) {
-      ncService.getAnalystsForCancellation().then(users => setSystemUsers(users.filter(u => u.is_active))).catch(console.error);
+      ncService.getAnalystsForCancellation().then(users => setSystemUsers((users as unknown as SystemUser[]).filter(u => u.is_active))).catch(console.error);
     }
   }, [canAssign]);
 
@@ -426,7 +426,7 @@ export const CancellationsPage = () => {
     
     // Fetch analysts dynamically when opening the modal to ensure fresh data and bypass any auth race conditions
     ncService.getAnalystsForCancellation()
-      .then(users => setSystemUsers(users.filter(u => u.is_active)))
+      .then(users => setSystemUsers((users as unknown as SystemUser[]).filter(u => u.is_active)))
       .catch(console.error);
   };
 

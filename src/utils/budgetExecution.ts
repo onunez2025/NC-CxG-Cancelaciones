@@ -239,15 +239,17 @@ export const calculateBudgetExecution = async (
                 const prNum = normalize(row.pr_number);
                 if (prNum && me5aMap.has(prNum)) {
                     const me5aRow = me5aMap.get(prNum);
-                    val = Number(me5aRow.total_value) ||
-                        (Number(me5aRow.quantity || 0) * Number(me5aRow.unit_price || 0));
+                    if (me5aRow) {
+                        val = Number(me5aRow.total_value) ||
+                            (Number(me5aRow.quantity || 0) * Number(me5aRow.unit_price || 0));
+                    }
                 }
             }
 
             if (!isNaN(val) && val !== 0) {
                 // Apply USD conversion if needed
                 const currency = String(row.currency || 'PEN').toUpperCase();
-                const dateRaw = row.release_date || row.request_date;
+                const dateRaw = (row.release_date || row.request_date) as string | number | undefined;
                 const finalVal = convertToPen(val, currency, dateRaw);
 
                 // ALWAYS add to display committed (History flow)
@@ -298,7 +300,7 @@ export const calculateBudgetExecution = async (
 
             if (!isNaN(val) && val !== 0) {
                 const currency = String(row.currency || 'PEN').toUpperCase();
-                const finalVal = convertToPen(val, currency, row.document_date);
+                const finalVal = convertToPen(val, currency, row.document_date as string | number | undefined);
 
                 entry.ordered += finalVal;
 
@@ -346,7 +348,7 @@ export const calculateBudgetExecution = async (
 
             if (!isNaN(val) && val !== 0) {
                 const currency = String(row.currency_transaction || row.currency || 'PEN').toUpperCase();
-                const finalVal = convertToPen(val, currency, row.posting_date);
+                const finalVal = convertToPen(val, currency, row.posting_date as string | number | undefined);
 
                 entry.real += finalVal;
 

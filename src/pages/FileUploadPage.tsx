@@ -44,7 +44,7 @@ export function FileUploadPage() {
     const loadUploads = async () => {
         try {
             const data = await SapParserService.getUploads();
-            setUploads(data);
+            setUploads(data as SAPTransactionData[]);
         } catch (error) {
             console.error("Error loading uploads metadata", error);
         }
@@ -167,7 +167,7 @@ export function FileUploadPage() {
     const getMissingReports = () => {
         const required = ['FBL1N', 'ME5K', 'ME2K'];
         const present = new Set(uploads.map(u => u.transaction_type));
-        return required.filter(r => !present.has(r));
+        return required.filter(r => !present.has(r as TransactionType));
     };
 
     const missing = getMissingReports();

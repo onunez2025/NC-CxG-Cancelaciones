@@ -17,7 +17,7 @@ export function useTableResizer(prefKey: string, initialWidths: ColumnWidths) {
     // Load saved preferences on mount
     PreferencesService.getPreferences().then(prefs => {
       if (prefs[prefKey]) {
-        const savedWidths = prefs[prefKey];
+        const savedWidths = prefs[prefKey] as ColumnWidths;
         setWidths(savedWidths);
         widthsRef.current = savedWidths;
       }

@@ -40,7 +40,7 @@ const normalizeLogs = (data: Record<string, unknown>[]): AuditLog[] => {
         entity: item.entity ?? item.Entidad ?? item.entidad ?? 'General',
         entity_id: item.entity_id ?? item.EntidadID ?? item.entidad_id ?? '',
         details: item.details ?? item.Detalle ?? item.detalle ?? ''
-    }));
+    } as AuditLog));
 };
 
 export default function AuditLogPage() {

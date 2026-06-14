@@ -147,10 +147,10 @@ export default function ProgramaSupervisoresPage() {
                 }
 
                 if (prefs?.prog_sup_view_mode) {
-                    setViewMode(prefs.prog_sup_view_mode);
+                    setViewMode(prefs.prog_sup_view_mode as 'table' | 'calendar');
                 }
                 if (prefs?.prog_sup_calendar_view) {
-                    setCalendarView(prefs.prog_sup_calendar_view);
+                    setCalendarView(prefs.prog_sup_calendar_view as 'day' | 'week' | 'workWeek');
                 }
             } catch (err) {
                 console.error('Error loading initial filters or preferences', err);
@@ -208,9 +208,9 @@ export default function ProgramaSupervisoresPage() {
             );
             
             setPrograma(data);
-            setTotalPages(metadata.totalPages);
-            setTotalItems(metadata.total || 0);
-            setPage(metadata.page);
+            setTotalPages(Number(metadata.totalPages));
+            setTotalItems(Number(metadata.total) || 0);
+            setPage(Number(metadata.page));
         } catch (error) {
             console.error('Error fetching programa', error);
         } finally {

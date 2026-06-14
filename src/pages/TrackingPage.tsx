@@ -470,7 +470,7 @@ function SourceDot({ label, active, title }: { label: string; active: boolean; t
 
 function DetailSection({ title, data, empty, released, children }: {
     title: string;
-    data: unknown[];
+    data: unknown;
     empty: string;
     released?: boolean;
     children: React.ReactNode;
