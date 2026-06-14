@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
+import sql from 'mssql';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { logAudit } from '../middleware/auth.js';
@@ -75,9 +76,9 @@ router.post('/', async (req: Request, res: Response) => {
                 .input('roleId', role_id)
                 .input('managementId', management_id)
                 .input('apps', mergedApps)
-                .input('avatarUrl', req.body.avatar_url || null)
+                .input('avatarUrl', sql.NVarChar(500), req.body.avatar_url || null)
                 .query(`
-                    UPDATE EBM.Users 
+                    UPDATE EBM.Users
                     SET FullName = @fullName, RoleId = @roleId, ManagementId = @managementId, Apps = @apps, AvatarUrl = @avatarUrl, IsActive = 1
                     WHERE Id = @id
                 `);
@@ -108,7 +109,7 @@ router.post('/', async (req: Request, res: Response) => {
             .input('managementId', management_id)
             .input('language', language)
             .input('theme', theme)
-            .input('avatarUrl', req.body.avatar_url || null)
+            .input('avatarUrl', sql.NVarChar(500), req.body.avatar_url || null)
             .input('apps', appsToSave)
             .query(`
                 INSERT INTO EBM.Users (FullName, Username, Email, PasswordHash, RoleId, ManagementId, Language, Theme, RequiresPasswordChange, AvatarUrl, Apps)
