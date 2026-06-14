@@ -27,3 +27,7 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Scripts de debug local
+analyze_*.ts
+debug_*.ts
