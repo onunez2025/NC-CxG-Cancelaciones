@@ -1,5 +1,6 @@
 import { Request } from 'express';
 import { getDbConnection } from '../db.js';
+import { addInput, sql } from '../lib/db.js';
 
 /**
  * Resolves the authenticated user's display name (FullName).
@@ -13,9 +14,9 @@ export async function getAuthenticatedUserDisplayName(req: Request, fallbackVal?
     if (req.user?.id) {
         try {
             const pool = await getDbConnection();
-            const userResult = await pool.request()
-                .input('id', req.user.id)
-                .query('SELECT FullName FROM EBM.Users WHERE Id = @id');
+            const r = pool.request();
+            addInput(r, 'id', sql.UniqueIdentifier, req.user.id);
+            const userResult = await r.query('SELECT FullName FROM EBM.Users WHERE Id = @id');
             if (userResult.recordset.length > 0 && userResult.recordset[0].FullName) {
                 return userResult.recordset[0].FullName;
             }

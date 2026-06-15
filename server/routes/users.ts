@@ -1,6 +1,6 @@
 ﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
-import sql from 'mssql';
+import { addInput, sql } from '../lib/db.js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { logAudit } from '../middleware/auth.js';
@@ -15,9 +15,9 @@ router.get('/', async (req: Request, res: Response) => {
         const pool = await getDbConnection();
         // Return users without PasswordHash for security
         // Also joining Roles and Managements to include names, matching User interface
-        const result = await pool.request()
-            .input('app', APP_IDENTIFIER)
-            .query(`
+        const getUsersReq = pool.request();
+        addInput(getUsersReq, 'app', sql.VarChar(50), APP_IDENTIFIER);
+        const result = await getUsersReq.query(`
                 SELECT 
                     u.Id as id,
                     u.FullName as full_name,
@@ -56,10 +56,10 @@ router.post('/', async (req: Request, res: Response) => {
         const pool = await getDbConnection();
 
         // 1. Check if user already exists (by Username or Email)
-        const checkResult = await pool.request()
-            .input('username', username)
-            .input('email', email)
-            .query("SELECT Id, Apps FROM EBM.Users WHERE Username = @username OR Email = @email");
+        const checkReq = pool.request();
+        addInput(checkReq, 'username', sql.NVarChar(200), username);
+        addInput(checkReq, 'email', sql.NVarChar(200), email);
+        const checkResult = await checkReq.query("SELECT Id, Apps FROM EBM.Users WHERE Username = @username OR Email = @email");
 
         const appsToSaveInput = Array.isArray(apps) ? apps.join(', ') : (apps || APP_IDENTIFIER);
         const appsToSave = cleanApps(appsToSaveInput);
@@ -70,14 +70,14 @@ router.post('/', async (req: Request, res: Response) => {
             const userId = existingUser.Id || existingUser.id;
             const mergedApps = cleanApps(existingUser.Apps + ', ' + APP_IDENTIFIER);
 
-            await pool.request()
-                .input('id', userId)
-                .input('fullName', full_name)
-                .input('roleId', role_id)
-                .input('managementId', management_id)
-                .input('apps', mergedApps)
-                .input('avatarUrl', sql.NVarChar(500), req.body.avatar_url || null)
-                .query(`
+            const upsertReq = pool.request();
+            addInput(upsertReq, 'id', sql.UniqueIdentifier, userId);
+            addInput(upsertReq, 'fullName', sql.NVarChar(200), full_name);
+            addInput(upsertReq, 'roleId', sql.UniqueIdentifier, role_id);
+            addInput(upsertReq, 'managementId', sql.UniqueIdentifier, management_id);
+            addInput(upsertReq, 'apps', sql.NVarChar(sql.MAX), mergedApps);
+            addInput(upsertReq, 'avatarUrl', sql.NVarChar(500), req.body.avatar_url || null);
+            await upsertReq.query(`
                     UPDATE EBM.Users
                     SET FullName = @fullName, RoleId = @roleId, ManagementId = @managementId, Apps = @apps, AvatarUrl = @avatarUrl, IsActive = 1
                     WHERE Id = @id
@@ -85,7 +85,9 @@ router.post('/', async (req: Request, res: Response) => {
 
             await logAudit(req, 'REACTIVATE/UPDATE', 'USERS', username, { apps: mergedApps });
 
-            const updatedUserResult = await pool.request().input('id', userId).query(`
+            const refetchReq = pool.request();
+            addInput(refetchReq, 'id', sql.UniqueIdentifier, userId);
+            const updatedUserResult = await refetchReq.query(`
                 SELECT u.Id as id, u.FullName as full_name, u.Username as username, u.Email as email,
                        u.RoleId as role_id, u.ManagementId as management_id,
                        CAST(u.IsActive AS BIT) as is_active, u.CreatedAt as created_at,
@@ -100,18 +102,18 @@ router.post('/', async (req: Request, res: Response) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(passwordToHash, salt);
 
-        const result = await pool.request()
-            .input('fullName', full_name)
-            .input('username', username)
-            .input('email', email)
-            .input('password', hashedPassword)
-            .input('roleId', role_id)
-            .input('managementId', management_id)
-            .input('language', language)
-            .input('theme', theme)
-            .input('avatarUrl', sql.NVarChar(500), req.body.avatar_url || null)
-            .input('apps', appsToSave)
-            .query(`
+        const insertReq = pool.request();
+        addInput(insertReq, 'fullName', sql.NVarChar(200), full_name);
+        addInput(insertReq, 'username', sql.NVarChar(200), username);
+        addInput(insertReq, 'email', sql.NVarChar(200), email);
+        addInput(insertReq, 'password', sql.NVarChar(sql.MAX), hashedPassword);
+        addInput(insertReq, 'roleId', sql.UniqueIdentifier, role_id);
+        addInput(insertReq, 'managementId', sql.UniqueIdentifier, management_id);
+        addInput(insertReq, 'language', sql.VarChar(10), language);
+        addInput(insertReq, 'theme', sql.VarChar(20), theme);
+        addInput(insertReq, 'avatarUrl', sql.NVarChar(500), req.body.avatar_url || null);
+        addInput(insertReq, 'apps', sql.NVarChar(sql.MAX), appsToSave);
+        const result = await insertReq.query(`
                 INSERT INTO EBM.Users (FullName, Username, Email, PasswordHash, RoleId, ManagementId, Language, Theme, RequiresPasswordChange, AvatarUrl, Apps)
                 OUTPUT 
                     INSERTED.Id as id, INSERTED.FullName as full_name, INSERTED.Username as username, INSERTED.Email as email,
@@ -157,18 +159,18 @@ router.put('/:id', async (req: Request, res: Response) => {
         const appsToSaveInput = Array.isArray(apps) ? apps.join(', ') : (apps || APP_IDENTIFIER);
         const appsToSave = cleanApps(appsToSaveInput);
 
-        const request = pool.request()
-            .input('id', userId)
-            .input('fullName', full_name)
-            .input('username', username)
-            .input('email', email)
-            .input('role_id', role_id)
-            .input('managementId', management_id)
-            .input('isActive', is_active ? 1 : 0)
-            .input('language', language)
-            .input('theme', theme)
-            .input('avatarUrl', avatar_url || null)
-            .input('apps', appsToSave);
+        const request = pool.request();
+        addInput(request, 'id', sql.UniqueIdentifier, userId);
+        addInput(request, 'fullName', sql.NVarChar(200), full_name);
+        addInput(request, 'username', sql.NVarChar(200), username);
+        addInput(request, 'email', sql.NVarChar(200), email);
+        addInput(request, 'role_id', sql.UniqueIdentifier, role_id);
+        addInput(request, 'managementId', sql.UniqueIdentifier, management_id);
+        addInput(request, 'isActive', sql.Bit, is_active ? 1 : 0);
+        addInput(request, 'language', sql.VarChar(10), language);
+        addInput(request, 'theme', sql.VarChar(20), theme);
+        addInput(request, 'avatarUrl', sql.NVarChar(500), avatar_url || null);
+        addInput(request, 'apps', sql.NVarChar(sql.MAX), appsToSave);
 
         // Only update password if provided
         if (password_hash && password_hash.trim() !== '') {
@@ -180,7 +182,7 @@ router.put('/:id', async (req: Request, res: Response) => {
             const forceChange = isSelfUpdate ? 0 : 1;
 
             queryStr += `, PasswordHash = @password, RequiresPasswordChange = ${forceChange} `;
-            request.input('password', hashedPwd);
+            addInput(request, 'password', sql.NVarChar(sql.MAX), hashedPwd);
         }
 
         queryStr += `
@@ -221,9 +223,9 @@ router.delete('/:id', async (req: Request, res: Response) => {
 
         // Soft delete or hard delete? Let's do hard delete for now, or just deactivate.
         // EBM uses is_active mostly, but delete in storage was absolute. We'll do hard delete.
-        const result = await pool.request()
-            .input('id', userId)
-            .query(`UPDATE EBM.Users SET IsActive = 0 WHERE Id = @id`);
+        const deactivateReq = pool.request();
+        addInput(deactivateReq, 'id', sql.UniqueIdentifier, userId);
+        const result = await deactivateReq.query(`UPDATE EBM.Users SET IsActive = 0 WHERE Id = @id`);
 
         await logAudit(req, 'DEACTIVATE', 'USERS', userId, {});
 

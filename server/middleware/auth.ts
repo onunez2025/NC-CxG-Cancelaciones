@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { getDbConnection } from '../db.js';
+import { addInput, sql } from '../lib/db.js';
 
 const isProduction = process.env.NODE_ENV === 'production';
 const JWT_SECRET = process.env.JWT_SECRET || (isProduction ? 'FAIL' : 'fallback_development_secret_do_not_use');
@@ -57,15 +58,15 @@ export async function logAudit(req: Request, action: string, entity: string, ent
         const user = req.user;
         if (!user) return;
         const pool = await getDbConnection();
-        await pool.request()
-            .input('uid', user.id)
-            .input('un', user.full_name || user.username)
-            .input('acc', action)
-            .input('ent', entity)
-            .input('eid', entityId)
-            .input('det', JSON.stringify(details))
-            .query(`
-                INSERT INTO [dbo].[GAC_APP_TB_AUDIT_LOG] 
+        const r = pool.request();
+        addInput(r, 'uid', sql.UniqueIdentifier, user.id);
+        addInput(r, 'un', sql.NVarChar(200), user.full_name || user.username);
+        addInput(r, 'acc', sql.NVarChar(100), action);
+        addInput(r, 'ent', sql.NVarChar(200), entity);
+        addInput(r, 'eid', sql.NVarChar(200), entityId);
+        addInput(r, 'det', sql.NVarChar(sql.MAX), JSON.stringify(details));
+        await r.query(`
+                INSERT INTO [dbo].[GAC_APP_TB_AUDIT_LOG]
                 (UsuarioID, UsuarioNombre, Accion, Entidad, EntidadID, Detalle, Fecha)
                 VALUES (@uid, @un, @acc, @ent, @eid, @det, GETDATE())
             `);

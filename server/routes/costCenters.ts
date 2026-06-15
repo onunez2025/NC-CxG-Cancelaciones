@@ -1,5 +1,6 @@
 ﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
+import { addInput, sql } from '../lib/db.js';
 
 const router = Router();
 
@@ -36,14 +37,14 @@ router.post('/', async (req: Request, res: Response) => {
         }
 
         const pool = await getDbConnection();
-        const result = await pool.request()
-            .input('code', code)
-            .input('name', name)
-            .input('managementId', management_id)
-            .input('isActive', is_active ? 1 : 0)
-            .query(`
+        const r = pool.request();
+        addInput(r, 'code', sql.VarChar(50), code);
+        addInput(r, 'name', sql.NVarChar(200), name);
+        addInput(r, 'managementId', sql.UniqueIdentifier, management_id);
+        addInput(r, 'isActive', sql.Bit, is_active ? 1 : 0);
+        const result = await r.query(`
                 INSERT INTO EBM.CostCenters (Id, Code, Name, ManagementId, IsActive)
-                OUTPUT INSERTED.Id as id, INSERTED.Code as code, INSERTED.Name as name, 
+                OUTPUT INSERTED.Id as id, INSERTED.Code as code, INSERTED.Name as name,
                        INSERTED.ManagementId as management_id, CAST(INSERTED.IsActive AS BIT) as is_active
                 VALUES (NEWID(), @code, @name, @managementId, @isActive)
             `);
@@ -66,16 +67,16 @@ router.put('/:id', async (req: Request, res: Response) => {
         }
 
         const pool = await getDbConnection();
-        const result = await pool.request()
-            .input('id', id)
-            .input('code', code)
-            .input('name', name)
-            .input('managementId', management_id)
-            .input('isActive', is_active !== undefined ? (is_active ? 1 : 0) : 1)
-            .query(`
+        const r = pool.request();
+        addInput(r, 'id', sql.UniqueIdentifier, id);
+        addInput(r, 'code', sql.VarChar(50), code);
+        addInput(r, 'name', sql.NVarChar(200), name);
+        addInput(r, 'managementId', sql.UniqueIdentifier, management_id);
+        addInput(r, 'isActive', sql.Bit, is_active !== undefined ? (is_active ? 1 : 0) : 1);
+        const result = await r.query(`
                 UPDATE EBM.CostCenters
                 SET Code = @code, Name = @name, ManagementId = @managementId, IsActive = @isActive
-                OUTPUT INSERTED.Id as id, INSERTED.Code as code, INSERTED.Name as name, 
+                OUTPUT INSERTED.Id as id, INSERTED.Code as code, INSERTED.Name as name,
                        INSERTED.ManagementId as management_id, CAST(INSERTED.IsActive AS BIT) as is_active
                 WHERE Id = @id
             `);
@@ -97,9 +98,9 @@ router.delete('/:id', async (req: Request, res: Response) => {
         const { id } = req.params;
         const pool = await getDbConnection();
 
-        const result = await pool.request()
-            .input('id', id)
-            .query('DELETE FROM EBM.CostCenters WHERE Id = @id');
+        const r = pool.request();
+        addInput(r, 'id', sql.UniqueIdentifier, id);
+        const result = await r.query('DELETE FROM EBM.CostCenters WHERE Id = @id');
 
         if (result.rowsAffected[0] === 0) {
             return res.status(404).json({ error: 'Cost Center not found' });

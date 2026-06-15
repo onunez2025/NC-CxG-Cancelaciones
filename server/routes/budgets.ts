@@ -1,6 +1,6 @@
 ﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
-import sql from 'mssql';
+import { addInput, sql } from '../lib/db.js';
 import { invalidateBudgetCache } from './crossReference.js';
 
 const router = Router();
@@ -29,15 +29,15 @@ router.get('/', async (req: Request, res: Response) => {
 
         if (year) {
             baseQuery += ` AND b.Year = @year`;
-            request.input('year', year);
+            addInput(request, 'year', sql.Int, Number(year));
         }
         if (management_id) {
             baseQuery += ` AND b.ManagementId = @management_id`;
-            request.input('management_id', management_id);
+            addInput(request, 'management_id', sql.UniqueIdentifier, String(management_id));
         }
         if (cost_center_id) {
             baseQuery += ` AND b.CostCenterId = @cost_center_id`;
-            request.input('cost_center_id', cost_center_id);
+            addInput(request, 'cost_center_id', sql.UniqueIdentifier, String(cost_center_id));
         }
 
         const result = await request.query(baseQuery);
@@ -51,7 +51,7 @@ router.get('/', async (req: Request, res: Response) => {
         const placeholders = budgetIds.map((_, i) => `@p${i}`).join(',');
 
         const monthsRequest = pool.request();
-        budgetIds.forEach((id, i) => monthsRequest.input(`p${i}`, id));
+        budgetIds.forEach((id: string, i: number) => addInput(monthsRequest, `p${i}`, sql.UniqueIdentifier, id));
 
         const monthsResult = await monthsRequest.query(`
             SELECT BudgetId, MonthIndex, Amount 
@@ -100,14 +100,14 @@ router.post('/', async (req: Request, res: Response) => {
 
         try {
             // 1. Insert Budget Header
-            const budgetResult = await transaction.request()
-                .input('year', year)
-                .input('accountId', account_id)
-                .input('managementId', management_id)
-                .input('costCenterId', cost_center_id)
-                .input('total', total)
-                .input('createdBy', created_by || null)
-                .query(`
+            const budgetReq = transaction.request();
+            addInput(budgetReq, 'year', sql.Int, Number(year));
+            addInput(budgetReq, 'accountId', sql.UniqueIdentifier, account_id);
+            addInput(budgetReq, 'managementId', sql.UniqueIdentifier, management_id);
+            addInput(budgetReq, 'costCenterId', sql.UniqueIdentifier, cost_center_id);
+            addInput(budgetReq, 'total', sql.Decimal(10, 2), total);
+            addInput(budgetReq, 'createdBy', sql.UniqueIdentifier, created_by || null);
+            const budgetResult = await budgetReq.query(`
                     INSERT INTO EBM.Budgets (Id, Year, AccountId, ManagementId, CostCenterId, Total, CreatedBy, CreatedAt)
                     OUTPUT INSERTED.Id as id, INSERTED.Year as year, INSERTED.AccountId as account_id,
                            INSERTED.ManagementId as management_id, INSERTED.CostCenterId as cost_center_id,
@@ -120,9 +120,9 @@ router.post('/', async (req: Request, res: Response) => {
             // 2. Insert Budget Months
             if (Array.isArray(monthly_amounts) && monthly_amounts.length === 12) {
                 const request = transaction.request();
-                request.input('budgetId', newBudget.id);
+                addInput(request, 'budgetId', sql.UniqueIdentifier, newBudget.id);
                 for (let i = 0; i < 12; i++) {
-                    request.input(`m${i}`, monthly_amounts[i] || 0);
+                    addInput(request, `m${i}`, sql.Decimal(10, 2), monthly_amounts[i] || 0);
                 }
                 await request.query(`
                     INSERT INTO EBM.BudgetMonths (BudgetId, MonthIndex, Amount)
@@ -168,14 +168,14 @@ router.put('/:id', async (req: Request, res: Response) => {
 
         try {
             // 1. Update Header
-            const budgetResult = await transaction.request()
-                .input('id', budgetId)
-                .input('year', year)
-                .input('accountId', account_id)
-                .input('managementId', management_id)
-                .input('costCenterId', cost_center_id)
-                .input('total', total)
-                .query(`
+            const updateReq = transaction.request();
+            addInput(updateReq, 'id', sql.UniqueIdentifier, budgetId);
+            addInput(updateReq, 'year', sql.Int, Number(year));
+            addInput(updateReq, 'accountId', sql.UniqueIdentifier, account_id);
+            addInput(updateReq, 'managementId', sql.UniqueIdentifier, management_id);
+            addInput(updateReq, 'costCenterId', sql.UniqueIdentifier, cost_center_id);
+            addInput(updateReq, 'total', sql.Decimal(10, 2), total);
+            const budgetResult = await updateReq.query(`
                     UPDATE EBM.Budgets 
                     SET Year = @year, AccountId = @accountId, ManagementId = @managementId, 
                         CostCenterId = @costCenterId, Total = @total
@@ -193,15 +193,15 @@ router.put('/:id', async (req: Request, res: Response) => {
             const updatedBudget = budgetResult.recordset[0];
 
             // 2. Refresh Months (Delete and re-insert)
-            await transaction.request()
-                .input('budgetId', budgetId)
-                .query(`DELETE FROM EBM.BudgetMonths WHERE BudgetId = @budgetId`);
+            const deleteMonthsReq = transaction.request();
+            addInput(deleteMonthsReq, 'budgetId', sql.UniqueIdentifier, budgetId);
+            await deleteMonthsReq.query(`DELETE FROM EBM.BudgetMonths WHERE BudgetId = @budgetId`);
 
             if (Array.isArray(monthly_amounts) && monthly_amounts.length === 12) {
                 const request = transaction.request();
-                request.input('budgetId', budgetId);
+                addInput(request, 'budgetId', sql.UniqueIdentifier, budgetId);
                 for (let i = 0; i < 12; i++) {
-                    request.input(`m${i}`, monthly_amounts[i] || 0);
+                    addInput(request, `m${i}`, sql.Decimal(10, 2), monthly_amounts[i] || 0);
                 }
                 await request.query(`
                     INSERT INTO EBM.BudgetMonths (BudgetId, MonthIndex, Amount)
@@ -246,10 +246,10 @@ router.delete('/bulk/:year/:managementId', async (req: Request, res: Response) =
 
         try {
             // 1. Delete Months (FK constraint)
-            await transaction.request()
-                .input('year', year)
-                .input('managementId', managementId)
-                .query(`
+            const delMonthsBulkReq = transaction.request();
+            addInput(delMonthsBulkReq, 'year', sql.Int, year);
+            addInput(delMonthsBulkReq, 'managementId', sql.UniqueIdentifier, managementId);
+            await delMonthsBulkReq.query(`
                     DELETE m
                     FROM EBM.BudgetMonths m
                     INNER JOIN EBM.Budgets b ON m.BudgetId = b.Id
@@ -257,10 +257,10 @@ router.delete('/bulk/:year/:managementId', async (req: Request, res: Response) =
                 `);
 
             // 2. Delete Headers
-            await transaction.request()
-                .input('year', year)
-                .input('managementId', managementId)
-                .query(`DELETE FROM EBM.Budgets WHERE Year = @year AND ManagementId = @managementId`);
+            const delBudgetsBulkReq = transaction.request();
+            addInput(delBudgetsBulkReq, 'year', sql.Int, year);
+            addInput(delBudgetsBulkReq, 'managementId', sql.UniqueIdentifier, managementId);
+            await delBudgetsBulkReq.query(`DELETE FROM EBM.Budgets WHERE Year = @year AND ManagementId = @managementId`);
 
             await transaction.commit();
             invalidateBudgetCache();
@@ -285,14 +285,14 @@ router.delete('/:id', async (req: Request, res: Response) => {
 
         try {
             // 1. Delete Months (FK constraint)
-            await transaction.request()
-                .input('id', budgetId)
-                .query(`DELETE FROM EBM.BudgetMonths WHERE BudgetId = @id`);
+            const delMonthsSingleReq = transaction.request();
+            addInput(delMonthsSingleReq, 'id', sql.UniqueIdentifier, budgetId);
+            await delMonthsSingleReq.query(`DELETE FROM EBM.BudgetMonths WHERE BudgetId = @id`);
 
             // 2. Delete Header
-            const result = await transaction.request()
-                .input('id', budgetId)
-                .query(`DELETE FROM EBM.Budgets WHERE Id = @id`);
+            const delBudgetSingleReq = transaction.request();
+            addInput(delBudgetSingleReq, 'id', sql.UniqueIdentifier, budgetId);
+            const result = await delBudgetSingleReq.query(`DELETE FROM EBM.Budgets WHERE Id = @id`);
 
             if (result.rowsAffected[0] === 0) {
                 await transaction.rollback();

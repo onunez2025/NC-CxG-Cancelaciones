@@ -1,5 +1,6 @@
 ﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
+import { addInput, sql } from '../lib/db.js';
 
 const router = Router();
 
@@ -33,14 +34,14 @@ router.post('/', async (req: Request, res: Response) => {
         }
 
         const pool = await getDbConnection();
-        const result = await pool.request()
-            .input('code', code)
-            .input('name', name)
-            .input('category', category)
-            .input('isActive', is_active ? 1 : 0)
-            .query(`
+        const r = pool.request();
+        addInput(r, 'code', sql.VarChar(50), code);
+        addInput(r, 'name', sql.NVarChar(200), name);
+        addInput(r, 'category', sql.NVarChar(100), category);
+        addInput(r, 'isActive', sql.Bit, is_active ? 1 : 0);
+        const result = await r.query(`
                 INSERT INTO EBM.AccountingAccounts (Id, Code, Name, Category, IsActive)
-                OUTPUT INSERTED.Id as id, INSERTED.Code as code, INSERTED.Name as name, 
+                OUTPUT INSERTED.Id as id, INSERTED.Code as code, INSERTED.Name as name,
                        INSERTED.Category as category, CAST(INSERTED.IsActive AS BIT) as is_active
                 VALUES (NEWID(), @code, @name, @category, @isActive)
             `);

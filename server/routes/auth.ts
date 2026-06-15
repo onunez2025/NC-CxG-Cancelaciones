@@ -3,7 +3,7 @@ import { getDbConnection } from '../db.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
-import sql from 'mssql';
+import { addInput, sql } from '../lib/db.js';
 import { verifyToken } from '../middleware/auth.js';
 
 const router = Router();
@@ -56,9 +56,9 @@ router.post('/login', async (req: Request, res: Response) => {
         }
 
         // Fetch permissions for the user's role
-        const permsResult = await pool.request()
-            .input('roleId', user.role_id)
-            .query('SELECT Permission FROM EBM.RolePermissions WHERE RoleId = @roleId');
+        const permsReq = pool.request();
+        addInput(permsReq, 'roleId', sql.UniqueIdentifier, user.role_id);
+        const permsResult = await permsReq.query('SELECT Permission FROM EBM.RolePermissions WHERE RoleId = @roleId');
 
         user.permissions = permsResult.recordset.map((p: { Permission: string }) => p.Permission);
 
@@ -138,9 +138,9 @@ router.get('/me', verifyToken, async (req: Request, res: Response) => {
             return res.status(401).json({ error: 'User not found or disabled' });
         }
 
-        const permsResult = await pool.request()
-            .input('roleId', user.role_id)
-            .query('SELECT Permission FROM EBM.RolePermissions WHERE RoleId = @roleId');
+        const permsReq2 = pool.request();
+        addInput(permsReq2, 'roleId', sql.UniqueIdentifier, user.role_id);
+        const permsResult = await permsReq2.query('SELECT Permission FROM EBM.RolePermissions WHERE RoleId = @roleId');
 
         user.permissions = permsResult.recordset.map((p: { Permission: string }) => p.Permission);
 

@@ -3,13 +3,13 @@ dotenv.config();
 
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import sql from 'mssql';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { getDbConnection } from './db.js'; // Ensure extension when running under tsx module resolution
+import { addInput, sql } from './lib/db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -273,9 +273,9 @@ let appMeta: AppMeta | null = null;
 async function fetchAppMeta(): Promise<void> {
     try {
         const pool = await getDbConnection();
-        const result = await pool.request()
-            .input('code', APP_CODE)
-            .query(`SELECT Label, LogoUrl, Url FROM [dbo].[GAC_APP_TB_CONSOLE_APPLICATIONS] WHERE UPPER(Code) = UPPER(@code)`);
+        const r = pool.request();
+        addInput(r, 'code', sql.VarChar(50), APP_CODE);
+        const result = await r.query(`SELECT Label, LogoUrl, Url FROM [dbo].[GAC_APP_TB_CONSOLE_APPLICATIONS] WHERE UPPER(Code) = UPPER(@code)`);
         if (result.recordset.length > 0) {
             const row = result.recordset[0];
             appMeta = { label: row.Label, logoUrl: row.LogoUrl, url: row.Url };

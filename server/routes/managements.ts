@@ -1,5 +1,6 @@
 ﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
+import { addInput, sql } from '../lib/db.js';
 
 const router = Router();
 
@@ -24,10 +25,10 @@ router.post('/', async (req: Request, res: Response) => {
         }
 
         const pool = await getDbConnection();
-        const result = await pool.request()
-            .input('name', name)
-            .input('code', code)
-            .query(`
+        const r = pool.request();
+        addInput(r, 'name', sql.NVarChar(200), name);
+        addInput(r, 'code', sql.VarChar(50), code);
+        const result = await r.query(`
                 INSERT INTO EBM.Managements (Id, Name, Code)
                 OUTPUT INSERTED.Id as id, INSERTED.Name as name, INSERTED.Code as code
                 VALUES (NEWID(), @name, @code)
@@ -51,11 +52,11 @@ router.put('/:id', async (req: Request, res: Response) => {
         }
 
         const pool = await getDbConnection();
-        const result = await pool.request()
-            .input('id', id)
-            .input('name', name)
-            .input('code', code)
-            .query(`
+        const r = pool.request();
+        addInput(r, 'id', sql.UniqueIdentifier, id);
+        addInput(r, 'name', sql.NVarChar(200), name);
+        addInput(r, 'code', sql.VarChar(50), code);
+        const result = await r.query(`
                 UPDATE EBM.Managements
                 SET Name = @name, Code = @code
                 OUTPUT INSERTED.Id as id, INSERTED.Name as name, INSERTED.Code as code
@@ -79,9 +80,9 @@ router.delete('/:id', async (req: Request, res: Response) => {
         const { id } = req.params;
         const pool = await getDbConnection();
 
-        const result = await pool.request()
-            .input('id', id)
-            .query('DELETE FROM EBM.Managements WHERE Id = @id');
+        const r = pool.request();
+        addInput(r, 'id', sql.UniqueIdentifier, id);
+        const result = await r.query('DELETE FROM EBM.Managements WHERE Id = @id');
 
         if (result.rowsAffected[0] === 0) {
             return res.status(404).json({ error: 'Management not found' });

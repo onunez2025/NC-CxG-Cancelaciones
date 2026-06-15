@@ -5,7 +5,7 @@
  * Uses the cached SAP uploads instead of fetching them from the browser.
  */
 import { getDbConnection } from '../db.js';
-import sql from 'mssql';
+import { addInput, sql } from '../lib/db.js';
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -107,7 +107,7 @@ export async function calculateBudgetExecutionServer(
         const budgetIds = budgets.map((b: { id: string; [key: string]: unknown }) => b.id);
         const placeholders = budgetIds.map((_, i: number) => `@p${i}`).join(',');
         const monthsRequest = pool.request();
-        budgetIds.forEach((id: string, i: number) => monthsRequest.input(`p${i}`, id));
+        budgetIds.forEach((id: string, i: number) => addInput(monthsRequest, `p${i}`, sql.UniqueIdentifier, id));
         const monthsResult = await monthsRequest.query(`
             SELECT BudgetId, MonthIndex, Amount
             FROM EBM.BudgetMonths

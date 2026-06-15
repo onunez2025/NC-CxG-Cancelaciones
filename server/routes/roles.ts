@@ -1,6 +1,6 @@
 ﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
-import sql from 'mssql';
+import { addInput, sql } from '../lib/db.js';
 import { logAudit } from '../middleware/auth.js';
 
 const router = Router();
@@ -62,10 +62,10 @@ router.post('/', async (req: Request, res: Response) => {
             const appsToSave = cleanApps(appsToSaveInput);
 
             // 1. Insert Role
-            const roleResult = await transaction.request()
-                .input('name', name)
-                .input('apps', appsToSave)
-                .query(`
+            const insertRoleReq = transaction.request();
+            addInput(insertRoleReq, 'name', sql.NVarChar(200), name);
+            addInput(insertRoleReq, 'apps', sql.NVarChar(sql.MAX), appsToSave);
+            const roleResult = await insertRoleReq.query(`
                     INSERT INTO EBM.Roles (Name, Apps)
                     OUTPUT INSERTED.Id as id, INSERTED.Name as name, INSERTED.Apps as apps
                     VALUES (@name, @apps)
@@ -76,10 +76,10 @@ router.post('/', async (req: Request, res: Response) => {
             // 2. Insert Permissions
             if (permissions && Array.isArray(permissions) && permissions.length > 0) {
                 for (const perm of permissions) {
-                    await transaction.request()
-                        .input('roleId', newRole.id)
-                        .input('permission', perm)
-                        .query(`
+                    const permReq = transaction.request();
+                    addInput(permReq, 'roleId', sql.UniqueIdentifier, newRole.id);
+                    addInput(permReq, 'permission', sql.VarChar(100), perm);
+                    await permReq.query(`
                             INSERT INTO EBM.RolePermissions (RoleId, Permission)
                             VALUES (@roleId, @permission)
                         `);
@@ -115,24 +115,24 @@ router.put('/:id', async (req: Request, res: Response) => {
             const appsToSave = cleanApps(appsToSaveInput);
 
             // 1. Update Role Name & Apps
-            await transaction.request()
-                .input('id', roleId)
-                .input('name', name)
-                .input('apps', appsToSave)
-                .query(`UPDATE EBM.Roles SET Name = @name, Apps = @apps WHERE Id = @id`);
+            const updateRoleReq = transaction.request();
+            addInput(updateRoleReq, 'id', sql.UniqueIdentifier, roleId);
+            addInput(updateRoleReq, 'name', sql.NVarChar(200), name);
+            addInput(updateRoleReq, 'apps', sql.NVarChar(sql.MAX), appsToSave);
+            await updateRoleReq.query(`UPDATE EBM.Roles SET Name = @name, Apps = @apps WHERE Id = @id`);
 
-            // 2. Refresh permissions: Delete ALL permissions for this role 
+            // 2. Refresh permissions: Delete ALL permissions for this role
             // We delete all because the frontend sends the complete set (union of all apps)
-            await transaction.request()
-                .input('id', roleId)
-                .query(`DELETE FROM EBM.RolePermissions WHERE RoleId = @id`);
+            const deletePermsReq = transaction.request();
+            addInput(deletePermsReq, 'id', sql.UniqueIdentifier, roleId);
+            await deletePermsReq.query(`DELETE FROM EBM.RolePermissions WHERE RoleId = @id`);
 
             if (permissions && Array.isArray(permissions)) {
                 for (const perm of permissions) {
-                    await transaction.request()
-                        .input('roleId', roleId)
-                        .input('permission', perm)
-                        .query(`
+                    const permReq = transaction.request();
+                    addInput(permReq, 'roleId', sql.UniqueIdentifier, roleId);
+                    addInput(permReq, 'permission', sql.VarChar(100), perm);
+                    await permReq.query(`
                             INSERT INTO EBM.RolePermissions (RoleId, Permission)
                             VALUES (@roleId, @permission)
                         `);
@@ -162,14 +162,14 @@ router.delete('/:id', async (req: Request, res: Response) => {
 
         try {
             // 1. Delete permissions first (FK constraint)
-            await transaction.request()
-                .input('id', roleId)
-                .query(`DELETE FROM EBM.RolePermissions WHERE RoleId = @id`);
+            const delPermsReq = transaction.request();
+            addInput(delPermsReq, 'id', sql.UniqueIdentifier, roleId);
+            await delPermsReq.query(`DELETE FROM EBM.RolePermissions WHERE RoleId = @id`);
 
             // 2. Delete Role
-            await transaction.request()
-                .input('id', roleId)
-                .query(`DELETE FROM EBM.Roles WHERE Id = @id`);
+            const delRoleReq = transaction.request();
+            addInput(delRoleReq, 'id', sql.UniqueIdentifier, roleId);
+            await delRoleReq.query(`DELETE FROM EBM.Roles WHERE Id = @id`);
 
             await transaction.commit();
             await logAudit(req, 'DELETE', 'ROLES', roleId, {});

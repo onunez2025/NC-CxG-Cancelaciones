@@ -1,4 +1,5 @@
 import { getDbConnection } from './db.js';
+import { addInput, sql } from './lib/db.js';
 
 // Deterministic UUIDs for seeding
 const ROLES = [
@@ -22,10 +23,10 @@ async function seed() {
         // 1. Roles
         console.log('Seeding Roles...');
         for (const role of ROLES) {
-            await pool.request()
-                .input('id', role.id)
-                .input('name', role.name)
-                .query(`
+            const r = pool.request();
+            addInput(r, 'id', sql.UniqueIdentifier, role.id);
+            addInput(r, 'name', sql.NVarChar(200), role.name);
+            await r.query(`
                     IF NOT EXISTS (SELECT * FROM EBM.Roles WHERE Id = @id)
                     BEGIN
                         INSERT INTO EBM.Roles (Id, Name) VALUES (@id, @name);
@@ -36,11 +37,11 @@ async function seed() {
         // 2. Managements
         console.log('Seeding Managements...');
         for (const m of MANAGEMENTS) {
-            await pool.request()
-                .input('id', m.id)
-                .input('name', m.name)
-                .input('code', m.code)
-                .query(`
+            const r = pool.request();
+            addInput(r, 'id', sql.UniqueIdentifier, m.id);
+            addInput(r, 'name', sql.NVarChar(200), m.name);
+            addInput(r, 'code', sql.VarChar(50), m.code);
+            await r.query(`
                     IF NOT EXISTS (SELECT * FROM EBM.Managements WHERE Id = @id)
                     BEGIN
                         INSERT INTO EBM.Managements (Id, Name, Code) VALUES (@id, @name, @code);
@@ -50,10 +51,10 @@ async function seed() {
 
         // 3. User
         console.log('Seeding Users...');
-        await pool.request()
-            .input('roleId', ROLES[0].id)
-            .input('managementId', MANAGEMENTS[0].id)
-            .query(`
+        const seedUserReq = pool.request();
+        addInput(seedUserReq, 'roleId', sql.UniqueIdentifier, ROLES[0].id);
+        addInput(seedUserReq, 'managementId', sql.UniqueIdentifier, MANAGEMENTS[0].id);
+        await seedUserReq.query(`
             IF NOT EXISTS (SELECT * FROM EBM.Users WHERE Username = 'admin')
             BEGIN
                 INSERT INTO EBM.Users (Username, Email, PasswordHash, RoleId, ManagementId, Language, Theme, IsActive) 
@@ -73,9 +74,9 @@ async function seed() {
         // 5. Cost Centers
         console.log('Seeding Cost Centers...');
         const mgmtId = MANAGEMENTS[0].id;
-        await pool.request()
-            .input('mgmtId', mgmtId)
-            .query(`
+        const seedCecoReq = pool.request();
+        addInput(seedCecoReq, 'mgmtId', sql.UniqueIdentifier, mgmtId);
+        await seedCecoReq.query(`
             IF NOT EXISTS (SELECT * FROM EBM.CostCenters WHERE Code = '1001')
             BEGIN
                 INSERT INTO EBM.CostCenters (Id, Code, Name, ManagementId, IsActive) VALUES (NEWID(), '1001', 'Desarrollo de Software', @mgmtId, 1);
