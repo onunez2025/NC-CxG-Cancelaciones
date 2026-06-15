@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 # check-security.sh — Verificador de seguridad pre-push para repos SIATC
 # Detecta patrones inseguros antes de permitir el push.
 # Uso manual: ./check-security.sh
@@ -86,6 +86,23 @@ else
         ERRORS=$((ERRORS+1))
     else
         echo -e "${GREEN}  ✓ TypeScript OK${NC}"
+    fi
+fi
+
+# C8: Build TypeScript + Vite (verifica que el proyecto compila correctamente)
+echo -e "\n🔨 Verificando build..."
+if [ ! -f "node_modules/.bin/tsc" ] && [ ! -f "node_modules/.bin/tsc.cmd" ]; then
+    echo -e "${YELLOW}  ⚠ Dependencias no instaladas — omitiendo build (ejecuta npm install)${NC}"
+    WARNINGS=$((WARNINGS+1))
+else
+    BUILD_OUT=$(npm run build 2>&1)
+    BUILD_EXIT=$?
+    if [ $BUILD_EXIT -ne 0 ]; then
+        echo -e "${RED}[C8-CRÍTICO]${NC} npm run build falló — corrige antes de hacer push"
+        echo "$BUILD_OUT" | tail -20 | sed 's/^/     /'
+        ERRORS=$((ERRORS+1))
+    else
+        echo -e "${GREEN}  ✓ Build OK${NC}"
     fi
 fi
 
