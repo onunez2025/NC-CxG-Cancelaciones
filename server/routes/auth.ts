@@ -87,6 +87,14 @@ router.post('/login', async (req: Request, res: Response) => {
             { expiresIn: '24h' }
         );
 
+        const ssoToken = jwt.sign(
+            { id: user.id, role: user.role_name, role_name: user.role_name, username: user.username, apps: user.apps || '', casId: null },
+            JWT_SECRET, { expiresIn: '24h' }
+        );
+        if (process.env.NODE_ENV === 'production') {
+            res.cookie('token', ssoToken, { domain: '.siatc.cloud', maxAge: 24 * 60 * 60 * 1000, httpOnly: false, secure: true, sameSite: 'lax', path: '/' });
+        }
+
         res.json({
             user: safeUser,
             token
@@ -143,6 +151,14 @@ router.get('/me', verifyToken, async (req: Request, res: Response) => {
         const permsResult = await permsReq2.query('SELECT Permission FROM EBM.RolePermissions WHERE RoleId = @roleId');
 
         user.permissions = permsResult.recordset.map((p: { Permission: string }) => p.Permission);
+
+        const ssoToken = jwt.sign(
+            { id: user.id, role: user.role_name, role_name: user.role_name, username: user.username, apps: user.apps || '', casId: null },
+            JWT_SECRET, { expiresIn: '24h' }
+        );
+        if (process.env.NODE_ENV === 'production') {
+            res.cookie('token', ssoToken, { domain: '.siatc.cloud', maxAge: 24 * 60 * 60 * 1000, httpOnly: false, secure: true, sameSite: 'lax', path: '/' });
+        }
 
         res.json({ user });
 
