@@ -1,7 +1,7 @@
 ﻿import dotenv from 'dotenv';
 dotenv.config();
 
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -248,6 +248,11 @@ if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
 if (process.env.NODE_ENV === 'production' && !(process.env.ALLOWED_ORIGINS || '').trim()) {
     console.warn('⚠️  WARNING: ALLOWED_ORIGINS is not set. CORS will block all cross-origin requests in production.');
 }
+
+app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
+    console.error(`[ERROR] ${req.method} ${req.path}:`, err);
+    res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Error interno del servidor' : err.message });
+});
 
 app.listen(port, () => {
     console.log(`Backend Server listening on port ${port} in ${process.env.NODE_ENV || 'development'} mode`);
