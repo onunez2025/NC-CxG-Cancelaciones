@@ -59,7 +59,8 @@ app.use(helmet({
             formAction: ["'self'"],
             baseUri: ["'self'"],
         }
-    }
+    },
+    hsts: process.env.NODE_ENV === 'production' ? { maxAge: 31536000, includeSubDomains: true } : false,
 }));
 
 // Rate limiting — store en Redis para persistir contadores ante reinicios
