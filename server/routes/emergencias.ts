@@ -1,3 +1,4 @@
+import { safeError } from '../lib/security.js';
 ﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
@@ -20,7 +21,7 @@ router.get('/catalogos/verificacion', async (req: Request, res: Response) => {
         `);
         res.json({ statuses: results.recordsets[0], motives: results.recordsets[1] });
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -35,7 +36,7 @@ router.get('/catalogos/procesado', async (req: Request, res: Response) => {
         `);
         res.json({ statuses: results.recordsets[0], motives: results.recordsets[1] });
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -111,7 +112,7 @@ router.get('/', async (req: Request, res: Response) => {
         });
     } catch (error: unknown) {
         console.error('Error fetching emergencies:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -148,7 +149,7 @@ router.get('/:id', async (req: Request, res: Response) => {
         }
         res.json(result.recordset[0]);
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -189,7 +190,7 @@ router.post('/', async (req: Request, res: Response) => {
             
         res.status(201).json({ message: 'Emergencia registrada', id });
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -213,7 +214,7 @@ router.put('/:id/asignar', async (req: Request, res: Response) => {
             `);
         res.json({ message: 'Técnico asignado' });
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -245,7 +246,7 @@ router.put('/:id/verificar', async (req: Request, res: Response) => {
             `);
         res.json({ message: 'Verificación registrada' });
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -277,7 +278,7 @@ router.put('/:id/procesar', async (req: Request, res: Response) => {
             `);
         res.json({ message: 'Procesamiento registrado' });
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -299,7 +300,7 @@ router.get('/:id/repuestos', async (req: Request, res: Response) => {
             `);
         res.json(result.recordset);
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -333,7 +334,7 @@ router.post('/:id/repuestos', async (req: Request, res: Response) => {
 
         res.status(201).json({ message: 'Repuesto agregado', id: solicitudId });
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 

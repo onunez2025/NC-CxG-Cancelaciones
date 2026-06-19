@@ -1,3 +1,4 @@
+import { safeError } from '../lib/security.js';
 ﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
@@ -85,7 +86,7 @@ router.get('/', async (req: Request, res: Response) => {
         });
     } catch (error: unknown) {
         console.error('Error fetching supervisor schedules:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -103,7 +104,7 @@ router.get('/colores', async (req: Request, res: Response) => {
         res.json(result.recordset);
     } catch (error: unknown) {
         console.error('Error fetching labor colors:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -128,7 +129,7 @@ router.get('/empleados', async (req: Request, res: Response) => {
         res.json(data);
     } catch (error: unknown) {
         console.error('Error fetching employees for dropdown:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -155,7 +156,7 @@ router.post('/', verifyPermission('cxg.programa_supervisores.create'), async (re
         res.status(201).json({ id });
     } catch (error: unknown) {
         console.error('Error creating supervisor schedule:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -184,7 +185,7 @@ router.put('/:id', verifyPermission('cxg.programa_supervisores.edit'), async (re
         res.json({ success: true });
     } catch (error: unknown) {
         console.error('Error updating supervisor schedule:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -201,7 +202,7 @@ router.delete('/:id', verifyPermission('cxg.programa_supervisores.delete'), asyn
         res.status(204).send();
     } catch (error: unknown) {
         console.error('Error deleting supervisor schedule:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 

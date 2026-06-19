@@ -1,3 +1,4 @@
+import { safeError } from '../lib/security.js';
 ﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import { addInput, sql } from '../lib/db.js';
@@ -80,7 +81,7 @@ router.get('/', async (req: Request, res: Response) => {
         res.json(finalBudgets);
     } catch (error: unknown) {
         console.error('Error fetching budgets:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -152,7 +153,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     } catch (error: unknown) {
         console.error('Error creating budget:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -230,7 +231,7 @@ router.put('/:id', async (req: Request, res: Response) => {
         }
     } catch (error: unknown) {
         console.error('Error updating budget:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -271,7 +272,7 @@ router.delete('/bulk/:year/:managementId', async (req: Request, res: Response) =
         }
     } catch (error: unknown) {
         console.error('Error bulk deleting budgets:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -308,7 +309,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
         }
     } catch (error: unknown) {
         console.error('Error deleting budget:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 

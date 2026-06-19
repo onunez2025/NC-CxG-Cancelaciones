@@ -1,3 +1,4 @@
+import { safeError } from '../lib/security.js';
 ﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import { addInput, sql } from '../lib/db.js';
@@ -40,7 +41,7 @@ router.get('/', async (req: Request, res: Response) => {
         res.json(result.recordset);
     } catch (error: unknown) {
         console.error('Error fetching users:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -130,7 +131,7 @@ router.post('/', async (req: Request, res: Response) => {
         res.status(201).json(createdUser);
     } catch (error: unknown) {
         console.error('Error in router.post(/):', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -211,7 +212,7 @@ router.put('/:id', async (req: Request, res: Response) => {
         if (sqlErr.number === 2601 || sqlErr.number === 2627) {
             return res.status(400).json({ error: 'El nombre de usuario o correo electrónico ya están registrados.' });
         }
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -236,7 +237,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
         res.status(204).send();
     } catch (error: unknown) {
         console.error('Error deleting user:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 

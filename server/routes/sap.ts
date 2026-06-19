@@ -1,3 +1,4 @@
+import { safeError } from '../lib/security.js';
 import { Router } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
@@ -496,7 +497,7 @@ router.post('/', async (req, res) => {
         if (error instanceof Error && error.message.includes('string or binary data would be truncated')) {
             return res.status(400).json({ error: 'Data is too large for the database column.' });
         }
-        res.status(500).json({ error: 'Internal server error: ' + (error instanceof Error ? error.message : String(error)) });
+        res.status(500).json({ error: 'Internal server error: ' + (safeError(error)) });
     }
 });
 

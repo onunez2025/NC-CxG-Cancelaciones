@@ -1,3 +1,4 @@
+import { safeError } from '../lib/security.js';
 ﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
@@ -168,7 +169,7 @@ router.get('/tracking', async (req: Request, res: Response) => {
         res.json(result.recordset);
     } catch (error: unknown) {
         console.error('Error fetching FSM tracking:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -205,7 +206,7 @@ router.get('/equipment-history/:ticket', async (req: Request, res: Response) => 
         res.json(result.recordset);
     } catch (error: unknown) {
         console.error('Error fetching equipment history:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 

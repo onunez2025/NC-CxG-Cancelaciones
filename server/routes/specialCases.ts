@@ -1,3 +1,4 @@
+import { safeError } from '../lib/security.js';
 ﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
@@ -20,7 +21,7 @@ router.get('/motivos', async (req: Request, res: Response) => {
         res.json(result.recordset);
     } catch (error: unknown) {
         console.error('Error fetching special case motives:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -92,7 +93,7 @@ router.get('/', async (req: Request, res: Response) => {
         });
     } catch (error: unknown) {
         console.error('Error fetching special cases:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -127,7 +128,7 @@ router.post('/', async (req: Request, res: Response) => {
         res.status(201).json({ message: 'Caso especial registrado', id });
     } catch (error: unknown) {
         console.error('Error creating special case:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -165,7 +166,7 @@ router.post('/:id/status', async (req: Request, res: Response) => {
         res.json({ message: 'Estado del caso especial actualizado' });
     } catch (error: unknown) {
         console.error('Error updating special case status:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 

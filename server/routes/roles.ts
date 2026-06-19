@@ -1,3 +1,4 @@
+import { safeError } from '../lib/security.js';
 ﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import { addInput, sql } from '../lib/db.js';
@@ -42,7 +43,7 @@ router.get('/', async (req: Request, res: Response) => {
         res.json(Array.from(rolesMap.values()));
     } catch (error: unknown) {
         console.error('Error fetching roles:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -96,7 +97,7 @@ router.post('/', async (req: Request, res: Response) => {
 
     } catch (error: unknown) {
         console.error('Error creating role:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -148,7 +149,7 @@ router.put('/:id', async (req: Request, res: Response) => {
         }
     } catch (error: unknown) {
         console.error('Error updating role:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -180,7 +181,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
         }
     } catch (error: unknown) {
         console.error('Error deleting role:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 

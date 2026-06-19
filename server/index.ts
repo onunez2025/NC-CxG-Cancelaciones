@@ -1,3 +1,4 @@
+import { safeError } from './lib/security.js';
 ﻿import dotenv from 'dotenv';
 dotenv.config();
 
@@ -117,11 +118,11 @@ app.get('/api/status', async (req: Request, res: Response) => {
         });
     } catch (error: unknown) {
         // Obfuscate internal error in production
-        const safeError = process.env.NODE_ENV === 'production' ? 'Database connection failed' : error.message;
+        const dbErrMsg = process.env.NODE_ENV === 'production' ? 'Database connection failed' : error.message;
         res.status(500).json({
             status: 'error',
             message: 'Failed to connect to Azure SQL.',
-            error: safeError
+            error: dbErrMsg
         });
     }
 });
@@ -150,7 +151,7 @@ app.get('/api/applications', verifyToken, async (req: Request, res: Response) =>
         const result = await pool.request().query(query);
         res.json(result.recordset);
     } catch (err: unknown) {
-        res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
+        res.status(500).json({ error: safeError(err) });
     }
 });
 app.use('/api/budgets', verifyToken, budgetsRouter);
@@ -174,7 +175,7 @@ app.get('/api/config/audit-logs', verifyToken, verifyPermission('ebm.config.user
         `);
         res.json(result.recordset);
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -207,7 +208,7 @@ app.post('/api/config/audit-logs', verifyToken, async (req: Request, res: Respon
         res.status(201).json({ message: 'Audit log created successfully' });
     } catch (error: unknown) {
         console.error('Error creating audit log:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 

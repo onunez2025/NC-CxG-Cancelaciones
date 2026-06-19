@@ -1,3 +1,4 @@
+import { safeError } from '../lib/security.js';
 ﻿import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
@@ -294,7 +295,7 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
         res.json(ticketData);
     } catch (error: unknown) {
         console.error('Error lookup ticket:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -313,7 +314,7 @@ router.get('/cancelaciones/motivos', verifyPermission('cxg.cancelaciones.view'),
         res.json(result.recordset);
     } catch (error: unknown) {
         console.error('Error fetching motives:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -363,7 +364,7 @@ router.get('/cancelaciones/unique-values', verifyPermission('cxg.cancelaciones.v
         res.json(result.recordset.map(r => r.value));
     } catch (error: unknown) {
         console.error('Error fetching unique values for cancellations:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -422,7 +423,7 @@ router.get('/cancelaciones/mapa/hoy', verifyPermission('cxg.cancelaciones.view')
         res.json(records);
     } catch (error: unknown) {
         console.error('Error fetching today cancellations map:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -448,7 +449,7 @@ router.get('/cancelaciones/analistas', verifyPermission('cxg.cancelaciones.assig
         res.json(result.recordset);
     } catch (error: unknown) {
         console.error('Error fetching analysts for cancellations:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -507,7 +508,7 @@ router.get('/cancelaciones/:id', verifyPermission('cxg.cancelaciones.view'), asy
         res.json(result.recordset[0]);
     } catch (error: unknown) {
         console.error('Error fetching cancellation detail:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -721,7 +722,7 @@ router.get('/cancelaciones', verifyPermission('cxg.cancelaciones.view'), async (
         });
     } catch (error: unknown) {
         console.error('Error fetching cancellations:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -740,7 +741,7 @@ router.get('/cxg-nc/motivos', verifyPermission('cxg.cxg_nc.view'), async (req: R
         res.json(result.recordset);
     } catch (error: unknown) {
         console.error('Error fetching CxG/NC motives:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -831,7 +832,7 @@ router.get('/cxg-nc/unique-values', verifyPermission('cxg.cxg_nc.view'), async (
         res.json(values);
     } catch (error: unknown) {
         console.error('Error fetching unique values:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -1139,7 +1140,7 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
         });
     } catch (error: unknown) {
         console.error('Error fetching CxG/NC:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -1168,7 +1169,7 @@ router.get('/cxg-nc/:id/historial', verifyPermission('cxg.cxg_nc.view'), async (
         res.json(result.recordset);
     } catch (error: unknown) {
         console.error('Error fetching historial:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -1256,7 +1257,7 @@ router.get('/cxg-nc/:id', verifyPermission('cxg.cxg_nc.view'), async (req: Reque
         ticketData.fsm_lugar_compra = resolveStoreDescription(ticketData.fsm_lugar_compra);
         res.json(ticketData);
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -1309,7 +1310,7 @@ router.post('/cancelaciones', verifyPermission('cxg.cancelaciones.create'), asyn
                 `);
         res.status(201).json({ message: 'Cancelación registrada', id, autoApproved: autoApprove });
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -1370,7 +1371,7 @@ router.post('/cancelaciones/:id/gestionar', verifyPermission('cxg.cancelaciones.
                 `);
         res.json({ message: 'Cancelación gestionada correctamente' });
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -1420,7 +1421,7 @@ router.post('/cancelaciones/:id/asignar', verifyPermission('cxg.cancelaciones.as
                 `);
         res.json({ message: 'Cancelación asignada' });
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -1438,7 +1439,7 @@ router.post('/cancelaciones/:id/approve', async (req: Request, res: Response) =>
             `);
         res.json({ message: 'Cancelación aprobada' });
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -1455,7 +1456,7 @@ router.post('/cancelaciones/:id/reject', async (req: Request, res: Response) => 
             `);
         res.json({ message: 'Cancelación rechazada' });
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -1527,7 +1528,7 @@ router.post('/cxg-nc', verifyPermission('cxg.cxg_nc.create'), async (req: Reques
                     }
                 }
             } catch (err: unknown) {
-                console.error(`[POST /cxg-nc ODATA ERROR] Failed resolving ticket ${ticket}:`, err instanceof Error ? err.message : String(err));
+                console.error(`[POST /cxg-nc ODATA ERROR] Failed resolving ticket ${ticket}:`, safeError(err));
             }
         }
 
@@ -1560,7 +1561,7 @@ router.post('/cxg-nc', verifyPermission('cxg.cxg_nc.create'), async (req: Reques
             
         res.status(201).json({ message: 'Solicitud CxG/NC registrada', id: solicitudId });
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -1648,7 +1649,7 @@ router.post('/cxg-nc/:id/aprobar-solicitud', verifyPermission('cxg.cxg_nc.approv
 
         res.json({ message: 'Solicitud evaluada correctamente' });
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -1705,7 +1706,7 @@ router.post('/cxg-nc/:id/asignar', verifyPermission('cxg.cxg_nc.assign'), async 
 
         res.json({ message: 'Solicitud asignada correctamente' });
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -1766,7 +1767,7 @@ router.post('/cxg-nc/:id/gestionar', verifyPermission('cxg.cxg_nc.process'), asy
 
         res.json({ message: 'Solicitud procesada correctamente' });
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -1823,7 +1824,7 @@ router.post('/cancelaciones/aprobar-masivo', verifyPermission('cxg.cancelaciones
         res.json({ message: 'Solicitudes procesadas en masivo correctamente', rowsAffected: result.rowsAffected[0] });
     } catch (error: unknown) {
         console.error('Error in bulk approval:', error);
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -1859,7 +1860,7 @@ router.post('/cancelaciones/:id/aprobar-solicitud', verifyPermission('cxg.cancel
             `);
         res.json({ message: 'Solicitud evaluada correctamente' });
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -1897,7 +1898,7 @@ router.post('/cancelaciones/:id/validar-cliente', verifyPermission('cxg.cancelac
             `);
         res.json({ message: 'Validación de cliente registrada' });
     } catch (error: unknown) {
-        res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: safeError(error) });
     }
 });
 
@@ -2003,10 +2004,10 @@ router.get('/c4c/report/:ticketId', async (req: Request, res: Response) => {
         res.send(buffer);
 
     } catch (err: unknown) {
-        console.error('C4C Proxy Error:', err instanceof Error ? err.message : String(err));
+        console.error('C4C Proxy Error:', safeError(err));
         res.status(500).json({
             error: 'Failed to retrieve report from C4C',
-            details: err instanceof Error ? err.message : String(err)
+            details: safeError(err)
         });
     }
 });
