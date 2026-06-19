@@ -28,11 +28,11 @@ router.get('/', async (req: Request, res: Response) => {
         let whereClause = "WHERE 1=1";
         if (search) {
             whereClause += " AND (LOWER(e.Nombre_Empleado) LIKE @search OR LOWER(l.Labor) LIKE @search)";
-            request.input('search', sql.NVarChar, `%${search}%`);
+            request.input('search', sql.NVarChar(sql.MAX), `%${search}%`);
         }
         if (empleadoId) {
             whereClause += " AND l.Empleado = @empleadoId";
-            request.input('empleadoId', sql.VarChar, empleadoId);
+            request.input('empleadoId', sql.VarChar(255), empleadoId);
         }
         if (startDate) {
             whereClause += " AND l.Fecha_Labor >= @startDate";
@@ -142,11 +142,11 @@ router.post('/', verifyPermission('cxg.programa_supervisores.create'), async (re
         const creadoPor = await getAuthenticatedUserDisplayName(req);
 
         await pool.request()
-            .input('id', sql.VarChar, id)
-            .input('empleado', sql.VarChar, empleado_id)
+            .input('id', sql.VarChar(255), id)
+            .input('empleado', sql.VarChar(255), empleado_id)
             .input('fecha', sql.Date, fecha_labor)
-            .input('labor', sql.VarChar, labor)
-            .input('creadoPor', sql.VarChar, creadoPor)
+            .input('labor', sql.VarChar(255), labor)
+            .input('creadoPor', sql.VarChar(255), creadoPor)
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_EMPLEADOS_CALENDARIO_LABORES] 
                 ([ID_empleado_calendario_labores], Empleado, Fecha_Labor, Labor, Creado_por, Creado_el)
@@ -169,11 +169,11 @@ router.put('/:id', verifyPermission('cxg.programa_supervisores.edit'), async (re
         const modificadoPor = await getAuthenticatedUserDisplayName(req);
 
         const result = await pool.request()
-            .input('id', sql.VarChar, id)
-            .input('empleado', sql.VarChar, empleado_id)
+            .input('id', sql.VarChar(255), id)
+            .input('empleado', sql.VarChar(255), empleado_id)
             .input('fecha', sql.Date, fecha_labor)
-            .input('labor', sql.VarChar, labor)
-            .input('modificadoPor', sql.VarChar, modificadoPor)
+            .input('labor', sql.VarChar(255), labor)
+            .input('modificadoPor', sql.VarChar(255), modificadoPor)
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_EMPLEADOS_CALENDARIO_LABORES]
                 SET Empleado = @empleado, Fecha_Labor = @fecha, Labor = @labor,
@@ -195,7 +195,7 @@ router.delete('/:id', verifyPermission('cxg.programa_supervisores.delete'), asyn
         const { id } = req.params;
         const pool = await getDbConnection();
         const result = await pool.request()
-            .input('id', sql.VarChar, id)
+            .input('id', sql.VarChar(255), id)
             .query('DELETE FROM [dbo].[GAC_APP_TB_EMPLEADOS_CALENDARIO_LABORES] WHERE [ID_empleado_calendario_labores] = @id');
         
         if (result.rowsAffected[0] === 0) return res.status(404).json({ error: 'Registro no encontrado' });

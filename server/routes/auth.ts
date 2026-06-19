@@ -25,7 +25,7 @@ router.post('/login', async (req: Request, res: Response) => {
 
         const pool = await getDbConnection();
         const userResult = await pool.request()
-            .input('username', sql.NVarChar, username)
+            .input('username', sql.NVarChar(sql.MAX), username)
             .query(`
                 SELECT
                     u.Id as id,
@@ -200,7 +200,7 @@ router.post('/force-change-password', verifyToken, async (req: Request, res: Res
         const passwordHash = await bcrypt.hash(newPassword, salt);
 
         await pool.request()
-            .input('hash', sql.NVarChar, passwordHash)
+            .input('hash', sql.NVarChar(sql.MAX), passwordHash)
             .input('id', sql.UniqueIdentifier, userId)
             .query('UPDATE EBM.Users SET PasswordHash = @hash, RequiresPasswordChange = 0 WHERE Id = @id');
 

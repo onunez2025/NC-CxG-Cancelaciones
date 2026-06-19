@@ -43,12 +43,12 @@ router.get('/', async (req: Request, res: Response) => {
         
         if (search) {
             whereClause += ` AND (n.Ticket LIKE @search OR n.Motivo_solicitud LIKE @search OR n.Comentario LIKE @search OR n.Creado_por LIKE @search)`;
-            request.input('search', sql.VarChar, `%${search}%`);
+            request.input('search', sql.VarChar(255), `%${search}%`);
         }
 
         // Get total count
         const countResult = await pool.request()
-            .input('search', sql.VarChar, `%${search}%`)
+            .input('search', sql.VarChar(255), `%${search}%`)
             .query(`
                 SELECT COUNT(*) as total 
                 FROM [dbo].[GAC_APP_TB_CASOS_ESPECIALES] n
@@ -114,11 +114,11 @@ router.post('/', async (req: Request, res: Response) => {
         const userDisplayName = await getAuthenticatedUserDisplayName(req, usuario);
 
         await pool.request()
-            .input('id', sql.VarChar, id)
-            .input('ticket', sql.VarChar, ticket)
-            .input('motivo', sql.VarChar, motivo)
-            .input('comentario', sql.VarChar, comentario || '')
-            .input('usuario', sql.VarChar, userDisplayName)
+            .input('id', sql.VarChar(255), id)
+            .input('ticket', sql.VarChar(255), ticket)
+            .input('motivo', sql.VarChar(255), motivo)
+            .input('comentario', sql.VarChar(255), comentario || '')
+            .input('usuario', sql.VarChar(255), userDisplayName)
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_CASOS_ESPECIALES] 
                 (ID_Casos_Especiales, Ticket, Motivo_solicitud, Comentario, Creado_el, Creado_por, Estado)
@@ -149,10 +149,10 @@ router.post('/:id/status', async (req: Request, res: Response) => {
         }
 
         await pool.request()
-            .input('id', sql.VarChar, id)
-            .input('estado', sql.VarChar, estado)
-            .input('revisado_por', sql.VarChar, revisor)
-            .input('motivo_rechazo', sql.VarChar, motivo_rechazo || null)
+            .input('id', sql.VarChar(255), id)
+            .input('estado', sql.VarChar(255), estado)
+            .input('revisado_por', sql.VarChar(255), revisor)
+            .input('motivo_rechazo', sql.VarChar(255), motivo_rechazo || null)
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_CASOS_ESPECIALES]
                 SET 

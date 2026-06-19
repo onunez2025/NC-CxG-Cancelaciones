@@ -158,11 +158,11 @@ router.get('/tracking', async (req: Request, res: Response) => {
         `;
 
         const request = pool.request();
-        if (ticket) request.input('ticket', sql.VarChar, `%${ticket}%`);
-        if (cliente) request.input('cliente', sql.VarChar, `%${cliente}%`);
-        if (documento) request.input('documento', sql.VarChar, `%${documento}%`);
-        if (tecnico) request.input('tecnico', sql.VarChar, `%${tecnico}%`);
-        if (celular) request.input('celular', sql.VarChar, `%${celular}%`);
+        if (ticket) request.input('ticket', sql.VarChar(255), `%${ticket}%`);
+        if (cliente) request.input('cliente', sql.VarChar(255), `%${cliente}%`);
+        if (documento) request.input('documento', sql.VarChar(255), `%${documento}%`);
+        if (tecnico) request.input('tecnico', sql.VarChar(255), `%${tecnico}%`);
+        if (celular) request.input('celular', sql.VarChar(255), `%${celular}%`);
         request.input('limit', sql.Int, limit);
 
         const result = await request.query(query);
@@ -200,7 +200,7 @@ router.get('/equipment-history/:ticket', async (req: Request, res: Response) => 
         `;
 
         const request = pool.request();
-        request.input('ticket', sql.VarChar, ticket);
+        request.input('ticket', sql.VarChar(255), ticket);
 
         const result = await request.query(query);
         res.json(result.recordset);

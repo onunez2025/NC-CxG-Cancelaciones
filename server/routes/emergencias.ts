@@ -60,13 +60,13 @@ router.get('/', async (req: Request, res: Response) => {
 
         // Get total count
         const countResult = await pool.request()
-            .input('search', sql.VarChar, `%${search}%`)
+            .input('search', sql.VarChar(255), `%${search}%`)
             .query(`SELECT COUNT(*) as total FROM [dbo].[GAC_APP_TB_EMERGENCIAS] e ${whereClause}`);
         
         const total = countResult.recordset[0].total;
 
         const result = await pool.request()
-            .input('search', sql.VarChar, `%${search}%`)
+            .input('search', sql.VarChar(255), `%${search}%`)
             .input('offset', sql.Int, offset)
             .input('pageSize', sql.Int, pageSize)
             .query(`
@@ -125,7 +125,7 @@ router.get('/:id', async (req: Request, res: Response) => {
         const { id } = req.params;
         const pool = await getDbConnection();
         const result = await pool.request()
-            .input('id', sql.VarChar, id)
+            .input('id', sql.VarChar(255), id)
             .query(`
                 SELECT 
                     e.ID_Emergencia as id, e.Ticket as ticket, e.Observacion as observacion,
@@ -170,18 +170,18 @@ router.post('/', async (req: Request, res: Response) => {
         const userDisplayName = await getAuthenticatedUserDisplayName(req, creado_por);
 
         await pool.request()
-            .input('id', sql.VarChar, id)
-            .input('ticket', sql.VarChar, ticket)
-            .input('tipo', sql.VarChar, tipo)
-            .input('producto', sql.VarChar, producto)
-            .input('asesor_cc', sql.VarChar, asesor_cc)
-            .input('cliente', sql.VarChar, cliente)
-            .input('tel1', sql.VarChar, telefono_1)
-            .input('tel2', sql.VarChar, telefono_2 || null)
-            .input('dir', sql.VarChar, direccion)
-            .input('dir_ref', sql.VarChar, direccion_referencia || null)
-            .input('obs', sql.VarChar, observacion)
-            .input('por', sql.VarChar, userDisplayName)
+            .input('id', sql.VarChar(255), id)
+            .input('ticket', sql.VarChar(255), ticket)
+            .input('tipo', sql.VarChar(255), tipo)
+            .input('producto', sql.VarChar(255), producto)
+            .input('asesor_cc', sql.VarChar(255), asesor_cc)
+            .input('cliente', sql.VarChar(255), cliente)
+            .input('tel1', sql.VarChar(255), telefono_1)
+            .input('tel2', sql.VarChar(255), telefono_2 || null)
+            .input('dir', sql.VarChar(255), direccion)
+            .input('dir_ref', sql.VarChar(255), direccion_referencia || null)
+            .input('obs', sql.VarChar(255), observacion)
+            .input('por', sql.VarChar(255), userDisplayName)
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_EMERGENCIAS] 
                 (ID_Emergencia, Ticket, Tipo, Producto, Asesor_CC, Cliente, Telefono_1, Telefono_2, Direccion, Direccion_referencia, Observacion, Creado_el, Creado_por)
@@ -205,8 +205,8 @@ router.put('/:id/asignar', async (req: Request, res: Response) => {
         
         const pool = await getDbConnection();
         await pool.request()
-            .input('id', sql.VarChar, id)
-            .input('tecnico', sql.VarChar, tecnico_asignado)
+            .input('id', sql.VarChar(255), id)
+            .input('tecnico', sql.VarChar(255), tecnico_asignado)
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_EMERGENCIAS] 
                 SET Tecnico_asignado = @tecnico
@@ -231,10 +231,10 @@ router.put('/:id/verificar', async (req: Request, res: Response) => {
         const userDisplayName = await getAuthenticatedUserDisplayName(req, usuario);
 
         await pool.request()
-            .input('id', sql.VarChar, id)
-            .input('verificacion', sql.VarChar, verificacion)
-            .input('motivo', sql.VarChar, motivo)
-            .input('usuario', sql.VarChar, userDisplayName)
+            .input('id', sql.VarChar(255), id)
+            .input('verificacion', sql.VarChar(255), verificacion)
+            .input('motivo', sql.VarChar(255), motivo)
+            .input('usuario', sql.VarChar(255), userDisplayName)
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_EMERGENCIAS] 
                 SET 
@@ -263,10 +263,10 @@ router.put('/:id/procesar', async (req: Request, res: Response) => {
         const userDisplayName = await getAuthenticatedUserDisplayName(req, usuario);
 
         await pool.request()
-            .input('id', sql.VarChar, id)
-            .input('procesado', sql.VarChar, procesado)
-            .input('motivo', sql.VarChar, motivo)
-            .input('usuario', sql.VarChar, userDisplayName)
+            .input('id', sql.VarChar(255), id)
+            .input('procesado', sql.VarChar(255), procesado)
+            .input('motivo', sql.VarChar(255), motivo)
+            .input('usuario', sql.VarChar(255), userDisplayName)
             .query(`
                 UPDATE [dbo].[GAC_APP_TB_EMERGENCIAS] 
                 SET 
@@ -291,7 +291,7 @@ router.get('/:id/repuestos', async (req: Request, res: Response) => {
         const { id } = req.params;
         const pool = await getDbConnection();
         const result = await pool.request()
-            .input('id', sql.VarChar, id)
+            .input('id', sql.VarChar(255), id)
             .query(`
                 SELECT sr.*, m.Nombre as material_nombre
                 FROM [dbo].[GAC_APP_TB_EMERGENCIAS_SOLICITUD_REPUESTOS] sr
@@ -317,10 +317,10 @@ router.post('/:id/repuestos', async (req: Request, res: Response) => {
         const solicitudId = Math.random().toString(16).substring(2, 10);
 
         await pool.request()
-            .input('sol_id', sql.VarChar, solicitudId)
-            .input('mat_id', sql.VarChar, material_id)
-            .input('cant', sql.VarChar, cantidad.toString())
-            .input('em_id', sql.VarChar, id)
+            .input('sol_id', sql.VarChar(255), solicitudId)
+            .input('mat_id', sql.VarChar(255), material_id)
+            .input('cant', sql.VarChar(255), cantidad.toString())
+            .input('em_id', sql.VarChar(255), id)
             .query(`
                 INSERT INTO [dbo].[GAC_APP_TB_EMERGENCIAS_SOLICITUD_REPUESTOS] 
                 (ID_Solicitud, ID_Material, Cantidad, Emergencia)
@@ -329,7 +329,7 @@ router.post('/:id/repuestos', async (req: Request, res: Response) => {
             
         // Update flag in main table
         await pool.request()
-            .input('em_id', sql.VarChar, id)
+            .input('em_id', sql.VarChar(255), id)
             .query(`UPDATE [dbo].[GAC_APP_TB_EMERGENCIAS] SET Solicitud_repuestos = 'Si' WHERE ID_Emergencia = @em_id`);
 
         res.status(201).json({ message: 'Repuesto agregado', id: solicitudId });
