@@ -5,6 +5,8 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import { RedisStore } from 'rate-limit-redis';
+import { getRedisClient, blacklistToken } from './lib/redis.js';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -59,19 +61,23 @@ app.use(helmet({
     }
 }));
 
-// Rate limiting
+// Rate limiting — store en Redis para persistir contadores ante reinicios
+const redisStore = () => new RedisStore({
+    sendCommand: (...args: string[]) => (getRedisClient() as any).call(...args) as any,
+    prefix: 'rl:cxg:',
+});
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 1000, // Limit each IP to 1000 requests per 15 minutes
-    message: { error: 'Too many requests from this IP, please try again later.' }
+    windowMs: 15 * 60 * 1000,
+    max: 1000,
+    store: redisStore(),
+    message: { error: 'Too many requests from this IP, please try again later.' },
 });
 app.use(limiter);
-
-// Specific Auth route limiter for brute-force protection
 const authLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour
-    max: 50, // Limit each IP to 50 login requests per hour
-    message: { error: 'Too many login attempts, please try again after an hour.' }
+    windowMs: 60 * 60 * 1000,
+    max: 50,
+    store: redisStore(),
+    message: { error: 'Too many login attempts, please try again after an hour.' },
 });
 app.use('/api/auth/login', authLimiter);
 
@@ -126,7 +132,12 @@ app.use('/api/cost-centers', verifyToken, costCentersRouter);
 app.use('/api/accounts', verifyToken, accountsRouter);
 app.use('/api/roles', verifyToken, verifyPermission('ebm.config.roles'), rolesRouter);
 app.use('/api/users', verifyToken, verifyPermission('ebm.config.users'), usersRouter);
-app.use('/api/auth', authRouter); // protect /me internally
+app.use('/api/auth', authRouter);
+app.post('/api/auth/logout', verifyToken, async (req: Request, res: Response) => {
+    const token = req.headers['authorization']!.split(' ')[1];
+    await blacklistToken(token, (req.user as any).exp ?? 0);
+    res.json({ message: 'Sesión cerrada correctamente.' });
+});
 app.get('/api/applications', verifyToken, async (req: Request, res: Response) => {
     try {
         const pool = await getDbConnection();

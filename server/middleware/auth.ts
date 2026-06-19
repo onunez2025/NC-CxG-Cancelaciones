@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { getDbConnection } from '../db.js';
 import { addInput, sql } from '../lib/db.js';
+import { isTokenBlacklisted } from '../lib/redis.js';
 
 const isProduction = process.env.NODE_ENV === 'production';
 const JWT_SECRET = process.env.JWT_SECRET || (isProduction ? 'FAIL' : 'fallback_development_secret_do_not_use');
@@ -32,20 +33,18 @@ declare global {
     }
 }
 
-export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-    // Check Authorization header
+export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers['authorization'];
-    if (!authHeader) {
-        return res.status(401).json({ error: 'Access denied. No token provided.' });
-    }
+    if (!authHeader) return res.status(401).json({ error: 'Access denied. No token provided.' });
 
-    const token = authHeader.split(' ')[1]; // Format is "Bearer <token>"
-    if (!token) {
-        return res.status(401).json({ error: 'Access denied. Malformed token.' });
-    }
+    const token = authHeader.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Access denied. Malformed token.' });
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
+        if (await isTokenBlacklisted(token)) {
+            return res.status(401).json({ error: 'Sesión cerrada. Inicia sesión nuevamente.' });
+        }
         req.user = decoded as JwtUserPayload;
         next();
     } catch (_err) {
