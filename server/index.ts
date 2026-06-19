@@ -63,7 +63,7 @@ app.use(helmet({
 
 // Rate limiting — store en Redis para persistir contadores ante reinicios
 const redisStore = () => new RedisStore({
-    sendCommand: (...args: string[]) => (getRedisClient() as any).call(...args) as any,
+    sendCommand: (...args: string[]) => (getRedisClient() as any).call(...args) as any, // eslint-disable-line @typescript-eslint/no-explicit-any
     prefix: 'rl:cxg:',
 });
 const limiter = rateLimit({
@@ -135,7 +135,7 @@ app.use('/api/users', verifyToken, verifyPermission('ebm.config.users'), usersRo
 app.use('/api/auth', authRouter);
 app.post('/api/auth/logout', verifyToken, async (req: Request, res: Response) => {
     const token = req.headers['authorization']!.split(' ')[1];
-    await blacklistToken(token, (req.user as any).exp ?? 0);
+    await blacklistToken(token, (req.user as any).exp ?? 0); // eslint-disable-line @typescript-eslint/no-explicit-any
     res.json({ message: 'Sesión cerrada correctamente.' });
 });
 app.get('/api/applications', verifyToken, async (req: Request, res: Response) => {
