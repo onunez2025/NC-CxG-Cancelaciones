@@ -1,5 +1,5 @@
 import { safeError } from '../lib/security.js';
-﻿import { Router, Request, Response } from 'express';
+import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import { addInput, sql } from '../lib/db.js';
 import { logAudit } from '../middleware/auth.js';

@@ -1,5 +1,5 @@
 import { safeError } from './lib/security.js';
-﻿import dotenv from 'dotenv';
+import dotenv from 'dotenv';
 dotenv.config();
 
 import express, { Request, Response, NextFunction } from 'express';
