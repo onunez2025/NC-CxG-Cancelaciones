@@ -75,10 +75,10 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 const authLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000,
+    windowMs: 5 * 60 * 1000,
     max: 50,
     store: redisStore(),
-    message: { error: 'Too many login attempts, please try again after an hour.' },
+    message: { error: 'Too many login attempts, please try again after 5 minutes.' },
 });
 app.use('/api/auth/login', authLimiter);
 
