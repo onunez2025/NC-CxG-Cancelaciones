@@ -1,4 +1,4 @@
-import { safeError } from '../lib/security.js';
+import { safeError, sanitizeLog } from '../lib/security.js';
 import { Router, Request, Response } from 'express';
 import { getDbConnection } from '../db.js';
 import sql from 'mssql';
@@ -227,10 +227,11 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
         let resolvedLugarCompra = null;
 
         // 1. Query SAP C4C OData for the custom Lugar de Compra field
-        const sapBaseUrl = process.env.SAP_BASE_URL || 'https://my361897.crm.ondemand.com/sap/c4c/odata/v1/c4codataapi';
-        const sapUser = process.env.SAP_USER || 'oscar.nunez';
-        const sapPassword = process.env.SAP_PASSWORD || '9xP6*epfuhWx4rK';
+        const sapBaseUrl = process.env.SAP_BASE_URL;
+        const sapUser = process.env.SAP_USER;
+        const sapPassword = process.env.SAP_PASSWORD;
 
+        if (sapBaseUrl && sapUser && sapPassword) {
         try {
             const authHeader = 'Basic ' + Buffer.from(`${sapUser}:${sapPassword}`).toString('base64');
             const url = `${sapBaseUrl}/ServiceRequestCollection?$filter=ID eq '${id}'&$format=json`;
@@ -250,17 +251,18 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
                     if (sdkCode) {
                         resolvedLugarCompra = C4C_STORE_MAPPING[sdkCode] || null;
                         if (resolvedLugarCompra) {
-                            console.log(`[C4C ODATA SUCCESS] Ticket ${id}: Mapped code "${sdkCode}" to "${resolvedLugarCompra}"`);
+                            console.log(`[C4C ODATA SUCCESS] Ticket ${sanitizeLog(id)}: Mapped code "${sdkCode}" to "${resolvedLugarCompra}"`);
                         } else {
-                            console.warn(`[C4C ODATA WARN] Ticket ${id}: Code "${sdkCode}" not in mapping dictionary`);
+                            console.warn(`[C4C ODATA WARN] Ticket ${sanitizeLog(id)}: Code "${sdkCode}" not in mapping dictionary`);
                         }
                     }
                 }
             } else {
-                console.error(`[C4C ODATA ERROR] Ticket ${id}: Fetch returned status ${response.status}`);
+                console.error(`[C4C ODATA ERROR] Ticket ${sanitizeLog(id)}: Fetch returned status ${response.status}`);
             }
         } catch (odataErr: unknown) {
-            console.error(`[C4C ODATA EXCEPTION] Ticket ${id}:`, odataErr instanceof Error ? odataErr.message : String(odataErr));
+            console.error(`[C4C ODATA EXCEPTION] Ticket ${sanitizeLog(id)}:`, odataErr instanceof Error ? odataErr.message : String(odataErr));
+        }
         }
 
         // 2. Database Fallback (retrieve resolved tienda from TBL_C4C_REPORTE_CONTROL if OData failed or unmapped)
@@ -276,17 +278,17 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
 
                 if (fallbackResult.recordset.length > 0) {
                     resolvedLugarCompra = fallbackResult.recordset[0].TIENDA;
-                    console.log(`[DB FALLBACK SUCCESS] Ticket ${id}: Retrieved tienda "${resolvedLugarCompra}"`);
+                    console.log(`[DB FALLBACK SUCCESS] Ticket ${sanitizeLog(id)}: Retrieved tienda "${resolvedLugarCompra}"`);
                 }
             } catch (dbErr: unknown) {
-                console.error(`[DB FALLBACK ERROR] Ticket ${id}:`, dbErr instanceof Error ? dbErr.message : String(dbErr));
+                console.error(`[DB FALLBACK ERROR] Ticket ${sanitizeLog(id)}:`, dbErr instanceof Error ? dbErr.message : String(dbErr));
             }
         }
 
         // 3. Legacy Fallback (CAS Company Name or TIENDAS VARIAS)
         if (!resolvedLugarCompra) {
             resolvedLugarCompra = ticketData.lugar_compra || ticketData.lugar_compra_id || 'TIENDAS VARIAS';
-            console.log(`[LEGACY FALLBACK] Ticket ${id}: Defaulted to "${resolvedLugarCompra}"`);
+            console.log(`[LEGACY FALLBACK] Ticket ${sanitizeLog(id)}: Defaulted to "${resolvedLugarCompra}"`);
         }
 
         // Update the returned object with our resolved store name

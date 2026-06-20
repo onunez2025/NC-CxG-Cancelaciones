@@ -1,4 +1,4 @@
-import { safeError } from './lib/security.js';
+import { safeError, sanitizeLog } from './lib/security.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -91,7 +91,7 @@ app.use(cors({
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            console.error(`Blocked CORS attempt from: ${origin}`);
+            console.error(`Blocked CORS attempt from: ${sanitizeLog(origin)}`);
             callback(new Error('Not allowed by CORS'));
         }
     },
