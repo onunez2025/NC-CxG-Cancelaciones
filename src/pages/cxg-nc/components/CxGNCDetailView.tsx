@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, DollarSign, ShieldCheck, UserPlus, CheckCircle2, ArrowLeft, Wrench, XCircle, FileText, RefreshCw } from 'lucide-react';
+import { Loader2, DollarSign, ShieldCheck, UserPlus, CheckCircle2, ArrowLeft, Wrench, XCircle, FileText, RefreshCw, PhoneCall } from 'lucide-react';
 import { SIATCBadge } from '../../../components/siatc/SIATCBadge';
 import { SIATCButton } from '../../../components/siatc/SIATCButton';
 import { ncService, type CxGNC, type EquipmentHistoryEntry } from '../../../services/ncService';
@@ -19,6 +19,8 @@ interface CxGNCDetailViewProps {
     onManage?: () => void;
     canClone?: boolean;
     onClone?: () => void;
+    canGestionarRechazo?: boolean;
+    onGestionarRechazo?: () => void;
   };
 }
 
@@ -130,6 +132,11 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, is
           {actions?.canClone && (
             <SIATCButton variant="secondary" size="sm" icon={RefreshCw} onClick={actions.onClone}>
               Volver a intentar (Clonar)
+            </SIATCButton>
+          )}
+          {actions?.canGestionarRechazo && (
+            <SIATCButton variant="info" size="sm" icon={PhoneCall} onClick={actions.onGestionarRechazo}>
+              Gestionar Rechazo
             </SIATCButton>
           )}
         </div>

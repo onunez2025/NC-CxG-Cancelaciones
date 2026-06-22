@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { 
-  Search, 
-  RefreshCw, 
+import {
+  Search,
+  RefreshCw,
   Loader2,
   FileSpreadsheet,
   UserPlus,
@@ -20,7 +20,8 @@ import {
   ArrowDown,
   ArrowUpDown,
   Filter,
-  LayoutGrid
+  LayoutGrid,
+  PhoneCall,
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { SIATC_THEME } from '../../utils/siatc-theme';
@@ -150,6 +151,13 @@ export const CxGNCPage = () => {
   const [isGestionModalOpen, setIsGestionModalOpen] = useState(false);
   const [gestiónObs, setGestiónObs] = useState('');
   const [gestiónResultado, setGestiónResultado] = useState<'true' | 'false' | ''>('');
+
+  // Gestión de Rechazo state
+  const [isGestionRechazaOpen, setIsGestionRechazaOpen] = useState(false);
+  const [gestionRechazoForm, setGestionRechazoForm] = useState<{
+    motivo: 'ACEPTO' | 'RECLAMO' | 'ESCALADO' | '';
+    observacion: string;
+  }>({ motivo: '', observacion: '' });
 
   // Detail state
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -513,6 +521,39 @@ export const CxGNCPage = () => {
     }
   };
 
+  const handleGestionarRechazo = async () => {
+    if (!selectedRecord || !gestionRechazoForm.motivo || !gestionRechazoForm.observacion) return;
+    setIsSubmitting(true);
+    try {
+      await ncService.gestionarRechazoCxGNC(selectedRecord.id, {
+        motivo: gestionRechazoForm.motivo as 'ACEPTO' | 'RECLAMO' | 'ESCALADO',
+        observacion: gestionRechazoForm.observacion,
+        gestionado_por: user?.full_name || user?.username || 'Sistema'
+      });
+
+      await auditService.logAction({
+        UsuarioID: user?.id || '0',
+        UsuarioNombre: user?.username || 'Sistema',
+        Accion: 'GESTIONAR_RECHAZO',
+        Entidad: 'CXG_NC',
+        EntidadID: selectedRecord.id,
+        Detalle: `Rechazo gestionado con cliente. Solicitud ${selectedRecord.correlativo}. Resultado: ${gestionRechazoForm.motivo}. Obs: ${gestionRechazoForm.observacion}`
+      });
+
+      setIsGestionRechazaOpen(false);
+      setGestionRechazoForm({ motivo: '', observacion: '' });
+      fetchData();
+      if (isDetailOpen && selectedRecord) {
+        handleViewDetail(selectedRecord.id);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Error', 'No se pudo registrar la gestión del rechazo.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleViewDetail = async (id: string) => {
     setIsDetailOpen(true);
     setIsLoadingDetail(true);
@@ -620,7 +661,12 @@ export const CxGNCPage = () => {
               setIsDetailOpen(false);
               setDetailData(null);
               setIsModalOpen(true);
-            }
+            },
+            canGestionarRechazo: detailData?.estado === 'RECHAZADO' && !detailData?.procesado_por && hasPermission('cxg.cxg_nc.gestionar_rechazo'),
+            onGestionarRechazo: () => {
+              setSelectedRecord(detailData);
+              setIsGestionRechazaOpen(true);
+            },
           }}
         />
       ) : isModalOpen ? (
@@ -1155,9 +1201,15 @@ export const CxGNCPage = () => {
                             </div>
                           </SIATCTooltip>
                           <div className="flex flex-col gap-0.5">
-                            <SIATCBadge variant={item.procesado === 'true' ? 'success' : 'warning'}>
-                              {item.procesado === 'true' ? 'SÍ' : 'PENDIENTE'}
-                            </SIATCBadge>
+                            {item.estado === 'RECHAZADO' ? (
+                              <SIATCBadge variant={item.procesado_por ? 'success' : 'secondary'}>
+                                {item.procesado_por ? 'Gestionado' : 'Sin gestionar'}
+                              </SIATCBadge>
+                            ) : (
+                              <SIATCBadge variant={item.procesado === 'true' ? 'success' : 'warning'}>
+                                {item.procesado === 'true' ? 'SÍ' : 'PENDIENTE'}
+                              </SIATCBadge>
+                            )}
                             {item.procesado_por && <span className="text-[9px] text-muted-foreground/80 truncate max-w-[100px] italic">{item.procesado_por}</span>}
                           </div>
                         </div>
@@ -1229,6 +1281,15 @@ export const CxGNCPage = () => {
                                 setIsGestionModalOpen(true);
                               },
                               show: item.estado === 'ASIGNADO' && hasPermission('cxg.cxg_nc.gestionar')
+                            },
+                            {
+                              label: 'Gestionar Rechazo',
+                              icon: PhoneCall,
+                              onClick: () => {
+                                setSelectedRecord(item);
+                                setIsGestionRechazaOpen(true);
+                              },
+                              show: item.estado === 'RECHAZADO' && !item.procesado_por && hasPermission('cxg.cxg_nc.gestionar_rechazo')
                             }
                           ]}
                         />
@@ -1465,6 +1526,75 @@ export const CxGNCPage = () => {
               placeholder={gestiónResultado === 'false' ? 'Explique el motivo del rechazo...' : 'Detalle el resultado del proceso (ej: N° de Nota SAP...)'}
               value={gestiónObs}
               onChange={(e) => setGestiónObs(e.target.value)}
+            />
+          </div>
+        </div>
+      </SIATCModalWrapper>
+      {/* ─────────────────────────────────────────── */}
+      {/* Gestionar Rechazo Modal */}
+      {/* ─────────────────────────────────────────── */}
+      <SIATCModalWrapper
+        isOpen={isGestionRechazaOpen}
+        onClose={() => setIsGestionRechazaOpen(false)}
+        title="Gestionar Rechazo con Cliente"
+        subtitle={selectedRecord ? `${selectedRecord.tipo} #${selectedRecord.correlativo} — ${selectedRecord.cliente}` : ''}
+        footer={
+          <>
+            <SIATCButton variant="ghost" onClick={() => setIsGestionRechazaOpen(false)}>Cancelar</SIATCButton>
+            <SIATCButton
+              variant="primary"
+              icon={PhoneCall}
+              onClick={handleGestionarRechazo}
+              isLoading={isSubmitting}
+              disabled={!gestionRechazoForm.motivo || !gestionRechazoForm.observacion}
+            >
+              Confirmar Gestión
+            </SIATCButton>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div className="p-4 bg-rose-50 dark:bg-rose-950/20 rounded-xl border border-rose-200 dark:border-rose-800">
+            <p className="text-[10px] font-black uppercase tracking-widest text-rose-600 dark:text-rose-400 mb-1">Motivo del Rechazo (Supervisor)</p>
+            <p className="text-sm font-bold text-foreground">{selectedRecord?.aprobado_motivo || '—'}</p>
+            {selectedRecord?.aprobado_observacion && (
+              <p className="text-xs text-muted-foreground mt-1">{selectedRecord.aprobado_observacion}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-3 block tracking-widest pl-4">¿Cómo respondió el cliente?</label>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {([
+                { value: 'ACEPTO',   label: 'Aceptó',    activeClass: 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-lg shadow-emerald-500/10' },
+                { value: 'RECLAMO',  label: 'Reclamó',   activeClass: 'border-amber-500 bg-amber-50 text-amber-700 shadow-lg shadow-amber-500/10' },
+                { value: 'ESCALADO', label: 'Se escaló', activeClass: 'border-rose-500 bg-rose-50 text-rose-700 shadow-lg shadow-rose-500/10' },
+              ] as const).map(({ value, label, activeClass }) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setGestionRechazoForm(f => ({ ...f, motivo: value }))}
+                  className={`flex flex-col items-center justify-center gap-1 p-3 rounded-xl border-2 transition-all font-bold text-sm ${
+                    gestionRechazoForm.motivo === value
+                      ? activeClass
+                      : 'border-border text-muted-foreground hover:bg-muted/50'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground mb-1.5 block tracking-widest pl-4">
+              Observaciones <span className="text-rose-500 font-bold ml-1">(REQUERIDO)</span>
+            </label>
+            <textarea
+              className={`${SIATC_THEME.COMPONENTS.INPUT} h-24 pt-2 resize-none`}
+              placeholder="Describe la conversación con el cliente..."
+              value={gestionRechazoForm.observacion}
+              onChange={(e) => setGestionRechazoForm(f => ({ ...f, observacion: e.target.value }))}
             />
           </div>
         </div>
