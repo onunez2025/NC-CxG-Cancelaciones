@@ -31,7 +31,7 @@ export type Permission =
     | 'dashboard.view'
     | 'budget.view' | 'budget.create' | 'budget.edit'
     | 'cxg.cancelaciones.view' | 'cxg.cancelaciones.create' | 'cxg.cancelaciones.assign' | 'cxg.cancelaciones.gestionar' | 'cxg.cancelaciones.process'
-    | 'cxg.cxg_nc.view' | 'cxg.cxg_nc.create' | 'cxg.cxg_nc.approve' | 'cxg.cxg_nc.assign' | 'cxg.cxg_nc.gestionar' | 'cxg.cxg_nc.process'
+    | 'cxg.cxg_nc.view' | 'cxg.cxg_nc.create' | 'cxg.cxg_nc.approve' | 'cxg.cxg_nc.assign' | 'cxg.cxg_nc.gestionar' | 'cxg.cxg_nc.process' | 'cxg.cxg_nc.gestionar_rechazo'
     | 'cxg.fsm.view'
     | 'cxg.programa_supervisores.view' | 'cxg.programa_supervisores.create' | 'cxg.programa_supervisores.edit' | 'cxg.programa_supervisores.delete'
     | 'cxg.casos_especiales.view' | 'cxg.casos_especiales.create' | 'cxg.casos_especiales.gestionar'
