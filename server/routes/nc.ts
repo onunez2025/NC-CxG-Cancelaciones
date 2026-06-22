@@ -905,10 +905,10 @@ router.get('/cxg-nc', verifyPermission('cxg.cxg_nc.view'), async (req: Request, 
                     n.Ticket as correlativo,
                     n.Creado_el as fecha_creacion,
                     COALESCE(t.NombreCliente, n.Tienda) as cliente,
-                    CASE 
+                    CASE
+                        WHEN n.Aprobado = 'false' THEN 'RECHAZADO'
                         WHEN n.Procesado = 'true' THEN 'CERRADO'
                         WHEN n.Procesado_por IS NOT NULL AND n.Procesado_por <> '' THEN 'ASIGNADO'
-                        WHEN n.Aprobado = 'false' THEN 'RECHAZADO'
                         WHEN n.Aprobado = 'true' THEN 'APROBADO_SUP'
                         ELSE 'REGISTRADO'
                     END as estado,
@@ -1194,10 +1194,10 @@ router.get('/cxg-nc/:id', verifyPermission('cxg.cxg_nc.view'), async (req: Reque
                     COALESCE(u_creador.FullName, n.Creado_por) as creado_por,
                     COALESCE(t.NombreCliente, n.Tienda) as cliente,
                     n.Observacion as observacion_inicial,
-                    CASE 
+                    CASE
+                        WHEN n.Aprobado = 'false' THEN 'RECHAZADO'
                         WHEN n.Procesado = 'true' THEN 'CERRADO'
                         WHEN n.Procesado_por IS NOT NULL AND n.Procesado_por <> '' THEN 'ASIGNADO'
-                        WHEN n.Aprobado = 'false' THEN 'RECHAZADO'
                         WHEN n.Aprobado = 'true' THEN 'APROBADO_SUP'
                         ELSE 'REGISTRADO'
                     END as estado,
@@ -1722,11 +1722,11 @@ router.post('/cxg-nc/:id/gestionar', verifyPermission('cxg.cxg_nc.process'), asy
         const { observacion, gestionado_por, resultado, motivo } = req.body;
         const pool = await getDbConnection();
         const checkState = await pool.request().input('id', sql.VarChar(255), id).query(`
-            SELECT 
-                CASE 
+            SELECT
+                CASE
+                    WHEN Aprobado = 'false' THEN 'RECHAZADO'
                     WHEN Procesado = 'true' THEN 'CERRADO'
                     WHEN Procesado_por IS NOT NULL AND Procesado_por <> '' THEN 'ASIGNADO'
-                    WHEN Aprobado = 'false' THEN 'RECHAZADO'
                     WHEN Aprobado = 'true' THEN 'APROBADO_SUP'
                     ELSE 'REGISTRADO'
                 END as Estado_Proceso
@@ -1768,6 +1768,87 @@ router.post('/cxg-nc/:id/gestionar', verifyPermission('cxg.cxg_nc.process'), asy
             `);
 
         res.json({ message: 'Solicitud procesada correctamente' });
+    } catch (error: unknown) {
+        res.status(500).json({ error: safeError(error) });
+    }
+});
+
+// ─────────────────────────────────────────────
+// CXG/NC: Gestionar Rechazo (Asesor informa al cliente)
+// ─────────────────────────────────────────────
+
+router.post('/cxg-nc/:id/gestionar-rechazo', verifyPermission('cxg.cxg_nc.gestionar_rechazo'), async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { motivo, observacion, gestionado_por } = req.body;
+
+        if (!motivo || !observacion) {
+            return res.status(400).json({ error: 'Motivo y observación son requeridos.' });
+        }
+
+        const pool = await getDbConnection();
+        const checkState = await pool.request()
+            .input('id', sql.VarChar(255), id)
+            .query(`
+                SELECT
+                    CASE
+                        WHEN Aprobado = 'false' THEN 'RECHAZADO'
+                        WHEN Procesado = 'true' THEN 'CERRADO'
+                        WHEN Procesado_por IS NOT NULL AND Procesado_por <> '' THEN 'ASIGNADO'
+                        WHEN Aprobado = 'true' THEN 'APROBADO_SUP'
+                        ELSE 'REGISTRADO'
+                    END as Estado_Proceso,
+                    Procesado_por
+                FROM [dbo].[GAC_APP_TB_CXG_NC]
+                WHERE ID_Apro_CxG_NC = @id
+            `);
+
+        if (checkState.recordset.length === 0) {
+            return res.status(404).json({ error: 'Solicitud no encontrada' });
+        }
+
+        const { Estado_Proceso, Procesado_por } = checkState.recordset[0];
+
+        if (Estado_Proceso !== 'RECHAZADO') {
+            return res.status(400).json({ error: `Acción inválida. Estado actual: ${Estado_Proceso}. Se requiere: RECHAZADO.` });
+        }
+        if (Procesado_por) {
+            return res.status(409).json({ error: 'Este rechazo ya fue gestionado.' });
+        }
+
+        const histId = Math.random().toString(16).substring(2, 10).toUpperCase();
+        const userDisplayName = await getAuthenticatedUserDisplayName(req, gestionado_por);
+
+        await pool.request()
+            .input('id', sql.VarChar(255), id)
+            .input('motivo', sql.VarChar(50), motivo)
+            .input('observacion', sql.NVarChar(500), observacion)
+            .input('gestionado_por', sql.VarChar(255), userDisplayName)
+            .query(`
+                UPDATE [dbo].[GAC_APP_TB_CXG_NC]
+                SET
+                    Procesado_motivo   = @motivo,
+                    Procesado_observacion = @observacion,
+                    Procesado_por      = @gestionado_por,
+                    Procesado_el       = GETDATE()
+                WHERE ID_Apro_CxG_NC = @id
+                  AND Aprobado = 'false'
+                  AND (Procesado_por IS NULL OR Procesado_por = '')
+            `);
+
+        await pool.request()
+            .input('histId', sql.VarChar(255), histId)
+            .input('solicitud', sql.VarChar(255), id)
+            .input('tipo', sql.VarChar(255), 'Gestión de Rechazo')
+            .input('obs', sql.NVarChar(500), `${motivo} — ${observacion}`)
+            .input('usuario', sql.VarChar(255), userDisplayName)
+            .query(`
+                INSERT INTO [dbo].[GAC_APP_TB_HISTOTIAL_APROB_CXG_NC]
+                (ID_Historial_Apro_CxG_NC, Solicitud, Tipo, Observacion, Creado_el, Creado_por)
+                VALUES (@histId, @solicitud, @tipo, @obs, GETDATE(), @usuario)
+            `);
+
+        res.json({ message: 'Gestión de rechazo registrada correctamente' });
     } catch (error: unknown) {
         res.status(500).json({ error: safeError(error) });
     }
