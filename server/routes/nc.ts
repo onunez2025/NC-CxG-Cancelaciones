@@ -767,7 +767,7 @@ router.get('/cxg-nc/unique-values', verifyPermission('cxg.cxg_nc.view'), async (
             supervisor: 'COALESCE(sup_cas.supervisor_nombre, sup_sole.supervisor_nombre)',
             aprobado: 'n.Aprobado',
             procesado: 'n.Procesado',
-            estado: 'CASE WHEN n.Procesado IS NOT NULL AND n.Procesado <> \'\' AND n.Procesado <> \'NO\' THEN \'CERRADO\' WHEN n.Procesado_por IS NOT NULL AND n.Procesado_por <> \'\' THEN \'ASIGNADO\' WHEN n.Aprobado = \'No\' THEN \'RECHAZADO\' WHEN n.Aprobado = \'Si\' THEN \'APROBADO_SUP\' ELSE \'REGISTRADO\' END',
+            estado: 'CASE WHEN n.Aprobado = \'false\' THEN \'RECHAZADO\' WHEN n.Procesado = \'true\' THEN \'CERRADO\' WHEN n.Procesado_por IS NOT NULL AND n.Procesado_por <> \'\' THEN \'ASIGNADO\' WHEN n.Aprobado = \'true\' THEN \'APROBADO_SUP\' ELSE \'REGISTRADO\' END',
             codigo_producto: 't.CodigoExternoEquipo',
             producto: 't.NombreEquipo'
         };
