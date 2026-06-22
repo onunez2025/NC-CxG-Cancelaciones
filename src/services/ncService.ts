@@ -394,5 +394,17 @@ export const ncService = {
         const response = await apiClient(`${API_BASE_URL}/cancelaciones/analistas`);
         if (!response.ok) throw new Error('Error al obtener analistas para asignación');
         return response.json();
+    },
+
+    async gestionarRechazoCxGNC(id: string, data: {
+        motivo: 'ACEPTO' | 'RECLAMO' | 'ESCALADO';
+        observacion: string;
+        gestionado_por: string;
+    }): Promise<void> {
+        const response = await apiClient(`${API_BASE_URL}/cxg-nc/${id}/gestionar-rechazo`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error('Error al gestionar rechazo de CxG/NC');
     }
 };
