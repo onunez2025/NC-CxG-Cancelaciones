@@ -1785,6 +1785,9 @@ router.post('/cxg-nc/:id/gestionar-rechazo', verifyPermission('cxg.cxg_nc.gestio
         if (!motivo || !observacion) {
             return res.status(400).json({ error: 'Motivo y observación son requeridos.' });
         }
+        if (!['ACEPTO', 'RECLAMO', 'ESCALADO'].includes(motivo)) {
+            return res.status(400).json({ error: 'Motivo inválido. Valores permitidos: ACEPTO, RECLAMO, ESCALADO.' });
+        }
 
         const pool = await getDbConnection();
         const checkState = await pool.request()
