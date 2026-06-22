@@ -26,7 +26,7 @@ async function migrate() {
 
             await pool.request()
                 .input('id', sql.UniqueIdentifier, user.Id)
-                .input('hash', sql.NVarChar, hashedPwd)
+                .input('hash', sql.NVarChar(sql.MAX), hashedPwd)
                 .query(`
                     UPDATE EBM.Users 
                     SET PasswordHash = @hash 

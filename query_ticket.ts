@@ -15,7 +15,7 @@ async function main() {
         
         if (res1.recordset.length > 0) {
             const id = res1.recordset[0].ID_Apro_CxG_NC;
-            const res2 = await request.input('id', sql.VarChar, id).query(`
+            const res2 = await request.input('id', sql.VarChar(255), id).query(`
                 SELECT * FROM [dbo].[GAC_APP_TB_HISTOTIAL_APROB_CXG_NC]
                 WHERE Solicitud = @id
             `);
