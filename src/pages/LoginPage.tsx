@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
@@ -24,9 +24,12 @@ export function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const submittingRef = useRef(false);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (submittingRef.current) return;
+        submittingRef.current = true;
         setError('');
         setLoading(true);
 
@@ -53,6 +56,7 @@ export function LoginPage() {
             setError((err instanceof Error ? err.message : null) || t('auth.errors.invalid') || 'Credenciales inválidas');
         } finally {
             setLoading(false);
+            submittingRef.current = false;
         }
     };
 
