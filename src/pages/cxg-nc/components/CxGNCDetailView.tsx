@@ -332,6 +332,57 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, is
               </div>
             )}
 
+            {/* Sección: Gestión del Rechazo */}
+            {detailData.estado === 'RECHAZADO' && (
+              <div className={`p-4 rounded-xl border ${detailData.procesado_por ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800'}`}>
+                <h3 className={`text-xs font-black uppercase tracking-widest mb-4 ${detailData.procesado_por ? 'text-emerald-700 dark:text-emerald-400' : 'text-muted-foreground'}`}>
+                  Gestión con el Cliente
+                </h3>
+                {detailData.procesado_por ? (
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold text-muted-foreground uppercase">Resultado</span>
+                      <span className={`text-sm font-black ${
+                        detailData.procesado_motivo === 'ACEPTO' ? 'text-emerald-600' :
+                        detailData.procesado_motivo === 'RECLAMO' ? 'text-amber-600' :
+                        'text-rose-600'
+                      }`}>
+                        {detailData.procesado_motivo === 'ACEPTO' ? 'Cliente Aceptó' :
+                         detailData.procesado_motivo === 'RECLAMO' ? 'Cliente Reclamó' :
+                         detailData.procesado_motivo === 'ESCALADO' ? 'Se Escaló' :
+                         detailData.procesado_motivo || '—'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-start gap-4">
+                      <span className="text-xs font-bold text-muted-foreground uppercase shrink-0">Observaciones</span>
+                      <span className="text-xs text-foreground text-right">{detailData.procesado_observacion || '—'}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold text-muted-foreground uppercase">Gestionado por</span>
+                      <span className="text-xs font-semibold">{detailData.procesado_por}</span>
+                    </div>
+                    {detailData.procesado_el && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold text-muted-foreground uppercase">Fecha</span>
+                        <span className="text-xs font-mono text-muted-foreground">
+                          {new Date(detailData.procesado_el).toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-3 py-2">
+                    <p className="text-xs text-muted-foreground text-center">El rechazo aún no ha sido gestionado con el cliente.</p>
+                    {actions?.canGestionarRechazo && (
+                      <SIATCButton variant="info" size="sm" icon={PhoneCall} onClick={actions.onGestionarRechazo}>
+                        Gestionar Rechazo
+                      </SIATCButton>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Equipment History */}
             <div className="p-4 rounded-xl bg-cyan-50 dark:bg-cyan-950/20 border border-cyan-100 dark:border-cyan-800">
               <h3 className="text-xs font-black uppercase tracking-widest text-cyan-700 dark:text-cyan-400 mb-4 flex items-center gap-2">
