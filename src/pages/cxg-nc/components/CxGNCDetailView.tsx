@@ -134,11 +134,6 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, is
               Volver a intentar (Clonar)
             </SIATCButton>
           )}
-          {actions?.canGestionarRechazo && (
-            <SIATCButton variant="info" size="sm" icon={PhoneCall} onClick={actions.onGestionarRechazo}>
-              Gestionar Rechazo
-            </SIATCButton>
-          )}
         </div>
       </div>
 
@@ -365,7 +360,7 @@ export const CxGNCDetailView: React.FC<CxGNCDetailViewProps> = ({ detailData, is
                       <div className="flex justify-between items-center">
                         <span className="text-xs font-bold text-muted-foreground uppercase">Fecha</span>
                         <span className="text-xs font-mono text-muted-foreground">
-                          {new Date(detailData.procesado_el).toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          {new Date(detailData.procesado_el).toLocaleString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
                     )}
