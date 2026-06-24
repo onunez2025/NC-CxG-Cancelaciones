@@ -204,6 +204,7 @@ export const CxGNCPage = () => {
 
   // Ticket Validation State
   const [isTicketValidated, setIsTicketValidated] = useState(false);
+  const [existingTicketRequests, setExistingTicketRequests] = useState<CxGNC[]>([]);
 
   // Form state
   const [formData, setFormData] = useState<Partial<CxGNC>>({
@@ -396,14 +397,15 @@ export const CxGNCPage = () => {
         return;
       }
 
-      // Check for existing requests for this ticket
+      // Check for existing active requests for this ticket (excludes CERRADO y RECHAZADO)
+      setExistingTicketRequests([]);
       const existingRequests = await ncService.getCxGNC({ search: formData.ticket, pageSize: 50 });
       const ticketRequests = existingRequests.data.filter(r => r.correlativo === formData.ticket);
-      
-      const hasActiveRequest = ticketRequests.some(r => r.estado !== 'RECHAZADO');
-      if (hasActiveRequest) {
+
+      const activeRequests = ticketRequests.filter(r => r.estado !== 'RECHAZADO' && r.estado !== 'CERRADO');
+      if (activeRequests.length > 0) {
+        setExistingTicketRequests(activeRequests);
         setIsTicketValidated(false);
-        toast.error('Solicitud Existente', 'Este ticket ya cuenta con una solicitud de CxG/NC en proceso o aprobada.');
         return;
       }
 
@@ -677,6 +679,8 @@ export const CxGNCPage = () => {
           isLookingUp={isLookingUp}
           isTicketValidated={isTicketValidated}
           setIsTicketValidated={setIsTicketValidated}
+          existingTicketRequests={existingTicketRequests}
+          setExistingTicketRequests={setExistingTicketRequests}
           handleLookupTicket={handleLookupTicket}
           handleCreate={handleCreate}
           onCancel={() => setIsModalOpen(false)}
