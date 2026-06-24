@@ -8,6 +8,7 @@ import { verifyToken } from '../middleware/auth.js';
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_development_secret_do_not_use';
+const APP_CODE = process.env.APP_CODE || 'CXG';
 
 const loginSchema = z.object({
     username: z.string().min(1, 'Usuario requerido').max(255),
@@ -42,7 +43,9 @@ router.post('/login', async (req: Request, res: Response) => {
                     u.Language as language,
                     u.Theme as theme,
                     u.AvatarUrl as avatar_url,
-                    u.Apps as apps
+                    u.Apps as apps,
+                    r.InactivityTimeoutMinutes as role_timeout,
+                    r.WarningBeforeMinutes as role_warning
                 FROM EBM.Users u
                 LEFT JOIN EBM.Roles r ON u.RoleId = r.Id
                 LEFT JOIN EBM.Managements m ON u.ManagementId = m.Id
@@ -61,6 +64,16 @@ router.post('/login', async (req: Request, res: Response) => {
         const permsResult = await permsReq.query('SELECT Permission FROM EBM.RolePermissions WHERE RoleId = @roleId');
 
         user.permissions = permsResult.recordset.map((p: { Permission: string }) => p.Permission);
+
+        // Fetch app session config for inactivity timeout fallback
+        const appCfgReq = pool.request();
+        addInput(appCfgReq, 'appCode', sql.VarChar(20), APP_CODE);
+        const appCfgResult = await appCfgReq.query(
+            'SELECT DefaultInactivityTimeoutMinutes, DefaultWarningBeforeMinutes FROM EBM.AppSessionConfig WHERE UPPER(AppCode) = UPPER(@appCode)'
+        );
+        const appCfg = appCfgResult.recordset[0];
+        const timeoutMinutes: number = user.role_timeout ?? appCfg?.DefaultInactivityTimeoutMinutes ?? 30;
+        const warningMinutes: number = user.role_warning ?? appCfg?.DefaultWarningBeforeMinutes ?? 2;
 
         // Compare hashed password
         const isMatch = await bcrypt.compare(password, user.password_hash);
@@ -97,7 +110,8 @@ router.post('/login', async (req: Request, res: Response) => {
 
         res.json({
             user: safeUser,
-            token
+            token,
+            sessionConfig: { timeoutMinutes, warningMinutes }
         });
 
     } catch (error: unknown) {

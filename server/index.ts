@@ -75,14 +75,15 @@ const limiter = rateLimit({
     message: { error: 'Too many requests from this IP, please try again later.' },
 });
 app.use(limiter);
-const authLimiter = rateLimit({
-    windowMs: 5 * 60 * 1000,
-    max: 50,
+// Auth rate limiter — starts with safe defaults, overwritten from EBM.AppSessionConfig at startup
+let authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
     skipSuccessfulRequests: true,
     store: redisStore(),
-    message: { error: 'Too many login attempts, please try again after 5 minutes.' },
+    message: { error: 'Too many login attempts, please try again later.' },
 });
-app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/login', (req: Request, res: Response, next: NextFunction) => authLimiter(req, res, next));
 
 // CORS Validation
 app.use(cors({
@@ -275,6 +276,18 @@ app.listen(port, () => {
     // Fetch app metadata from DB for OG tags
     fetchAppMeta();
 
+    // Load session config and replace rate limiter with DB values
+    fetchSessionConfig().then(cfg => {
+        authLimiter = rateLimit({
+            windowMs: cfg.rateLimitWindowMinutes * 60 * 1000,
+            max: cfg.rateLimitMaxAttempts,
+            skipSuccessfulRequests: true,
+            store: redisStore(),
+            message: { error: `Too many login attempts, please try again after ${cfg.rateLimitWindowMinutes} minutes.` },
+        });
+        console.log(`[SessionConfig] Auth limiter: ${cfg.rateLimitMaxAttempts} intentos / ${cfg.rateLimitWindowMinutes} min`);
+    }).catch(err => console.error('[SessionConfig] Failed to load rate limit config:', err));
+
     // Ensure SQL Views are always up-to-date (CREATE OR ALTER — idempotent)
     setupSapViews()
         .then(() => console.log('[Views] SQL Views initialized/updated.'))
@@ -288,6 +301,28 @@ const APP_CODE = process.env.APP_CODE || 'CXG';
 
 interface AppMeta { label: string; logoUrl: string; url: string; }
 let appMeta: AppMeta | null = null;
+
+interface SessionConfig { rateLimitMaxAttempts: number; rateLimitWindowMinutes: number; }
+
+async function fetchSessionConfig(): Promise<SessionConfig> {
+    try {
+        const pool = await getDbConnection();
+        const r = pool.request();
+        addInput(r, 'code', sql.VarChar(20), APP_CODE);
+        const result = await r.query(`
+            SELECT RateLimitMaxAttempts, RateLimitWindowMinutes
+            FROM EBM.AppSessionConfig
+            WHERE UPPER(AppCode) = UPPER(@code)
+        `);
+        if (result.recordset.length > 0) {
+            const row = result.recordset[0];
+            return { rateLimitMaxAttempts: row.RateLimitMaxAttempts, rateLimitWindowMinutes: row.RateLimitWindowMinutes };
+        }
+    } catch (err: unknown) {
+        console.warn('[SessionConfig] Could not fetch from DB, using defaults:', (err as Error).message);
+    }
+    return { rateLimitMaxAttempts: 20, rateLimitWindowMinutes: 15 };
+}
 
 async function fetchAppMeta(): Promise<void> {
     try {
