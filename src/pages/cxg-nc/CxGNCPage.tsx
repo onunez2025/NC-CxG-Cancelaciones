@@ -378,7 +378,7 @@ export const CxGNCPage = () => {
       });
     } catch (error: unknown) {
       console.error(error);
-      const errMsg = (error as { response?: { data?: { error?: string } } })?.response?.data?.error;
+      const errMsg = error instanceof Error ? error.message : undefined;
       toast.error('Error al Registrar', errMsg || 'No se pudo registrar la solicitud. Verifique que el ticket no haya sido registrado previamente.');
     } finally {
       setIsSubmitting(false);
@@ -398,7 +398,7 @@ export const CxGNCPage = () => {
 
       // Check for existing requests for this ticket
       const existingRequests = await ncService.getCxGNC({ search: formData.ticket, pageSize: 50 });
-      const ticketRequests = existingRequests.data.filter(r => r.ticket === formData.ticket);
+      const ticketRequests = existingRequests.data.filter(r => r.correlativo === formData.ticket);
       
       const hasActiveRequest = ticketRequests.some(r => r.estado !== 'RECHAZADO');
       if (hasActiveRequest) {
@@ -643,7 +643,7 @@ export const CxGNCPage = () => {
               setSelectedRecord(detailData);
               setIsAssignModalOpen(true);
             },
-            canManage: detailData?.estado === 'ASIGNADO' && hasPermission('cxg.cxg_nc.gestionar'),
+            canManage: detailData?.estado === 'ASIGNADO' && hasPermission('cxg.cxg_nc.process'),
             onManage: () => {
               setSelectedRecord(detailData);
               setIsGestionModalOpen(true);
@@ -1280,7 +1280,7 @@ export const CxGNCPage = () => {
                                 setSelectedRecord(item);
                                 setIsGestionModalOpen(true);
                               },
-                              show: item.estado === 'ASIGNADO' && hasPermission('cxg.cxg_nc.gestionar')
+                              show: item.estado === 'ASIGNADO' && hasPermission('cxg.cxg_nc.process')
                             },
                             {
                               label: 'Gestionar Rechazo',

@@ -298,7 +298,10 @@ export const ncService = {
             method: 'POST',
             body: JSON.stringify(data)
         });
-        if (!response.ok) throw new Error('Error al crear CxG/NC');
+        if (!response.ok) {
+            const body = await response.json().catch(() => ({})) as { error?: string };
+            throw new Error(body?.error || 'Error al crear CxG/NC');
+        }
         return response.json();
     },
 

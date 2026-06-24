@@ -1501,11 +1501,11 @@ router.post('/cxg-nc', verifyPermission('cxg.cxg_nc.create'), async (req: Reques
 
         // Resolve store name via C4C OData if not provided by frontend
         let finalLugarCompra = lugar_compra;
-        if (!finalLugarCompra && ticket) {
+        const sapBaseUrl = process.env.SAP_BASE_URL;
+        const sapUser = process.env.SAP_USER;
+        const sapPassword = process.env.SAP_PASSWORD;
+        if (!finalLugarCompra && ticket && sapBaseUrl && sapUser && sapPassword) {
             try {
-                const sapBaseUrl = process.env.SAP_BASE_URL || 'https://my361897.crm.ondemand.com/sap/c4c/odata/v1/c4codataapi';
-                const sapUser = process.env.SAP_USER || 'oscar.nunez';
-                const sapPassword = process.env.SAP_PASSWORD || '9xP6*epfuhWx4rK';
                 const authHeader = 'Basic ' + Buffer.from(`${sapUser}:${sapPassword}`).toString('base64');
                 const url = `${sapBaseUrl}/ServiceRequestCollection?$filter=ID eq '${ticket}'&$format=json`;
 
@@ -1996,9 +1996,13 @@ router.get('/c4c/report/:ticketId', async (req: Request, res: Response) => {
     try {
         const { ticketId } = req.params;
 
-        const sapBaseUrl = process.env.SAP_BASE_URL || 'https://my361897.crm.ondemand.com/sap/c4c/odata/v1/c4codataapi';
-        const sapUser = process.env.SAP_USER || 'oscar.nunez';
-        const sapPassword = process.env.SAP_PASSWORD || '9xP6*epfuhWx4rK';
+        const sapBaseUrl = process.env.SAP_BASE_URL;
+        const sapUser = process.env.SAP_USER;
+        const sapPassword = process.env.SAP_PASSWORD;
+
+        if (!sapBaseUrl || !sapUser || !sapPassword) {
+            return res.status(503).json({ error: 'Servicio C4C no configurado.' });
+        }
 
         const authHeader = 'Basic ' + Buffer.from(`${sapUser}:${sapPassword}`).toString('base64');
 
