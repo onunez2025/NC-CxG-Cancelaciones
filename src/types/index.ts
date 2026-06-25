@@ -1,6 +1,11 @@
 export type Language = 'es' | 'en';
 export type Theme = 'light' | 'dark';
 
+export interface SessionConfig {
+    timeoutMinutes: number;
+    warningMinutes: number;
+}
+
 export interface User {
     id: string;
     full_name: string;

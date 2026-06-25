@@ -45,10 +45,10 @@ export function LoginPage() {
                 throw new Error(errData.error || t('auth.errors.invalid'));
             }
 
-            const { user, token } = await response.json();
+            const { user, token, sessionConfig } = await response.json();
 
             // Success, register session in Context
-            login(user, token);
+            login(user, token, sessionConfig);
             navigate('/dashboard');
 
         } catch (err: unknown) {
