@@ -164,10 +164,13 @@ check_file() {
         fi
     fi
 
-    # C7-BLACKLIST: archivo con endpoint logout que no llama a blacklistToken
-    if grep -qE "(\/auth\/logout|\/logout)" "$f" 2>/dev/null; then
-        if ! grep -q "blacklistToken" "$f" 2>/dev/null; then
-            dynamic_check "C7-BLACKLIST: endpoint logout sin llamada a blacklistToken()" "$f" ""
+    # C7-BLACKLIST: servidor con endpoint logout que no llama a blacklistToken
+    # Solo aplica a archivos del servidor (no a hooks/componentes frontend que solo LLAMAN al endpoint)
+    if [[ "$f" != */src/* ]]; then
+        if grep -qE "(\/auth\/logout|\/logout)" "$f" 2>/dev/null; then
+            if ! grep -q "blacklistToken" "$f" 2>/dev/null; then
+                dynamic_check "C7-BLACKLIST: endpoint logout sin llamada a blacklistToken()" "$f" ""
+            fi
         fi
     fi
 
