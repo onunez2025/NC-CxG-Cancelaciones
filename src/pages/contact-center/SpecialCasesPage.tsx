@@ -129,7 +129,7 @@ export const SpecialCasesPage = () => {
     setFilterSearchTerm('');
     const col = COLUMNS.find(c => c.id === colId);
     if (col?.filterType === 'fixed' && 'filterValues' in col) {
-      setFilterSuggestions([...(col.filterValues as string[])]);
+      setFilterSuggestions([...(col.filterValues as unknown as string[])]);
     } else if (col?.filterType !== 'date') {
       setFilterSuggestions([]);
     }
