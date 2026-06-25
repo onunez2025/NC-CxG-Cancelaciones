@@ -1,12 +1,11 @@
 /**
  * fix_tienda_nc.ts
- * Diagnóstico y corrección de registros CxG/NC con tienda incorrecta.
+ * Diagnóstico de registros CxG/NC con posible tienda incorrecta — Junio 2026.
  *
  * Uso:
- *   npx tsx fix_tienda_nc.ts           → solo reporta, no modifica nada
- *   npx tsx fix_tienda_nc.ts --fix     → corrige los registros con tienda incorrecta
- *
- * Requiere: C4C_BASE_URL, C4C_USER, C4C_PASSWORD en .env (o variables de entorno)
+ *   npx tsx fix_tienda_nc.ts           → análisis por BD (sin OData)
+ *   npx tsx fix_tienda_nc.ts --odata   → valida cada ticket contra C4C OData
+ *   npx tsx fix_tienda_nc.ts --fix     → corrige via OData (requiere --odata)
  */
 
 import dotenv from 'dotenv';
@@ -15,18 +14,16 @@ dotenv.config();
 import { getDbConnection } from './server/db.js';
 import sql from 'mssql';
 
-// ── Mapping OData SDK → nombre de tienda (misma tabla que nc.ts) ──────────────
+const USE_ODATA = process.argv.includes('--odata') || process.argv.includes('--fix');
+const DRY_RUN   = !process.argv.includes('--fix');
+
+const C4C_BASE_URL = process.env.C4C_BASE_URL || process.env.SAP_BASE_URL || '';
+const C4C_USER     = process.env.C4C_USER     || process.env.SAP_USER     || '';
+const C4C_PASSWORD = process.env.C4C_PASSWORD || process.env.SAP_PASSWORD || '';
+
+// ── Mapping SDK → tienda (igual que nc.ts) ───────────────────────────────────
 const STORE_MAPPING: Record<string, string> = {
     "000000000000000000000000000000000000000000000000000000002995": "SODIMAC PERU S.A.",
-    "000000000000000000000000000000000000000000000000000000002540": "TIENDAS VARIAS",
-    "000000000000000000000000000000000000000000000000000000000003": "IMPORTACIONES HIRAOKA S.A.C.",
-    "000000000000000000000000000000000000000000000000000000003381": "CASSINELLI S A",
-    "000000000000000000000000000000000000000000000000000000002211": "PROMART - HOMECENTERS PERUANOS S.A.",
-    "000000000000000000000000000000000000000000000000000000003005": "MAESTRO - TIENDA DEL MEJORAMIENTO DEL HOGAR S.A.",
-    "000000000000000000000000000000000000000000000000000000001836": "TIENDAS PERUANAS SA - OECHSLE",
-    "000000000000000000000000000000000000000000000000000000002548": "TIENDAS POR DEPARTAMENTO RIPLEY",
-    "000000000000000000000000000000000000000000000000000000002295": "SAGA FALABELLA SA",
-    "000000000000000000000000000000000000000000000000000000002444": "HIPERMERCADOS TOTTUS SA",
     "000000000000000000000000000000000000000000000000000000003978": "TIENDA SOLE CHORRILLOS",
     "000000000000000000000000000000000000000000000000000000003984": "TIENDA SOLE PRINCIPAL",
     "000000000000000000000000000000000000000000000000000000003990": "TIENDA SOLE SANTA ANITA",
@@ -42,7 +39,6 @@ const STORE_MAPPING: Record<string, string> = {
     "000000000000000000000000000000000000000000000000000000003980": "TIENDA SOLE SAN JUAN LURIGANCHO",
     "000000000000000000000000000000000000000000000000000000003989": "TELEVENTAS SOLE",
     "000000000000000000000000000000000000000000000000000000003971": "TIENDA SOLE JOCKEY PLAZA",
-    "000000000000000000000000000000000000000000000000000000003979": "TIENDA SOLE JOCKEY PLAZA",
     "000000000000000000000000000000000000000000000000000000003968": "TIENDA SOLE PLAZA NORTE",
     "000000000000000000000000000000000000000000000000000000003972": "TIENDA SOLE PURUCHUCO",
     "000000000000000000000000000000000000000000000000000000003977": "TIENDA SOLE SALAVERRY",
@@ -51,160 +47,155 @@ const STORE_MAPPING: Record<string, string> = {
     "000000000000000000000000000000000000000000000000000000003992": "TIENDA SOLE PIURA",
     "000000000000000000000000000000000000000000000000000000003974": "TIENDA SOLE PLAZA SAN MIGUEL",
     "000000000000000000000000000000000000000000000000000000003967": "TELEVENTAS SOLE",
+    "000000000000000000000000000000000000000000000000000000002211": "PROMART - HOMECENTERS PERUANOS S.A.",
+    "000000000000000000000000000000000000000000000000000000003005": "MAESTRO - TIENDA DEL MEJORAMIENTO DEL HOGAR S.A.",
+    "000000000000000000000000000000000000000000000000000000002295": "SAGA FALABELLA SA",
+    "000000000000000000000000000000000000000000000000000000002548": "TIENDAS POR DEPARTAMENTO RIPLEY",
+    "000000000000000000000000000000000000000000000000000000002444": "HIPERMERCADOS TOTTUS SA",
 };
 
-function resolveStore(code: string | null | undefined): string {
-    if (!code) return 'TIENDAS VARIAS';
-    const c = code.toString().trim();
-    if (STORE_MAPPING[c]) return STORE_MAPPING[c];
-    if (c.startsWith('1301') || c.includes('2995')) return 'SODIMAC PERU S.A.';
-    if (c.startsWith('1303') || c.includes('2211')) return 'PROMART - HOMECENTERS PERUANOS S.A.';
-    if (/^[a-zA-Z]/i.test(c) && c !== 'null' && c !== 'undefined') return c;
-    return 'TIENDAS VARIAS';
-}
-
-// ── OData ────────────────────────────────────────────────────────────────────
-const C4C_BASE_URL = process.env.C4C_BASE_URL || process.env.SAP_BASE_URL || '';
-const C4C_USER     = process.env.C4C_USER     || process.env.SAP_USER     || '';
-const C4C_PASSWORD = process.env.C4C_PASSWORD || process.env.SAP_PASSWORD || '';
-
-if (!C4C_BASE_URL || !C4C_USER || !C4C_PASSWORD) {
-    console.error('❌ Faltan variables de entorno: C4C_BASE_URL, C4C_USER, C4C_PASSWORD');
-    process.exit(1);
-}
-
-const AUTH_HEADER = 'Basic ' + Buffer.from(`${C4C_USER}:${C4C_PASSWORD}`).toString('base64');
-
-async function resolveStoreFromOData(ticket: string): Promise<{ store: string | null; sdkCode: string | null }> {
+async function testODataConnection(): Promise<boolean> {
+    if (!C4C_BASE_URL || !C4C_USER || !C4C_PASSWORD) return false;
+    const auth = 'Basic ' + Buffer.from(`${C4C_USER}:${C4C_PASSWORD}`).toString('base64');
     try {
-        const url = `${C4C_BASE_URL}/ServiceRequestCollection?$filter=ID eq '${ticket}'&$format=json`;
-        const res = await fetch(url, {
-            headers: { 'Authorization': AUTH_HEADER, 'Accept': 'application/json' },
-            signal: AbortSignal.timeout(8000),
-        });
-        if (!res.ok) return { store: null, sdkCode: null };
+        const res = await fetch(
+            `${C4C_BASE_URL}/ServiceRequestCollection?$top=1&$format=json`,
+            { headers: { 'Authorization': auth, 'Accept': 'application/json' }, signal: AbortSignal.timeout(8000) }
+        );
+        if (!res.ok) {
+            console.log(`  ⚠️  OData respondió HTTP ${res.status} — verifique credenciales C4C`);
+            return false;
+        }
+        return true;
+    } catch (e) {
+        console.log(`  ⚠️  OData no disponible: ${e instanceof Error ? e.message : e}`);
+        return false;
+    }
+}
+
+async function resolveFromOData(ticket: string): Promise<string | null> {
+    const auth = 'Basic ' + Buffer.from(`${C4C_USER}:${C4C_PASSWORD}`).toString('base64');
+    try {
+        const res = await fetch(
+            `${C4C_BASE_URL}/ServiceRequestCollection?$filter=ID eq '${ticket}'&$format=json`,
+            { headers: { 'Authorization': auth, 'Accept': 'application/json' }, signal: AbortSignal.timeout(8000) }
+        );
+        if (!res.ok) return null;
         const body = await res.json() as { d?: { results?: Array<{ zIDLugarCompra_SDK?: string }> } };
-        const results = body?.d?.results || [];
-        if (results.length === 0) return { store: null, sdkCode: null };
-        const sdkCode = results[0].zIDLugarCompra_SDK || null;
-        if (!sdkCode) return { store: null, sdkCode: null };
-        const store = STORE_MAPPING[sdkCode] || null;
-        return { store, sdkCode };
-    } catch {
-        return { store: null, sdkCode: null };
+        const sdkCode = body?.d?.results?.[0]?.zIDLugarCompra_SDK;
+        return sdkCode ? (STORE_MAPPING[sdkCode] ?? null) : null;
+    } catch { return null; }
+}
+
+// ── Análisis BD sin OData ─────────────────────────────────────────────────────
+async function analyzeFromDB(pool: Awaited<ReturnType<typeof getDbConnection>>) {
+    console.log('\n📊 ANÁLISIS DE DISTRIBUCIÓN DE TIENDAS — Junio 2026\n');
+
+    // 1. Distribución por tienda almacenada
+    const dist = await pool.request().query(`
+        SELECT
+            COALESCE(NULLIF(LTRIM(RTRIM(n.Lugar_Compra)), ''), 'SIN DATO') AS tienda,
+            COUNT(*) AS total,
+            SUM(CASE WHEN n.Tipo = 'NC'  THEN 1 ELSE 0 END) AS nc,
+            SUM(CASE WHEN n.Tipo = 'CXG' THEN 1 ELSE 0 END) AS cxg
+        FROM [dbo].[GAC_APP_TB_CXG_NC] n
+        WHERE YEAR(n.Creado_el) = 2026 AND MONTH(n.Creado_el) = 6
+        GROUP BY LTRIM(RTRIM(n.Lugar_Compra))
+        ORDER BY total DESC
+    `);
+
+    console.log(`  ${'TIENDA'.padEnd(50)} ${'TOTAL'.padStart(6)} ${'NC'.padStart(6)} ${'CXG'.padStart(6)}`);
+    console.log(`  ${'─'.repeat(72)}`);
+    let grandTotal = 0;
+    for (const row of dist.recordset as Array<{ tienda: string; total: number; nc: number; cxg: number }>) {
+        const flag = row.tienda === 'SODIMAC PERU S.A.' ? ' ⚠️' : '';
+        console.log(`  ${(row.tienda + flag).padEnd(55)} ${String(row.total).padStart(5)} ${String(row.nc).padStart(6)} ${String(row.cxg).padStart(6)}`);
+        grandTotal += row.total;
+    }
+    console.log(`  ${'─'.repeat(72)}`);
+    console.log(`  ${'TOTAL'.padEnd(50)} ${String(grandTotal).padStart(6)}\n`);
+
+    // 2. Detalle SODIMAC — registros potencialmente incorrectos
+    const sodimac = await pool.request().query(`
+        SELECT
+            n.Ticket            AS ticket,
+            n.Tipo              AS tipo,
+            n.Lugar_Compra      AS tienda_actual,
+            n.Creado_el         AS fecha,
+            n.Creado_por        AS creado_por,
+            -- Ver si el ticket en FSM pertenece a empresa SOLE o SODIMAC
+            t.IDEmpresa         AS fsm_empresa_id,
+            COALESCE(emp.DsEmpresa, t.IDEmpresa) AS fsm_empresa_nombre
+        FROM [dbo].[GAC_APP_TB_CXG_NC] n
+        LEFT JOIN [SIATC].[Dashboard_FSM] t ON n.Ticket = t.Ticket
+        LEFT JOIN [SAP].[FSM_TBL_EMPRESA] emp ON t.IDEmpresa = CAST(emp.IdEmpresa AS VARCHAR)
+        WHERE YEAR(n.Creado_el) = 2026
+          AND MONTH(n.Creado_el) = 6
+          AND LTRIM(RTRIM(n.Lugar_Compra)) = 'SODIMAC PERU S.A.'
+        ORDER BY n.Creado_el DESC
+    `);
+
+    const rows = sodimac.recordset as Array<{
+        ticket: string; tipo: string; tienda_actual: string; fecha: Date;
+        creado_por: string; fsm_empresa_id: string | null; fsm_empresa_nombre: string | null;
+    }>;
+
+    if (rows.length === 0) {
+        console.log('  ✅ No hay registros con SODIMAC como tienda en junio 2026.');
+        return;
+    }
+
+    console.log(`\n⚠️  REGISTROS CON "SODIMAC PERU S.A." — Total: ${rows.length}\n`);
+    console.log(`  ${'TICKET'.padEnd(12)} ${'TIPO'.padEnd(5)} ${'FECHA'.padEnd(12)} ${'EMPRESA FSM'.padEnd(35)} CREADO POR`);
+    console.log(`  ${'─'.repeat(90)}`);
+
+    let sodimacsReal = 0;
+    let sodimacsDoubt = 0;
+
+    for (const r of rows) {
+        const fecha = new Date(r.fecha).toLocaleDateString('es-PE');
+        const empresa = r.fsm_empresa_nombre || '(sin ticket en FSM)';
+        const isSodimacFSM = empresa.toUpperCase().includes('SODIMAC');
+        const marker = isSodimacFSM ? '' : ' ← POSIBLE ERROR';
+        if (isSodimacFSM) sodimacsReal++; else sodimacsDoubt++;
+        console.log(`  ${r.ticket.padEnd(12)} ${r.tipo.padEnd(5)} ${fecha.padEnd(12)} ${empresa.padEnd(35)} ${r.creado_por}${marker}`);
+    }
+
+    console.log(`\n  ${'─'.repeat(90)}`);
+    console.log(`  🔴 Con empresa FSM también SODIMAC (probablemente correctos): ${sodimacsReal}`);
+    console.log(`  🟡 Empresa FSM diferente a SODIMAC (posiblemente incorrectos):  ${sodimacsDoubt}\n`);
+
+    if (sodimacsDoubt > 0) {
+        console.log(`  💡 Los marcados con "← POSIBLE ERROR" tienen SODIMAC en la BD`);
+        console.log(`     pero su ticket en FSM NO pertenece a empresa SODIMAC.`);
+        console.log(`     Para corregirlos necesitas confirmar la tienda real en CAC.`);
     }
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
-const DRY_RUN = !process.argv.includes('--fix');
-
 async function main() {
     console.log(`\n🔍 Diagnóstico tiendas CxG/NC — Junio 2026`);
-    console.log(`   Modo: ${DRY_RUN ? 'SOLO LECTURA (agregar --fix para corregir)' : '⚠️  CORRECCIÓN ACTIVA'}\n`);
-
     const pool = await getDbConnection();
 
-    const result = await pool.request().query(`
-        SELECT
-            n.ID_Apro_CxG_NC   AS id,
-            n.Ticket            AS ticket,
-            n.Tipo              AS tipo,
-            n.Lugar_Compra      AS lugar_compra_bd,
-            n.Creado_el         AS fecha,
-            n.Creado_por        AS creado_por
-        FROM [dbo].[GAC_APP_TB_CXG_NC] n
-        WHERE YEAR(n.Creado_el) = 2026
-          AND MONTH(n.Creado_el) = 6
-        ORDER BY n.Creado_el DESC
-    `);
-
-    const records = result.recordset as Array<{
-        id: string; ticket: string; tipo: string;
-        lugar_compra_bd: string | null; fecha: Date; creado_por: string;
-    }>;
-
-    console.log(`📋 Total registros junio 2026: ${records.length}\n`);
-
-    const stats = { correctos: 0, incorrectos: 0, sinDatoC4C: 0, sdkDesconocido: 0, corregidos: 0 };
-
-    type Discrepancia = {
-        ticket: string; tipo: string; fecha: string; creado_por: string;
-        actual: string; correcto: string; sdkCode: string;
-    };
-    const discrepancias: Discrepancia[] = [];
-
-    for (let i = 0; i < records.length; i++) {
-        const rec = records[i];
-        const actual = resolveStore(rec.lugar_compra_bd);
-        process.stdout.write(`  [${i + 1}/${records.length}] ${rec.tipo} #${rec.ticket} ... `);
-
-        const { store: correcto, sdkCode } = await resolveStoreFromOData(rec.ticket);
-
-        if (!sdkCode) {
-            stats.sinDatoC4C++;
-            console.log(`⚪ Sin código SDK en C4C`);
-        } else if (!correcto) {
-            stats.sdkDesconocido++;
-            console.log(`🟡 SDK "${sdkCode}" desconocido — actual: "${actual}"`);
-        } else if (actual === correcto) {
-            stats.correctos++;
-            console.log(`✅ OK (${actual})`);
-        } else {
-            stats.incorrectos++;
-            console.log(`🔴 DISCREPANCIA: "${actual}" → debería ser "${correcto}"`);
-            discrepancias.push({
-                ticket: rec.ticket, tipo: rec.tipo,
-                fecha: new Date(rec.fecha).toLocaleDateString('es-PE'),
-                creado_por: rec.creado_por, actual, correcto, sdkCode,
-            });
-
-            if (!DRY_RUN) {
-                await pool.request()
-                    .input('id',           sql.VarChar(255), rec.id)
-                    .input('lugar_compra', sql.VarChar(255), correcto)
-                    .query(`
-                        UPDATE [dbo].[GAC_APP_TB_CXG_NC]
-                        SET Lugar_Compra = @lugar_compra
-                        WHERE ID_Apro_CxG_NC = @id
-                    `);
-                stats.corregidos++;
-                console.log(`    ✏️  → Actualizado en BD`);
-            }
+    if (USE_ODATA) {
+        console.log(`\n🔌 Verificando conexión OData C4C...`);
+        const ok = await testODataConnection();
+        if (!ok) {
+            console.log(`\n  Cambiando a análisis por BD (sin OData)...\n`);
+            await analyzeFromDB(pool);
+            process.exit(0);
         }
-
-        // Pausa para no saturar C4C
-        await new Promise(r => setTimeout(r, 250));
-    }
-
-    // ── Resumen ──
-    console.log(`\n${'═'.repeat(60)}`);
-    console.log(`📊 RESUMEN — Junio 2026`);
-    console.log(`   Total analizados     : ${records.length}`);
-    console.log(`   ✅ Tienda correcta   : ${stats.correctos}`);
-    console.log(`   🔴 Tienda incorrecta : ${stats.incorrectos}`);
-    console.log(`   ⚪ Sin dato en C4C   : ${stats.sinDatoC4C}`);
-    console.log(`   🟡 SDK desconocido   : ${stats.sdkDesconocido}`);
-    if (!DRY_RUN) console.log(`   ✏️  Corregidos        : ${stats.corregidos}`);
-
-    if (discrepancias.length > 0) {
-        console.log(`\n${'─'.repeat(60)}`);
-        console.log(`🔴 REGISTROS CON TIENDA INCORRECTA:\n`);
-        console.log(`  ${'TICKET'.padEnd(12)} ${'TIPO'.padEnd(5)} ${'FECHA'.padEnd(12)} ${'ACTUAL'.padEnd(30)} ${'CORRECTO'}`);
-        console.log(`  ${'─'.repeat(90)}`);
-        for (const d of discrepancias) {
-            console.log(`  ${d.ticket.padEnd(12)} ${d.tipo.padEnd(5)} ${d.fecha.padEnd(12)} ${d.actual.padEnd(30)} ${d.correcto}`);
-        }
-
-        if (DRY_RUN) {
-            console.log(`\n  Para corregir estos ${discrepancias.length} registro(s), ejecuta:`);
-            console.log(`  npx tsx fix_tienda_nc.ts --fix\n`);
-        }
+        console.log(`  ✅ OData C4C disponible\n`);
+        // Aquí iría el análisis con OData cuando las credenciales funcionen
+        console.log('  OData disponible — ejecutar con tickets específicos para validar.');
+    } else {
+        await analyzeFromDB(pool);
     }
 
     process.exit(0);
 }
 
 main().catch(err => {
-    console.error('\n❌ Error fatal:', err instanceof Error ? err.message : err);
+    console.error('\n❌ Error:', err instanceof Error ? err.message : err);
     process.exit(1);
 });

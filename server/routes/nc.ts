@@ -285,10 +285,13 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
             }
         }
 
-        // 3. Legacy Fallback (CAS Company Name or TIENDAS VARIAS)
+        // 3. Legacy Fallback — use only the company NAME (DsEmpresa), never the numeric FSM
+        //    company ID. The FSM dispatch company (IDEmpresa) is not the purchase location;
+        //    using it caused e.g. IDEmpresa=1301 (SODIMAC service) → "SODIMAC" even when
+        //    the client bought at a SOLE store.
         if (!resolvedLugarCompra) {
-            resolvedLugarCompra = ticketData.lugar_compra || ticketData.lugar_compra_id || 'TIENDAS VARIAS';
-            console.log(`[LEGACY FALLBACK] Ticket ${sanitizeLog(id)}: Defaulted to "${resolvedLugarCompra}"`);
+            resolvedLugarCompra = ticketData.lugar_compra || null;
+            console.log(`[LEGACY FALLBACK] Ticket ${sanitizeLog(id)}: Defaulted to "${resolvedLugarCompra ?? 'TIENDAS VARIAS'}"`);
         }
 
         // Update the returned object with our resolved store name
