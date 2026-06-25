@@ -227,9 +227,9 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
         let resolvedLugarCompra = null;
 
         // 1. Query SAP C4C OData for the custom Lugar de Compra field
-        const sapBaseUrl = process.env.SAP_BASE_URL;
-        const sapUser = process.env.SAP_USER;
-        const sapPassword = process.env.SAP_PASSWORD;
+        const sapBaseUrl = process.env.C4C_BASE_URL || process.env.SAP_BASE_URL;
+        const sapUser = process.env.C4C_USER || process.env.SAP_USER;
+        const sapPassword = process.env.C4C_PASSWORD || process.env.SAP_PASSWORD;
 
         if (sapBaseUrl && sapUser && sapPassword) {
         try {
@@ -1501,9 +1501,9 @@ router.post('/cxg-nc', verifyPermission('cxg.cxg_nc.create'), async (req: Reques
 
         // Resolve store name via C4C OData if not provided by frontend
         let finalLugarCompra = lugar_compra;
-        const sapBaseUrl = process.env.SAP_BASE_URL;
-        const sapUser = process.env.SAP_USER;
-        const sapPassword = process.env.SAP_PASSWORD;
+        const sapBaseUrl = process.env.C4C_BASE_URL || process.env.SAP_BASE_URL;
+        const sapUser = process.env.C4C_USER || process.env.SAP_USER;
+        const sapPassword = process.env.C4C_PASSWORD || process.env.SAP_PASSWORD;
         if (!finalLugarCompra && ticket && sapBaseUrl && sapUser && sapPassword) {
             try {
                 const authHeader = 'Basic ' + Buffer.from(`${sapUser}:${sapPassword}`).toString('base64');
@@ -1996,9 +1996,9 @@ router.get('/c4c/report/:ticketId', async (req: Request, res: Response) => {
     try {
         const { ticketId } = req.params;
 
-        const sapBaseUrl = process.env.SAP_BASE_URL;
-        const sapUser = process.env.SAP_USER;
-        const sapPassword = process.env.SAP_PASSWORD;
+        const sapBaseUrl = process.env.C4C_BASE_URL || process.env.SAP_BASE_URL;
+        const sapUser = process.env.C4C_USER || process.env.SAP_USER;
+        const sapPassword = process.env.C4C_PASSWORD || process.env.SAP_PASSWORD;
 
         if (!sapBaseUrl || !sapUser || !sapPassword) {
             return res.status(503).json({ error: 'Servicio C4C no configurado.' });
