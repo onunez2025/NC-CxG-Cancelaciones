@@ -54,6 +54,7 @@ export const SpecialCasesPage = () => {
   const [filterSearchTerm, setFilterSearchTerm] = useState('');
   const [filterSuggestions, setFilterSuggestions] = useState<string[]>([]);
   const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
+  const [dateRangeDraft, setDateRangeDraft] = useState<Record<string, string>>({});
 
   // Detail & approval
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -130,7 +131,13 @@ export const SpecialCasesPage = () => {
     const col = COLUMNS.find(c => c.id === colId);
     if (col?.filterType === 'fixed' && 'filterValues' in col) {
       setFilterSuggestions([...(col.filterValues as unknown as string[])]);
-    } else if (col?.filterType !== 'date') {
+    } else if (col?.filterType === 'date') {
+      // Initialize draft from current applied filters
+      setDateRangeDraft({
+        [`${colId}_start`]: columnFilters[`${colId}_start`]?.[0] || '',
+        [`${colId}_end`]:   columnFilters[`${colId}_end`]?.[0]   || '',
+      });
+    } else {
       setFilterSuggestions([]);
     }
   };
@@ -171,6 +178,7 @@ export const SpecialCasesPage = () => {
     setSearchTerm('');
     setColumnFilters({});
     setSortConfig(null);
+    setDateRangeDraft({});
   };
 
   const handleLookupTicket = async () => {
@@ -368,8 +376,8 @@ export const SpecialCasesPage = () => {
                                       <input
                                         type="date"
                                         className={`${SIATC_THEME.COMPONENTS.INPUT} h-8 text-xs font-semibold`}
-                                        value={columnFilters[`${col.id}_start`]?.[0] || ''}
-                                        onChange={e => setColumnFilters(prev => ({ ...prev, [`${col.id}_start`]: e.target.value ? [e.target.value] : [] }))}
+                                        value={dateRangeDraft[`${col.id}_start`] || ''}
+                                        onChange={e => setDateRangeDraft(prev => ({ ...prev, [`${col.id}_start`]: e.target.value }))}
                                       />
                                     </div>
                                     <div className="flex flex-col gap-1">
@@ -377,11 +385,21 @@ export const SpecialCasesPage = () => {
                                       <input
                                         type="date"
                                         className={`${SIATC_THEME.COMPONENTS.INPUT} h-8 text-xs font-semibold`}
-                                        value={columnFilters[`${col.id}_end`]?.[0] || ''}
-                                        onChange={e => setColumnFilters(prev => ({ ...prev, [`${col.id}_end`]: e.target.value ? [e.target.value] : [] }))}
+                                        value={dateRangeDraft[`${col.id}_end`] || ''}
+                                        onChange={e => setDateRangeDraft(prev => ({ ...prev, [`${col.id}_end`]: e.target.value }))}
                                       />
                                     </div>
-                                    <SIATCButton variant="primary" size="sm" className="mt-1" onClick={() => setActiveFilterCol(null)}>
+                                    <SIATCButton variant="primary" size="sm" className="mt-1" onClick={() => {
+                                      const start = dateRangeDraft[`${col.id}_start`];
+                                      const end   = dateRangeDraft[`${col.id}_end`];
+                                      setColumnFilters(prev => {
+                                        const next = { ...prev };
+                                        if (start) next[`${col.id}_start`] = [start]; else delete next[`${col.id}_start`];
+                                        if (end)   next[`${col.id}_end`]   = [end];   else delete next[`${col.id}_end`];
+                                        return next;
+                                      });
+                                      setActiveFilterCol(null);
+                                    }}>
                                       Aplicar Rango
                                     </SIATCButton>
                                   </div>
