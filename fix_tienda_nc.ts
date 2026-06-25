@@ -12,17 +12,16 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import { getDbConnection } from './server/db.js';
-import sql from 'mssql';
 
 const USE_ODATA = process.argv.includes('--odata') || process.argv.includes('--fix');
-const DRY_RUN   = !process.argv.includes('--fix');
+const _DRY_RUN  = !process.argv.includes('--fix');
 
 const C4C_BASE_URL = process.env.C4C_BASE_URL || process.env.SAP_BASE_URL || '';
 const C4C_USER     = process.env.C4C_USER     || process.env.SAP_USER     || '';
 const C4C_PASSWORD = process.env.C4C_PASSWORD || process.env.SAP_PASSWORD || '';
 
 // ── Mapping SDK → tienda (igual que nc.ts) ───────────────────────────────────
-const STORE_MAPPING: Record<string, string> = {
+const _STORE_MAPPING: Record<string, string> = {
     "000000000000000000000000000000000000000000000000000000002995": "SODIMAC PERU S.A.",
     "000000000000000000000000000000000000000000000000000000003978": "TIENDA SOLE CHORRILLOS",
     "000000000000000000000000000000000000000000000000000000003984": "TIENDA SOLE PRINCIPAL",
@@ -71,20 +70,6 @@ async function testODataConnection(): Promise<boolean> {
         console.log(`  ⚠️  OData no disponible: ${e instanceof Error ? e.message : e}`);
         return false;
     }
-}
-
-async function resolveFromOData(ticket: string): Promise<string | null> {
-    const auth = 'Basic ' + Buffer.from(`${C4C_USER}:${C4C_PASSWORD}`).toString('base64');
-    try {
-        const res = await fetch(
-            `${C4C_BASE_URL}/ServiceRequestCollection?$filter=ID eq '${ticket}'&$format=json`,
-            { headers: { 'Authorization': auth, 'Accept': 'application/json' }, signal: AbortSignal.timeout(8000) }
-        );
-        if (!res.ok) return null;
-        const body = await res.json() as { d?: { results?: Array<{ zIDLugarCompra_SDK?: string }> } };
-        const sdkCode = body?.d?.results?.[0]?.zIDLugarCompra_SDK;
-        return sdkCode ? (STORE_MAPPING[sdkCode] ?? null) : null;
-    } catch { return null; }
 }
 
 // ── Análisis BD sin OData ─────────────────────────────────────────────────────
