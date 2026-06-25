@@ -32,8 +32,6 @@ const COLUMNS = [
   { id: 'service_status', label: 'ESTADO SERVICIO',   sortable: true,  filterable: true,  filterType: 'text'  },
 ] as const;
 
-type ColId = typeof COLUMNS[number]['id'];
-
 export const SpecialCasesPage = () => {
   const { user, hasPermission } = useAuth();
   const filterDropdownRef = useRef<HTMLDivElement>(null);
