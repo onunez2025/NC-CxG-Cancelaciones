@@ -2016,9 +2016,11 @@ router.get('/c4c/report/:ticketId', async (req: Request, res: Response) => {
         });
 
         if (!searchResponse.ok) {
-            return res.status(searchResponse.status).json({ 
-                error: `Error al buscar el ticket en C4C`, 
-                details: `C4C retornó código ${searchResponse.status}` 
+            // Nunca pasar el status de C4C directamente — un 401 de SAP dispararía el
+            // logout del cliente como si fuera nuestra sesión. Siempre usar 502.
+            return res.status(502).json({
+                error: `Error al buscar el ticket en C4C`,
+                details: `C4C retornó código ${searchResponse.status}`
             });
         }
 
@@ -2080,7 +2082,8 @@ router.get('/c4c/report/:ticketId', async (req: Request, res: Response) => {
         });
 
         if (!pdfResponse.ok) {
-            return res.status(pdfResponse.status).json({ 
+            // Nunca pasar el status de C4C directamente — mismo riesgo que arriba.
+            return res.status(502).json({
                 error: 'Failed to retrieve report content from C4C',
                 details: `C4C download returned status ${pdfResponse.status}`
             });
