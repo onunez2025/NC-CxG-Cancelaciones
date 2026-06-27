@@ -305,6 +305,24 @@ router.get('/tickets/:id', async (req: Request, res: Response) => {
 });
 
 // ─────────────────────────────────────────────
+// DASHBOARD: Stats for sidebar badges
+// ─────────────────────────────────────────────
+
+router.get('/dashboard/stats', verifyPermission('cxg.cancelaciones.view'), async (req: Request, res: Response) => {
+    try {
+        const pool = await getDbConnection();
+        const result = await pool.request().query(`
+            SELECT COUNT(*) as cancelaciones_sin_gestionar
+            FROM [dbo].[GAC_APP_TB_CANCELACIONES]
+            WHERE (Gestionado IS NULL OR Gestionado = '' OR Gestionado = 'No')
+        `);
+        res.json({ cancelaciones_sin_gestionar: result.recordset[0].cancelaciones_sin_gestionar });
+    } catch (error: unknown) {
+        res.status(500).json({ error: safeError(error) });
+    }
+});
+
+// ─────────────────────────────────────────────
 // CANCELACIONES: Motivos (must be before :id)
 // ─────────────────────────────────────────────
 

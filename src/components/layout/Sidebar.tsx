@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -15,6 +16,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { useAuth } from '../../hooks/useAuth';
+import { apiClient, API_BASE_URL } from '../../services/apiClient';
 import type { Permission } from '../../types';
 
 // SIATC DESIGN SYSTEM IMPORTS
@@ -29,6 +31,23 @@ export function Sidebar({ className, isEffectivelyExpanded = true, onNavigate }:
     const showFull = isEffectivelyExpanded;
     const effectiveOnNavigate = SIATC_THEME.SIDEBAR.MOBILE_CLOSE_ON_NAVIGATE ? onNavigate : undefined;
 
+    const [cancelsBadge, setCancelsBadge] = useState(0);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const res = await apiClient(`${API_BASE_URL}/dashboard/stats`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setCancelsBadge(data.cancelaciones_sin_gestionar ?? 0);
+                }
+            } catch { /* silencioso — badge simplemente no aparece */ }
+        };
+        fetchStats();
+        const interval = setInterval(fetchStats, 60000);
+        return () => clearInterval(interval);
+    }, []);
+
     const toggleLanguage = () => {
         i18n.changeLanguage(i18n.language === 'es' ? 'en' : 'es');
     };
@@ -38,11 +57,12 @@ export function Sidebar({ className, isEffectivelyExpanded = true, onNavigate }:
         icon: React.ElementType;
         label: string;
         permission?: Permission;
+        badge?: number;
     }
 
     const navItems: NavItem[] = [
         { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-        { to: '/cancelaciones', icon: XCircle, label: 'Cancelaciones', permission: 'cxg.cancelaciones.view' as const },
+        { to: '/cancelaciones', icon: XCircle, label: 'Cancelaciones', permission: 'cxg.cancelaciones.view' as const, badge: cancelsBadge },
         { to: '/cxg-nc', icon: FileText, label: 'CxG & NC', permission: 'cxg.cxg_nc.view' as const },
         { to: '/fsm-tracking', icon: Clock, label: 'Horarios Visitas', permission: 'cxg.fsm.view' as const },
         { to: '/fsm/mapa', icon: Map, label: 'Mapa Servicios', permission: 'cxg.fsm.view' as const },
@@ -100,10 +120,16 @@ export function Sidebar({ className, isEffectivelyExpanded = true, onNavigate }:
                                 )} />
                                 <span className="tracking-tight">{item.label}</span>
                             </div>
-                            <ChevronRight className={cn(
-                                "w-4 h-4 transition-all duration-300 opacity-0 -translate-x-2 relative z-10",
-                                "group-hover/item:opacity-100 group-hover/item:translate-x-0"
-                            )} />
+                            {item.badge && item.badge > 0 ? (
+                                <span className="relative z-10 px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 bg-rose-500 text-white animate-pulse">
+                                    {item.badge}
+                                </span>
+                            ) : (
+                                <ChevronRight className={cn(
+                                    "w-4 h-4 transition-all duration-300 opacity-0 -translate-x-2 relative z-10",
+                                    "group-hover/item:opacity-100 group-hover/item:translate-x-0"
+                                )} />
+                            )}
                         </NavLink>
                     ))}
                 </nav>
@@ -113,16 +139,21 @@ export function Sidebar({ className, isEffectivelyExpanded = true, onNavigate }:
                         <NavLink
                             key={item.to}
                             to={item.to}
-                            title={item.label}
+                            title={item.badge && item.badge > 0 ? `${item.label} (${item.badge})` : item.label}
                             onClick={effectiveOnNavigate}
                             className={({ isActive }) => cn(
-                                "w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200",
+                                "w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 relative",
                                 isActive
                                     ? "bg-primary text-primary-foreground shadow-md"
                                     : "text-muted-foreground hover:bg-primary/10 hover:text-primary"
                             )}
                         >
                             <item.icon className="w-5 h-5 shrink-0" />
+                            {item.badge && item.badge > 0 && (
+                                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center bg-rose-500 text-white">
+                                    {item.badge > 9 ? '9+' : item.badge}
+                                </span>
+                            )}
                         </NavLink>
                     ))}
                 </nav>
