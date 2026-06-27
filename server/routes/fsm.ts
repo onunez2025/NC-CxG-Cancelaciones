@@ -210,4 +210,124 @@ router.get('/equipment-history/:ticket', async (req: Request, res: Response) => 
     }
 });
 
+// ─────────────────────────────────────────────
+// FSM MAPA: Filter options (empresas CAS + tecnicos)
+// ─────────────────────────────────────────────
+
+router.get('/mapa/filtros', async (req: Request, res: Response) => {
+    try {
+        const pool = await getDbConnection();
+        const fechaDesde = (req.query.fechaDesde as string || '').trim();
+        const fechaHasta = (req.query.fechaHasta as string || '').trim();
+
+        const empresasResult = await pool.request().query(`
+            SELECT DISTINCT LTRIM(RTRIM(Empresa)) as empresa
+            FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS]
+            WHERE Empresa IS NOT NULL AND LTRIM(RTRIM(Empresa)) <> ''
+            ORDER BY empresa ASC
+        `);
+
+        let tecnicosQuery = `
+            SELECT DISTINCT
+                LTRIM(RTRIM(ISNULL(NombreTecnico, '') + ' ' + ISNULL(ApellidoTecnico, ''))) as tecnico
+            FROM [SIATC].[Dashboard_FSM]
+            WHERE ISNULL(NombreTecnico, '') <> ''
+        `;
+        const tecnicosReq = pool.request();
+        if (fechaDesde && fechaHasta) {
+            tecnicosQuery += ' AND FechaVisita >= @fechaDesde AND FechaVisita < DATEADD(day, 1, CAST(@fechaHasta AS DATE))';
+            tecnicosReq.input('fechaDesde', sql.Date, fechaDesde);
+            tecnicosReq.input('fechaHasta', sql.Date, fechaHasta);
+        }
+        tecnicosQuery += ' ORDER BY tecnico ASC';
+        const tecnicosResult = await tecnicosReq.query(tecnicosQuery);
+
+        res.json({
+            empresas: empresasResult.recordset.map((r: { empresa: string }) => r.empresa),
+            tecnicos: tecnicosResult.recordset.map((r: { tecnico: string }) => r.tecnico).filter(Boolean),
+        });
+    } catch (error: unknown) {
+        console.error('Error fetching FSM mapa filtros:', error);
+        res.status(500).json({ error: safeError(error) });
+    }
+});
+
+// ─────────────────────────────────────────────
+// FSM MAPA: Servicios geolocalizados
+// ─────────────────────────────────────────────
+
+router.get('/mapa', async (req: Request, res: Response) => {
+    try {
+        const pool = await getDbConnection();
+        const empresaCas = (req.query.empresaCas as string || '').trim();
+        const tecnico    = (req.query.tecnico    as string || '').trim();
+        const fechaDesde = (req.query.fechaDesde as string || '').trim();
+        const fechaHasta = (req.query.fechaHasta as string || '').trim();
+
+        const request = pool.request();
+
+        let dateFilter: string;
+        if (fechaDesde && fechaHasta) {
+            dateFilter = 'AND t.FechaVisita >= @fechaDesde AND t.FechaVisita < DATEADD(day, 1, CAST(@fechaHasta AS DATE))';
+            request.input('fechaDesde', sql.Date, fechaDesde);
+            request.input('fechaHasta', sql.Date, fechaHasta);
+        } else {
+            // Default: today in Peru time
+            dateFilter = `
+                AND t.FechaVisita >= CAST(CAST(SYSDATETIMEOFFSET() AT TIME ZONE 'SA Pacific Standard Time' AS DATE) AS DATETIME)
+                AND t.FechaVisita <  DATEADD(day, 1, CAST(CAST(SYSDATETIMEOFFSET() AT TIME ZONE 'SA Pacific Standard Time' AS DATE) AS DATETIME))
+            `;
+        }
+
+        let tecnicoFilter = '';
+        if (tecnico) {
+            tecnicoFilter = `AND LTRIM(RTRIM(ISNULL(t.NombreTecnico, '') + ' ' + ISNULL(t.ApellidoTecnico, ''))) = @tecnico`;
+            request.input('tecnico', sql.NVarChar(500), tecnico);
+        }
+
+        request.input('empresaCas', sql.NVarChar(255), empresaCas);
+
+        const query = `
+            WITH ServiciosMapa AS (
+                SELECT
+                    t.Ticket                                                                              AS ticket,
+                    t.NombreCliente                                                                       AS cliente,
+                    LTRIM(RTRIM(ISNULL(t.NombreTecnico, '') + ' ' + ISNULL(t.ApellidoTecnico, '')))      AS tecnico,
+                    t.FechaVisita                                                                         AS fecha_visita,
+                    t.Estado                                                                              AS estado,
+                    t.Distrito                                                                            AS distrito,
+                    LTRIM(RTRIM(ISNULL(t.Calle, '') + ISNULL(' ' + t.NumeroCalle, '')))                  AS direccion,
+                    TRY_CAST(t.Latitud  AS FLOAT)                                                        AS latitud,
+                    TRY_CAST(t.Longitud AS FLOAT)                                                        AS longitud,
+                    emp_cas.empresa
+                FROM [SIATC].[Dashboard_FSM] t
+                OUTER APPLY (
+                    SELECT TOP 1 LTRIM(RTRIM(cas.Empresa)) AS empresa
+                    FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas
+                    WHERE cas.Nombre_FSM LIKE '%' + LTRIM(RTRIM(ISNULL(t.NombreTecnico, ''))) + '%'
+                      AND cas.Nombre_FSM LIKE '%' + LTRIM(RTRIM(ISNULL(t.ApellidoTecnico, ''))) + '%'
+                      AND (ISNULL(t.NombreTecnico, '') <> '' OR ISNULL(t.ApellidoTecnico, '') <> '')
+                ) emp_cas
+                WHERE TRY_CAST(t.Latitud  AS FLOAT) IS NOT NULL
+                  AND TRY_CAST(t.Longitud AS FLOAT) IS NOT NULL
+                  ${dateFilter}
+                  ${tecnicoFilter}
+            )
+            SELECT * FROM ServiciosMapa
+            WHERE (
+                @empresaCas = ''
+                OR (@empresaCas = 'SOLE'  AND empresa IS NULL)
+                OR empresa = @empresaCas
+            )
+            ORDER BY fecha_visita DESC
+        `;
+
+        const result = await request.query(query);
+        res.json(result.recordset);
+    } catch (error: unknown) {
+        console.error('Error fetching FSM mapa data:', error);
+        res.status(500).json({ error: safeError(error) });
+    }
+});
+
 export default router;
