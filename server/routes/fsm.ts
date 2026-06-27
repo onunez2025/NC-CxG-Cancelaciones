@@ -211,6 +211,25 @@ router.get('/equipment-history/:ticket', async (req: Request, res: Response) => 
 });
 
 // ─────────────────────────────────────────────
+// FSM DEBUG: Schema inspector (temporal — remover tras fix)
+// ─────────────────────────────────────────────
+
+router.get('/debug/schema-cas', async (req: Request, res: Response) => {
+    try {
+        const pool = await getDbConnection();
+        const result = await pool.request().query(`
+            SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_NAME IN ('GAC_APP_TB_CAS', 'GAC_APP_TB_COLABORADORES_CAS')
+            ORDER BY TABLE_NAME, ORDINAL_POSITION
+        `);
+        res.json(result.recordset);
+    } catch (error: unknown) {
+        res.status(500).json({ error: String(error) });
+    }
+});
+
+// ─────────────────────────────────────────────
 // FSM MAPA: Filter options (empresas CAS + tecnicos)
 // ─────────────────────────────────────────────
 
