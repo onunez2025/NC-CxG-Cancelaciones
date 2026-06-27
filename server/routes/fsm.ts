@@ -221,9 +221,10 @@ router.get('/mapa/filtros', async (req: Request, res: Response) => {
         const fechaHasta = (req.query.fechaHasta as string || '').trim();
 
         const empresasResult = await pool.request().query(`
-            SELECT DISTINCT LTRIM(RTRIM(Empresa)) as empresa
-            FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS]
-            WHERE Empresa IS NOT NULL AND LTRIM(RTRIM(Empresa)) <> ''
+            SELECT DISTINCT LTRIM(RTRIM(cas_tb.Nombre_Empresa)) as empresa
+            FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] colab
+            INNER JOIN [dbo].[GAC_APP_TB_CAS] cas_tb ON colab.Empresa = cas_tb.ID_CAS
+            WHERE cas_tb.Nombre_Empresa IS NOT NULL AND LTRIM(RTRIM(cas_tb.Nombre_Empresa)) <> ''
             ORDER BY empresa ASC
         `);
 
@@ -302,10 +303,11 @@ router.get('/mapa', async (req: Request, res: Response) => {
                     emp_cas.empresa
                 FROM [SIATC].[Dashboard_FSM] t
                 OUTER APPLY (
-                    SELECT TOP 1 LTRIM(RTRIM(cas.Empresa)) AS empresa
-                    FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] cas
-                    WHERE cas.Nombre_FSM LIKE '%' + LTRIM(RTRIM(ISNULL(t.NombreTecnico, ''))) + '%'
-                      AND cas.Nombre_FSM LIKE '%' + LTRIM(RTRIM(ISNULL(t.ApellidoTecnico, ''))) + '%'
+                    SELECT TOP 1 LTRIM(RTRIM(cas_tb.Nombre_Empresa)) AS empresa
+                    FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] colab
+                    INNER JOIN [dbo].[GAC_APP_TB_CAS] cas_tb ON colab.Empresa = cas_tb.ID_CAS
+                    WHERE colab.Nombre_FSM LIKE '%' + LTRIM(RTRIM(ISNULL(t.NombreTecnico, ''))) + '%'
+                      AND colab.Nombre_FSM LIKE '%' + LTRIM(RTRIM(ISNULL(t.ApellidoTecnico, ''))) + '%'
                       AND (ISNULL(t.NombreTecnico, '') <> '' OR ISNULL(t.ApellidoTecnico, '') <> '')
                 ) emp_cas
                 WHERE TRY_CAST(t.Latitud  AS FLOAT) IS NOT NULL
