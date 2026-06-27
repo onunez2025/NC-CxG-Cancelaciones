@@ -21,12 +21,13 @@ import type { Permission } from '../../types';
 import { useAppConfig } from '../../context/AppConfigContext';
 import { SIATC_THEME } from '../../utils/siatc-theme';
 
-export function Sidebar({ className, isEffectivelyExpanded = true }: { className?: string; isEffectivelyExpanded?: boolean }) {
+export function Sidebar({ className, isEffectivelyExpanded = true, onNavigate }: { className?: string; isEffectivelyExpanded?: boolean; onNavigate?: () => void }) {
     const { t, i18n } = useTranslation();
     const { logout, hasPermission } = useAuth();
     const appConfig = useAppConfig();
     const logoUrl = appConfig?.logoUrl || '/Logo.png';
     const showFull = isEffectivelyExpanded;
+    const effectiveOnNavigate = SIATC_THEME.SIDEBAR.MOBILE_CLOSE_ON_NAVIGATE ? onNavigate : undefined;
 
     const toggleLanguage = () => {
         i18n.changeLanguage(i18n.language === 'es' ? 'en' : 'es');
@@ -86,6 +87,7 @@ export function Sidebar({ className, isEffectivelyExpanded = true }: { className
                         <NavLink
                             key={item.to}
                             to={item.to}
+                            onClick={effectiveOnNavigate}
                             className={({ isActive }) => isActive
                                 ? SIATC_THEME.LAYOUT.SIDEBAR_ITEM_ACTIVE
                                 : SIATC_THEME.LAYOUT.SIDEBAR_ITEM_INACTIVE
@@ -112,6 +114,7 @@ export function Sidebar({ className, isEffectivelyExpanded = true }: { className
                             key={item.to}
                             to={item.to}
                             title={item.label}
+                            onClick={effectiveOnNavigate}
                             className={({ isActive }) => cn(
                                 "w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200",
                                 isActive

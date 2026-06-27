@@ -26,10 +26,13 @@ export function MainLayout({ children }: MainLayoutProps) {
     const COLLAPSED_KEY = 'cxg_sidebar_collapsed';
     const [isCollapsed, setIsCollapsed] = useState(() => localStorage.getItem(COLLAPSED_KEY) === 'true');
     const [isHovering,  setIsHovering]  = useState(false);
-    const allowCollapse  = true;
-    const hoverExpand    = true;
-    const expandedWidth  = '288px';
-    const collapsedWidth = '64px';
+    const allowCollapse  = SIATC_THEME.SIDEBAR.ALLOW_COLLAPSE;
+    const hoverExpand    = SIATC_THEME.SIDEBAR.HOVER_EXPAND;
+    const expandedWidth  = SIATC_THEME.SIDEBAR.EXPANDED_WIDTH;
+    const collapsedWidth = SIATC_THEME.SIDEBAR.COLLAPSED_WIDTH;
+    const handleMobileNavClose = SIATC_THEME.SIDEBAR.MOBILE_CLOSE_ON_NAVIGATE
+        ? () => setSidebarOpen(false)
+        : undefined;
     const isHoverExpanded       = isCollapsed && isHovering && hoverExpand && allowCollapse;
     const isEffectivelyExpanded = !isCollapsed || isHoverExpanded;
     const sidebarPanelWidth     = isEffectivelyExpanded ? expandedWidth : collapsedWidth;
@@ -120,7 +123,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
-                        <Sidebar className="flex-1" isEffectivelyExpanded={isEffectivelyExpanded || sidebarOpen} />
+                        <Sidebar className="flex-1" isEffectivelyExpanded={isEffectivelyExpanded || sidebarOpen} onNavigate={handleMobileNavClose} />
                     </div>
                 </div>
             </aside>
