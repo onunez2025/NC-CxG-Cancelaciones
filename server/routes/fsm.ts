@@ -217,9 +217,11 @@ router.get('/equipment-history/:ticket', async (req: Request, res: Response) => 
 router.get('/mapa/filtros', async (req: Request, res: Response) => {
     try {
         const pool = await getDbConnection();
-        const fechaDesde = (req.query.fechaDesde as string || '').trim();
-        const fechaHasta = (req.query.fechaHasta as string || '').trim();
+        const fechaDesde  = (req.query.fechaDesde  as string || '').trim();
+        const fechaHasta  = (req.query.fechaHasta  as string || '').trim();
+        const empresaCas  = (req.query.empresaCas  as string || '').trim();
 
+        // ── Empresas (always all, no date dependency) ──
         const empresasResult = await pool.request().query(`
             SELECT DISTINCT LTRIM(RTRIM(cas_tb.Nombre_CAS)) as empresa
             FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] colab
@@ -228,24 +230,61 @@ router.get('/mapa/filtros', async (req: Request, res: Response) => {
             ORDER BY empresa ASC
         `);
 
+        // ── Técnicos — cascading by empresa and date ──
+        const tecnicosReq = pool.request();
         let tecnicosQuery = `
             SELECT DISTINCT
-                LTRIM(RTRIM(ISNULL(NombreTecnico, '') + ' ' + ISNULL(ApellidoTecnico, ''))) as tecnico
-            FROM [SIATC].[Dashboard_FSM]
-            WHERE ISNULL(NombreTecnico, '') <> ''
+                LTRIM(RTRIM(ISNULL(t.NombreTecnico, '') + ' ' + ISNULL(t.ApellidoTecnico, ''))) as tecnico
+            FROM [SIATC].[Dashboard_FSM] t
+            WHERE ISNULL(t.NombreTecnico, '') <> ''
         `;
-        const tecnicosReq = pool.request();
         if (fechaDesde && fechaHasta) {
-            tecnicosQuery += ' AND FechaVisita >= @fechaDesde AND FechaVisita < DATEADD(day, 1, CAST(@fechaHasta AS DATE))';
+            tecnicosQuery += ' AND t.FechaVisita >= @fechaDesde AND t.FechaVisita < DATEADD(day, 1, CAST(@fechaHasta AS DATE))';
             tecnicosReq.input('fechaDesde', sql.Date, fechaDesde);
             tecnicosReq.input('fechaHasta', sql.Date, fechaHasta);
+        }
+        if (empresaCas === 'SOLE') {
+            tecnicosQuery += `
+                AND NOT EXISTS (
+                    SELECT 1 FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] colab
+                    WHERE colab.Nombre_FSM LIKE '%' + LTRIM(RTRIM(ISNULL(t.NombreTecnico, ''))) + '%'
+                      AND colab.Nombre_FSM LIKE '%' + LTRIM(RTRIM(ISNULL(t.ApellidoTecnico, ''))) + '%'
+                      AND (ISNULL(t.NombreTecnico, '') <> '' OR ISNULL(t.ApellidoTecnico, '') <> '')
+                )`;
+        } else if (empresaCas) {
+            tecnicosReq.input('empresaCasFilter', sql.NVarChar(255), empresaCas);
+            tecnicosQuery += `
+                AND EXISTS (
+                    SELECT 1 FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] colab
+                    INNER JOIN [dbo].[GAC_APP_TB_CAS] cas_tb ON colab.CAS = cas_tb.ID_CAS
+                    WHERE colab.Nombre_FSM LIKE '%' + LTRIM(RTRIM(ISNULL(t.NombreTecnico, ''))) + '%'
+                      AND colab.Nombre_FSM LIKE '%' + LTRIM(RTRIM(ISNULL(t.ApellidoTecnico, ''))) + '%'
+                      AND (ISNULL(t.NombreTecnico, '') <> '' OR ISNULL(t.ApellidoTecnico, '') <> '')
+                      AND cas_tb.Nombre_CAS = @empresaCasFilter
+                )`;
         }
         tecnicosQuery += ' ORDER BY tecnico ASC';
         const tecnicosResult = await tecnicosReq.query(tecnicosQuery);
 
+        // ── Estados ──
+        const estadosReq = pool.request();
+        let estadosQuery = `
+            SELECT DISTINCT LTRIM(RTRIM(Estado)) as estado
+            FROM [SIATC].[Dashboard_FSM]
+            WHERE Estado IS NOT NULL AND LTRIM(RTRIM(Estado)) <> ''
+        `;
+        if (fechaDesde && fechaHasta) {
+            estadosQuery += ' AND FechaVisita >= @fechaDesde2 AND FechaVisita < DATEADD(day, 1, CAST(@fechaHasta2 AS DATE))';
+            estadosReq.input('fechaDesde2', sql.Date, fechaDesde);
+            estadosReq.input('fechaHasta2', sql.Date, fechaHasta);
+        }
+        estadosQuery += ' ORDER BY estado ASC';
+        const estadosResult = await estadosReq.query(estadosQuery);
+
         res.json({
             empresas: empresasResult.recordset.map((r: { empresa: string }) => r.empresa),
             tecnicos: tecnicosResult.recordset.map((r: { tecnico: string }) => r.tecnico).filter(Boolean),
+            estados:  estadosResult.recordset.map((r: { estado: string }) => r.estado),
         });
     } catch (error: unknown) {
         console.error('Error fetching FSM mapa filtros:', error);
@@ -264,6 +303,7 @@ router.get('/mapa', async (req: Request, res: Response) => {
         const tecnico    = (req.query.tecnico    as string || '').trim();
         const fechaDesde = (req.query.fechaDesde as string || '').trim();
         const fechaHasta = (req.query.fechaHasta as string || '').trim();
+        const estado     = (req.query.estado     as string || '').trim();
 
         const request = pool.request();
 
@@ -273,7 +313,6 @@ router.get('/mapa', async (req: Request, res: Response) => {
             request.input('fechaDesde', sql.Date, fechaDesde);
             request.input('fechaHasta', sql.Date, fechaHasta);
         } else {
-            // Default: today in Peru time
             dateFilter = `
                 AND t.FechaVisita >= CAST(CAST(SYSDATETIMEOFFSET() AT TIME ZONE 'SA Pacific Standard Time' AS DATE) AS DATETIME)
                 AND t.FechaVisita <  DATEADD(day, 1, CAST(CAST(SYSDATETIMEOFFSET() AT TIME ZONE 'SA Pacific Standard Time' AS DATE) AS DATETIME))
@@ -284,6 +323,12 @@ router.get('/mapa', async (req: Request, res: Response) => {
         if (tecnico) {
             tecnicoFilter = `AND LTRIM(RTRIM(ISNULL(t.NombreTecnico, '') + ' ' + ISNULL(t.ApellidoTecnico, ''))) = @tecnico`;
             request.input('tecnico', sql.NVarChar(500), tecnico);
+        }
+
+        let estadoFilter = '';
+        if (estado) {
+            estadoFilter = 'AND t.Estado = @estado';
+            request.input('estado', sql.NVarChar(100), estado);
         }
 
         request.input('empresaCas', sql.NVarChar(255), empresaCas);
@@ -314,6 +359,7 @@ router.get('/mapa', async (req: Request, res: Response) => {
                   AND TRY_CAST(t.Longitud AS FLOAT) IS NOT NULL
                   ${dateFilter}
                   ${tecnicoFilter}
+                  ${estadoFilter}
             )
             SELECT * FROM ServiciosMapa
             WHERE (

@@ -16,6 +16,7 @@ export interface FSMMapItem {
 export interface FSMMapFiltros {
     empresas: string[];
     tecnicos: string[];
+    estados:  string[];
 }
 
 export interface FSMTracking {
@@ -71,10 +72,11 @@ export const fsmService = {
         return response.json();
     },
 
-    getMapFiltros: async (params?: { fechaDesde?: string; fechaHasta?: string }): Promise<FSMMapFiltros> => {
+    getMapFiltros: async (params?: { fechaDesde?: string; fechaHasta?: string; empresaCas?: string }): Promise<FSMMapFiltros> => {
         const queryParams = new URLSearchParams();
-        if (params?.fechaDesde) queryParams.append('fechaDesde', params.fechaDesde);
-        if (params?.fechaHasta) queryParams.append('fechaHasta', params.fechaHasta);
+        if (params?.fechaDesde)  queryParams.append('fechaDesde',  params.fechaDesde);
+        if (params?.fechaHasta)  queryParams.append('fechaHasta',  params.fechaHasta);
+        if (params?.empresaCas)  queryParams.append('empresaCas',  params.empresaCas);
         const response = await apiClient(`${API_BASE_URL}/fsm/mapa/filtros?${queryParams.toString()}`);
         if (!response.ok) throw new Error('Error al obtener filtros del mapa');
         return response.json();
@@ -85,12 +87,14 @@ export const fsmService = {
         tecnico?: string;
         fechaDesde?: string;
         fechaHasta?: string;
+        estado?: string;
     }): Promise<FSMMapItem[]> => {
         const queryParams = new URLSearchParams();
         if (params?.empresaCas) queryParams.append('empresaCas', params.empresaCas);
         if (params?.tecnico)    queryParams.append('tecnico',    params.tecnico);
         if (params?.fechaDesde) queryParams.append('fechaDesde', params.fechaDesde);
         if (params?.fechaHasta) queryParams.append('fechaHasta', params.fechaHasta);
+        if (params?.estado)     queryParams.append('estado',     params.estado);
         const response = await apiClient(`${API_BASE_URL}/fsm/mapa?${queryParams.toString()}`);
         if (!response.ok) throw new Error('Error al obtener datos del mapa FSM');
         return response.json();

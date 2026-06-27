@@ -44,7 +44,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 // ── Component ──────────────────────────────────────────────────────────────
 
 export const FSMMapPage = () => {
-    const [filtros, setFiltros]         = useState<FSMMapFiltros>({ empresas: [], tecnicos: [] });
+    const [filtros, setFiltros]         = useState<FSMMapFiltros>({ empresas: [], tecnicos: [], estados: [] });
     const [data, setData]               = useState<FSMMapItem[]>([]);
     const [isLoadingFiltros, setIsLoadingFiltros] = useState(false);
     const [isLoading, setIsLoading]     = useState(false);
@@ -53,6 +53,7 @@ export const FSMMapPage = () => {
     // Draft filters (panel) — applied only when user clicks Aplicar
     const [draftEmpresa,  setDraftEmpresa]  = useState('');
     const [draftTecnico,  setDraftTecnico]  = useState('');
+    const [draftEstado,   setDraftEstado]   = useState('');
     const [draftDesde,    setDraftDesde]    = useState(today());
     const [draftHasta,    setDraftHasta]    = useState(today());
 
@@ -60,15 +61,16 @@ export const FSMMapPage = () => {
     const [appliedFilters, setAppliedFilters] = useState({
         empresaCas: '',
         tecnico: '',
+        estado: '',
         fechaDesde: today(),
         fechaHasta: today(),
     });
 
-    // Load filter options whenever the date range draft changes
-    const loadFiltros = useCallback(async (fechaDesde: string, fechaHasta: string) => {
+    // Load filter options whenever date range or empresa draft changes
+    const loadFiltros = useCallback(async (fechaDesde: string, fechaHasta: string, empresaCas: string) => {
         setIsLoadingFiltros(true);
         try {
-            const result = await fsmService.getMapFiltros({ fechaDesde, fechaHasta });
+            const result = await fsmService.getMapFiltros({ fechaDesde, fechaHasta, empresaCas });
             setFiltros(result);
         } catch {
             // Non-critical: filtros just won't update
@@ -78,8 +80,8 @@ export const FSMMapPage = () => {
     }, []);
 
     useEffect(() => {
-        loadFiltros(draftDesde, draftHasta);
-    }, [draftDesde, draftHasta, loadFiltros]);
+        loadFiltros(draftDesde, draftHasta, draftEmpresa);
+    }, [draftDesde, draftHasta, draftEmpresa, loadFiltros]);
 
     // Load map data whenever applied filters change
     useEffect(() => {
@@ -87,7 +89,13 @@ export const FSMMapPage = () => {
             setIsLoading(true);
             setError(null);
             try {
-                const result = await fsmService.getMapData(appliedFilters);
+                const result = await fsmService.getMapData({
+                    empresaCas: appliedFilters.empresaCas,
+                    tecnico:    appliedFilters.tecnico,
+                    estado:     appliedFilters.estado,
+                    fechaDesde: appliedFilters.fechaDesde,
+                    fechaHasta: appliedFilters.fechaHasta,
+                });
                 setData(result);
             } catch (err: unknown) {
                 setError(err instanceof Error ? err.message : 'Error al cargar datos del mapa');
@@ -99,25 +107,25 @@ export const FSMMapPage = () => {
     }, [appliedFilters]);
 
     const handleApply = () => {
+        const tecnico = filtros.tecnicos.includes(draftTecnico) ? draftTecnico : '';
+        if (tecnico !== draftTecnico) setDraftTecnico(tecnico);
         setAppliedFilters({
             empresaCas: draftEmpresa,
-            tecnico:    draftTecnico,
+            tecnico,
+            estado:     draftEstado,
             fechaDesde: draftDesde,
             fechaHasta: draftHasta,
         });
-        // Reset tecnico if it no longer exists in updated filtros
-        if (draftTecnico && !filtros.tecnicos.includes(draftTecnico)) {
-            setDraftTecnico('');
-        }
     };
 
     const handleClear = () => {
         const t = today();
         setDraftEmpresa('');
         setDraftTecnico('');
+        setDraftEstado('');
         setDraftDesde(t);
         setDraftHasta(t);
-        setAppliedFilters({ empresaCas: '', tecnico: '', fechaDesde: t, fechaHasta: t });
+        setAppliedFilters({ empresaCas: '', tecnico: '', estado: '', fechaDesde: t, fechaHasta: t });
     };
 
     const defaultCenter: [number, number] = [-12.046374, -77.042793];
@@ -154,7 +162,7 @@ export const FSMMapPage = () => {
                             </label>
                             <select
                                 value={draftEmpresa}
-                                onChange={e => { setDraftEmpresa(e.target.value); setDraftTecnico(''); }}
+                                onChange={e => { setDraftEmpresa(e.target.value); setDraftTecnico(''); setDraftEstado(''); }}
                                 className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                             >
                                 <option value="">Todas (CAS + SOLE)</option>
@@ -179,6 +187,24 @@ export const FSMMapPage = () => {
                                 <option value="">Todos</option>
                                 {filtros.tecnicos.map(tec => (
                                     <option key={tec} value={tec}>{tec}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Estado */}
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                Estado
+                                {isLoadingFiltros && <Loader2 className="inline w-3 h-3 ml-1 animate-spin" />}
+                            </label>
+                            <select
+                                value={draftEstado}
+                                onChange={e => setDraftEstado(e.target.value)}
+                                className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                            >
+                                <option value="">Todos</option>
+                                {filtros.estados.map(est => (
+                                    <option key={est} value={est}>{est}</option>
                                 ))}
                             </select>
                         </div>
