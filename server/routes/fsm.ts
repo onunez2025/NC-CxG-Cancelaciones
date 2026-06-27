@@ -211,25 +211,6 @@ router.get('/equipment-history/:ticket', async (req: Request, res: Response) => 
 });
 
 // ─────────────────────────────────────────────
-// FSM DEBUG: Schema inspector (temporal — remover tras fix)
-// ─────────────────────────────────────────────
-
-router.get('/debug/schema-cas', async (req: Request, res: Response) => {
-    try {
-        const pool = await getDbConnection();
-        const result = await pool.request().query(`
-            SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
-            FROM INFORMATION_SCHEMA.COLUMNS
-            WHERE TABLE_NAME IN ('GAC_APP_TB_CAS', 'GAC_APP_TB_COLABORADORES_CAS')
-            ORDER BY TABLE_NAME, ORDINAL_POSITION
-        `);
-        res.json(result.recordset);
-    } catch (error: unknown) {
-        res.status(500).json({ error: String(error) });
-    }
-});
-
-// ─────────────────────────────────────────────
 // FSM MAPA: Filter options (empresas CAS + tecnicos)
 // ─────────────────────────────────────────────
 
@@ -240,10 +221,10 @@ router.get('/mapa/filtros', async (req: Request, res: Response) => {
         const fechaHasta = (req.query.fechaHasta as string || '').trim();
 
         const empresasResult = await pool.request().query(`
-            SELECT DISTINCT LTRIM(RTRIM(cas_tb.Nombre_Empresa)) as empresa
+            SELECT DISTINCT LTRIM(RTRIM(cas_tb.Nombre_CAS)) as empresa
             FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] colab
-            INNER JOIN [dbo].[GAC_APP_TB_CAS] cas_tb ON colab.Empresa = cas_tb.ID_CAS
-            WHERE cas_tb.Nombre_Empresa IS NOT NULL AND LTRIM(RTRIM(cas_tb.Nombre_Empresa)) <> ''
+            INNER JOIN [dbo].[GAC_APP_TB_CAS] cas_tb ON colab.CAS = cas_tb.ID_CAS
+            WHERE cas_tb.Nombre_CAS IS NOT NULL AND LTRIM(RTRIM(cas_tb.Nombre_CAS)) <> ''
             ORDER BY empresa ASC
         `);
 
@@ -322,9 +303,9 @@ router.get('/mapa', async (req: Request, res: Response) => {
                     emp_cas.empresa
                 FROM [SIATC].[Dashboard_FSM] t
                 OUTER APPLY (
-                    SELECT TOP 1 LTRIM(RTRIM(cas_tb.Nombre_Empresa)) AS empresa
+                    SELECT TOP 1 LTRIM(RTRIM(cas_tb.Nombre_CAS)) AS empresa
                     FROM [dbo].[GAC_APP_TB_COLABORADORES_CAS] colab
-                    INNER JOIN [dbo].[GAC_APP_TB_CAS] cas_tb ON colab.Empresa = cas_tb.ID_CAS
+                    INNER JOIN [dbo].[GAC_APP_TB_CAS] cas_tb ON colab.CAS = cas_tb.ID_CAS
                     WHERE colab.Nombre_FSM LIKE '%' + LTRIM(RTRIM(ISNULL(t.NombreTecnico, ''))) + '%'
                       AND colab.Nombre_FSM LIKE '%' + LTRIM(RTRIM(ISNULL(t.ApellidoTecnico, ''))) + '%'
                       AND (ISNULL(t.NombreTecnico, '') <> '' OR ISNULL(t.ApellidoTecnico, '') <> '')
